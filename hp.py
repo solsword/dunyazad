@@ -1,4 +1,0 @@
-'''
-hp.py
-Hierarchical planner.
-'''
