@@ -5,35 +5,27 @@ Task network representation: tracks tasks and dependencies between them.
 
 from utils import *
 
+import obj
+
 import random
 
-@singleton("task status")
+@symbol("task status")
 class TaskStatus:
-  @singleton("ready")
+  @symbol("ready")
   class Ready: pass
 
-  @singleton("completed")
+  @symbol("completed")
   class Completed: pass
 
-  @singleton("failed")
+  @symbol("failed")
   class Failed: pass
 
-  @singleton("in progress")
+  @symbol("in progress")
   class InProgress: pass
 
-  @singleton("blocked")
+  @symbol("blocked")
   class Blocked: pass
 
-  @singleton("suspended")
-  class Suspended: pass
-
-
-class obj:
-  """
-  A perfectly generic object.
-  """
-  def __init__(self, **kwargs):
-    self.__dict__.update(kwargs)
 
 class Dependency:
   """
@@ -83,8 +75,8 @@ class Task:
     self.func = func
     self.priority = priority
     self.deps = deps or set()
-    self.mem = mem or obj()
-    self.net = net
+    self.mem = mem or obj.Obj()
+    self.net = net or obj.Obj.Empty
     self.status = TaskStatus.Ready
     self._gen = None
 
@@ -123,7 +115,7 @@ class TaskNet:
     self.last = None
     self.active = active or []
     self.finished = finished or []
-    self.mem = mem or obj()
+    self.mem = mem or obj.Obj()
 
   def ready(self):
     """
@@ -233,13 +225,7 @@ class TaskNet:
     while self.step(scheduling=scheduling):
       pass
 
-
-def __test__():
-  import sys
-  print("Starting tests...")
-  passed = 0
-  failed = 0
-  crashed = 0
+def _test_tasknet_basic():
   tn = TaskNet()
   def put_hello(t):
     t.net.mem.string = "Hello "
@@ -247,28 +233,13 @@ def __test__():
   def put_world(t):
     t.net.mem.string += "world!"
     yield TaskStatus.Completed
-  try:
-    t1 = Task(put_hello)
-    t2 = Task(put_world)
-    t2.add_dep(t1)
-    tn.add_tasks(t1, t2)
-    tn.run()
-    if tn.mem.string == "Hello world!":
-      print('Test passed! "Hello world!"')
-      passed += 1
-    else:
-      err("""\
-  Test case FAILED: "Hello world!" produced:
-  {}
-  instead of:
-  "Hello world!"
-  """.format(repr(tn.mem.string))
-      )
-      failed += 1
-  except Exception as e:
-    crashed += 1
-    err('Test case CRASHED: "Hello world!"'.format(e))
-    sys.excepthook(e.__class__, e, e.__traceback__)
-  print(
-    "Stats: {} passed, {} failed, {} crashed.".format(passed, failed, crashed)
-  )
+  t1 = Task(put_hello)
+  t2 = Task(put_world)
+  t2.add_dep(t1)
+  tn.add_tasks(t1, t2)
+  tn.run()
+  return tn.mem.string
+
+_test_cases = [
+  (_test_tasknet_basic, "Hello world!")
+]
