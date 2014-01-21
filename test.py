@@ -34,21 +34,42 @@ def test(module):
         print("Test passed! {}({})".format(f.__name__, repr(i)))
       else:
         failed += 1
-        err("""\
+        print("""\
 Test case FAILED: {}({}) produced:
 {}
 instead of:
-{}
-""".format(f.__name__, i, r, o)
+{}""".format(f.__name__, i, r, o),
+          file=sys.stderr
         )
     except Exception as e:
       crashed += 1
-      err("Test case CRASHED: {}".format(e))
+      print("Test case CRASHED: {}".format(e), file=sys.stderr)
       sys.excepthook(e.__class__, e, e.__traceback__)
-  print(
-    "Stats: {} passed, {} failed, {} crashed.".format(passed, failed, crashed)
-  )
+  print("""
+Stats: {} passed, {} failed, {} crashed.""".format(passed, failed, crashed)
+       )
+  if failed == 0 and crashed == 0 and passed > 0:
+    print ("===all tests passed===")
+    return True
+  elif failed == 0 and crashed == 0 and passsed == 0:
+    print ("???no tests for module '{}'???".format(module))
+    return None
+  else:
+    print ("!!!SOME TESTS FAILED!!!")
+    return False
 
 if __name__ == "__main__":
+  failed = []
   for m in sys.argv[1:] or default_tests:
-    test(m)
+    print('-'*80)
+    if not test(m):
+      failed.append(m)
+    print('-'*80)
+  print('='*80)
+  if failed:
+    print("[FAIL]: Some tests failed.")
+    print(" Defective (see individual results above):")
+    print('   ' + '\n   '.join(f for f in failed))
+  else:
+    print("[pass]: All tests succeeded!")
+  print('='*80)

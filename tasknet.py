@@ -76,7 +76,7 @@ class Task:
     self.priority = priority
     self.deps = deps or set()
     self.mem = mem or obj.Obj()
-    self.net = net or obj.Obj.Empty
+    self.net = net or obj.Obj()
     self.status = TaskStatus.Ready
     self._gen = None
 

@@ -9,6 +9,9 @@ from utils import *
 
 from ans import *
 
+class ParseError(Exception):
+  pass
+
 token_types = {
   "period": re.compile(r"\.((?=[^.])|$)"),
     # Matches a period NOT followed by another, but doesn't eat the following
@@ -117,8 +120,7 @@ def tokenize(text):
         matched = True
         break
     if not matched:
-      err("No token matches text starting '{}'.".format(text[:15]))
-      return None
+      raise ParseError("No token matches text starting '{}'.".format(text[:15]))
   return tokens
 
 def try_parses(tokens, *args):
@@ -228,19 +230,17 @@ def parse_predicates(tokens):
   while(tokens):
     p, tokens = parse_predicate(tokens)
     if not p:
-      err(
+      raise ParseError(
         "Failed to parse predicate from tokens: '{}'".format(
           ''.join(t[1] for t in tokens)
         )
       )
-      return None
     if tokens and tokens[0][0] != "period":
-      err(
+      raise ParseError(
         "Extra tokens (expected period): '{}'".format(
           ''.join(t[1] for t in tokens)
         )
       )
-      return None
     tokens = tokens[1:]
     predicates.append(p)
   return predicates
@@ -259,6 +259,12 @@ def parse_program(tokens):
   # TODO!
   return None
 
+def _test_bad_fact(text):
+  try:
+    parse_facts(text)
+  except ParseError:
+    return True
+  return False
 
 _test_cases = [
   (parse_facts, "test", [Predicate("test")]),
@@ -377,6 +383,6 @@ _test_cases = [
       )
     ]
   ),
-  (parse_facts, "3(v)", None),
-  (parse_facts, "_(1)", None),
+  (_test_bad_fact, "3(v)", True),
+  (_test_bad_fact, "_(1)", True),
 ]
