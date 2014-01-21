@@ -3,6 +3,10 @@ tasknet.py
 Task network representation: tracks tasks and dependencies between them.
 """
 
+from utils import *
+
+import random
+
 @singleton("task status")
 class TaskStatus:
   @singleton("ready")
@@ -22,46 +26,6 @@ class TaskStatus:
 
   @singleton("suspended")
   class Suspended: pass
-
-
-@singleton("goal status")
-class GoalStatus:
-  @singleton("ready")
-  class Ready: pass
-
-  @singleton("completed")
-  class Completed: pass
-
-  @singleton("failed")
-  class Failed: pass
-
-  @singleton("in progress")
-  class InProgress: pass
-
-  @singleton("dormant")
-  class Dormant: pass
-
-
-@singleton("goal policy")
-class GoalPolicy:
-  @singleton("try once")
-  class TryOnce:
-    def check(task_result, tasks_remaining):
-      if task_result == TaskStatus.Succeeded:
-        return GoalStatus.Completed
-      elif task_result == TaskStatus.Failed:
-        return GoalStatus.Failed
-      else:
-        return GoalStatus.Failed
-
-  @singleton("repeat on success")
-  class RepeatOnSuccess: pass
-
-  @singleton("repeat on failure")
-  class RepeatOnFailure: pass
-
-  @singleton("repeat")
-  class Repeat: pass
 
 
 class obj:
@@ -85,6 +49,25 @@ class Dependency:
   def check(self):
     return self.tail.status == self.requires
 
+  def __hash__(self):
+    return 47 * (
+      47 * (
+        47 * (
+          31 + hash(self.head)
+        ) + hash(self.tail)
+      ) + hash(self.requires)
+    )
+
+  def __eq__(self, other):
+    return \
+      self.head == other.head \
+     and self.tail == other.tail \
+     and self.requires == other.requires
+
+  def __ne__(self, other):
+    return not self == other
+
+
 class Task:
   """
   A task has a generator function that gets run when the task is up for
@@ -99,71 +82,193 @@ class Task:
   def __init__(self, func, priority=0.5, deps=None, mem=None, net=None):
     self.func = func
     self.priority = priority
-    self.deps = deps or []
+    self.deps = deps or set()
     self.mem = mem or obj()
     self.net = net
     self.status = TaskStatus.Ready
+    self._gen = None
 
   def ready(self):
     return all(d.check() for d in self.deps)
 
   def run(self):
+    if not self._gen:
+      self._gen = self.func(self)
     if not self.ready():
-      return TaskStatus.Blocked
-    self.status = self.func(self)
+      self.status = TaskStatus.Blocked
+    else:
+      self.status = next(self._gen, TaskStatus.Completed)
     return self.status
 
+  def add_dep(self, other, state=TaskStatus.Completed):
+    self.deps.add(Dependency(self, other, requires=state))
+
+  def rm_dep(self, other, state=TaskStatus.Completed):
+    self.deps.remove(Dependency(self, other, requires=state))
+
   def __str__(self):
-    return "task '{}'".format(self.func.__name__)
+    return "task '{}' #{}".format(self.func.__name__, hash(self))
 
-class Goal:
-  """
-  While a Task is a chunk of work to do, a Goal is an abstract desire, which
-  might be pursued via a variety of tasks.
-
-  A Goal has a condition, which when met fulfils the goal. It also has a
-  policy, which indicates what should happen when a goal-critical task fails.
-  Optionally, a Goal can have preconditions, which will keep it suppressed
-  until they are met.
-
-  Finally, a goal has a list of critical tasks, it's own memory object, and a
-  reference to a parent network.
-  """
-  def __init__(
-    self,
-    cond,
-    policy=None,
-    precond=None,
-    tasks=None,
-    mem=None,
-    net=None
-  ):
-    self.func = func
-    self.priority = priority
-    self.deps = deps or []
-    self.mem = mem or obj()
-    self.net = net
-    self.status = TaskStatus.Ready
+class MissingTaskException(Exception):
+  pass
 
 class TaskNet:
   """
   A TaskNet is a network of tasks. Each task keeps track of its own
   dependencies, while the task network just tracks the pool of tasks. The
-  network does keep track of active vs. inactive tasks though, and it stores a
-  global memory object which all of its tasks can access.
+  network does keep track of the last task run, active vs. finished tasks, and
+  a global memory object which all of its tasks can access.
   """
-  def __init__(self, active=None, inactive=None, mem=None):
+  def __init__(self, active=None, finished=None, mem=None):
+    self.last = None
     self.active = active or []
-    self.inactive = inactive or []
+    self.finished = finished or []
     self.mem = mem or obj()
 
   def ready(self):
     """
-    A generator for the set of ready tasks from the active task list of this
-    network.
+    Returns a generator for the set of ready tasks from the active task list of
+    this network.
     """
     for t in self.active:
       if t.ready():
         yield t
 
-  def 
+  def add_task(self, task, finished=False):
+    """
+    Adds the given task to this task network, and sets the task's net field to
+    this network. Optionally marks it as finished.
+    """
+    if finished:
+      self.finished.append(task)
+    else:
+      self.active.append(task)
+    task.net = self
+
+  def add_tasks(self, *tasks, finished=False):
+    """
+    Adds multiple tasks to this task network, and sets the tasks' net fields to
+    this network. Optionally marks them as finished.
+    """
+    if finished:
+      self.finished.extend(tasks)
+    else:
+      self.active.extend(tasks)
+    for t in tasks:
+      t.net = self
+
+  def run_task(self, task):
+    """
+    Runs the given task (which should be on the active list; returns an error
+    if isn't). Automatically handles last-task tracking and moves the task onto
+    the finished list if it returns a status of either Completed or Failed.
+    """
+    if task not in self.active:
+      raise MissingTaskException(
+        "Task to run missing from task network's active list."
+      )
+    st = task.run()
+    self.last = task
+    if st in (TaskStatus.Completed, TaskStatus.Failed):
+      self.active.remove(task)
+      self.finished.append(task)
+
+  def next(self, mode="round-robin", visited=set()):
+    """
+    Returns the "next" task to be run (returns None if there are no ready
+    tasks). Possible selection modes include:
+      first: select the first ready task according to the order of tasks in the
+         active task list.
+      random: use the hash of the last task to determine which to run next out
+         of the currently ready tasks. A presumably chaotic but also
+         deterministic ordering.
+      round-robin (the default): selects a task using the same pseudorandom
+         method as "random," but never revisits a task until all tasks have
+         been visited. Note that this visitation property may be violated if
+         next() is called using a different mode.
+    Note that the "visited" argument is just a pseudo-static variable and
+    shouldn't ever be used when calling this function.
+    """
+    if not self.active:
+      return None
+
+    firstready = next(self.ready(), None)
+    if not firstready:
+      return None
+    else:
+      if mode == "first":
+        return firstready
+      elif mode == "random":
+        random.seed(hash(self.active[0]))
+        return random.choice(list(self.ready()))
+      elif mode == "round-robin":
+        random.seed(hash(self.active[0]))
+        ready = list(self.ready())
+        candidates = [t for t in ready if t not in visited]
+        if not candidates:
+          candidates = ready
+          visited.clear()
+        choice = random.choice(candidates)
+        visited.add(choice)
+        return choice
+
+  def step(self, scheduling="round-robin"):
+    """
+    Determines the next task using the given scheduling mode (see `next`) and
+    runs it (see `run_task`). Returns True if a step was executed and False if
+    there were no tasks to execute.
+    """
+    n = self.next(mode=scheduling)
+    if n:
+      self.run_task(n)
+      return True
+    else:
+      return False
+
+  def run(self, scheduling="round-robin"):
+    """
+    Repeatedly calls `step` until there are no more tasks to accomplish, using
+    the given scheduling mode.
+    """
+    while self.step(scheduling=scheduling):
+      pass
+
+
+def __test__():
+  import sys
+  print("Starting tests...")
+  passed = 0
+  failed = 0
+  crashed = 0
+  tn = TaskNet()
+  def put_hello(t):
+    t.net.mem.string = "Hello "
+    yield TaskStatus.Completed
+  def put_world(t):
+    t.net.mem.string += "world!"
+    yield TaskStatus.Completed
+  try:
+    t1 = Task(put_hello)
+    t2 = Task(put_world)
+    t2.add_dep(t1)
+    tn.add_tasks(t1, t2)
+    tn.run()
+    if tn.mem.string == "Hello world!":
+      print('Test passed! "Hello world!"')
+      passed += 1
+    else:
+      err("""\
+  Test case FAILED: "Hello world!" produced:
+  {}
+  instead of:
+  "Hello world!"
+  """.format(repr(tn.mem.string))
+      )
+      failed += 1
+  except Exception as e:
+    crashed += 1
+    err('Test case CRASHED: "Hello world!"'.format(e))
+    sys.excepthook(e.__class__, e, e.__traceback__)
+  print(
+    "Stats: {} passed, {} failed, {} crashed.".format(passed, failed, crashed)
+  )

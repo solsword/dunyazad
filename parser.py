@@ -262,7 +262,7 @@ def parse_program(tokens):
 
 
 
-test_cases = [
+__test_cases__ = [
   (parse_facts, "test", [Predicate("test")]),
   (parse_facts, "two_part", [Predicate("two_part")]),
   (parse_facts, "with_period.", [Predicate("with_period")]),
@@ -383,13 +383,13 @@ test_cases = [
   (parse_facts, "_(1)", None),
 ]
 
-def test():
+def __test__():
   import sys
   print("Starting tests...")
   passed = 0
   failed = 0
   crashed = 0
-  for f, i, o in test_cases:
+  for f, i, o in __test_cases__:
     try:
       r = f(i)
       if r == o:
@@ -406,7 +406,7 @@ instead of:
         )
     except Exception as e:
       crashed += 1
-      err("Test case ERRORED: {}".format(e))
+      err("Test case CRASHED: {}".format(e))
       sys.excepthook(e.__class__, e, e.__traceback__)
   print(
     "Stats: {} passed, {} failed, {} crashed.".format(passed, failed, crashed)
