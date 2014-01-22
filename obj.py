@@ -121,6 +121,76 @@ class Obj:
     _dict = object.__getattribute__(self, "_dict")
     _dict[name] = val
 
+# Note that with the way Obj objects are set up, they can't usefully provide
+# methods. The following obj_* functions are thus pseudo-methods of Obj.
+
+def obj_readaddr(obj, addr):
+  """
+  Takes a string containing a dotted address and returns the value at that
+  address from the given object. Mechanically equivalent to:
+
+    eval("<varname of obj>" + addr)
+
+  but obviously safer.
+  """
+  if '.' in addr:
+    i = addr.index('.')
+    key = addr[:i]
+    tail = addr[i+1:]
+    return obj_readaddr(getattr(obj, key), tail)
+  else:
+    return getattr(obj, addr)
+
+def obj_writeaddr(obj, addr, value):
+  """
+  Takes a string containing a dotted address and writes the given value to that
+  address. Creates structure as necessary to place the value at the given
+  address, but raises an AttributeError if doing so would overwrite existing
+  data (for example assigning "a.b.c" to "foo" when "a.b" is 3).
+  """
+  if '.' in addr:
+    i = addr.index('.')
+    key = addr[:i]
+    tail = addr[i+1:]
+    obj_writeaddr(getattr(obj, key), tail, value)
+  else:
+    setattr(obj, addr, value)
+
+def obj_contents(obj, prefix=""):
+  """
+  Iterates recursively over all of this object's keys in depth-first order,
+  yielding (key, value) tuples where the key is a dotted string specifying
+  the value's path. For example, the following code:
+
+    a = Obj()
+    a.n = 5
+    a.b.c = "foo"
+    a.b.x = 3
+    
+    for (key, value) in a.contents():
+      print(key + ":", value)
+
+  produces this output:
+
+    a.b.c: foo
+    a.b.x: 3
+    a.n: 5
+
+  Note that the traversal is ordered according to a string sort() on the keys
+  at each level.
+  """
+  _dict = object.__getattribute__(obj, "_dict")
+  for key in sorted(_dict.keys()):
+    full_key = key
+
+    if prefix:
+      full_key = prefix + '.' + full_key
+
+    if type(key) == Obj:
+      yield from _dict[key].contents(prefix=full_key)
+    else:
+      yield (full_key, _dict[key])
+
 def _test_obj_basic():
   a = Obj()
   if type(a.xyzzx) != EmptyObj:

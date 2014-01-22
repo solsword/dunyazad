@@ -8,15 +8,19 @@ from utils import *
 
 import sys
 
+import types
+
 default_tests = [
+  "utils",
   "parser",
   "tasknet",
   "obj",
+  "ans",
 ]
 
 def test(module):
-  m = __import__(module)
   print("Starting tests for module '{}'...".format(module))
+  m = __import__(module)
   passed = 0
   failed = 0
   crashed = 0
@@ -24,11 +28,18 @@ def test(module):
     try:
       if len(tc) == 3:
         f, i, o = tc
-        r = f(i)
+        if type(i) == tuple:
+          r = f(*i)
+        else:
+          r = f(i)
       elif len(tc) == 2:
         f, o = tc
         i = norepr
         r = f()
+
+      if type(r) == types.GeneratorType:
+        r = list(r)
+
       if r == o:
         passed += 1
         print("Test passed! {}({})".format(f.__name__, repr(i)))

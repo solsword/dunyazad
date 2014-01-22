@@ -3,7 +3,11 @@ utils.py
 Utility functions.
 '''
 
+import re
+
 import sys
+
+# 'symbol' and 'singleton' class decorators:
 
 class SymbolInstantiationError(Exception):
   pass
@@ -52,6 +56,9 @@ def singleton(cls):
   cls.__init__ = __init__
   return cls
 
+
+# A class whose repr() is the empty string:
+
 @singleton
 class NoRepr:
   """
@@ -61,3 +68,38 @@ class NoRepr:
   def __repr__(self): return ""
 
 norepr = NoRepr()
+
+
+# Quoting and unquoting:
+
+def quote(string):
+  return '"' + string.replace("\\", "\\\\").replace('"', r'\"') + '"'
+
+escape_sequence = re.compile(r'\\(["\\])')
+def unquote(string):
+  if string[0] == '"' and string[-1] == '"':
+    return escape_sequence.sub(r'\1', string)[1:-1]
+  else:
+    raise ValueError("'unquote' called on non-quoted string.")
+
+# How to represent arbitrary values as predicates
+
+def as_predicate(value):
+  if type(value) == int:
+    return Predicate(value)
+  elif type(value) == Predicate:
+    return value
+  else:
+    return Predicate(quoted(str(value)))
+
+_test_cases = [
+  (quote, r"test", r'"test"'),
+  (quote, r'comp"lex', r'"comp\"lex"'),
+  (quote, r'ha\rd"er', r'"ha\\rd\"er"'),
+  (quote, r'tou\"gh', r'"tou\\\"gh"'),
+  (unquote, r'"test"', r"test"),
+  (unquote, r'"comp\"lex"', r'comp"lex'),
+  (unquote, r'"ha\\rd\"er"', r'ha\rd"er'),
+  (unquote, r'"tou\\\"gh"', r'tou\"gh'),
+  (unquote, r'"mis\\\\"match"ed"', r'mis\\"match"ed'),
+]

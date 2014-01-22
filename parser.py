@@ -223,10 +223,9 @@ def parse_predicate(tokens):
 def parse_predicates(tokens):
   '''
   Takes a list of tokens (name + text tuples) and parses it as a sequence of
-  predicates, returning a list of Predicate objects. If the parsing fails at
-  any point it prints an error and returns None.
+  predicates, generating Predicate objects. If the parsing fails at any point
+  it raises a ParseError.
   '''
-  predicates = []
   while(tokens):
     p, tokens = parse_predicate(tokens)
     if not p:
@@ -242,12 +241,11 @@ def parse_predicates(tokens):
         )
       )
     tokens = tokens[1:]
-    predicates.append(p)
-  return predicates
+    yield p
 
 def parse_facts(text):
   '''
-  Takes text and parses it as a list of predicates, tokenizing it first.
+  Takes text and parses it as a stream of predicates, tokenizing it first.
   '''
   return parse_predicates(tokenize(text))
 
@@ -261,7 +259,7 @@ def parse_program(tokens):
 
 def _test_bad_fact(text):
   try:
-    parse_facts(text)
+    list(parse_facts(text))
   except ParseError:
     return True
   return False

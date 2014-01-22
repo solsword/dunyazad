@@ -9,8 +9,10 @@ import obj
 
 import random
 
-@symbol("task status")
+@symbol("task_status")
 class TaskStatus:
+  statuses = {}
+
   @symbol("ready")
   class Ready: pass
 
@@ -20,11 +22,17 @@ class TaskStatus:
   @symbol("failed")
   class Failed: pass
 
-  @symbol("in progress")
+  @symbol("in_progress")
   class InProgress: pass
 
   @symbol("blocked")
   class Blocked: pass
+
+# Set up the mapping of string -> class automatically in TaskStatus.statuses
+for attr in TaskStatus.__dict__:
+  value = getattr(TaskStatus, attr)
+  if type(value) == type:
+    TaskStatus.statuses[str(value)] = value
 
 
 class Dependency:
