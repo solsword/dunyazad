@@ -1,0 +1,18 @@
+Noah:
+  Start with something that provokes curiosity.
+  -> how would you satisfy that curiosity no matter the player's choice.
+  You don't have to reason *everywhere* (cheat in some places).
+  Tough question:
+    Where does choice come in?
+      -> You are Scheherazade: keep the story going and the audience interested.
+  Douglass Fairbanks (1920's actor)
+  The Thief of Baghdad
+    -> First ways that these stories came over. 
+  Investigate extra-textual stories.
+
+  Quarter goal:
+   Submit a workshop paper to INT about the structure of 1001 nights stories.
+     -> A critique of the fable as the prototypical story.
+     -> Other people have worked on things like suspense; I'm working on
+       curiosity which is new.
+   End-to-end stupid generator.
