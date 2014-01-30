@@ -1,0 +1,140 @@
+% Scene-level encoding:
+
+%%%%%%%%%%%%
+% Scene #1 %
+%%%%%%%%%%%%
+
+scene( 1, type, character_introduction ).
+scene( 1, setting, city_in_land(land(Ruman), city(Fars)) ).
+scene( 1, subject, king(Yunan) ).
+
+scene( 1, action, 1, introduce_subject_and_setting ).
+scene( 1,
+  action, 2,
+  description(
+    king(Yunan),
+    praise,
+    list_3(
+      wealthy,
+      dignified,
+      commands(troops)
+    )
+  )
+).
+scene( 1,
+  action, 3,
+  description(
+    king(Yunan),
+    sympathize,
+    sick(leprousy)
+  )
+).
+scene( 1,
+  action, 4,
+  state_situation(
+    unable(
+      cure(_anyone_, king(Yunan)),
+      tried_many_times(
+        list_2(
+          doctors,
+          men_of_learning
+        )
+      )
+    )
+  )
+).
+
+scene( 1,
+  introduces_problem(1),
+  list_2(
+    status(king(Yunan), sick(leprousy)),
+    situation(
+      unable(
+        cure(_anyone_, king(Yunan)),
+        tried_many_times(
+          list_2(
+            doctors,
+            men_of_learning
+          )
+        )
+      )
+    )
+  )
+).
+
+%%%%%%%%%%%%
+% Scene #2 %
+%%%%%%%%%%%%
+
+scene( 2, type, character_introduction ).
+scene( 2, setting, __unspecified__ ).
+scene( 2, subject, sage(Duban) ).
+
+scene( 2, action, 1, introduce_subject_and_setting ).
+scene( 2,
+  action, 2,
+  description(
+    sage(Duban),
+    praise,
+    list_4(
+      elderly,
+      had_studied(books_of(list_4(Greeks, Persians, Arabs, Syrians))),
+      master_of_subject(
+        list_4(
+          medicine,
+          astronomy,
+          philosophy,
+          other_sciences
+        )
+      ),
+      knowledge_of(
+        list_2(helpful_plants, harmful_plants)
+      ),
+    )
+  )
+).
+
+%%%%%%%%%%%%
+% Scene #3 %
+%%%%%%%%%%%%
+
+scene( 3, type, character_arrives ).
+scene( 3, setting, city(Fars) ).
+scene( 3, subject, sage(Duban) ).
+
+scene( 3, action, 1, describe_act ).
+scene( 3,
+  action, 2,
+  triggered_action(
+    a_few_days,
+    hear_of(
+      sage(Duban),
+      problem(1)
+    )
+  )
+).
+scene( 3,
+  action, 3,
+  durative_action(
+    all_night,
+    think_about(
+      sage(Duban),
+      problem(1)
+    )
+  )
+).
+scene( 3,
+  action, 4,
+  immediate_action(
+    dawn,
+    prepare_and_act(
+      sage(Duban),
+      put_on(
+        finery
+      ),
+      visit(
+        king(Yunan)
+      )
+    )
+  )
+).
