@@ -6,93 +6,89 @@
 
 scene( 1, type, character_introduction ).
 scene( 1, setting, city_in_land(land(Ruman), city(Fars)) ).
-scene( 1, subject, king(Yunan) ).
+scene( 1, main_actor, king(Yunan) ).
 
-scene( 1, action, 1, introduce_subject_and_setting ).
-scene( 1,
-  action, 2,
-  description(
-    king(Yunan),
-    praise,
-    list_3(
-      wealthy,
-      dignified,
-      commands(troops)
-    )
-  )
-).
-scene( 1,
-  action, 3,
-  description(
-    king(Yunan),
-    sympathize,
-    sick(leprousy)
-  )
-).
-scene( 1,
-  action, 4,
-  state_situation(
-    unable(
-      cure(_anyone_, king(Yunan)),
-      tried_many_times(
-        list_2(
-          doctors,
-          men_of_learning
-        )
-      )
-    )
-  )
-).
+narration( scene(1), time(1), type, introduce_subject_and_setting ).
 
-scene( 1,
-  introduces_problem(1),
-  list_2(
-    status(king(Yunan), sick(leprousy)),
-    situation(
-      unable(
-        cure(_anyone_, king(Yunan)),
-        tried_many_times(
-          list_2(
-            doctors,
-            men_of_learning
-          )
-        )
-      )
-    )
-  )
-).
+narration( scene(1), time(2), type, description ).
+narration( scene(1), time(2), tone, extolling ).
+narration( scene(1), time(2), subject, king(Yunan) ).
+narration( scene(1), time(2), facet, wealthy ).
+narration( scene(1), time(2), facet, dignified ).
+narration( scene(1), time(2), facet, commands(troops) ).
+
+link( scene(1), time(2), time(3), however ).
+
+narration( scene(1), time(3), type, state_situation ).
+narration( scene(1), time(3), tone, sympathetic ).
+narration( scene(1), time(3), situation, sit(1) ).
+
+situation( 1, type, afflicted ).
+situation( 1, subject, king(Yunan) ).
+situation( 1, affliction, leprosy ).
+
+narration( scene(1), time(3), type, state_situation ).
+narration( scene(1), time(3), tone, sympathetic ).
+narration( scene(1), time(3), situation, sit(2) ).
+
+situation( 2, type, inability ).
+situation( 2, capacity, cure(_anyone_, king(Yunan)) ).
+situation( 2, despite, hist(1) ).
+
+history( 1, type, tried_many_times ).
+history( 1, act, cure( king(Yunan) ) ).
+history( 1, actor, doctors ).
+history( 1, actor, men_of_learning ).
+history( 1, outcome, failed ).
+
+problem( 1, type, distressing_situation ).
+problem( 1, problematic_situation, sit(1) ).
+problem( 1, problematic_situation, sit(2) ).
+problem( 1, introduced, scene(1), time(3) ).
+% problem( 1, emphasized, ... ).
+% problem( 1, foreshadowed, ... ).
+% problem( 1, solved, ... ).
 
 %%%%%%%%%%%%
 % Scene #2 %
 %%%%%%%%%%%%
 
 scene( 2, type, character_introduction ).
-scene( 2, setting, __unspecified__ ).
-scene( 2, subject, sage(Duban) ).
+scene( 2, setting, _unspecified_ ).
+scene( 2, main_actor, sage(Duban) ).
 
-scene( 2, action, 1, introduce_subject_and_setting ).
-scene( 2,
-  action, 2,
-  description(
-    sage(Duban),
-    praise,
-    list_4(
-      elderly,
-      had_studied(books_of(list_4(Greeks, Persians, Arabs, Syrians))),
-      master_of_subject(
-        list_4(
-          medicine,
-          astronomy,
-          philosophy,
-          other_sciences
-        )
-      ),
-      knowledge_of(
-        list_2(helpful_plants, harmful_plants)
-      ),
-    )
-  )
-).
+narration( scene(2), time(1), type, introduce_subject_and_setting ).
+
+narration( scene(2), time(2), type, description ).
+narration( scene(2), time(2), tone, extolling ).
+narration( scene(2), time(2), subject, sage(Duban) ).
+narration( scene(2), time(2), facet, elderly ).
+narration( scene(2), time(2), facet, sit(3) ).
+narration( scene(2), time(2), facet, sit(4) ).
+narration( scene(2), time(2), facet, sit(5) ).
+
+situation( 3, type, has_experience ).
+situation( 3, subject, sage(Duban) ).
+situation( 3, experience, has_studied ).
+situation( 3, object, books_of(Greeks) ).
+situation( 3, object, books_of(Persians) ).
+situation( 3, object, books_of(Arabs) ).
+situation( 3, object, books_of(Syrians) ).
+
+situation( 4, type, has_experience ).
+situation( 4, subject, sage(Duban) ).
+situation( 4, experience, has_mastered ).
+situation( 4, object, medicine ).
+situation( 4, object, astronomy ).
+situation( 4, object, philosophy ).
+situation( 4, object, other_sciences ).
+
+situation( 5, type, has_experience ).
+situation( 5, subject, sage(Duban) ).
+situation( 5, experience, has_knowledge_of ).
+situation( 5, object, helpful_plants ).
+situation( 5, object, harmful_plants ).
+
 
 %%%%%%%%%%%%
 % Scene #3 %
@@ -100,41 +96,226 @@ scene( 2,
 
 scene( 3, type, character_arrives ).
 scene( 3, setting, city(Fars) ).
-scene( 3, subject, sage(Duban) ).
+scene( 3, main_actor, sage(Duban) ).
+scene( 3, actor, king(Yunan) ).
 
-scene( 3, action, 1, describe_act ).
-scene( 3,
-  action, 2,
-  triggered_action(
-    a_few_days,
-    hear_of(
-      sage(Duban),
-      problem(1)
-    )
-  )
-).
-scene( 3,
-  action, 3,
-  durative_action(
-    all_night,
-    think_about(
-      sage(Duban),
-      problem(1)
-    )
-  )
-).
-scene( 3,
-  action, 4,
-  immediate_action(
-    dawn,
-    prepare_and_act(
-      sage(Duban),
-      put_on(
-        finery
-      ),
-      visit(
-        king(Yunan)
-      )
-    )
-  )
-).
+
+event( scene(3), time(1), action, act(1) ).
+event( scene(3), time(1), trigger_delay, a_few_days ).
+event( scene(3), time(1), triggered, act(2) ).
+
+action( 1, type, arrival ).
+action( 1, subject, sage(Duban) ).
+action( 1, destination, city(Fars) ).
+
+action( 2, type, hear_of ).
+action( 2, subject, sage(Duban) ).
+action( 2, object, prob(1) ).
+action( 2, result, sit(6) ).
+
+situation( 6, type, knows ).
+situation( 6, subject, sage(Duban) ).
+situation( 6, object, prob(1) ).
+situation( 6, cause, act(2) ).
+
+
+event( scene(3), time(2), action, act(3) ).
+
+action( 3, type, ponder ).
+action( 3, subject, sage(Duban) ).
+action( 3, object, prob(1) ).
+action( 3, duration, all_night ).
+
+
+event( scene(3), time(3), preparation, act(4) ).
+event( scene(3), time(3), action, act(5) ).
+event( scene(3), time(3), happens_at, dawn ).
+
+action( 4, type, dress_up ).
+action( 4, subject, sage(Duban) ).
+action( 4, object, fine_clothes ).
+
+action( 5, type, compound ).
+action( 5, part, 1, act(6) ).
+action( 5, part, 2, act(7) ).
+
+action( 6, type, visit ).
+action( 6, subject, sage(Duban) ).
+action( 6, object, king(Yunan) ).
+
+action( 7, type, greet ).
+action( 7, tone, humble ).
+action( 7, subject, sage(Duban) ).
+action( 7, object, king(Yunan) ).
+action( 7, behavior, kissing_the_ground ).
+action( 7, behavior, calling_for_good_fortune ).
+
+
+event( scene(3), time(4), action, act(8) ).
+event( scene(3), time(4), timing, subsequent ).
+
+action( 8, type, conversation ).
+action( 8, line, 1, act(9) ).
+action( 8, line, 2, act(10) ).
+
+action( 9, type, tell ).
+action( 9, category, establish_common_ground ).
+action( 9, speaker, sage(Duban) ).
+action( 9, addressee, king(Yunan) ).
+action( 9, content, sit(6) ).
+
+action( 10, type, tell ).
+action( 10, category, make_claim ).
+action( 10, speaker, sage(Duban) ).
+action( 10, addressee, king(Yunan) ).
+action( 10, claim, clm(1) ).
+
+claim( 1, type, intent ).
+claim( 1, claimant, sage(Duban) ).
+claim( 1, claim, act(11) ).
+claim( 1, condition, cnd(1) ).
+
+action( 11, type, cure ).
+action( 11, method, _any_ ).
+action( 11, subject, sage(Duban) ).
+action( 11, object, king(Yunan) ).
+
+condition( 1, type, eschew_method ).
+condition( 1, method, oral_medicine ).
+condition( 1, method, medical_ointment ).
+
+mystery( 1, type, impossible_claim ).
+mystery( 1, mysterious_claim, clm(1) ).
+mystery( 1, introduced, scene(3), time(4) ).
+% mystery( 1, emphasized, ... ).
+% mystery( 1, foreshadowed, ... ).
+% mystery( 1, revealed, ... ).
+
+
+event( scene(3), time(5), action, act(12) ).
+
+action( 12, type, conversation ).
+action( 12, line, 1, act(13) ).
+action( 12, line, 2, act(14) ).
+
+action( 13, type, ask ).
+action( 13, category, wonder_how ).
+action( 13, tone, amazed ).
+action( 13, speaker, king(Yunan) ).
+action( 13, addressee, sage(Duban) ).
+action( 13, claim, clm(1) ).
+
+action( 14, type, promise ).
+action( 14, category, promise_reward ).
+action( 14, tone, grateful ).
+action( 14, speaker, king(Yunan) ).
+action( 14, addressee, sage(Duban) ).
+action( 14, condition, clm(1) ).
+action( 14, reward, act(15) ).
+
+action( 15, type, compound ).
+action( 15, part, 1, act(16) ).
+action( 15, part, 2, act(17) ).
+action( 15, part, 3, act(18) ).
+
+action( 16, type, give ).
+action( 16, subject, king(Yunan) ).
+action( 16, object, sage(Duban) ).
+action( 16, gift, vast_wealth ).
+
+action( 17, type, grant ).
+action( 17, subject, king(Yunan) ).
+action( 17, object, sage(Duban) ).
+action( 17, grant, all_wishes ).
+
+action( 18, type, treat ).
+action( 18, subject, king(Yunan) ).
+action( 18, object, sage(Duban) ).
+action( 18, treatment, boon_companion ).
+
+
+event( scene(3), time(6), action, act(19) ).
+
+action( 19, type, compound ).
+action( 19, part, 1, act(20) ).
+action( 19, part, 2, act(21) ).
+
+action( 20, type, give ).
+action( 20, subject, king(Yunan) ).
+action( 20, object, sage(Duban) ).
+action( 20, gift, robe_of_honor ).
+
+action( 21, type, treat ).
+action( 21, subject, king(Yunan) ).
+action( 21, object, sage(Duban) ).
+action( 21, treatment, favor ).
+
+
+event( scene(3), time(7), action, act(22) ).
+event( scene(3), time(7), timing, subsequent ).
+
+action( 22, type, conversation ).
+action( 22, line, 1, act(23) ).
+action( 22, line, 2, act(24) ).
+action( 22, line, 3, act(25) ).
+action( 22, line, 4, act(26) ).
+action( 22, line, 5, act(27) ).
+action( 22, line, 6, act(28) ).
+
+action( 23, type, ask ).
+action( 23, category, ask_whether ).
+action( 23, tone, grateful ).
+action( 23, speaker, king(Yunan) ).
+action( 23, addressee, sage(Duban) ).
+action( 23, claim, clm(1) ).
+
+action( 24, type, answer ).
+action( 24, category, affirm_claim ).
+action( 24, tone, confident ).
+action( 24, speaker, sage(Duban) ).
+action( 24, addressee, king(Yunan) ).
+action( 24, claim, clm(1) ).
+
+action( 25, type, ask ).
+action( 25, category, ask_when ).
+action( 25, tone, astonished ).
+action( 25, speaker, king(Yunan) ).
+action( 25, addressee, sage(Duban) ).
+action( 25, claim, clm(1) ).
+% action( 25, action, act(11) ).
+
+action( 26, type, ask ).
+action( 26, category, urge ).
+action( 26, tone, eager ).
+action( 26, speaker, king(Yunan) ).
+action( 26, addressee, sage(Duban) ).
+action( 26, claim, clm(1) ).
+action( 26, schedule, as_soon_as_possible ).
+% action( 26, method, carefully ).
+% action( 26, manner, quickly ).
+
+action( 27, type, confirmation ).
+action( 27, category, assent ).
+action( 27, tone, loyal ).
+action( 27, speaker, sage(Duban) ).
+action( 27, addressee, king(Yunan) ).
+
+action( 28, type, promise ).
+action( 28, category, promise_schedule ).
+action( 28, speaker, sage(Duban) ).
+action( 28, addressee, king(Yunan) ).
+action( 28, action, clm(1) ).
+action( 28, schedule, the_next_day ).
+
+% To this point 32 lines of the story have been covered. This is line 241 of
+% the file (not counting empty lines), which makes about 7.5 lines of
+% predicates + comments per line of prose. 
+
+
+%%%%%%%%%%%%
+% Scene #4 %
+%%%%%%%%%%%%
+
+scene( 4, type, prepare_plan ).
+scene( 4, setting, city(Fars) ).
+scene( 4, main_actor, sage(Duban) ).
