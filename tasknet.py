@@ -79,7 +79,7 @@ class Task:
   Each task also has a priority, a local memory, a list of dependencies, a
   current status, and a parent task network (which is None by default).
   """
-  def __init__(self, func, priority=0.5, deps=None, mem=None, net=None):
+  def __init__(self, func, priority=0.5, mem=None, deps=None, net=None):
     self.func = func
     self.priority = priority
     self.deps = deps or set()

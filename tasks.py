@@ -3,9 +3,32 @@ tasks.py
 Defines some default tasks and task building blocks.
 """
 
+import copy
+
 import tasknet
 import asp
 import parser
+import obj
+
+def with_args(task, **kwargs):
+  """
+  Takes a Task object and returns a new Task that has the memory locations
+  specified as keyword arguments overwritten with the given values. The new
+  Task object will not inherit the dependencies, network, or status of the old
+  Task object, but instead will be a fresh Task ready for insertion.
+  """
+  newmem = copy.deepcopy(task.mem)
+
+  for key in kwargs:
+    newmem[key] = kwargs[key]
+
+  return Task(
+    task.func,
+    priority=task.priority,
+    mem=newmem,
+    deps=None,
+    net=None,
+  )
 
 def mktask(func, returnsstatus=False, passtask=False):
   """
@@ -57,7 +80,7 @@ def get_mem_predicates(mem, exclude=[], basename="mem"):
   This means that if you store a predicate directly into a memory location,
   that predicate's structure will be preserved in the memory readout.
   """
-  for key, value in mem.contents():
+  for key, value in obj.obj_contents(mem):
     if any(rx.match(key) for rx in exclude):
       continue
     yield Predicate(
@@ -76,6 +99,7 @@ active_schemas = {
   "run_code": Pr( "run_code", Vr("QuotedCode")),
   "error": Pr("error", Vr("Message")),
   "status": Pr("status", Vr("String")),
+  "subgoal": Pr("subgoal", Vr("String")),
 }
 
 def asptask(name, asp):

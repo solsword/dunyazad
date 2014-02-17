@@ -1,0 +1,9 @@
+provocation(outrage; sympathy; curiosity).
+temptation(beauty; luxury; excitement; wealth; deliciousness; coincidence; justice; exoticness).
+
+1 { selected(prov(P)) : provocation(P) } 1.
+
+1 { selected(tmpt(T)) : temptation(T) } 3.
+
+story_add( character(1) ).
+story_add( intrinsic( id(chr,1), name, ) ).

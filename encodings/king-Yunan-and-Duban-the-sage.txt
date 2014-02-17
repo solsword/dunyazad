@@ -198,7 +198,7 @@ action( 12, type, conversation ).
 action( 12, line, 1, act(13) ).
 action( 12, line, 2, act(14) ).
 
-action( 13, type, ask ).
+action( 13, type, question ).
 action( 13, category, wonder_how ).
 action( 13, tone, amazed ).
 action( 13, speaker, king(Yunan) ).
@@ -262,7 +262,7 @@ action( 22, line, 4, act(26) ).
 action( 22, line, 5, act(27) ).
 action( 22, line, 6, act(28) ).
 
-action( 23, type, ask ).
+action( 23, type, question ).
 action( 23, category, ask_whether ).
 action( 23, tone, grateful ).
 action( 23, speaker, king(Yunan) ).
@@ -276,7 +276,7 @@ action( 24, speaker, sage(Duban) ).
 action( 24, addressee, king(Yunan) ).
 action( 24, claim, clm(1) ).
 
-action( 25, type, ask ).
+action( 25, type, question ).
 action( 25, category, ask_when ).
 action( 25, tone, astonished ).
 action( 25, speaker, king(Yunan) ).
@@ -284,7 +284,7 @@ action( 25, addressee, sage(Duban) ).
 action( 25, claim, clm(1) ).
 % action( 25, action, act(11) ).
 
-action( 26, type, ask ).
+action( 26, type, question ).
 action( 26, category, urge ).
 action( 26, tone, eager ).
 action( 26, speaker, king(Yunan) ).
@@ -319,3 +319,125 @@ action( 28, schedule, the_next_day ).
 scene( 4, type, prepare_plan ).
 scene( 4, setting, city(Fars) ).
 scene( 4, main_actor, sage(Duban) ).
+
+
+event( scene(4), time(1), action, act(29) ).
+event( scene(4), time(1), timing, subsequent ).
+
+action( 29, type, compound ).
+action( 29, part, 1, act(30) ).
+action( 29, part, 2, act(31) ).
+action( 29, part, 3, act(32) ).
+
+action( 30, type, travel ).
+action( 30, subject, sage(Duban) ).
+action( 30, destination, area_in(city(Fars), the_city) ).
+
+action( 31, type, rent ).
+action( 31, subject, sage(Duban) ).
+action( 31, object, obj(1) ).
+
+object( 1, type, building ).
+object( 1, subtype, house ).
+
+relation( scene(4), time(1), obj(1), location, city(Fars) ).
+
+action( 32, type, store ).
+action( 32, subject, sage(Duban) ).
+action( 32, object, owned_by(sage(Duban), books) ).
+action( 32, object, owned_by(sage(Duban), medicines) ).
+action( 32, container, obj(1) ).
+
+
+event( scene(4), time(2), action, act(33) ).
+
+object( 2, type, implement ).
+object( 2, subtype, polo_stick ).
+
+action( 33, type, craft ).
+action( 33, subject, sage(Duban) ).
+action( 33, object, obj(2) ).
+action( 33, object, polo_ball ).
+action( 33, ingredient, some_of(owned_by(sage(Duban), medicines)) ).
+
+event( scene(4), time(3), action, act(34) ).
+event( scene(4), time(3), happens_at, the_next_day ).
+event( scene(4), time(3), timing, subsequent ).
+
+action( 34, type, compound ).
+action( 34, part, 1, act(35) ).
+action( 34, part, 2, act(36) ).
+action( 34, part, 3, act(37) ).
+
+action( 35, type, visit ).
+action( 35, subject, sage(Duban) ).
+action( 35, object, king(Yunan) ).
+
+action( 36, type, greet ).
+action( 36, tone, humble ).
+action( 36, subject, sage(Duban) ).
+action( 36, object, king(Yunan) ).
+action( 36, behavior, kissing_the_ground ).
+
+action( 37, type, conversation ).
+action( 37, line, 1, act(38) ).
+
+action( 38, type, imperative ).
+action( 38, category, instruct ).
+action( 38, speaker, sage(Duban) ).
+action( 38, addressee, king(Yunan) ).
+action( 38, instruction, act(39) ).
+
+action( 39, type, compound ).
+action( 39, part, 1, act(40) ).
+action( 39, part, 2, act(41) ).
+
+action( 40, type, travel ).
+action( 40, subject, king(Yunan) ).
+action( 40, destination, polo_field ).
+
+action( 41, type, play_match ).
+action( 41, subject, king(Yunan) ).
+action( 41, game, polo ).
+
+
+event( scene(4), time(4), action, act(42) ).
+
+action( 42, type, travel ).
+action( 42, subject, king(Yunan) ).
+action( 42, destination, polo_field ).
+action( 42, retinue, emirs ).
+action( 42, retinue, chamberlains ).
+action( 42, retinue, viziers ).
+action( 42, retinue, officers_of_state ).
+
+
+event( scene(4), time(5), action, act(43) ).
+event( scene(4), time(5), preemption, act(44) ).
+
+action( 43, type, pose ).
+action( 43, subject, king(Yunan) ).
+action( 43, pose, sit ).
+
+action( 44, type, compound ).
+action( 44, part, 1, act(45) ).
+action( 44, part, 1, act(46) ).
+action( 44, part, 1, act(47) ).
+
+action( 45, type, approach ).
+action( 45, subject, sage(Duban) ).
+action( 45, object, king(Yunan) ).
+
+action( 46, type, give ).
+action( 46, subject, sage(Duban) ).
+action( 46, object, king(Yunan) ).
+action( 46, gift, obj(2) ).
+
+action( 47, type, conversation ).
+action( 47, line, 1, act(48) ).
+
+action( 48, type, imperative ).
+action( 48, category, instruct ).
+action( 48, speaker, sage(Duban) ).
+action( 48, addressee, king(Yunan) ).
+action( 48, instruction, act(49) ).

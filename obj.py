@@ -17,6 +17,8 @@ Arbitrarily nested attributes can also be automagically created:
 
 from utils import *
 
+import copy
+
 class EmptyObj:
   """
   An empty object which evaluates to False and which returns another EmptyObj
@@ -71,16 +73,26 @@ class EmptyObj:
     return "<empty>"
 
   def __getattribute__(self, name):
-    #print("ga ({}, {})".format(self, name))
+    #print("ega: '{}'".format(name))
+    if name.startswith('__') and name.endswith('__'):
+      return object.__getattribute__(self, name)
     return EmptyObj(self, name)
 
   def __setattr__(self, attr, val):
-    #print("sa ({}, {}, {})".format(self, attr, val))
     asr = object.__getattribute__(self, "_attr_set_request")
     asr([attr], val)
 
+  def __getitem__(self, addr):
+    raise KeyError("EmptyObj objects have no contents.")
+
+  def __contains__(self, addr):
+    return False
+
+  def __setitem__(self, addr, value):
+    asr = object.__getattribute__(self, "_attr_set_request")
+    asr(addr.split('.'), value)
+
   def _attr_set_request(self, attr_chain, val):
-    #print("asr({}, {}, {})".format(self, attr_chain, val))
     parent = object.__getattribute__(self, "_parent")
     name = object.__getattribute__(self, "_name")
     attr_chain.insert(0, name)
@@ -102,15 +114,17 @@ class EmptyObj:
 class Obj:
   """
   A generic object which returns Empty instead of throwing an exception if you
-  try to access nonexistent fields. This object pretends not to have any of the
-  normal standard builtin fields, so only assigned fields should show up as
-  non-empty.
+  try to access nonexistent fields. For convenience, field names that start and
+  end with '__' will revert to normal attribute lookup, so that Python internal
+  code can access methods like __deepcopy__ without issues.
   """
   def __init__(self, **kwargs):
     object.__setattr__(self, "_dict", kwargs)
 
   def __getattribute__(self, name):
-    #print("oga ({}, {})".format(self, name))
+    #print("ga: '{}'".format(name))
+    if name.startswith('__') and name.endswith('__'):
+      return object.__getattribute__(self, name)
     _dict = object.__getattribute__(self, "_dict")
     if name in _dict:
       return _dict[name]
@@ -121,40 +135,76 @@ class Obj:
     _dict = object.__getattribute__(self, "_dict")
     _dict[name] = val
 
-# Note that with the way Obj objects are set up, they can't usefully provide
-# methods. The following obj_* functions are thus pseudo-methods of Obj.
+  def __copy__(obj):
+    raise NotImplementedError("Shallow copying of Obj objects is forbidden.")
 
-def obj_readaddr(obj, addr):
-  """
-  Takes a string containing a dotted address and returns the value at that
-  address from the given object. Mechanically equivalent to:
+  def __deepcopy__(obj, memo={}):
+    result = Obj()
+    memo[id(obj)] = result
+    _dict = object.__getattribute__(obj, "_dict")
+    for key in _dict.keys():
+      val = _dict[key]
+      if id(val) in memo:
+        setattr(result, key, memo[id(val)])
+      else:
+        setattr(result, key, copy.deepcopy(val, memo=memo))
+    return result
 
-    eval("<varname of obj>" + addr)
+  def __getitem__(self, addr):
+    """
+    Takes a string containing a dotted address and returns the value at that
+    address from the given object. Mechanically equivalent to:
 
-  but obviously safer.
-  """
-  if '.' in addr:
-    i = addr.index('.')
-    key = addr[:i]
-    tail = addr[i+1:]
-    return obj_readaddr(getattr(obj, key), tail)
-  else:
-    return getattr(obj, addr)
+      eval("<varname of obj>" + addr)
 
-def obj_writeaddr(obj, addr, value):
-  """
-  Takes a string containing a dotted address and writes the given value to that
-  address. Creates structure as necessary to place the value at the given
-  address, but raises an AttributeError if doing so would overwrite existing
-  data (for example assigning "a.b.c" to "foo" when "a.b" is 3).
-  """
-  if '.' in addr:
-    i = addr.index('.')
-    key = addr[:i]
-    tail = addr[i+1:]
-    obj_writeaddr(getattr(obj, key), tail, value)
-  else:
-    setattr(obj, addr, value)
+    but obviously safer. Note that unlike attribute access, __getitem__ will
+    return a KeyError if the given address doesn't exist.
+    """
+    if type(addr) != str:
+      raise KeyError(
+        "Key '{}' not found (objects only contain strings).".format(addr)
+      )
+    if '.' in addr:
+      i = addr.index('.')
+      key = addr[:i]
+      tail = addr[i+1:]
+      try:
+        return getattr(self, key)[tail]
+      except TypeError:
+        return KeyError(
+          "Address '{}' contained non-mapping object.".format(addr)
+        )
+    else:
+      result = getattr(self, addr)
+      if type(result) == EmptyObj:
+        raise KeyError("Address '{}' is empty.".format(addr))
+      return result
+
+  def __contains__(self, addr):
+    """
+    Works like __getitem__ but just returns True/False.
+    """
+    try:
+      gi = object.__getattribute__(self, "__getitem__")
+      gi(addr)
+      return True
+    except KeyError:
+      return False
+
+  def __setitem__(self, addr, value):
+    """
+    Takes a string containing a dotted address and writes the given value to
+    that address. Creates structure as necessary to place the value at the
+    given address, but raises an AttributeError if doing so would overwrite
+    existing data (for example assigning "a.b.c" to "foo" when "a.b" is 3).
+    """
+    if '.' in addr:
+      i = addr.index('.')
+      key = addr[:i]
+      tail = addr[i+1:]
+      getattr(self, key)[tail] = value
+    else:
+      setattr(self, addr, value)
 
 def obj_contents(obj, prefix=""):
   """
@@ -167,14 +217,14 @@ def obj_contents(obj, prefix=""):
     a.b.c = "foo"
     a.b.x = 3
     
-    for (key, value) in a.contents():
+    for (key, value) in obj_contents(a):
       print(key + ":", value)
 
   produces this output:
 
-    a.b.c: foo
-    a.b.x: 3
-    a.n: 5
+    b.c: foo
+    b.x: 3
+    n: 5
 
   Note that the traversal is ordered according to a string sort() on the keys
   at each level.
@@ -186,8 +236,8 @@ def obj_contents(obj, prefix=""):
     if prefix:
       full_key = prefix + '.' + full_key
 
-    if type(key) == Obj:
-      yield from _dict[key].contents(prefix=full_key)
+    if type(_dict[key]) == Obj:
+      yield from obj_contents(_dict[key], prefix=full_key)
     else:
       yield (full_key, _dict[key])
 
@@ -240,10 +290,63 @@ def _test_obj_no_shadow_values():
   a.b.c.d = "full"
   return (str(tmp.d), str(a.b.c.d))
 
+def _test_obj_get():
+  a = Obj()
+  a.b.c.d = "success"
+  return ("b.c.d" in a, a["b.c.d"])
+
+def _test_obj_set():
+  a = Obj()
+  a["b.c.d"] = "success"
+  return ("c.d" in a.b, a.b.c.d)
+
+def _test_obj_get_missing():
+  a = Obj()
+  a.b.c.d = "success"
+  return (
+    "b.c.d" in a,
+    "d" in a.b.c,
+    "x" not in a,
+    "b.c.x" not in a,
+    "b.x.y" not in a,
+    "x.y.z.q" not in a.b.c,
+    "x.y.z.q" not in a.b.c.d,
+  )
+
+def _test_obj_contents():
+  a = Obj()
+  a.b.c = 3
+  a.b.x = "foo"
+  a.z = "bar"
+  a.a = "baz"
+  return list(obj_contents(a))
+
+def _test_obj_copy():
+  a = Obj()
+  a.b.c = 3
+  a.b.x = "foo"
+  a.z = "bar"
+  a.a = "baz"
+  b = copy.deepcopy(a)
+  return list(obj_contents(a)) == list(obj_contents(b))
+
 _test_cases = [
   (_test_obj_basic, True),
   (_test_obj_gen, True),
   (_test_obj_tmp_empty, ("a.b.c.f", "a.b.c.d")),
   (_test_obj_tmp_shadow_attribute_error, True),
   (_test_obj_no_shadow_values, ("<empty>", "full")),
+  (_test_obj_get, (True, "success")),
+  (_test_obj_set, (True, "success")),
+  (_test_obj_get_missing, (True,)*7),
+  (
+    _test_obj_contents,
+    [
+      ("a", "baz"),
+      ("b.c", 3),
+      ("b.x", "foo"),
+      ("z", "bar")
+    ]
+  ),
+  ( _test_obj_copy, True),
 ]
