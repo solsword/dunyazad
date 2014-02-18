@@ -96,8 +96,10 @@ class ASPTaskError(Exception):
 active_schemas = {
   "story_add": Pr("story_add", SbT("Predicate")),
   "story_remove": Pr("story_remove", SbT("Predicate")),
+  "local_mem": Pr("local_mem", Vr("Address"), SbT("Value")),
+  "global_mem": Pr("global_mem", Vr("Address"), SbT("Value")),
   "run_code": Pr( "run_code", Vr("QuotedCode")),
-  "error": Pr("error", Vr("Message")),
+  "error": Pr("error", SbT("Message")),
   "status": Pr("status", Vr("String")),
   "subgoal": Pr("subgoal", Vr("String")),
 }
@@ -122,7 +124,7 @@ def asptask(name, asp):
     3. Scans the resulting answer set for the following predicates and behaves
        accordingly, updating the code in net.mem.code.story if directed to do
        so and yielding an appropriate status:
-     error("error message")
+     error(<predicate>)
        If any error predicates are generated, an exception will be raised and
        none of the other predicates in this list will be heeded.
      status(completed|failed|inprogress|blocked)
@@ -138,6 +140,12 @@ def asptask(name, asp):
      story_remove(<predicate>)
        The given predicate will be removed from the story predicates. The
        predicate must exactly match an entire story predicate.
+     local_mem(<address>, <predicate>)
+       The given local memory address will be set to the given predicate.
+     global_mem(<address>, <predicate>)
+       The given (network-) global memory address will be set to the given
+       predicate.
+     subgoal(<goalname>, <args>)
      run_code(code)
        Runs the given Python code (the code must be quoted). Several useful
        local variables are available (and editing them affects continued
@@ -154,6 +162,12 @@ def asptask(name, asp):
          rmlist:
            A list of Predicate objects that are about to be removed from the
            story.
+         lmemlist:
+           A list of Address, Value objects that are about to be set in local
+           memory.
+         gmemlist:
+           A list of Address, Value objects that are about to be set in
+           (network-) global memory.
   """
   def gen(t):
     if not t.mem.code:
@@ -208,9 +222,11 @@ def asptask(name, asp):
     addlist = []
     rmlist = []
     to_run = []
+    lmemlist = []
+    gmemlist = []
     for (schema, binding) in bindings(active_schemas, predicates):
       if schema == "error":
-        errors.append(binding["error.Message"].name)
+        errors.append(str(binding["error.Message"]))
       elif schema == "status":
         if status == None:
           status = binding["status.String"].name
@@ -220,6 +236,14 @@ def asptask(name, asp):
         addlist.append(binding["story_add.Predicate"])
       elif schema == "story_remove":
         rmlist.append(binding["story_remove.Predicate"])
+      elif schema == "local_mem":
+        lmemlist.append(
+          (binding["local_mem.Address"].name, binding["local_mem.Value"])
+        )
+      elif schema == "global_mem":
+        gmemlist.append(
+          (binding["global_mem.Address"].name, binding["global_mem.Value"])
+        )
       elif schema == "run_code":
         to_run.append(unquote(binding["run_code.QuotedCode"]))
 
@@ -242,6 +266,8 @@ def asptask(name, asp):
         "task": t,
         "addlist": addlist,
         "rmlist": rmlist,
+        "lmemlist": lmemlist,
+        "gmemlist": gmemlist,
       }
       exec(
         code,
@@ -251,10 +277,19 @@ def asptask(name, asp):
       status = code_locals["status"]
       addlist = code_locals["addlist"]
       rmlist = code_locals["rmlist"]
+      lmemlist = code_locals["lmemlist"]
+      gmemlist = code_locals["gmemlist"]
 
     # Process additions and removals:
     for p in addlist:
       t.net.mem.code.story.add(p)
+
+    for (addr, val) in lmemlist:
+      t.mem[addr] = val
+
+    for (addr, val) in gmemlist:
+      t.net.mem[addr] = val
+
     t.net.mem.code.story = set(
       filter(
         t.net.mem.code.story,
