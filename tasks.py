@@ -4,13 +4,41 @@ Defines some default tasks and task building blocks.
 """
 
 import copy
+import os
+from warnings import *
 
 import tasknet
 import asp
 import parser
 import obj
 
-def with_args(task, **kwargs):
+# This global variable stores tasks loaded from files in the tasks/
+# subdirectory:
+TASK_LIST = {}
+
+class TaskOverwriteWarning(Warning):
+  pass
+
+def register_task(task):
+  """
+  Registers the given task to the global TASK_LIST, producing a warning if a
+  task with the same name as the new task already exists, and overwriting the
+  old task in that case. Note that registration should be used for abstract
+  tasks, and copies of registered tasks should be used to do actual work (see
+  the clone_task function below).
+  """
+  global TASK_LIST
+  if task.name in TASK_LIST:
+    warn(
+      "New task {} overwrites old task {}".format(
+        task,
+        TASK_LIST[task.name]
+      ),
+      TaskOverwriteWarning
+    )
+  TASK_LIST[task.name] = task
+
+def clone_task(task, **kwargs):
   """
   Takes a Task object and returns a new Task that has the memory locations
   specified as keyword arguments overwritten with the given values. The new
@@ -28,7 +56,38 @@ def with_args(task, **kwargs):
     mem=newmem,
     deps=None,
     net=None,
+    source="cloned from {}".format(task)
   )
+
+class TaskMissingError(Exception):
+  pass
+
+def spawn_task(_net, _name, **kwargs):
+  """
+  Looks up a task by name in the task list and spawns a copy of that task on
+  the given network, passing keyword arguments (other than the arguments _net
+  and _name that are used here) into clone_task to be written into the cloned
+  task's memory. This function returns the Task object that it creates, but
+  doesn't add any dependencies to or from it.
+  """
+  if _name not in TASK_LIST:
+    raise TaskMissingError("Task '{}' not found.".format(_name))
+  t = clone_task(TASK_LIST[_name], **kwargs)
+  _net.add_task(t)
+  return t
+
+def subtask(_parent, _name, **kwargs):
+  """
+  Works like spawn_task, but takes a Task as its first argument and spwans the
+  new task on the given task's network. It also adds a dependency from the
+  parent task to the newly spawned task.
+  """
+  if _name not in TASK_LIST:
+    raise TaskMissingError("Task '{}' not found.".format(_name))
+  t = clone_task(TASK_LIST[_name], **kwargs)
+  _parent.net.add_task(t)
+  _parent.add_dep(t)
+  return t
 
 def mktask(func, returnsstatus=False, passtask=False):
   """
@@ -54,7 +113,7 @@ def mktask(func, returnsstatus=False, passtask=False):
         func()
         yield tasknet.TaskStatus.Completed
   gen.__name__ = func.__name__
-  return Task(gen)
+  return Task(gen, source="function '{}'".format(func.__name__)
 
 def get_mem_predicates(mem, exclude=[], basename="mem"):
   """
@@ -101,7 +160,6 @@ active_schemas = {
   "run_code": Pr( "run_code", Vr("QuotedCode")),
   "error": Pr("error", SbT("Message")),
   "status": Pr("status", Vr("String")),
-  "subgoal": Pr("subgoal", Vr("String")),
 }
 
 def asptask(name, asp):
@@ -145,7 +203,6 @@ def asptask(name, asp):
      global_mem(<address>, <predicate>)
        The given (network-) global memory address will be set to the given
        predicate.
-     subgoal(<goalname>, <args>)
      run_code(code)
        Runs the given Python code (the code must be quoted). Several useful
        local variables are available (and editing them affects continued
@@ -310,3 +367,32 @@ def asptask(name, asp):
   )
   mem.code = singledot.split(asp.replace('\n', ' '))
   return Task(gen, mem=mem)
+
+def load_tasks(dir):
+  """
+  Loads tasks from files in the given directory. Walks the directory tree
+  recursively, loading .lp files as ASP tasks (using asptask() on their
+  contents) and .py files as python tasks by looking for a run function defined
+  in the file and using it to construct a Task. Loaded tasks are registered in
+  the global TASK_LIST dictionary.
+  """
+  for (root, dirs, files) in os.walk(dir):
+    for f in files:
+      filename = os.path.join(root, f)
+      taskname = '.'.join(f.split('.')[:-1])
+      if f.endswith(".py"):
+        with open(f) as fin:
+          contents = f.read()
+        code_locals = {}
+        exec(
+          contents,
+          globals = globals(),
+          locals = code_locals
+        )
+        func = code_locals["run"]
+        func.__name__ = taskname
+        register_task(Task(func))
+      elif f.endswith(".lp"):
+        with open(f) as fin:
+          contents = f.read()
+        register_task(asptask(taskname, contents))

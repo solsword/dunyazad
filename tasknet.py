@@ -78,14 +78,27 @@ class Task:
 
   Each task also has a priority, a local memory, a list of dependencies, a
   current status, and a parent task network (which is None by default).
+
+  Tasks can also be assigned a "source" which indicates where the code came
+  from, and which is printed when errors or warnings are issued.
   """
-  def __init__(self, func, priority=0.5, mem=None, deps=None, net=None):
+  def __init__(
+    self,
+    func,
+    priority=0.5,
+    mem=None,
+    deps=None,
+    net=None,
+    source="unknown"
+  ):
     self.func = func
+    self.name = self.func.__name__
     self.priority = priority
     self.deps = deps or set()
     self.mem = mem or obj.Obj()
     self.net = net or obj.Obj()
     self.status = TaskStatus.Ready
+    self.source = source
     self._gen = None
 
   def ready(self):
@@ -107,7 +120,11 @@ class Task:
     self.deps.remove(Dependency(self, other, requires=state))
 
   def __str__(self):
-    return "task '{}' #{}".format(self.func.__name__, hash(self))
+    return "task '{}' #{} source: {}".format(
+      self.name,
+      hash(self),
+      self.source
+    )
 
 class MissingTaskException(Exception):
   pass
