@@ -4,13 +4,21 @@ Defines some default tasks and task building blocks.
 """
 
 import copy
-import os
+import re
+
 from warnings import *
 
-import tasknet
+import tasknet as tn
 import asp
+import ans
 import parser
 import obj
+
+from utils import *
+
+# Global task directory (on module import, tasks from this directory will be
+# loaded).
+TASK_DIRECTORY = "tasks"
 
 # This global variable stores tasks loaded from files in the tasks/
 # subdirectory:
@@ -50,7 +58,7 @@ def clone_task(task, **kwargs):
   for key in kwargs:
     newmem[key] = kwargs[key]
 
-  return Task(
+  return tn.Task(
     task.func,
     priority=task.priority,
     mem=newmem,
@@ -101,9 +109,10 @@ def mktask(func, returnsstatus=False, passtask=False):
     if returnsstatus:
       def gen(t):
         yield func(t)
-      else:
+    else:
+      def gen(t):
         func(t)
-        yield tasknet.TaskStatus.Completed
+        yield tn.TaskStatus.Completed
   else:
     if returnsstatus:
       def gen(t):
@@ -111,9 +120,9 @@ def mktask(func, returnsstatus=False, passtask=False):
     else:
       def gen(t):
         func()
-        yield tasknet.TaskStatus.Completed
+        yield tn.TaskStatus.Completed
   gen.__name__ = func.__name__
-  return Task(gen, source="function '{}'".format(func.__name__)
+  return tn.Task(gen, source="function '{}'".format(func.__name__))
 
 def get_mem_predicates(mem, exclude=[], basename="mem"):
   """
@@ -142,10 +151,10 @@ def get_mem_predicates(mem, exclude=[], basename="mem"):
   for key, value in obj.obj_contents(mem):
     if any(rx.match(key) for rx in exclude):
       continue
-    yield Predicate(
+    yield ans.Predicate(
       basename,
-      Predicate(quote(key)),
-      as_predicate(value),
+      ans.Predicate(quote(key)),
+      ans.as_predicate(value),
     )
 
 class ASPTaskError(Exception):
@@ -153,19 +162,22 @@ class ASPTaskError(Exception):
 
 # Schemas for binding active predicates:
 active_schemas = {
-  "story_add": Pr("story_add", SbT("Predicate")),
-  "story_remove": Pr("story_remove", SbT("Predicate")),
-  "local_mem": Pr("local_mem", Vr("Address"), SbT("Value")),
-  "global_mem": Pr("global_mem", Vr("Address"), SbT("Value")),
-  "run_code": Pr( "run_code", Vr("QuotedCode")),
-  "error": Pr("error", SbT("Message")),
-  "status": Pr("status", Vr("String")),
+  "story_add": ans.Pr("story_add", ans.SbT("Predicate")),
+  "story_remove": ans.Pr("story_remove", ans.SbT("Predicate")),
+  "local_mem": ans.Pr("local_mem", ans.Vr("Address"), ans.SbT("Value")),
+  "global_mem": ans.Pr("global_mem", ans.Vr("Address"), ans.SbT("Value")),
+  "run_code": ans.Pr( "run_code", ans.Vr("QuotedCode")),
+  "error": ans.Pr("error", ans.SbT("Message")),
+  "status": ans.Pr("status", ans.Vr("String")),
+  "spawn_task": ans.Pr("spawn_task", ans.Vr("Id"), ans.Vr("TaskName")),
+  "task_arg": ans.Pr("task_arg", ans.Vr("Id"), ans.Vr("Key"), ans.SbT("Value")),
 }
 
-def asptask(name, asp):
+def asptask(name, code, source="unknown"):
   """
   Takes a name and a string (full of ASP predicates and/or constraints) and
-  returns a Task object which does the following when run:
+  returns a Task object (setting the Tasks's source if given or using 'unknown'
+  as the default source). The returned Task does the following when run:
     1. Gathers ASP source code from the following locations:
       a: The code passed as an argument to this function, stored in the task's
          local memory at mem.code.
@@ -203,7 +215,15 @@ def asptask(name, asp):
      global_mem(<address>, <predicate>)
        The given (network-) global memory address will be set to the given
        predicate.
-     run_code(code)
+     spawn_task(<id>, <task-name>)
+       A copy of the named task will be spawned on the current task's network
+       after it completes. Arguments can be passed using the task_arg predciate
+       structure.
+     task_arg(<id>, <key>, <value>)
+       Passes an argument to the task with the given id. This will set
+       mem.args.<key> to <value> (which can be a predicate structure) in the
+       spawned task.
+     run_code(<code>)
        Runs the given Python code (the code must be quoted). Several useful
        local variables are available (and editing them affects continued
        operation):
@@ -231,9 +251,9 @@ def asptask(name, asp):
       raise ASPTaskError(
         "Task '{}' has no code (missing t.mem.code)!".format(name)
       )
-    if not t.net.mem.code.story:
+    if type(t.net.mem.code.story) == obj.EmptyObj:
       raise ASPTaskError("No story found (missing t.net.mem.code.story)!")
-    if type(t.net.mem.code.universal) == EmptyObj:
+    if type(t.net.mem.code.universal) == obj.EmptyObj:
       raise ASPTaskError(
         "No universal constraints object (missing t.net.mem.code.universal)!"
       )
@@ -250,7 +270,7 @@ def asptask(name, asp):
           t.mem,
           exclude=[re.compile("code")]
         )
-      )
+      ),
       "%%%%%%%%%%%%%%%%%%",
       "% Global memory: %",
       "%%%%%%%%%%%%%%%%%%",
@@ -260,7 +280,7 @@ def asptask(name, asp):
           exclude=[re.compile("code")],
           basename="glmem"
         )
-      )
+      ),
       "%%%%%%%%%%%%%%%%%%%",
       "% Universal code: %",
       "%%%%%%%%%%%%%%%%%%%",
@@ -268,7 +288,7 @@ def asptask(name, asp):
       "%%%%%%%%%%%%%%%",
       "% Story code: %",
       "%%%%%%%%%%%%%%%",
-      '\n'.join(str(p) + '.' for p in t.net.mem.code.story)
+      '\n'.join(str(p) + '.' for p in t.net.mem.code.story),
     ])
     results = asp.solve(source)
     # TODO: avoid this?
@@ -279,6 +299,7 @@ def asptask(name, asp):
     addlist = []
     rmlist = []
     to_run = []
+    to_spawn = {}
     lmemlist = []
     gmemlist = []
     for (schema, binding) in bindings(active_schemas, predicates):
@@ -301,6 +322,14 @@ def asptask(name, asp):
         gmemlist.append(
           (binding["global_mem.Address"].name, binding["global_mem.Value"])
         )
+      elif schema == "spawn_task":
+        to_spawn[binding["spawn_task.Id"]] = {
+          "name": binding["spawn_task.TaskName"],
+          "args": {}
+        }
+      elif schema == "task_arg":
+        args = to_spawn[binding["task_arg.Id"]]["args"]
+        args[binding["task_arg.Key"]] = binding["task_arg.Value"]
       elif schema == "run_code":
         to_run.append(unquote(binding["run_code.QuotedCode"]))
 
@@ -328,8 +357,8 @@ def asptask(name, asp):
       }
       exec(
         code,
-        globals = {},
-        locals = code_locals
+        {},
+        code_locals
       )
       status = code_locals["status"]
       addlist = code_locals["addlist"]
@@ -348,51 +377,67 @@ def asptask(name, asp):
       t.net.mem[addr] = val
 
     t.net.mem.code.story = set(
-      filter(
+      ans.filter(
         t.net.mem.code.story,
         forbid=rmlist
       )
     )
+
+    # Spawn tasks:
+    for id in to_spawn:
+      spawn_task(
+        t.net,
+        to_spawn[id]["name"],
+        **to_spawn[id]["args"]
+      )
 
     # We're finally done, so yield the indicated status:
     yield status
   # end of gen function
 
   gen.__name__ = name
-  mem = Obj()
+  mem = obj.Obj()
   # TODO: use actual predicates+constraints instead of strings?
   singledot = re.compile(
     # a period neither preceded nor followed by a period:
     r"(?<!\.)\.(?!\.)"
   )
-  mem.code = singledot.split(asp.replace('\n', ' '))
-  return Task(gen, mem=mem)
+  mem.code = singledot.split(code.replace('\n', ' '))
+  return tn.Task(gen, mem=mem, source=source)
 
 def load_tasks(dir):
   """
   Loads tasks from files in the given directory. Walks the directory tree
   recursively, loading .lp files as ASP tasks (using asptask() on their
   contents) and .py files as python tasks by looking for a run function defined
-  in the file and using it to construct a Task. Loaded tasks are registered in
-  the global TASK_LIST dictionary.
+  in the file and using it to construct a Task. Yields loaded Task objects one
+  by one.
   """
-  for (root, dirs, files) in os.walk(dir):
-    for f in files:
-      filename = os.path.join(root, f)
-      taskname = '.'.join(f.split('.')[:-1])
-      if f.endswith(".py"):
-        with open(f) as fin:
-          contents = f.read()
-        code_locals = {}
-        exec(
-          contents,
-          globals = globals(),
-          locals = code_locals
-        )
-        func = code_locals["run"]
-        func.__name__ = taskname
-        register_task(Task(func))
-      elif f.endswith(".lp"):
-        with open(f) as fin:
-          contents = f.read()
-        register_task(asptask(taskname, contents))
+  for f in walk_files(
+    dir,
+    include=lambda f: (f.endswith(".lp") or f.endswith(".py"))
+  ):
+    filename = os.path.split(f)[-1]
+    taskname = '.'.join(filename.split('.')[:-1])
+
+    if f.endswith(".py"):
+      with open(f) as fin:
+        contents = fin.read()
+      code_locals = {}
+      exec(
+        contents,
+        globals(),
+        code_locals
+      )
+      func = code_locals["run"]
+      func.__name__ = taskname
+      yield tn.Task(func, source=f)
+    elif f.endswith(".lp"):
+      with open(f) as fin:
+        contents = fin.read()
+      yield asptask(taskname, contents, source=f)
+
+# Load tasks from the default directory on module load (the loading function is
+# defined in utils.py):
+for t in load_tasks(TASK_DIRECTORY):
+  register_task(t)

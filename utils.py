@@ -4,6 +4,7 @@ Utility functions.
 '''
 
 import re
+import os
 
 import sys
 
@@ -82,15 +83,36 @@ def unquote(string):
   else:
     raise ValueError("'unquote' called on non-quoted string.")
 
-# How to represent arbitrary values as predicates
+def walk_files(dir, include=None, exclude=None):
+  """
+  Walks the directory tree rooted at dir and generates the filenames of each
+  file which passes the include function and fails the exclude function
+  (default is include-all exclude-none).
+  """
+  for (root, dirs, files) in os.walk(dir):
+    for f in files:
+      filename = os.path.join(root, f)
 
-def as_predicate(value):
-  if type(value) == int:
-    return Predicate(value)
-  elif type(value) == Predicate:
-    return value
-  else:
-    return Predicate(quoted(str(value)))
+      safe = include == None or include(filename)
+
+      if exclude != None and exclude(filename):
+        safe = False
+
+      if safe:
+        yield filename
+
+def load_logic(dir):
+  """
+  Loads every .lp file in the given directory (and all subdirectories) together
+  into a big string and parses it into a set of rules.
+  """
+  raw = ""
+  rules = set()
+  for f in walk_files(dir, include=lambda f: f.endswith(".lp")):
+    with open(f, 'r') as fin:
+      raw += fin.read()
+      raw += "\n"
+  return rules
 
 _test_cases = [
   (quote, r"test", r'"test"'),

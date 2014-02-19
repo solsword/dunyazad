@@ -1,6 +1,6 @@
 def run(self):
-  subtask('add_character', {'args.name':'A'} )
-  subtask('add_character', {'args.name':'B'} )
-  subtask('add_character', {'args.name':'C'} )
-  yield TaskStatus.InProgress
+  subtask(self, 'add_character', **{'args.name':'A'} )
+  subtask(self, 'add_character', **{'args.name':'B'} )
+  subtask(self, 'add_character', **{'args.name':'C'} )
+  yield tn.TaskStatus.InProgress
   spawn_task('setup_provocation')

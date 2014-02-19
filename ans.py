@@ -12,7 +12,9 @@ import string
 class Predicate:
   """
   A Predicate represents a predicate structure, something like:
+
     foo(bar, baz(xyzzy))
+
   Each Predicate object has a name and 0 or more arguments. Generally, unless
   the name begins and ends with a '"' character, it should only contain
   characters from the class [a-zA-Z0-9_] and its first character should be in
@@ -131,6 +133,16 @@ class Subtree(Variable):
   def matches(self, other):
     return True
 
+# How to represent arbitrary values as predicates
+
+def as_predicate(value):
+  if type(value) == int:
+    return Predicate(value)
+  elif type(value) == Predicate:
+    return value
+  else:
+    return Predicate(quote(str(value)))
+
 def build_schema(predicate):
   """
   Takes the given pure-Predicate structure and converts all predicates whose
@@ -225,68 +237,166 @@ def filter(predicates, require=[], forbid=[]):
     and all(bind(schema, p) == None for schema in forbid):
       yield p
 
-#class Constraint:
-#  def __init__(self, typ, TODO):
-#    self.typ = typ
-#
-#  def __str__(self):
-#    if self.head:
-#      if self.body:
-#        return "{} :- {}".format(self.head, self.body)
-#      else:
-#        return str(self.head)
-#    else:
-#      return ":- {}".format(self.body)
-#
-#  def __hash__(self):
-#    # TODO
-#    return 47 * (
-#      47 * (
-#        31 + hash(self.args)
-#      ) + hash(self.name)
-#    )
-#
-#  def __eq__(self, other):
-#    # TODO
-#    return self.name == other.name and self.args == other.args
-#
-#  def __ne__(self, other):
-#    return not self == other
-#
-#class Rule:
-#  def __init__(self, head, body):
-#    self.head = head or []
-#    self.body = body or []
-#
-#  def __str__(self):
-#    if self.head:
-#      if self.body:
-#        return "{} :- {}".format(self.head, self.body)
-#      else:
-#        return str(self.head)
-#    else:
-#      return ":- {}".format(self.body)
-#
-#  def __hash__(self):
-#    return 47 * (
-#      47 * (
-#        31 + hash(self.body)
-#      ) + hash(self.head)
-#    )
-#
-#  def __eq__(self, other):
-#    return self.head == other.head and self.body == other.body
-#
-#  def __ne__(self, other):
-#    return not self == other
+def complex_term(*args, salt_cellar = [37]):
+  salt_cellar[0] += 6
+  if not args:
+    raise ValueError("Tried to create complex term class without any contents.")
+  def decorate(cls):
+    init_args = ', '.join(args)
+    init_body = '\n  '.join("self.{var} = {var}".format(var=a) for a in args)
+    hash_expr = '{} + hash(self.{})'.format(salt_cellar[0], args[0])
+    for a in args[1:]:
+      hash_expr = '47 * (' + hash_expr + ') + hash(self.{}) '.format(a)
+    eq_expr = ' and '.join(
+      "(self.{var} == other.{var})".format(var=a) for a in args
+    )
+    code = """
+def __init__(self, {init_args}):
+  {init_body}
+
+def __hash__(self):
+  return {hash_expr}
+
+def __eq__(self, other):
+  return {eq_expr}
+
+def __ne__(self, other):
+  return not self == other
+""".format(
+  init_args=init_args,
+  init_body=init_body,
+  hash_expr=hash_expr,
+  eq_expr=eq_expr,
+)
+    exec(code, locals(), globals())
+    cls.__init__ = __init__
+    cls.__hash__ = __hash__
+    cls.__eq__ = __eq__
+    cls.__ne__ = __ne__
+    return cls
+  return decorate
+
+@complex_term("op", "arg")
+class UnOp:
+  def __str__(self):
+    return "{}{}".format(self.op, self.arg)
+
+@complex_term("op", "arg")
+class AbsOp:
+  def __str__(self):
+    return "{op}{arg}{op}".format(op=self.op, arg=self.arg)
+
+@complex_term("op", "left", "right")
+class BinOp:
+  def __str__(self):
+    return "{} {} {}".format(self.left, self.op, self.right)
+
+@complex_term("cmpr", "left", "right")
+class Comparison:
+  def __str__(self):
+    return "{} {} {}".format(self.left, self.cmpr, self.right)
+
+@complex_term("asgn", "left", "right")
+class Assignment:
+  def __str__(self):
+    return "{} {} {}".format(self.left, self.asgn, self.right)
+
+@complex_term("const")
+class Constant:
+  def __str__(self):
+    return "{}".format(self.const)
+
+@complex_term("min", "max")
+class Interval:
+  def __str__(self):
+    return "{} .. {}".format(self.min, self.max)
+
+@complex_term("subject", "filter")
+class Condition:
+  def __str__(self):
+    return "{} : {}".format(self.subject, self.filter)
+
+@complex_term("contents")
+class Pool:
+  def __str__(self):
+    return ';'.join(self.contents)
+
+@complex_term("literal", "weight")
+class WeightedLiteral:
+  def __str__(self):
+    if self.weight == 1:
+      return str(self.literal)
+    else:
+      return "{}={}".format(self.literal, self.weight)
+
+@complex_term("weight", "priority")
+class PrioritizedWeight:
+  def __str__(self):
+    return "{}@{}".format(self.weight, self.priority)
+
+@complex_term("op", "lower", "upper", "literals", "weights", "multi")
+class MultisetAggregate:
+  def __str__(self):
+    return "{l} {op} [ {contents} ] {u}".format(
+      l=self.lower,
+      u=self.upper,
+      op=self.op,
+      contents=', '.join(str(wl) for wl in self.contents),
+    )
+
+@complex_term("op", "lower", "upper", "contents")
+class SetAggregate:
+  def __str__(self):
+    return "{l} {op} {{ {contents} }} {u}".format(
+      l=self.lower,
+      u=self.upper,
+      op=self.op,
+      contents=', '.join(str(wl) for wl in self.contents),
+    )
+
+@complex_term("opt", "contents")
+class MultisetOptimization:
+  def __str__(self):
+    return "{opt} [ {contents} ] {u}".format(
+      opt=self.opt,
+      contents=', '.join(str(pl) for pl in self.contents),
+    )
+
+@complex_term("opt", "contents")
+class SetOptimization:
+  def __str__(self):
+    return "{opt} {{ {contents} }} {u}".format(
+      opt=self.opt,
+      contents=', '.join(str(pl) for pl in self.contents),
+    )
+
+@complex_term("text")
+class Comment:
+  def __str__(self):
+    return "%* {} *%".format(self.text)
+
+@complex_term("dir", "content")
+class Directive:
+  def __str__(self):
+    return "{} {}.".format(self.dir, self.content)
+
+
+@complex_term("head", "body")
+class Rule:
+  def __str__(self):
+    if self.head:
+      if self.body:
+        return "{} :- {}.".format(self.head, self.body)
+      else:
+        return "{}.".format(self.head)
+    else:
+      return ":- {}.".format(self.body)
 
 # shortcuts:
 Pr = Predicate
 Vr = Variable
 PVr = PatternVariable
 SbT = Subtree
-#Cn = Constraint
-#Rl = Rule
 
 _test_cases = [
   (
