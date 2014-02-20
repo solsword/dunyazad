@@ -5,6 +5,7 @@ Utility functions.
 
 import re
 import os
+import itertools
 
 import sys
 
@@ -57,7 +58,6 @@ def singleton(cls):
   cls.__init__ = __init__
   return cls
 
-
 # A class whose repr() is the empty string:
 
 @singleton
@@ -70,6 +70,29 @@ class NoRepr:
 
 norepr = NoRepr()
 
+
+## Iterator peeking:
+#
+#def unpeekable(iter):
+#  """
+#  Returns an unpeekable version of the given iterator which can be unpeeked
+#  by sending it the string 'unpeek' (see the unpeek function below).
+#  """
+#  def iterate():
+#    current = next(iter)
+#    while True:
+#      r = yield current
+#      if r == "unpeek":
+#        yield current # goes to the send() call
+#      else:
+#        break
+#  return iterate
+#
+#def unpeek(unpeekable):
+#  """
+#  Unpeeks the given unpeekable generator.
+#  """
+#  unpeekable.send("unpeek")
 
 # Quoting and unquoting:
 

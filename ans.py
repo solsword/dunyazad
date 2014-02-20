@@ -258,7 +258,7 @@ def __hash__(self):
   return {hash_expr}
 
 def __eq__(self, other):
-  return {eq_expr}
+  return type(self) == type(other) and {eq_expr}
 
 def __ne__(self, other):
   return not self == other
@@ -281,15 +281,31 @@ class UnOp:
   def __str__(self):
     return "{}{}".format(self.op, self.arg)
 
-@complex_term("op", "arg")
-class AbsOp:
-  def __str__(self):
-    return "{op}{arg}{op}".format(op=self.op, arg=self.arg)
-
 @complex_term("op", "left", "right")
 class BinOp:
   def __str__(self):
     return "{} {} {}".format(self.left, self.op, self.right)
+
+@complex_term("items", "sep")
+class List:
+  def __str__(self):
+    return (self.sep + ' ').join(str(it) for it in self.items)
+
+@complex_term("open", "expr")
+class Group:
+  close = {
+    '|': '|',
+    '(': ')',
+    '[': ']',
+    '{': '}',
+    '': '',
+  }
+  def __str__(self):
+    return "{o}{expr}{c}".format(
+      o=self.open,
+      c=self.close[self.open]
+      expr=self.expr,
+    )
 
 @complex_term("cmpr", "left", "right")
 class Comparison:
@@ -301,11 +317,6 @@ class Assignment:
   def __str__(self):
     return "{} {} {}".format(self.left, self.asgn, self.right)
 
-@complex_term("const")
-class Constant:
-  def __str__(self):
-    return "{}".format(self.const)
-
 @complex_term("min", "max")
 class Interval:
   def __str__(self):
@@ -316,10 +327,7 @@ class Condition:
   def __str__(self):
     return "{} : {}".format(self.subject, self.filter)
 
-@complex_term("contents")
-class Pool:
-  def __str__(self):
-    return ';'.join(self.contents)
+# Note: a Pool is just a List with ';' as its separator.
 
 @complex_term("literal", "weight")
 class WeightedLiteral:
@@ -334,51 +342,33 @@ class PrioritizedWeight:
   def __str__(self):
     return "{}@{}".format(self.weight, self.priority)
 
-@complex_term("op", "lower", "upper", "literals", "weights", "multi")
-class MultisetAggregate:
+@complex_term("op", "lower", "upper", "group")
+class Aggregate:
   def __str__(self):
-    return "{l} {op} [ {contents} ] {u}".format(
+    return "{l} {op} {group} {u}".format(
       l=self.lower,
       u=self.upper,
       op=self.op,
-      contents=', '.join(str(wl) for wl in self.contents),
+      group=group,
     )
 
-@complex_term("op", "lower", "upper", "contents")
-class SetAggregate:
+@complex_term("opt", "group")
+class Optimization:
   def __str__(self):
-    return "{l} {op} {{ {contents} }} {u}".format(
-      l=self.lower,
-      u=self.upper,
-      op=self.op,
-      contents=', '.join(str(wl) for wl in self.contents),
-    )
-
-@complex_term("opt", "contents")
-class MultisetOptimization:
-  def __str__(self):
-    return "{opt} [ {contents} ] {u}".format(
+    return "{opt} {group} {u}".format(
       opt=self.opt,
-      contents=', '.join(str(pl) for pl in self.contents),
+      group=group,
     )
-
-@complex_term("opt", "contents")
-class SetOptimization:
-  def __str__(self):
-    return "{opt} {{ {contents} }} {u}".format(
-      opt=self.opt,
-      contents=', '.join(str(pl) for pl in self.contents),
-    )
-
-@complex_term("text")
-class Comment:
-  def __str__(self):
-    return "%* {} *%".format(self.text)
 
 @complex_term("dir", "content")
 class Directive:
   def __str__(self):
     return "{} {}.".format(self.dir, self.content)
+
+@complex_term("text")
+class Comment:
+  def __str__(self):
+    return "%* {} *%".format(self.text)
 
 
 @complex_term("head", "body")
@@ -386,11 +376,11 @@ class Rule:
   def __str__(self):
     if self.head:
       if self.body:
-        return "{} :- {}.".format(self.head, self.body)
+        return "{} :- {}.".format(self.head, ', '.join(self.body))
       else:
         return "{}.".format(self.head)
     else:
-      return ":- {}.".format(self.body)
+      return ":- {}.".format(', '.join(self.body))
 
 # shortcuts:
 Pr = Predicate

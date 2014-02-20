@@ -292,7 +292,7 @@ def asptask(name, code, source="unknown"):
     ])
     results = asp.solve(source)
     # TODO: avoid this?
-    predicates = parser.parse_facts(results)
+    predicates = parser.as_predicates(parser.tokenize(results))
 
     errors = []
     status = None
