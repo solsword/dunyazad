@@ -107,32 +107,6 @@ for attr in Tokens.__dict__:
   if not attr.startswith("__") and not attr.endswith("__"):
     setattr(Tokens.ignore, attr, peg.omit(getattr(Tokens, attr)))
 
-class NotGiven:
-  pass
-
-#def ensure_attr(attr, val=NotGiven, cons=NotGiven):
-#  if val == NotGiven and cons == NotGiven:
-#    raise ValueError("ensure_attr must be given one of 'val' or 'cons.'")
-#  def munge(result):
-#    nonlocal attr, val, cons
-#    if not hasattr(result, attr):
-#      if val != NotGiven:
-#        setattr(result, attr, val)
-#      elif cons != NotGiven:
-#        setattr(result, attr, cons())
-#    return result
-#  return munge
-
-def ensure_attr(attr, default, parse_as):
-  class EnsureAttr:
-    @classmethod
-    def parse(cls, parser, text, pos):
-      leftovers, result = parser.parse(text, parse_as)
-      if getattr(result, attr) == None:
-        setattr(result, attr, default)
-      return result
-  return EnsureAttr()
-
 class Predicate:
   """
   A Predicate represents a predicate structure, something like:
@@ -401,52 +375,12 @@ def filter(predicates, require=[], forbid=[]):
     and all(bind(schema, p) == None for schema in forbid):
       yield p
 
-def complex_term(*args, salt_cellar = [37]):
-  salt_cellar[0] += 6
-  if not args:
-    raise ValueError("Tried to create complex term class without any contents.")
-  def decorate(cls):
-    nonlocal salt_cellar, args
-    init_args = ', '.join("{}=None".format(a) for a in args)
-    init_body = '\n  '.join("self.{var} = {var}".format(var=a) for a in args)
-    hash_expr = '{} + hash(self.{})'.format(salt_cellar[0], args[0])
-    for a in args[1:]:
-      hash_expr = '47 * (' + hash_expr + ') + hash(self.{}) '.format(a)
-    eq_expr = ' and '.join(
-      "(self.{var} == other.{var})".format(var=a) for a in args
-    )
-    code = """
-def __init__(self, {init_args}):
-  {init_body}
-
-def __hash__(self):
-  return {hash_expr}
-
-def __eq__(self, other):
-  return type(self) == type(other) and {eq_expr}
-
-def __ne__(self, other):
-  return not self == other
-""".format(
-  init_args=init_args,
-  init_body=init_body,
-  hash_expr=hash_expr,
-  eq_expr=eq_expr,
-)
-    exec(code, locals(), globals())
-    cls.__init__ = __init__
-    cls.__hash__ = __hash__
-    cls.__eq__ = __eq__
-    cls.__ne__ = __ne__
-    return cls
-  return decorate
-
 # Class definitions for answer set elements:
 # Based almost entirely on the ASP-CORE language specification (and probably
 # missing some gringo-specific constructions).
 # https://www.mat.unical.it/aspcomp2013/files/ASP-CORE-2.03b.pdf
 
-@complex_term("negated", "op", "lhs", "rhs")
+@attr_object("negated", "op", "lhs", "rhs")
 class Expression:
   def __str__(self):
     if self.rhs:
@@ -468,7 +402,7 @@ class Expression:
         self.lhs
       )
 
-@complex_term("id", "terms")
+@attr_object("id", "terms")
 class SimpleTerm:
   def __str__(self):
     if self.terms:
@@ -479,7 +413,7 @@ class SimpleTerm:
     else:
       return "{}".format(self.id)
 
-@complex_term("negated", "id", "terms")
+@attr_object("negated", "id", "terms")
 class ClassicalLiteral:
   def __str__(self):
     if self.terms:
@@ -494,12 +428,12 @@ class ClassicalLiteral:
         self.id
       )
 
-@complex_term("op", "lhs", "rhs")
+@attr_object("op", "lhs", "rhs")
 class BuiltinAtom:
   def __str__(self):
     return "{} {} {}".format(self.lhs, self.op, self.rhs)
 
-@complex_term("negated", "contents")
+@attr_object("negated", "contents")
 class NafLiteral:
   def __str__(self):
     if self.negated:
@@ -507,7 +441,7 @@ class NafLiteral:
     else:
       return str(self.contents)
 
-@complex_term("weight", "level", "terms")
+@attr_object("weight", "level", "terms")
 class WeightAtLevel:
   def __str__(self):
     return "{}@{}, {}".format(
@@ -516,7 +450,7 @@ class WeightAtLevel:
       ', '.join(str(t) for t in self.terms)
     )
 
-@complex_term("terms", "constraints")
+@attr_object("terms", "constraints")
 class AggregateElement:
   def __str__(self):
     if self.constraints:
@@ -527,7 +461,7 @@ class AggregateElement:
     else:
       return ', '.join(str(t) for t in self.terms)
 
-@complex_term("negated", "l", "lop", "function", "elements", "uop", "u")
+@attr_object("negated", "l", "lop", "function", "elements", "uop", "u")
 class Aggregate:
   def __str__(self):
     return "{n}{l}{lop}{function} {{ {elements} }}{uop}{u}".format(
@@ -540,7 +474,7 @@ class Aggregate:
       u=(self.u and (' ' + str(self.u))) or '',
     )
 
-@complex_term("literal", "constraints")
+@attr_object("literal", "constraints")
 class ChoiceElement:
   def __str__(self):
     if self.constraints:
@@ -551,7 +485,7 @@ class ChoiceElement:
     else:
       return str(self.literal)
 
-@complex_term("l", "lop", "elements", "uop", "u")
+@attr_object("l", "lop", "elements", "uop", "u")
 class Choice:
   def __str__(self):
     return "{l}{lop}{{ {elements} }}{uop}{u}".format(
@@ -562,7 +496,7 @@ class Choice:
       u=(self.u and (str(self.u) + ' ')) or '',
     )
 
-@complex_term("weightlevel", "literals")
+@attr_object("weightlevel", "literals")
 class OptimizeElement:
   def __str__(self):
     if self.literals:
@@ -573,7 +507,7 @@ class OptimizeElement:
     else:
       return str(self.weightlevel)
 
-@complex_term("function", "elements")
+@attr_object("function", "elements")
 class Optimization:
   def __str__(self):
     return "{} {{ {} }}.".format(
@@ -581,7 +515,7 @@ class Optimization:
       '; '.join(str(e) for e in (self.elements or []))
     )
 
-@complex_term("body", "weightlevel")
+@attr_object("body", "weightlevel")
 class WeakConstraint:
   def __str__(self):
     return ":~ {}. [ {}@{}, {} ]".format(
@@ -591,7 +525,7 @@ class WeakConstraint:
       ', '.join(str(t) for t in self.terms)
     )
 
-@complex_term("head", "body")
+@attr_object("head", "body")
 class Rule:
   def __str__(self):
     if self.head:
@@ -602,22 +536,22 @@ class Rule:
     else:
       return ":- {}.".format(', '.join(self.body))
 
-@complex_term("literal")
+@attr_object("literal")
 class Query:
   def __str__(self):
     return "{}?".format(self.literal)
 
-@complex_term("directive", "contents")
+@attr_object("directive", "contents")
 class Directive:
   def __str__(self):
     return "{} {}".format(self.directive, self.contents)
 
-@complex_term("text")
+@attr_object("text")
 class Comment:
   def __str__(self):
     return "%* {} *%".format(self.text)
 
-@complex_term("statements", "query")
+@attr_object("statements", "query")
 class Program:
   def __str__(self):
     return "{}\n{}".format(

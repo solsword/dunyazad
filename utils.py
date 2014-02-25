@@ -58,6 +58,63 @@ def singleton(cls):
   cls.__init__ = __init__
   return cls
 
+# Decorators for easy class construction:
+
+def uniquely_defined_by(*attributes):
+  """
+  If a class is uniquely defined by some listing of its attributes, we can
+  automatically create __hash__, __eq__, and __ne__ functions for it.
+  """
+  def decorate(cls):
+    nonlocal attributes
+    hash_expr = str(hash(cls.__name__))
+    for a in attributes:
+      hash_expr = '47 * ({}) + hash(self.{}) '.format(hash_expr, a)
+    eq_expr = ' and '.join(
+      "(self.{var} == other.{var})".format(var=a) for a in attributes
+    )
+    code = """\
+def __hash__(self):
+  return {hash_expr}
+
+def __eq__(self, other):
+  return type(self) == type(other) and {eq_expr}
+
+def __ne__(self, other):
+  return not self == other
+""".format(
+  hash_expr=hash_expr,
+  eq_expr=eq_expr,
+)
+    exec(code, locals(), globals())
+    cls.__hash__ = __hash__
+    cls.__eq__ = __eq__
+    cls.__ne__ = __ne__
+    return cls
+  return decorate
+
+def attr_object(*args):
+  """
+  A "attr_object" is a class with the listed discrete instance attributes
+  (each of which is optional) that is uniquely defined by those attributes.
+  """
+  if not args:
+    raise ValueError("Tried to create attr_object class without any contents.")
+  def decorate(cls):
+    init_args = ', '.join("{}=None".format(a) for a in args)
+    init_body = '\n  '.join("self.{var} = {var}".format(var=a) for a in args)
+    code = """\
+def __init__(self, {init_args}):
+  {init_body}
+""".format(
+  init_args=init_args,
+  init_body=init_body,
+)
+    exec(code, locals(), globals())
+    cls.__init__ = __init__
+    return uniquely_defined_by(*args)(cls)
+  return decorate
+
 # A class whose repr() is the empty string:
 
 @singleton

@@ -11,7 +11,6 @@ from warnings import *
 import tasknet as tn
 import asp
 import ans
-import parser
 import obj
 
 from utils import *
@@ -292,7 +291,7 @@ def asptask(name, code, source="unknown"):
     ])
     results = asp.solve(source)
     # TODO: avoid this?
-    predicates = parser.as_predicates(parser.tokenize(results))
+    predicates = ans.as_predicate_statements(results)
 
     errors = []
     status = None
