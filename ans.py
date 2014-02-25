@@ -178,9 +178,11 @@ class Predicate:
   def matches(self, other):
     return self.name == other.name and len(self.args) == len(other.args)
 
-  def _cleanup(self):
-    if self.args == None:
-      self.args = list()
+  def polish(self):
+    try:
+      self.name = int(self.name)
+    except ValueError:
+      pass
 
 Predicate.grammar = [
   (
@@ -209,6 +211,11 @@ Predicate.grammar = [
     ]
   ),
 ]
+
+PredicateStatement = (
+  Predicate,
+  Tokens.ignore.DOT
+)
 
 
 class Variable(Predicate):
@@ -520,10 +527,11 @@ class AggregateElement:
     else:
       return ', '.join(str(t) for t in self.terms)
 
-@complex_term("l", "lop", "function", "elements", "uop", "u")
+@complex_term("negated", "l", "lop", "function", "elements", "uop", "u")
 class Aggregate:
   def __str__(self):
-    return "{l}{lop}{function} {{ {elements} }}{uop}{u}".format(
+    return "{n}{l}{lop}{function} {{ {elements} }}{uop}{u}".format(
+      n="not " if self.negated else "",
       l=(self.l and (str(self.l) + ' ')) or '',
       lop=(self.lop and (str(self.lop) + ' ')) or '',
       function=self.function,
@@ -937,7 +945,151 @@ Vr = Variable
 PVr = PatternVariable
 SbT = Subtree
 
+
+# Testing:
+
+def _test_parse_as_predicate(text):
+  return peg.parse(text, Predicate)
+
+def _test_parse_as_predicate_statement(text):
+  return peg.parse(text, PredicateStatement)
+
+def _test_parse_as_term(text):
+  return peg.parse(text, Term)
+
+def _test_parse_as_statement(text):
+  return peg.parse(text, Statement)
+
+def _test_parse_as_program(text):
+  return peg.parse(text, Program)
+
+
+def _test_restring_predicate(text):
+  return str(peg.parse(text, Predicate))
+
+def _test_restring_term(text):
+  return str(peg.parse(text, Term))
+
+def _test_restring_statement(text):
+  return str(peg.parse(text, Statement))
+
+def _test_restring_program(text):
+  return str(peg.parse(text, Program))
+
+
+def _test_bad_fact(text):
+  try:
+    peg.parse(text, Predicate)
+  except SyntaxError:
+    return True
+  return False
+
 _test_cases = [
+  (
+    _test_parse_as_predicate,
+    "test",
+    Predicate("test")
+  ),
+  (
+    _test_parse_as_predicate,
+    "two_part",
+    Predicate("two_part")
+  ),
+  (
+    _test_parse_as_predicate_statement,
+    "with_period.",
+    Predicate("with_period")
+  ),
+  (
+    _test_parse_as_predicate,
+    "_",
+    Predicate("_")
+  ),
+  (
+    _test_parse_as_predicate,
+    "-15",
+    Predicate(-15)
+  ),
+  (
+    _test_parse_as_predicate,
+    "p(p(2), v(3, 4, s), z)",
+    Pr(
+      "p",
+      Pr(
+        "p",
+        Pr(2)
+      ),
+      Pr("v",
+        Pr(3),
+        Pr(4),
+        Pr("s")
+      ),
+      Pr("z")
+    )
+  ),
+  (
+    _test_restring_predicate,
+    "p(p(2), v(3, 4, s), z)",
+    "p(p(2), v(3, 4, s), z)",
+  ),
+  (
+    _test_parse_as_predicate,
+    '"quoted"',
+    Predicate('"quoted"')
+  ),
+  (
+    _test_parse_as_predicate,
+    '"negative(-3).bar"',
+    Predicate('"negative(-3).bar"')
+  ),
+  (
+    _test_parse_as_predicate,
+    'negative(-3)',
+    Predicate("negative", Predicate(-3))
+  ),
+  (
+    _test_parse_as_predicate,
+    '"qp"(test, "qp2")',
+    Pr(
+      '"qp"',
+      Pr("test"),
+      Pr('"qp2"')
+    )
+  ),
+  (
+    _test_parse_as_predicate,
+    'slot(n("P2.AgitatedInsult","S1"),to,empty).',
+    Pr(
+      "slot",
+      Pr(
+        "n",
+        Pr('"P2.AgitatedInsult"'),
+        Pr('"S1"'),
+      ),
+      Pr("to"),
+      Pr("empty"),
+    )
+  ),
+  (_test_bad_fact, "3(v)", True),
+  (_test_bad_fact, "_(1)", True),
+  (
+    _test_parse_as_predicate,
+    'p(p(2), v(3, 4, s), z, "myeh myeh \\"jyeh, )")',
+    Pr(
+      "p",
+      Pr(
+        "p",
+        Pr(2)
+      ),
+      Pr("v",
+        Pr(3),
+        Pr(4),
+        Pr("s")
+      ),
+      Pr("z"),
+      Pr('"myeh myeh \\"jyeh, )"')
+    )
+  ),
   (
     str,
     Pr(
@@ -955,6 +1107,44 @@ _test_cases = [
       Pr('"myeh myeh \\"jyeh, )"')
     ),
     'p(p(2), v(3, 4, s), z, "myeh myeh \\"jyeh, )")',
+  ),
+  (
+    _test_parse_as_predicate,
+    "value(5,6,9,tr(2,-1,tr(6,1,tr(1,1,tr(3,-1,tr(3,1,none))))))).",
+    [
+      Pr(
+        "value",
+        Pr(5),
+        Pr(6),
+        Pr(9),
+        Pr(
+          "tr",
+          Pr(2),
+          Pr(-1),
+          Pr(
+            "tr",
+            Pr(6),
+            Pr(1),
+            Pr(
+              "tr",
+              Pr(1),
+              Pr(1),
+              Pr(
+                "tr",
+                Pr(3),
+                Pr(-1),
+                Pr(
+                  "tr",
+                  Pr(3),
+                  Pr(1),
+                  Pr("none")
+                )
+              )
+            )
+          )
+        )
+      )
+    ]
   ),
   (
     str,
@@ -991,6 +1181,20 @@ _test_cases = [
       )
     ),
     "value(5, 6, 9, tr(2, -1, tr(6, 1, tr(1, 1, tr(3, -1, tr(3, 1, none))))))",
+  ),
+  (
+    _test_parse_as_predicate,
+    'slot(n("P2.AgitatedInsult","S1"),to,empty).',
+    Pr(
+      "slot",
+      Pr(
+        "n",
+        Pr('"P2.AgitatedInsult"'),
+        Pr('"S1"'),
+      ),
+      Pr("to"),
+      Pr("empty"),
+    )
   ),
   (
     build_schema,
@@ -1052,7 +1256,7 @@ _test_cases = [
   ),
   # TODO: add more tests for binding with pattern variables and subtrees.
   (
-    lambda text: pypeg2.parse(text, Term),
+    _test_parse_as_term,
     "foo(bar, 5)",
     SimpleTerm(
       "foo",
@@ -1063,7 +1267,7 @@ _test_cases = [
     ),
   ),
   (
-    lambda text: pypeg2.parse(text, Term),
+    _test_parse_as_term,
     "foo(Var(bar), baz(X, X+1)) / bar(Zed)",
     Expression(
       False,
@@ -1090,7 +1294,7 @@ _test_cases = [
     ),
   ),
   (
-    lambda text: pypeg2.parse(text, Term),
+    _test_parse_as_term,
     "-(x + 3) / 5 - 4", # Note awful operator binding x2
     Expression(
       True,
@@ -1110,12 +1314,7 @@ _test_cases = [
     ),
   ),
   (
-    lambda text: str(pypeg2.parse(text, Term)),
-    "-(x + 3) / 5 - 4 * 3 - 1",
-    "-((x + 3) / (5 - (4 * (3 - 1))))"
-  ),
-  (
-    lambda text: pypeg2.parse(text, Term),
+    _test_parse_as_term,
     "X * Y - -Z", # Note again bad operator binding
     Expression(
       False,
@@ -1134,12 +1333,17 @@ _test_cases = [
     )
   ),
   (
-    lambda text: str(pypeg2.parse(text, Term)),
+    _test_restring_term,
     "X * Y - -Z",
     "(X * (Y - -(Z)))"
   ),
   (
-    lambda text: pypeg2.parse(text, Statement),
+    _test_restring_term,
+    "-(x + 3) / 5 - 4 * 3 - 1",
+    "-((x + 3) / (5 - (4 * (3 - 1))))"
+  ),
+  (
+    _test_parse_as_statement,
     "foo(bar, baz).",
     Rule(
       [
@@ -1156,12 +1360,7 @@ _test_cases = [
     ),
   ),
   (
-    lambda text: str(pypeg2.parse(text, Statement)),
-    "foo(bar, baz).",
-    "foo(bar, baz).",
-  ),
-  (
-    lambda text: pypeg2.parse(text, Statement),
+    _test_parse_as_statement,
     "foo(bar, baz) | -xyzzy :- a, not b.",
     Rule(
       [
@@ -1197,12 +1396,7 @@ _test_cases = [
     ),
   ),
   (
-    lambda text: str(pypeg2.parse(text, Statement)),
-    "foo(bar, baz) | -xyzzy :- a, not b.",
-    "foo(bar, baz) | -xyzzy :- a, not b.",
-  ),
-  (
-    lambda text: pypeg2.parse(text, Statement),
+    _test_parse_as_statement,
     """\
 1 <= { x(T) : not T < 3 ; y(T) } :-
   -3 < #count {
@@ -1294,7 +1488,17 @@ _test_cases = [
     ),
   ),
   (
-    lambda text: str(pypeg2.parse(text, Statement)),
+    _test_restring_statement,
+    "foo(bar, baz).",
+    "foo(bar, baz).",
+  ),
+  (
+    _test_restring_statement,
+    "foo(bar, baz) | -xyzzy :- a, not b.",
+    "foo(bar, baz) | -xyzzy :- a, not b.",
+  ),
+  (
+    _test_restring_statement,
     """\
 1 <= { x(T) : not T < 3 ; y(T) } :-
   -3 < #count {
@@ -1308,7 +1512,7 @@ _test_cases = [
     "other; a, b : c, not d} < 7, other.",
   ),
   (
-    lambda text: pypeg2.parse(text, Program),
+    _test_parse_as_program,
     """\
 a.
 b.
@@ -1329,20 +1533,7 @@ q :- a, b.
     ),
   ),
   (
-    lambda text: str(pypeg2.parse(text, Program)),
-    """\
-a.
-b.
-q :- a, b.
-    """,
-    """\
-a.
-b.
-q :- a, b.
-""",
-  ),
-  (
-    lambda text: pypeg2.parse(text, Program),
+    _test_parse_as_program,
     """\
 foo(3, 4).
 bar(X, Y+1) :- foo(X, Y), not bar(X, Y-1).
@@ -1416,7 +1607,20 @@ bar(3, 5)?
     ),
   ),
   (
-    lambda text: str(pypeg2.parse(text, Program)),
+    _test_restring_program,
+    """\
+a.
+b.
+q :- a, b.
+    """,
+    """\
+a.
+b.
+q :- a, b.
+""",
+  ),
+  (
+    _test_restring_program,
     """\
 foo(3, 4).
 bar(X, Y+1) :- foo(X, Y), not bar(X, Y-1).

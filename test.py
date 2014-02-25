@@ -49,7 +49,7 @@ def test(module):
 Test case FAILED: {}({}) produced:
 {}
 instead of:
-{}""".format(f.__name__, i, r, o),
+{}""".format(f.__name__, repr(i), repr(r), repr(o)),
           file=sys.stderr
         )
     except Exception as e:
