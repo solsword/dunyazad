@@ -12,10 +12,13 @@ narration( scene(1), time(1), type, introduce_subject_and_setting ).
 
 narration( scene(1), time(2), type, description ).
 narration( scene(1), time(2), tone, extolling ).
-narration( scene(1), time(2), subject, king(Yunan) ).
+narration( scene(1), time(2), subject, chr(1)) ).
 narration( scene(1), time(2), facet, wealthy ).
 narration( scene(1), time(2), facet, dignified ).
 narration( scene(1), time(2), facet, commands(troops) ).
+
+character( 1, type, king).
+character( 1, name, Yunan).
 
 link( scene(1), time(2), time(3), however ).
 
@@ -24,7 +27,7 @@ narration( scene(1), time(3), tone, sympathetic ).
 narration( scene(1), time(3), situation, sit(1) ).
 
 situation( 1, type, afflicted ).
-situation( 1, subject, king(Yunan) ).
+situation( 1, subject, chr(1) ).
 situation( 1, affliction, leprosy ).
 
 narration( scene(1), time(3), type, state_situation ).
@@ -35,11 +38,11 @@ situation( 2, type, inability ).
 situation( 2, capacity, cure(_anyone_, king(Yunan)) ).
 situation( 2, despite, hist(1) ).
 
-history( 1, type, tried_many_times ).
-history( 1, act, cure( king(Yunan) ) ).
-history( 1, actor, doctors ).
-history( 1, actor, men_of_learning ).
-history( 1, outcome, failed ).
+action( 1, recurrence, tried_many_times ).
+action( 1, type, cure( king(Yunan) ) ).
+action( 1, actor, doctors ).
+action( 1, actor, men_of_learning ).
+action( 1, outcome, failed ).
 
 problem( 1, type, distressing_situation ).
 problem( 1, problematic_situation, sit(1) ).

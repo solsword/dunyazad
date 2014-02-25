@@ -1,4 +1,4 @@
-next_chr_id(1) :- { character(N) } 0.
+next_chr_id(1) :- { character(_) } 0.
 next_chr_id(N+1) :- character(N), { character(N+1) } 0.
 
 l_name(Name) :- mem("args.name", Name).

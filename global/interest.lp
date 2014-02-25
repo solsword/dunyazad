@@ -13,4 +13,3 @@ temptation(
   justice;
   exoticness
 ).
-
