@@ -31,7 +31,7 @@ class TaskStatus:
 # Set up the mapping of string -> class automatically in TaskStatus.statuses
 for attr in TaskStatus.__dict__:
   value = getattr(TaskStatus, attr)
-  if type(value) == type:
+  if isinstance(value, Symbol):
     TaskStatus.statuses[str(value)] = value
 
 

@@ -25,6 +25,7 @@ def test(module):
   failed = 0
   crashed = 0
   for tc in m._test_cases:
+    print('-'*40)
     try:
       if len(tc) == 3:
         f, i, o = tc

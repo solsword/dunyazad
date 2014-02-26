@@ -14,22 +14,35 @@ import sys
 class SymbolInstantiationError(Exception):
   pass
 
-def symbol(string):
+class Symbol:
+  def __init__(self, name, as_bool, **kwargs):
+    self._name = name
+    if as_bool in (False, True):
+      self._as_bool = as_bool
+    else:
+      self._as_bool = True
+    self.__dict__.update(kwargs)
+
+  def __call__(self):
+    raise SymbolInstantiationError(
+      "{} is a Symbol and can't be instantiated.".format(self._name)
+    )
+
+  def __str__(self):
+    return self._name
+
+  def __bool__(self):
+    return self._as_bool
+
+def symbol(name, as_bool=True):
   """
-  Overwrites the decorated class' __init__ and __str__ functions: the new
-  __init__ always raises a SymbolInstantiationError, while the new __str__
-  returns the string given to this decorator as an argument.
+  Replaces the decorated class with an instance of the Symbol class. If as_bool
+  is given and either True or False then the __bool__ function of the created
+  symbol will return the given value.
   """
   def wrap(cls):
-    def __init__(self):
-      raise SymbolInstantiationError(
-        "Class {} is a symbol and can't be instantiated.".format(cls.__name__)
-      )
-    def __str__(self):
-      return string
-    cls.__init__ = __init__
-    cls.__str__ = __str__
-    return cls
+    nonlocal name, as_bool
+    return Symbol(name, as_bool, **cls.__dict__)
   return wrap
 
 class SingletonInstantiationError(Exception):
@@ -115,7 +128,7 @@ def __init__(self, {init_args}):
     return uniquely_defined_by(*args)(cls)
   return decorate
 
-# A class whose repr() is the empty string:
+# Miscellaneous classes:
 
 @singleton
 class NoRepr:
@@ -127,29 +140,12 @@ class NoRepr:
 
 norepr = NoRepr()
 
-
-## Iterator peeking:
-#
-#def unpeekable(iter):
-#  """
-#  Returns an unpeekable version of the given iterator which can be unpeeked
-#  by sending it the string 'unpeek' (see the unpeek function below).
-#  """
-#  def iterate():
-#    current = next(iter)
-#    while True:
-#      r = yield current
-#      if r == "unpeek":
-#        yield current # goes to the send() call
-#      else:
-#        break
-#  return iterate
-#
-#def unpeek(unpeekable):
-#  """
-#  Unpeeks the given unpeekable generator.
-#  """
-#  unpeekable.send("unpeek")
+@symbol("NotGiven", as_bool=False)
+class NotGiven:
+  """
+  A symbol for use in default arguments where None is a valid argument.
+  """
+  pass
 
 # Quoting and unquoting:
 
