@@ -12,7 +12,7 @@ import types
 # Globals: #
 ############
 
-MAX_ERROR_CONTEXT = 40
+MAX_ERROR_CONTEXT = 20
 
 RegExpType = re._pattern_type
 
@@ -48,10 +48,27 @@ class ParseError(Exception):
   """
   pass
 
-@symbol("NoResult", as_bool=False)
+@instance
 class NoResult:
   """
-  A symbol for use as a parser return value for items that have no result.
+  An object for use as a parser return value for items that have no result.
+  """
+  def __bool__(self):
+    return False
+
+@abstract
+class GrammarElement:
+  """
+  A class denoting a grammar element. Not used to determine parsing behavior
+  (instead the functional property of having a _parse attribute is used).
+  """
+  pass
+
+@abstract
+class Bubble:
+  """
+  An abstract class denoting a bubble, which is designed to be passed upwards
+  during parsing until captured.
   """
   pass
 
@@ -60,7 +77,7 @@ class NoResult:
 ##########################
 
 @attr_object("string", "preserve")
-class StrToken:
+class StrToken(GrammarElement):
   """
   A token matches a string exactly, returning NoResult as a result unless
   "preserve" is given in which case it returns the matched string.
@@ -68,7 +85,7 @@ class StrToken:
 
   def __str__(self):
     return "StrToken({}{})".format(
-      self.string,
+      repr(self.string),
       ', ' + str(self.preserve) if self.preserve else ''
     )
 
@@ -91,7 +108,7 @@ class StrToken:
       )
 
 @uniquely_defined_by("expression", "omit")
-class REToken:
+class REToken(GrammarElement):
   """
   A term that's defined by a regular expression. Matches the given RE and
   returns the string that matched as a result, or NoResult if omit is set to
@@ -110,13 +127,13 @@ class REToken:
       self.expression = expression
 
   def __str__(self):
-    return "REToken({})".format(self.expression)
+    return "REToken({})".format(repr(self.expression.pattern))
 
   def _parse(self, text):
     m = self.expression.match(text)
     if m:
       match = NoResult if self.omit else m.group(0)
-      return match, (), text[len(match):]
+      return match, (), text[len(m.group(0)):]
     else:
       return (
         NoResult,
@@ -148,10 +165,11 @@ def Token(expr, preserve=NotGiven):
       return REToken(expr, omit=not preserve)
 
 @attr_object("thing")
-class Omit:
+class Omit(GrammarElement):
   """
   Parse something but return nothing (NoResult and no bubbles).
   """
+  @prevent_recursion()
   def __str__(self):
     return "Omit({})".format(self.thing)
 
@@ -160,13 +178,14 @@ class Omit:
     return NoResult, (), l
 
 @uniquely_defined_by("elements")
-class Sequence:
+class Sequence(GrammarElement):
   """
   Parse a fixed sequence of things.
   """
   def __init__(self, *args):
     self.elements = tuple(args)
 
+  @prevent_recursion()
   def __str__(self):
     return 'Sequence({})'.format(', '.join(str(e) for e in self.elements))
 
@@ -183,7 +202,7 @@ class Sequence:
     return tuple(results), tuple(bubble_cloud), leftovers
 
 @uniquely_defined_by("elements")
-class Seq:
+class Seq(GrammarElement):
   """
   Parse a fixed sequence of things, returning a condensed list of results that
   doesn't include any instances of NoResult.
@@ -191,6 +210,7 @@ class Seq:
   def __init__(self, *args):
     self.elements = tuple(args)
 
+  @prevent_recursion()
   def __str__(self):
     return 'Seq({})'.format(', '.join(str(e) for e in self.elements))
 
@@ -208,7 +228,7 @@ class Seq:
     return tuple(results), tuple(bubble_cloud), leftovers
 
 @uniquely_defined_by("elements")
-class Alternatives:
+class OneOf(GrammarElement):
   """
   Parse a set of alternatives by trying them in order. Note that this class'
   _parse method is a generator that can generate multiple valid results (it
@@ -218,8 +238,9 @@ class Alternatives:
   def __init__(self, *args):
     self.elements = tuple(args)
 
+  @prevent_recursion()
   def __str__(self):
-    return 'Any({})'.format(', '.join(str(e) for e in self.elements))
+    return 'OneOf({})'.format(', '.join(str(e) for e in self.elements))
 
   def _parse(self, text):
     for alt in self.elements:
@@ -238,7 +259,7 @@ class Alternatives:
     )
 
 @attr_object("thing", "require_match")
-class Repeated:
+class Rep(GrammarElement):
   """
   Parse a variable number of repetitions of the given thing. If require_match
   is set to True, at least one match will be required, and a ParseError will be
@@ -246,6 +267,12 @@ class Repeated:
   None) an empty list will be returned as a result when the thing doesn't
   match.
   """
+  @prevent_recursion()
+  def __str__(self):
+    return "Rep({}{})".format(
+      self.thing,
+      (', ' + str(self.require_match)) if self.require_match else ''
+    )
   def _parse(self, text):
     results = []
     bubble_cloud = []
@@ -260,16 +287,15 @@ class Repeated:
       result, bubbles, leftovers = packrat_parse(leftovers, self.thing)
     return tuple(results), tuple(bubble_cloud), last_good_leftovers
 
-Rep = Repeated
-
 @uniquely_defined_by("thing")
-class Optional:
+class Opt(GrammarElement):
   """
   Parse the given thing but if it doesn't match just return NoResult.
   """
   def __init__(self, thing):
     self.thing = thing
 
+  @prevent_recursion()
   def __str__(self):
     return 'Opt({})'.format(self.thing)
 
@@ -280,10 +306,8 @@ class Optional:
     else:
       return result, bubbles, leftovers
 
-Opt = Optional
-
 @attr_object("name", "value")
-class AttributeBubble:
+class AttributeBubble(Bubble):
   """
   A bubble indicating that a named attribute should be added to an object being
   constructed.
@@ -291,24 +315,23 @@ class AttributeBubble:
   pass
 
 @attr_object("name", "thing")
-class Attribute:
+class Attr(GrammarElement):
   """
   Parse the given thing and return NoResult as the result, while adding an
-  Attribute bubble to the bubble cloud.
+  AttributeBubble to the bubble cloud.
   """
 
+  @prevent_recursion()
   def __str__(self):
-    return "Attr({}, {})".format(self.name, self.thing)
+    return "Attr({}, {})".format(repr(self.name), self.thing)
 
   def _parse(self, text):
     result, bubbles, leftovers = packrat_parse(text, self.thing)
-    bubbles = tuple(list(bubbles) + [AttributeBubble(self.name, result)])
+    bubbles = tuple_with(bubbles, AttributeBubble(self.name, result))
     return NoResult, bubbles, leftovers
 
-Attr = Attribute
-
 @attr_object("name", "thing")
-class Flag:
+class Flag(GrammarElement):
   """
   Parse the given thing. If it parses, return NoResult as a result and add an
   AttributeBubble with the given name and a value of True to the bubble cloud.
@@ -316,25 +339,27 @@ class Flag:
   to the bubble cloud with the given name and False as a value.
   """
 
+  @prevent_recursion()
   def __str__(self):
     return "Flag({}, {})".format(self.name, self.thing)
 
   def _parse(self, text):
     result, bubbles, leftovers = packrat_parse(text, self.thing)
     if isinstance(leftovers, ParseError):
-      bubbles = tuple(list(bubbles) + [AttributeBubble(self.name, False)])
+      bubbles = tuple_with(bubbles, AttributeBubble(self.name, False))
       return NoResult, bubbles, text
     else:
-      bubbles = tuple(list(bubbles) + [AttributeBubble(self.name, True)])
+      bubbles = tuple_with(bubbles, AttributeBubble(self.name, True))
       return NoResult, bubbles, leftovers
 
 @attr_object("callback", "thing")
-class ResultHook:
+class Munge(GrammarElement):
   """
-  A ResultHook grammar element works like a Hook but its callback only affects
-  the result returned: it neither gets as arguments nor is expected to return
-  the bubbles and leftovers.
+  A Munge grammar element works like a Hook but its callback only affects the
+  result returned: it neither gets as arguments nor is expected to return the
+  bubbles and leftovers.
   """
+  @prevent_recursion()
   def __str__(self):
     return "Munge({}, {})".format(self.callback, self.thing)
 
@@ -342,24 +367,24 @@ class ResultHook:
     r, b, l = packrat_parse(text, self.thing)
     return self.callback(r), b, l
 
-Munge = ResultHook
-
 @attr_object("callback", "thing")
-class Hook:
+class Hook(GrammarElement):
   """
   A Hook grammar element parses text as the given object and then calls the
   given callback function on the result, bubbles, and leftovers before
   returning the modified results.
   """
+  @prevent_recursion()
   def __str__(self):
     return "Hook({}, {})".format(self.callback, self.thing)
 
   def _parse(self, text):
     r, b, l = packrat_parse(text, self.thing)
-    return self.callback(r, b, l)
+    r, b, l = self.callback(r, b, l)
+    return r, b, l
 
 @attr_object("cls", "thing")
-class Package:
+class Package(GrammarElement):
   """
   A Package grammar element creates an instance of a specific class after
   parsing the given text as the given thing. It ignores any result from parsing
@@ -367,6 +392,7 @@ class Package:
   and assigns attributes on the newly created object accordingly. As part of
   this process it calls the constructor of the given class with zero arguments.
   """
+  @prevent_recursion()
   def __str__(self):
     return "Package({}, {})".format(self.cls, self.thing)
 
@@ -408,35 +434,70 @@ def packrat_parse(text, thing, devour=_default_devour):
   if (text, thing) in _ratnest:
     return _ratnest[(text, thing)]
   r, b, l = NoResult, (), ParseError("No result.")
-  if hasattr(thing, "_parse"):
-    r, b, l = thing._parse(text)
-    if isinstance(r, types.GeneratorType):
-      r = next(r)
-  elif hasattr(thing, "grammar"):
-    r, b, l = packrat_parse(text, thing.grammar)
-  elif isinstance(thing, str):
-    r, b, l = packrat_parse(text, StrToken(thing))
-  elif isinstance(thing, RegExpType):
-    r, b, l = packrat_parse(text, REToken(thing))
+  try:
+    if hasattr(thing, "_parse"):
+      result = thing._parse(text)
+      if isinstance(result, types.GeneratorType):
+        r, b, l = next(r)
+      else:
+        r, b, l = result
+    elif hasattr(thing, "grammar"):
+      r, b, l = packrat_parse(text, thing.grammar)
+    elif isinstance(thing, str):
+      r, b, l = packrat_parse(text, StrToken(thing))
+    elif isinstance(thing, RegExpType):
+      r, b, l = packrat_parse(text, REToken(thing))
+    else:
+      raise ParseError(
+        "No known method for parsing text as a {}.".format(type(thing))
+      )
+  except Exception as e:
+    return (
+      NoResult,
+      (),
+      ParseError(
+        "Failed to parse '{}' as {}.\nGot error: {}".format(
+          error_context(text), thing, e
+        )
+      )
+    )
   _ratnest[(text, thing)] = (r, b, l)
   return r, b, l
 
-def parse(text, thing, allow_incomplete=True):
+def parse(text, thing, devour=_default_devour):
   """
   Wrapper for packrat_parse that returns just a result object and leftover text
-  or raises an error. If allow_incomplete is set to False, this function will
-  raise an error if the given text doesn't parse completely.
+  or raises an error.
   """
   r, b, l = packrat_parse(text, thing)
   if isinstance(l, ParseError):
     raise l
-  if l and not allow_incomplete:
+  return r, l
+
+def parse_completely(
+  text,
+  thing,
+  devour=_default_devour,
+  devour_leftovers=True
+):
+  """
+  A wrapper for packrat_parse that ensures that the given text parses as the
+  given thing without leftovers. Returns just the parse result. By default,
+  the devour function will be called on the leftovers before raising an error,
+  but this can be turned off by passing devour_leftovers=False.
+  """
+  r, b, l = packrat_parse(text, thing)
+  if isinstance(l, ParseError):
+    raise l
+  if devour_leftovers:
+    l = devour(l)
+  if l:
     raise ParseError(
       "Parse successful but incomplete (remainder '{}').".format(
         error_context(l)
       )
     )
-  return r, l
+  return r
 
 ##########
 # Sugar: #
@@ -444,7 +505,7 @@ def parse(text, thing, allow_incomplete=True):
 
 Integer = Munge( int, Token(re.compile('-?0|([1-9][0-9]*)')))
 Word = Token(re.compile('\w+'))
-def SeparatedList(elem, sep=Token(',')):
+def SepList(elem, sep=Token(',')):
   return Munge(
     lambda L: tuple([L[0]] + [e[0] for e in L[1]]),
     Seq(
@@ -457,7 +518,6 @@ def SeparatedList(elem, sep=Token(',')):
       )
     )
   )
-SepList = SeparatedList
 
 ######################
 # Testing functions: #
@@ -490,6 +550,43 @@ class _TestObject:
   def __init__(self, a=None, b=None):
     self.a = a or []
     self.b = b or 5
+
+_test_grammar_1 = Seq(
+  Token("to"),
+  Token("("),
+  Opt(
+    Seq(
+      Attr("a", Integer),
+      Token(","),
+    ),
+  ),
+  Attr("b", Integer),
+  Token(")"),
+)
+
+_test_grammar_1.elements = tuple_with(
+  _test_grammar_1.elements,
+  Opt(Attr("recurisve", _test_grammar_1))
+)
+
+# the same as _test_grammar_1
+_test_grammar_2 = Seq(
+  Token("to"),
+  Token("("),
+  Opt(
+    Seq(
+      Attr("a", Integer),
+      Token(","),
+    ),
+  ),
+  Attr("b", Integer),
+  Token(")"),
+)
+
+_test_grammar_2.elements = tuple_with(
+  _test_grammar_2.elements,
+  Opt(Attr("recurisve", _test_grammar_2))
+)
 
 ###############
 # Test cases: #
@@ -553,5 +650,78 @@ _test_cases = [
     _test_parse( Seq( Word, "(", SepList( Integer, sep=";" ), ")" ) ),
     "test(3; 4; 5; 6)",
     ( "test", ( 3, 4, 5, 6 ) )
+  ),
+  (
+    hash,
+    Package(
+      _TestObject,
+      Seq(
+        Token("to"),
+        Token("("),
+        Opt(
+          Seq(
+            Attr("a", Integer),
+            Token(","),
+          ),
+        ),
+        Attr("b", Integer),
+        Token(")"),
+      )
+    ),
+    hash(
+      Package(
+        _TestObject,
+        Seq(
+          Token("to"),
+          Token("("),
+          Opt(
+            Seq(
+              Attr("a", Integer),
+              Token(","),
+            ),
+          ),
+          Attr("b", Integer),
+          Token(")"),
+        )
+      )
+    )
+  ),
+  (
+    lambda x: x, # test object equality
+    Package(
+      _TestObject,
+      Seq(
+        Token("to"),
+        Token("("),
+        Opt(
+          Seq(
+            Attr("a", Integer),
+            Token(","),
+          ),
+        ),
+        Attr("b", Integer),
+        Token(")"),
+      )
+    ),
+    Package(
+      _TestObject,
+      Seq(
+        Token("to"),
+        Token("("),
+        Opt(
+          Seq(
+            Attr("a", Integer),
+            Token(","),
+          ),
+        ),
+        Attr("b", Integer),
+        Token(")"),
+      )
+    )
+  ),
+  (
+    lambda x: x, # test recursive object equality
+    _test_grammar_1,
+    _test_grammar_2
   ),
 ]

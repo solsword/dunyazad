@@ -3,36 +3,47 @@ tasknet.py
 Task network representation: tracks tasks and dependencies between them.
 """
 
+import random
+
 from utils import *
 
 import obj
 
-import random
-
-@symbol("task_status")
+@abstract
 class TaskStatus:
-  statuses = {}
+  aliases = {}
+  def __str__(self):
+    return self.alias
 
-  @symbol("ready")
-  class Ready: pass
+def task_status(cls):
+  """
+  Creates and returns an instance of the given class but also registers it as a
+  TaskStatus by adding it to TaskStatus' __dict__ and to the dictionary of
+  aliases.
+  """
+  setattr(TaskStatus, cls.__name__, cls)
+  TaskStatus.aliases[cls.alias] = cls
+  return cls
 
-  @symbol("completed")
-  class Completed: pass
+@task_status
+class Ready(TaskStatus):
+  alias = "ready"
 
-  @symbol("failed")
-  class Failed: pass
+@task_status
+class Completed(TaskStatus):
+  alias = "completed"
 
-  @symbol("in_progress")
-  class InProgress: pass
+@task_status
+class Failed(TaskStatus):
+  alias = "failed"
 
-  @symbol("blocked")
-  class Blocked: pass
+@task_status
+class InProgress(TaskStatus):
+  alias = "in_progress"
 
-# Set up the mapping of string -> class automatically in TaskStatus.statuses
-for attr in TaskStatus.__dict__:
-  value = getattr(TaskStatus, attr)
-  if isinstance(value, Symbol):
-    TaskStatus.statuses[str(value)] = value
+@task_status
+class Blocked(TaskStatus):
+  alias = "blocked"
 
 
 class Dependency:
@@ -72,9 +83,9 @@ class Task:
   """
   A task has a generator function that gets run when the task is up for
   execution. This function should perform a small chunk of work and then
-  quickly yield one of the TaskStatus singletons back to the task scheduler. 
-  If it yields Succeeded or Failed the task network will be updated
-  accordingly, removing the task from the pool of active tasks.
+  quickly yield one of the TaskStatus objects back to the task scheduler. If it
+  yields Succeeded or Failed the task network will be updated accordingly,
+  removing the task from the pool of active tasks.
 
   Each task also has a priority, a local memory, a list of dependencies, a
   current status, and a parent task network (which is None by default).

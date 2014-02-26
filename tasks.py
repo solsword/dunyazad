@@ -337,8 +337,8 @@ def asptask(name, code, source="unknown"):
         "Error(s) while resolving answer set task:\n" + '\n'.join(errors)
       )
 
-    if status in TaskStatus.statuses:
-      status = TaskStatus.statuses[status]
+    if status in TaskStatus.aliases:
+      status = TaskStatus.aliases[status]
     else:
       raise ASPTaskError(
         "Error: answer set produced invalid status '{}'.".format(status)

@@ -35,7 +35,7 @@ def test(module):
           r = f(i)
       elif len(tc) == 2:
         f, o = tc
-        i = norepr
+        i = NoRepr
         r = f()
 
       if type(r) == types.GeneratorType:

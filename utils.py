@@ -9,65 +9,51 @@ import itertools
 
 import sys
 
-# 'symbol' and 'singleton' class decorators:
+# Appending to a tuple:
 
-class SymbolInstantiationError(Exception):
-  pass
+def tuple_with(src, add):
+  return tuple(list(src) + [add])
 
-class Symbol:
-  def __init__(self, name, as_bool, **kwargs):
-    self._name = name
-    if as_bool in (False, True):
-      self._as_bool = as_bool
-    else:
-      self._as_bool = True
-    self.__dict__.update(kwargs)
+# Quoting and unquoting:
 
-  def __call__(self):
-    raise SymbolInstantiationError(
-      "{} is a Symbol and can't be instantiated.".format(self._name)
-    )
+def quote(string):
+  return '"' + string.replace("\\", "\\\\").replace('"', r'\"') + '"'
 
-  def __str__(self):
-    return self._name
+escape_sequence = re.compile(r'\\(["\\])')
+def unquote(string):
+  if string[0] == '"' and string[-1] == '"':
+    return escape_sequence.sub(r'\1', string)[1:-1]
+  else:
+    raise ValueError("'unquote' called on non-quoted string.")
 
-  def __bool__(self):
-    return self._as_bool
+# Class decorators:
 
-def symbol(name, as_bool=True):
+def instance(cls):
   """
-  Replaces the decorated class with an instance of the Symbol class. If as_bool
-  is given and either True or False then the __bool__ function of the created
-  symbol will return the given value.
+  Replaces the decorated class with an instance of itself, constructed with
+  zero arguments. Attributes from the class (except those that start and begin
+  with "__") are copied onto the instance, so they behave as if they were
+  instance attributes rather than class attributes.
   """
-  def wrap(cls):
-    nonlocal name, as_bool
-    return Symbol(name, as_bool, **cls.__dict__)
-  return wrap
+  result = cls()
+  for attr in cls.__dict__:
+    if not (attr.startswith("__") and attr.endswith("__")):
+      setattr(result, attr, cls.__dict__[attr])
+  return result
 
-class SingletonInstantiationError(Exception):
-  pass
-
-def singleton(cls):
+def abstract(cls):
   """
-  Overwrites the decorated class' __init__ function with a version that raises
-  a SingletonInstantiationError if called more than once. Arguments to the init
-  function are unaffected (i.e. passed through to the old __init__).
+  Creates an __init__ method for the given class that raises a
+  NotImplementedError indicating that the class is abstract. Classes inheriting
+  from an abstract base class that don't override __init__ will also be
+  effectively abstract.
   """
-  instantiated = False
-  baseinit = cls.__init__
-  def __init__(self, *args, **kwargs):
-    nonlocal instantiated
-    if instantiated:
-      raise SingletonInstantiationError(
-        "Can't instantiate a second instance of singleton Class {}.".format(
-          cls.__name__
-        )
+  def __init__(self):
+    raise NotImplementedError(
+      "Can't instantiate abstract class '{}'.".format(
+        type(self).__name__
       )
-    else:
-      baseinit(self, *args, **kwargs)
-      instantiated = True
-
+    )
   cls.__init__ = __init__
   return cls
 
@@ -80,6 +66,7 @@ def uniquely_defined_by(*attributes):
   """
   def decorate(cls):
     nonlocal attributes
+    rec_hash = str(hash(cls.__name__) + 17)
     hash_expr = str(hash(cls.__name__))
     for a in attributes:
       hash_expr = '47 * ({}) + hash(self.{}) '.format(hash_expr, a)
@@ -87,15 +74,18 @@ def uniquely_defined_by(*attributes):
       "(self.{var} == other.{var})".format(var=a) for a in attributes
     )
     code = """\
+@prevent_recursion({rec_hash})
 def __hash__(self):
   return {hash_expr}
 
+@prevent_recursion(base_case=lambda self, other: id(self) == id(other))
 def __eq__(self, other):
   return type(self) == type(other) and {eq_expr}
 
 def __ne__(self, other):
   return not self == other
 """.format(
+  rec_hash=rec_hash,
   hash_expr=hash_expr,
   eq_expr=eq_expr,
 )
@@ -103,6 +93,7 @@ def __ne__(self, other):
     cls.__hash__ = __hash__
     cls.__eq__ = __eq__
     cls.__ne__ = __ne__
+    cls._being_hashed = False
     return cls
   return decorate
 
@@ -130,7 +121,7 @@ def __init__(self, {init_args}):
 
 # Miscellaneous classes:
 
-@singleton
+@instance
 class NoRepr:
   """
   An object that returns '' for both str() and repr().
@@ -138,26 +129,48 @@ class NoRepr:
   def __str__(self): return ""
   def __repr__(self): return ""
 
-norepr = NoRepr()
-
-@symbol("NotGiven", as_bool=False)
+@instance
 class NotGiven:
   """
-  A symbol for use in default arguments where None is a valid argument.
+  A object for use in default arguments where None is a valid argument.
   """
-  pass
+  def __bool__(self):
+    return False
 
-# Quoting and unquoting:
+# Function decorators:
 
-def quote(string):
-  return '"' + string.replace("\\", "\\\\").replace('"', r'\"') + '"'
+def prevent_recursion(default_value=NotGiven, base_case=NotGiven):
+  """
+  A decorator that returns the given default value instead of whatever would
+  usually be returned when the decorated method (it must be a method) is called
+  recursively. Definitely not thread-safe. If no default value is given, it
+  returns '<cls:id>' where 'cls' is the class name of the object the method is
+  being called on and 'id' is its id. If a base_case is given, it overrides any
+  default_value that is given, and it is called as a function with the
+  arguments of the method (including self) to produce a default value.
+  """
+  def decorate(method):
+    def recursion_guard(self, *args, **kwargs):
+      nonlocal default_value, base_case
+      if not hasattr(self, "_is_being_called"):
+        self._is_being_called = False
+      if self._is_being_called:
+        if base_case != NotGiven:
+          return base_case(self, *args, **kwargs)
+        else:
+          if default_value == NotGiven:
+            return "<{}:{}>".format(type(self).__name__, id(self))
+          else:
+            return default_value
+      else:
+        self._is_being_called = True
+        result = method(self, *args, **kwargs)
+        self._is_being_called = False
+        return result
+    return recursion_guard
+  return decorate
 
-escape_sequence = re.compile(r'\\(["\\])')
-def unquote(string):
-  if string[0] == '"' and string[-1] == '"':
-    return escape_sequence.sub(r'\1', string)[1:-1]
-  else:
-    raise ValueError("'unquote' called on non-quoted string.")
+# Filesystem functions:
 
 def walk_files(dir, include=None, exclude=None):
   """

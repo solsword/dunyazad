@@ -8,104 +8,126 @@ from utils import *
 import re
 import string
 
-import pypeg2 as peg # for parsing functionality
+import parser
 
-# A dictionary of regular expressions for various tokens:
+@instance
 class Tokens:
-  QUERY_MARK = re.compile(r"\?")
-  CONS = re.compile(r":-")
-  WCONS = re.compile(r":~")
-  DOT = re.compile(r"\.((?=[^.])|$)")
+  """
+  An object containing regular expressions for various tokens.
+  """
+  QUERY_MARK = parser.Token(re.compile(r"\?"))
+  CONS = parser.Token(re.compile(r":-"))
+  WCONS = parser.Token(re.compile(r":~"))
+  DOT = parser.Token(re.compile(r"\.((?=[^.])|$)"))
     # Matches a period NOT followed by another, but doesn't eat the following
     # character.
-  AT = re.compile(r"@")
-  OR = re.compile(r"|")
-  NAF = re.compile(r"not")
+  AT = parser.Token(re.compile(r"@"))
+  OR = parser.Token(re.compile(r"|"))
+  NAF = parser.Token(re.compile(r"not"))
 
-  COMMA = re.compile(r",")
-  COLON = re.compile(r":")
-  SEMICOLON = re.compile(r";")
+  COMMA = parser.Token(re.compile(r","))
+  COLON = parser.Token(re.compile(r":"))
+  SEMICOLON = parser.Token(re.compile(r";"))
 
-  OP_PLUS = re.compile(r"\+")
-  OP_MINUS = re.compile(r"-")
-  OP_TIMES = re.compile(r"\*((?=[^*])|$)")
-  OP_DIV = re.compile(r"/")
-  OP_MOD = re.compile(r"\\")
-  OP_POW = re.compile(r"\*\*")
-  OP_BITWISE_AND = re.compile(r"&")
-  OP_BITWISE_OR = re.compile(r"\?")
-  OP_BITWISE_XOR = re.compile(r"\^")
-  OP_BITWISE_NEG = re.compile(r"~")
+  OP_PLUS = parser.Token(re.compile(r"\+"))
+  OP_MINUS = parser.Token(re.compile(r"-"))
+  OP_TIMES = parser.Token(re.compile(r"\*((?=[^*])|$)"))
+  OP_DIV = parser.Token(re.compile(r"/"))
+  OP_MOD = parser.Token(re.compile(r"\\"))
+  OP_POW = parser.Token(re.compile(r"\*\*"))
+  OP_BITWISE_AND = parser.Token(re.compile(r"&"))
+  OP_BITWISE_OR = parser.Token(re.compile(r"\?"))
+  OP_BITWISE_XOR = parser.Token(re.compile(r"\^"))
+  OP_BITWISE_NEG = parser.Token(re.compile(r"~"))
 
-  CMP_EQ = re.compile(r"=")
-  CMP_NEQ = re.compile(r"(<>)|(!=)")
-  CMP_GT = re.compile(r">((?=[^=])|$)")
-  CMP_LT = re.compile(r"<((?=[^=])|$)")
-  CMP_GE = re.compile(r">=")
-  CMP_LE = re.compile(r"<=")
+  CMP_EQ = parser.Token(re.compile(r"="))
+  CMP_NEQ = parser.Token(re.compile(r"(<>)|(!=)"))
+  CMP_GT = parser.Token(re.compile(r">((?=[^=])|$)"))
+  CMP_LT = parser.Token(re.compile(r"<((?=[^=])|$)"))
+  CMP_GE = parser.Token(re.compile(r">="))
+  CMP_LE = parser.Token(re.compile(r"<="))
 
-  INTERVAL = re.compile(r"\.\.")
+  INTERVAL = parser.Token(re.compile(r"\.\."))
 
-  ANONYMOUS = re.compile(r"_((?=[^a-zA-Z0-9_])|$)")
+  ANONYMOUS = parser.Token(re.compile(r"_((?=[^a-zA-Z0-9_])|$)"))
     # Matches an underscore NOT followed any further word characters, but
     # doesn't eat the following character.
 
-  NUMBER = re.compile(r"0|([1-9][0-9]*)")
+  NUMBER = parser.Token(re.compile(r"0|([1-9][0-9]*)"))
 
-  ID = re.compile(r"[a-z][A-Za-z0-9_]*")
-  VARIABLE = re.compile(r"[A-Z][A-Za-z0-9_]*")
+  ID = parser.Token(re.compile(r"[a-z][A-Za-z0-9_]*"))
+  VARIABLE = parser.Token(re.compile(r"[A-Z][A-Za-z0-9_]*"))
 
-  STRING = re.compile(r'"([^\\"]|(\\.))*"')
+  STRING = parser.Token(re.compile(r'"([^\\"]|(\\.))*"'))
     # Matches a starting quote, followed by any number of tokens which are
     # either non-backslash, non-quote characters or which are escape codes ('\'
     # plus any character), finished by an ending quote.
 
-  DIR_HIDE = re.compile(r"#hide")
-  DIR_SHOW = re.compile(r"#show")
-  DIR_CONST = re.compile(r"#const")
-  DIR_DOMAIN = re.compile(r"#domain")
-  DIR_EXTERNAL = re.compile(r"#external")
+  DIR_HIDE = parser.Token(re.compile(r"#hide"))
+  DIR_SHOW = parser.Token(re.compile(r"#show"))
+  DIR_CONST = parser.Token(re.compile(r"#const"))
+  DIR_DOMAIN = parser.Token(re.compile(r"#domain"))
+  DIR_EXTERNAL = parser.Token(re.compile(r"#external"))
 
-  DIRECTIVE_BODY = re.compile(r"[^.]*(?=\.)")
+  DIRECTIVE_BODY = parser.Token(re.compile(r"[^.]*(?=\.)"))
     # Matches any number of non-period characters followed by a period, but
     # doesn't eat the period.
 
-  ABS = re.compile(r"\|")
-  PAREN_OPEN = re.compile(r"\(")
-  PAREN_CLOSE = re.compile(r"\)")
-  CURLY_OPEN = re.compile(r"\{")
-  CURLY_CLOSE = re.compile(r"\}")
-  SQUARE_OPEN = re.compile(r"\[")
-  SQUARE_CLOSE = re.compile(r"\]")
+  ABS = parser.Token(re.compile(r"\|"))
+  PAREN_OPEN = parser.Token(re.compile(r"\("))
+  PAREN_CLOSE = parser.Token(re.compile(r"\)"))
+  CURLY_OPEN = parser.Token(re.compile(r"\{"))
+  CURLY_CLOSE = parser.Token(re.compile(r"\}"))
+  SQUARE_OPEN = parser.Token(re.compile(r"\["))
+  SQUARE_CLOSE = parser.Token(re.compile(r"\]"))
 
-  KW_AGGREGATE_COUNT = re.compile(r"#count")
-  KW_AGGREGATE_MIN = re.compile(r"#min")
-  KW_AGGREGATE_MAX = re.compile(r"#max")
-  KW_AGGREGATE_SUM = re.compile(r"#sum")
+  KW_AGGREGATE_COUNT = parser.Token(re.compile(r"#count"))
+  KW_AGGREGATE_MIN = parser.Token(re.compile(r"#min"))
+  KW_AGGREGATE_MAX = parser.Token(re.compile(r"#max"))
+  KW_AGGREGATE_SUM = parser.Token(re.compile(r"#sum"))
 
-  KW_MAXIMIZE = re.compile(r"#maximi[sz]e")
-  KW_MINIMIZE = re.compile(r"#minimi[sz]e")
+  KW_MAXIMIZE = parser.Token(re.compile(r"#maximi[sz]e"))
+  KW_MINIMIZE = parser.Token(re.compile(r"#minimi[sz]e"))
 
-  LOOSE_CONSTANT = re.compile(r"_*[a-z][a-zA-Z0-9_]*")
-  LOOSE_VARIABLE = re.compile(r"_*[A-Z][a-zA-Z0-9_]*")
+  LOOSE_CONSTANT = parser.Token(re.compile(r"_*[a-z][a-zA-Z0-9_]*"))
+  LOOSE_VARIABLE = parser.Token(re.compile(r"_*[A-Z][a-zA-Z0-9_]*"))
     # Matches some number of optional starting underscores, a first-position
     # alphabetic character, and then any number of alphanumerics and/or
     # underscores.
 
-  LOOSE_INTEGER = re.compile(r"-?[0-9]+")
+  LOOSE_INTEGER = parser.Token(re.compile(r"-?[0-9]+"))
 
-  KW_INFIMUM = re.compile(r"#infimum")
-  KW_SUPREMUM = re.compile(r"#supremum")
+  KW_INFIMUM = parser.Token(re.compile(r"#infimum"))
+  KW_SUPREMUM = parser.Token(re.compile(r"#supremum"))
 
-  def ignore():
+  COMMENT = parser.Token(re.compile(r"%([^*\n][^\n]*)?\n"))
+    # Matches a percent possibly followed by some junk and then a newline.
+    # The junk doesn't begin with either a * or a newline and it doesn't
+    # contain any newlines.
+
+  MULTI_LINE_COMMENT = parser.Token(re.compile(r"%\*([^*]|(\*[^%]))*\*%"))
+    # Matches %* followed by some junk which is composed entirely of either
+    # non-asterisk characters or pairs of characters that begin with an
+    # asterisk and end with a non-% character. All of this ends with *%.
+
+  BLANK = parser.Token(re.compile(r"[ \t\n]+"))
+
+  @instance
+  class Ignore:
     '''
     A place to store ignored versions of the normal attributes.
     '''
     pass
 
 for attr in Tokens.__dict__:
-  if not attr.startswith("__") and not attr.endswith("__"):
-    setattr(Tokens.ignore, attr, peg.omit(getattr(Tokens, attr)))
+  if not attr.startswith("__") and not attr.endswith("__") and attr != "Ignore":
+    val = Tokens.__dict__[attr]
+    if isinstance(val, parser.StrToken):
+      setattr(Tokens.Ignore, attr, parser.StrToken(val.string, preserve=False))
+    elif isinstance(val, parser.REToken):
+      setattr(Tokens.Ignore, attr, parser.REToken(val.expression, omit=True))
+    else:
+      setattr(Tokens.Ignore, attr, parser.Omit(val))
 
 class Predicate:
   """
@@ -158,37 +180,40 @@ class Predicate:
     except ValueError:
       pass
 
-Predicate.grammar = [
-  (
-    peg.attr(
-      "name",
-      [ Tokens.STRING, Tokens.LOOSE_CONSTANT ]
-    ),
-    peg.optional(
-      (
-        "(",
-        peg.attr(
-          "args",
-          peg.csl( Predicate, separator=Tokens.ignore.COMMA )
-        ),
-        ")"
-      )
-    )
-  ),
-  peg.attr(
-    "name",
-    [
-      Tokens.ANONYMOUS,
-      Tokens.LOOSE_INTEGER,
-      Tokens.KW_INFIMUM,
-      Tokens.KW_SUPREMUM,
-    ]
-  ),
-]
-
-PredicateStatement = (
+Predicate.grammar = parser.Package(
   Predicate,
-  Tokens.ignore.DOT
+  parser.OneOf(
+    parser.Seq(
+      parser.Attr(
+        "name",
+        parser.OneOf( Tokens.STRING, Tokens.LOOSE_CONSTANT )
+      ),
+      parser.Opt(
+        parser.Seq(
+          Tokens.Ignore.PAREN_OPEN,
+          parser.Attr(
+            "args",
+            parser.SepList( Predicate, sep=Tokens.Ignore.COMMA )
+          ),
+          Tokens.Ignore.PAREN_CLOSE,
+        )
+      )
+    ),
+    parser.Attr(
+      "name",
+      parser.OneOf(
+        Tokens.ANONYMOUS,
+        Tokens.LOOSE_INTEGER,
+        Tokens.KW_INFIMUM,
+        Tokens.KW_SUPREMUM,
+      )
+    ),
+  )
+)
+
+PredicateStatement = parser.Seq(
+  Predicate,
+  Tokens.Ignore.DOT
 )
 
 
@@ -344,6 +369,12 @@ def bind(schema, predicate, prefix=""):
     result.update(b)
 
   return result
+
+# shortcuts:
+Pr = Predicate
+Vr = Variable
+PVr = PatternVariable
+SbT = Subtree
 
 def bindings(schemas, predicates):
   """
@@ -561,7 +592,7 @@ class Program:
 
 # Grammar definitions for answer set elements:
 
-ArithOp = [
+ArithOp = parser.OneOf(
   Tokens.OP_PLUS,
   Tokens.OP_MINUS,
   Tokens.OP_TIMES,
@@ -572,348 +603,395 @@ ArithOp = [
   Tokens.OP_BITWISE_OR,
   Tokens.OP_BITWISE_XOR,
   Tokens.OP_BITWISE_NEG,
-]
+)
 
-Comparator = [
+Comparator = parser.OneOf(
   Tokens.CMP_EQ,
   Tokens.CMP_NEQ,
   Tokens.CMP_LT,
   Tokens.CMP_GT,
   Tokens.CMP_LE,
   Tokens.CMP_GE,
-]
+)
 
-Term = [
+Term = parser.OneOf(
   Expression,
   SimpleTerm,
-]
+)
 
-Term.append( #'cause this one is directly recursive
-  (
-    Tokens.ignore.PAREN_OPEN,
+# Because this element is directly recursive it can't be defined as part of the
+# initial definition of Term, so we have to hack it in like this:
+Term.elements = tuple_with(
+  Term.elements,
+  parser.Seq(
+    Tokens.Ignore.PAREN_OPEN,
     Term,
-    Tokens.ignore.PAREN_CLOSE,
+    Tokens.Ignore.PAREN_CLOSE,
   )
 )
 
-Terms = peg.csl(Term, separator=Tokens.ignore.COMMA)
+Terms = parser.SepList(Term, sep=Tokens.Ignore.COMMA)
 
-SimpleTerm.grammar = [
-  (
-    peg.attr("id", Tokens.ID),
-    peg.optional(
-      Tokens.ignore.PAREN_OPEN,
-      peg.optional(
-        peg.attr("terms", Terms),
-      ),
-      Tokens.ignore.PAREN_CLOSE,
+SimpleTerm.grammar = parser.OneOf(
+  parser.Seq(
+    parser.Attr("id", Tokens.ID),
+    parser.Opt(
+      parser.Seq(
+        Tokens.Ignore.PAREN_OPEN,
+        parser.Opt(
+          parser.Attr("terms", Terms),
+        ),
+        Tokens.Ignore.PAREN_CLOSE,
+      )
     )
   ),
-  peg.attr("id", Tokens.NUMBER),
-  peg.attr("id", Tokens.STRING),
-  peg.attr("id", Tokens.VARIABLE),
-  peg.attr("id", Tokens.ANONYMOUS),
-]
+  parser.Attr(
+    "id",
+    parser.OneOf(
+      Tokens.NUMBER,
+      Tokens.STRING,
+      Tokens.VARIABLE,
+      Tokens.ANONYMOUS,
+    )
+  ),
+)
 
-Expression.grammar = (
-  peg.flag("negated", Tokens.OP_MINUS),
-  [
-    (
-      peg.attr(
+Expression.grammar = parser.Seq(
+  parser.Flag("negated", Tokens.OP_MINUS),
+  parser.OneOf(
+    parser.Seq(
+      parser.Attr(
         "lhs",
-        (
-          Tokens.ignore.PAREN_OPEN,
+        parser.Seq(
+          Tokens.Ignore.PAREN_OPEN,
           Term,
-          Tokens.ignore.PAREN_CLOSE,
+          Tokens.Ignore.PAREN_CLOSE,
         )
       ),
-      peg.attr("op", ArithOp),
-      peg.attr("rhs", Term)
+      parser.Attr("op", ArithOp),
+      parser.Attr("rhs", Term)
     ),
-    (
-      peg.attr("lhs", SimpleTerm),
-      peg.attr("op", ArithOp),
-      peg.attr("rhs", Term)
+    parser.Seq(
+      parser.Attr("lhs", SimpleTerm),
+      parser.Attr("op", ArithOp),
+      parser.Attr("rhs", Term)
     ),
-    peg.attr(
+    parser.Attr(
       "lhs",
       SimpleTerm,
     ),
-  ]
-)
-
-ClassicalLiteral.grammar = (
-  peg.flag("negated", Tokens.OP_MINUS),
-  peg.attr("id", Tokens.ID),
-  peg.optional(
-    Tokens.ignore.PAREN_OPEN,
-    peg.optional(
-      peg.attr("terms", Terms),
-    ),
-    Tokens.ignore.PAREN_CLOSE,
   )
 )
 
-BuiltinAtom.grammar = (
-  peg.attr("lhs", Term),
-  peg.attr("op", Comparator),
-  peg.attr("rhs", Term),
+ClassicalLiteral.grammar = parser.Seq(
+  parser.Flag("negated", Tokens.OP_MINUS),
+  parser.Attr("id", Tokens.ID),
+  parser.Opt(
+    parser.Seq(
+      Tokens.Ignore.PAREN_OPEN,
+      parser.Opt(
+        parser.Attr("terms", Terms),
+      ),
+      Tokens.Ignore.PAREN_CLOSE,
+    )
+  )
 )
 
-NafLiteral.grammar = (
-  peg.flag("negated", Tokens.NAF),
-  peg.attr(
+BuiltinAtom.grammar = parser.Seq(
+  parser.Attr("lhs", Term),
+  parser.Attr("op", Comparator),
+  parser.Attr("rhs", Term),
+)
+
+NafLiteral.grammar = parser.Seq(
+  parser.Flag("negated", Tokens.NAF),
+  parser.Attr(
     "contents",
-    [
+    parser.OneOf(
       ClassicalLiteral,
       BuiltinAtom
-    ]
+    )
   )
 )
 
-WeightAtLevel.grammar = (
-  peg.attr("weight", Term),
-  peg.optional(
-    (
-      Tokens.ignore.AT,
-      peg.attr("level", Term),
+WeightAtLevel.grammar = parser.Seq(
+  parser.Attr("weight", Term),
+  parser.Opt(
+    parser.Seq(
+      Tokens.Ignore.AT,
+      parser.Attr("level", Term),
     )
   ),
-  peg.optional(
-    (
-      Tokens.ignore.COMMA,
-      peg.attr("terms", Terms)
+  parser.Opt(
+    parser.Seq(
+      Tokens.Ignore.COMMA,
+      parser.Attr("terms", Terms)
     )
   )
 )
 
-AggregateElement.grammar = (
-  peg.attr("terms", Terms),
-  peg.optional(
-    Tokens.ignore.COLON,
-    peg.attr(
-      "constraints",
-      peg.csl(NafLiteral, separator=Tokens.ignore.COMMA)
+AggregateElement.grammar = parser.Seq(
+  parser.Attr("terms", Terms),
+  parser.Opt(
+    parser.Seq(
+      Tokens.Ignore.COLON,
+      parser.Attr(
+        "constraints",
+        parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
+      )
     )
   )
 )
 
-Aggregate.grammar = (
-  peg.flag("negated", Tokens.NAF),
-  peg.optional(
-    (
-      peg.attr("l", Term),
-      peg.attr("lop", Comparator),
+Aggregate.grammar = parser.Seq(
+  parser.Flag("negated", Tokens.NAF),
+  parser.Opt(
+    parser.Seq(
+      parser.Attr("l", Term),
+      parser.Attr("lop", Comparator),
     )
   ),
-  peg.attr(
+  parser.Attr(
     "function",
-    [
+    parser.OneOf(
       Tokens.KW_AGGREGATE_COUNT,
       Tokens.KW_AGGREGATE_MAX,
       Tokens.KW_AGGREGATE_MIN,
       Tokens.KW_AGGREGATE_SUM,
-    ]
-  ),
-  Tokens.ignore.CURLY_OPEN,
-  peg.optional(
-    peg.attr(
-      "elements",
-      peg.csl(AggregateElement, separator=Tokens.ignore.SEMICOLON),
     )
   ),
-  Tokens.ignore.CURLY_CLOSE,
-  peg.optional(
-    (
-      peg.attr("uop", Comparator),
-      peg.attr("u", Term),
+  Tokens.Ignore.CURLY_OPEN,
+  parser.Opt(
+    parser.Attr(
+      "elements",
+      parser.SepList(AggregateElement, sep=Tokens.Ignore.SEMICOLON),
+    )
+  ),
+  Tokens.Ignore.CURLY_CLOSE,
+  parser.Opt(
+    parser.Seq(
+      parser.Attr("uop", Comparator),
+      parser.Attr("u", Term),
     )
   ),
 )
 
-ChoiceElement.grammar = (
-  peg.attr("literal", ClassicalLiteral),
-  peg.optional(
-    Tokens.ignore.COLON,
-    peg.attr(
-      "constraints",
-      peg.csl(NafLiteral, separator=Tokens.ignore.COMMA)
+ChoiceElement.grammar = parser.Seq(
+  parser.Attr("literal", ClassicalLiteral),
+  parser.Opt(
+    parser.Seq(
+      Tokens.Ignore.COLON,
+      parser.Attr(
+        "constraints",
+        parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
+      )
     )
   )
 )
 
-Choice.grammar = (
-  peg.optional(
-    (
-      peg.attr("l", Term),
-      peg.attr("lop", Comparator),
+Choice.grammar = parser.Seq(
+  parser.Opt(
+    parser.Seq(
+      parser.Attr("l", Term),
+      parser.Attr("lop", Comparator),
     )
   ),
-  Tokens.ignore.CURLY_OPEN,
-  peg.optional(
-    peg.attr(
+  Tokens.Ignore.CURLY_OPEN,
+  parser.Opt(
+    parser.Attr(
       "elements",
-      peg.csl(ChoiceElement, separator=Tokens.ignore.SEMICOLON)
+      parser.SepList(ChoiceElement, sep=Tokens.Ignore.SEMICOLON)
     )
   ),
-  Tokens.ignore.CURLY_CLOSE,
-  peg.optional(
+  Tokens.Ignore.CURLY_CLOSE,
+  parser.Opt(
     (
-      peg.attr("uop", Comparator),
-      peg.attr("u", Term),
+      parser.Attr("uop", Comparator),
+      parser.Attr("u", Term),
     )
   ),
 )
 
-Disjunction = peg.csl(ClassicalLiteral, separator=Tokens.ignore.OR)
+Disjunction = parser.SepList(ClassicalLiteral, sep=Tokens.Ignore.OR)
 
-Head = [
+Head = parser.OneOf(
   Disjunction,
   Choice
-]
-
-Body = peg.csl(
-  [
-    NafLiteral,
-    Aggregate
-  ],
-  separator=Tokens.ignore.COMMA
 )
 
-OptimizeElement.grammar = (
-  peg.attr("weightlevel", WeightAtLevel),
-  peg.optional(
-    (
-      Tokens.ignore.COLON,
-      peg.attr("literals", peg.csl( NafLiteral, separator=Tokens.ignore.COMMA ))
+Body = parser.SepList(
+  parser.OneOf(
+    NafLiteral,
+    Aggregate
+  ),
+  sep=Tokens.Ignore.COMMA
+)
+
+OptimizeElement.grammar = parser.Seq(
+  parser.Attr("weightlevel", WeightAtLevel),
+  parser.Opt(
+    parser.Seq(
+      Tokens.Ignore.COLON,
+      parser.Attr(
+        "literals",
+        parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
+      )
     )
   )
 )
 
-OptimizeFunction = [ Tokens.KW_MAXIMIZE, Tokens.KW_MINIMIZE ]
+OptimizeFunction = parser.OneOf( Tokens.KW_MAXIMIZE, Tokens.KW_MINIMIZE )
 
-Optimization.grammar = [
-  (
-    peg.attr("function", OptimizeFunction),
-    Tokens.ignore.CURLY_OPEN,
-    peg.attr(
-      "elements",
-      peg.csl(OptimizeElement, separator=Tokens.ignore.SEMICOLON)
-    ),
-    Tokens.ignore.CURLY_CLOSE,
-    Tokens.ignore.DOT,
+Optimization.grammar = parser.Seq(
+  parser.Attr("function", OptimizeFunction),
+  Tokens.Ignore.CURLY_OPEN,
+  parser.Attr(
+    "elements",
+    parser.SepList(OptimizeElement, sep=Tokens.Ignore.SEMICOLON)
   ),
-]
+  Tokens.Ignore.CURLY_CLOSE,
+  Tokens.Ignore.DOT,
+)
 
-WeakConstraint.grammar = [
-  (
-    Tokens.ignore.WCONS,
-    peg.optional(
-      peg.attr("body", Body),
-    ),
-    Tokens.ignore.DOT,
-    Tokens.ignore.SQUARE_OPEN,
-    peg.attr("weightlevel", WeightAtLevel),
-    Tokens.ignore.SQUARE_CLOSE,
+WeakConstraint.grammar = parser.Seq(
+  Tokens.Ignore.WCONS,
+  parser.Opt(
+    parser.Attr("body", Body),
   ),
-]
+  Tokens.Ignore.DOT,
+  Tokens.Ignore.SQUARE_OPEN,
+  parser.Attr("weightlevel", WeightAtLevel),
+  Tokens.Ignore.SQUARE_CLOSE,
+)
 
-Rule.grammar = [
-  (
-    Tokens.ignore.CONS,
-    peg.attr("body", Body),
-    Tokens.ignore.DOT
+Rule.grammar = parser.OneOf(
+  parser.Seq(
+    Tokens.Ignore.CONS,
+    parser.Attr("body", Body),
+    Tokens.Ignore.DOT
   ),
-  (
-    peg.attr("head", Head),
-    peg.optional(
-      (
-        Tokens.ignore.CONS,
-        peg.attr("body", Body),
+  parser.Seq(
+    parser.Attr("head", Head),
+    parser.Opt(
+      parser.Seq(
+        Tokens.Ignore.CONS,
+        parser.Attr("body", Body),
       )
     ),
-    Tokens.ignore.DOT
+    Tokens.Ignore.DOT
   ),
-]
+)
 
-Directive.grammar = (
-  peg.attr(
+Directive.grammar = parser.Seq(
+  parser.Attr(
     "directive",
-    [
+    parser.OneOf(
       Tokens.DIR_HIDE,
       Tokens.DIR_SHOW,
       Tokens.DIR_CONST,
       Tokens.DIR_DOMAIN,
       Tokens.DIR_EXTERNAL,
-    ]
+    )
   ),
-  peg.attr(
+  parser.Attr(
     "contents",
     Tokens.DIRECTIVE_BODY
   ),
-  Tokens.ignore.DOT
+  Tokens.Ignore.DOT
 )
 
-Statement = [
+Statement = parser.OneOf(
   Rule,
   WeakConstraint,
   Optimization,
   Directive,
-]
+)
 
-Query.grammar = (
-  peg.attr("literal", ClassicalLiteral),
-  Tokens.ignore.QUERY_MARK
+Query.grammar = parser.Seq(
+  parser.Attr("literal", ClassicalLiteral),
+  Tokens.Ignore.QUERY_MARK
 )
 
 Comment.grammar = None
 
-Program.grammar = (
-  peg.attr("statements", peg.maybe_some( Statement )),
-  peg.optional( peg.attr("query", Query) ),
+Program.grammar = parser.Seq(
+  parser.Attr("statements", parser.Rep( Statement )),
+  parser.Opt( parser.Attr("query", Query) ),
 )
 
-# shortcuts:
-Pr = Predicate
-Vr = Variable
-PVr = PatternVariable
-SbT = Subtree
+# Parsing setup:
 
+def devour_asp(text):
+  """
+  A devour function for ASP that eats whitespace and comments.
+  """
+  ate_something = True
+  while ate_something:
+    ate_something = False
+    for r in (
+      Tokens.BLANK.expression,
+      Tokens.COMMENT.expression,
+      Tokens.MULTI_LINE_COMMENT.expression,
+    ):
+      m = r.match(text)
+      if m:
+        text = text[len(m.group(0)):]
+        ate_something = True
+  return text
+
+def parse_ans(text):
+  """
+  Parses the given text as an answer set, i.e., a sequence of predicate
+  statements. Returns a (possibly empty) tuple of Predicate objects.
+  """
+  return parse_completely(
+    text,
+    parser.Rep(PredicateStatement),
+    devour=devour_asp
+  )
+
+def parse_asp(text):
+  """
+  Parses the given text as an answer set program, i.e., a Program (see above).
+  Returns a Program object.
+  """
+  return parse_completely(
+    text,
+    Program,
+    devour=devour_asp
+  )
 
 # Testing:
 
 def _test_parse_as_predicate(text):
-  return peg.parse(text, Predicate)
+  return parser.parse(text, Predicate)
 
 def _test_parse_as_predicate_statement(text):
-  return peg.parse(text, PredicateStatement)
+  return parser.parse(text, PredicateStatement)
 
-def _test_parse_as_term(text):
-  return peg.parse(text, Term)
+def _test_parse_completely_as_term(text):
+  return parser.parse_completely(text, Term)
 
-def _test_parse_as_statement(text):
-  return peg.parse(text, Statement)
-
-def _test_parse_as_program(text):
-  return peg.parse(text, Program)
+def _test_parse_completely_as_statement(text):
+  return parser.parse_completely(text, Statement)
 
 
 def _test_restring_predicate(text):
-  return str(peg.parse(text, Predicate))
+  return str(parser.parse_completely(text, Predicate))
 
 def _test_restring_term(text):
-  return str(peg.parse(text, Term))
+  return str(parser.parse_completely(text, Term))
 
 def _test_restring_statement(text):
-  return str(peg.parse(text, Statement))
+  return str(parser.parse_completely(text, Statement))
 
 def _test_restring_program(text):
-  return str(peg.parse(text, Program))
+  return str(parser.parse_completely(text, Program))
 
 
 def _test_bad_fact(text):
   try:
-    peg.parse(text, Predicate)
+    parser.parse_completely(text, Predicate)
   except SyntaxError:
     return True
   return False
@@ -922,43 +1000,51 @@ _test_cases = [
   (
     _test_parse_as_predicate,
     "test",
-    Predicate("test")
+    (Predicate("test"), '')
   ),
   (
     _test_parse_as_predicate,
     "two_part",
-    Predicate("two_part")
+    (Predicate("two_part"), '')
+  ),
+  (
+    _test_parse_as_predicate,
+    "with_period.",
+    (Predicate("with_period"), '.')
   ),
   (
     _test_parse_as_predicate_statement,
     "with_period.",
-    Predicate("with_period")
+    (Predicate("with_period"), '')
   ),
   (
     _test_parse_as_predicate,
     "_",
-    Predicate("_")
+    (Predicate("_"), '')
   ),
   (
     _test_parse_as_predicate,
     "-15",
-    Predicate(-15)
+    (Predicate(-15), '')
   ),
   (
     _test_parse_as_predicate,
     "p(p(2), v(3, 4, s), z)",
-    Pr(
-      "p",
+    (
       Pr(
         "p",
-        Pr(2)
+        Pr(
+          "p",
+          Pr(2)
+        ),
+        Pr("v",
+          Pr(3),
+          Pr(4),
+          Pr("s")
+        ),
+        Pr("z")
       ),
-      Pr("v",
-        Pr(3),
-        Pr(4),
-        Pr("s")
-      ),
-      Pr("z")
+      ''
     )
   ),
   (
@@ -969,39 +1055,45 @@ _test_cases = [
   (
     _test_parse_as_predicate,
     '"quoted"',
-    Predicate('"quoted"')
+    (Predicate('"quoted"'), '')
   ),
   (
     _test_parse_as_predicate,
     '"negative(-3).bar"',
-    Predicate('"negative(-3).bar"')
+    (Predicate('"negative(-3).bar"'), '')
   ),
   (
     _test_parse_as_predicate,
     'negative(-3)',
-    Predicate("negative", Predicate(-3))
+    (Predicate("negative", Predicate(-3)), '')
   ),
   (
     _test_parse_as_predicate,
     '"qp"(test, "qp2")',
-    Pr(
-      '"qp"',
-      Pr("test"),
-      Pr('"qp2"')
+    (
+      Pr(
+        '"qp"',
+        Pr("test"),
+        Pr('"qp2"')
+      ),
+      ''
     )
   ),
   (
     _test_parse_as_predicate,
     'slot(n("P2.AgitatedInsult","S1"),to,empty).',
-    Pr(
-      "slot",
+    (
       Pr(
-        "n",
-        Pr('"P2.AgitatedInsult"'),
-        Pr('"S1"'),
+        "slot",
+        Pr(
+          "n",
+          Pr('"P2.AgitatedInsult"'),
+          Pr('"S1"'),
+        ),
+        Pr("to"),
+        Pr("empty"),
       ),
-      Pr("to"),
-      Pr("empty"),
+      ''
     )
   ),
   (_test_bad_fact, "3(v)", True),
@@ -1009,19 +1101,22 @@ _test_cases = [
   (
     _test_parse_as_predicate,
     'p(p(2), v(3, 4, s), z, "myeh myeh \\"jyeh, )")',
-    Pr(
-      "p",
+    (
       Pr(
         "p",
-        Pr(2)
+        Pr(
+          "p",
+          Pr(2)
+        ),
+        Pr("v",
+          Pr(3),
+          Pr(4),
+          Pr("s")
+        ),
+        Pr("z"),
+        Pr('"myeh myeh \\"jyeh, )"')
       ),
-      Pr("v",
-        Pr(3),
-        Pr(4),
-        Pr("s")
-      ),
-      Pr("z"),
-      Pr('"myeh myeh \\"jyeh, )"')
+      ''
     )
   ),
   (
@@ -1045,7 +1140,7 @@ _test_cases = [
   (
     _test_parse_as_predicate,
     "value(5,6,9,tr(2,-1,tr(6,1,tr(1,1,tr(3,-1,tr(3,1,none))))))).",
-    [
+    (
       Pr(
         "value",
         Pr(5),
@@ -1077,8 +1172,9 @@ _test_cases = [
             )
           )
         )
-      )
-    ]
+      ),
+      ''
+    )
   ),
   (
     str,
@@ -1119,15 +1215,18 @@ _test_cases = [
   (
     _test_parse_as_predicate,
     'slot(n("P2.AgitatedInsult","S1"),to,empty).',
-    Pr(
-      "slot",
+    (
       Pr(
-        "n",
-        Pr('"P2.AgitatedInsult"'),
-        Pr('"S1"'),
+        "slot",
+        Pr(
+          "n",
+          Pr('"P2.AgitatedInsult"'),
+          Pr('"S1"'),
+        ),
+        Pr("to"),
+        Pr("empty"),
       ),
-      Pr("to"),
-      Pr("empty"),
+      ''
     )
   ),
   (
@@ -1190,7 +1289,7 @@ _test_cases = [
   ),
   # TODO: add more tests for binding with pattern variables and subtrees.
   (
-    _test_parse_as_term,
+    _test_parse_completely_as_term,
     "foo(bar, 5)",
     SimpleTerm(
       "foo",
@@ -1201,7 +1300,7 @@ _test_cases = [
     ),
   ),
   (
-    _test_parse_as_term,
+    _test_parse_completely_as_term,
     "foo(Var(bar), baz(X, X+1)) / bar(Zed)",
     Expression(
       False,
@@ -1228,7 +1327,7 @@ _test_cases = [
     ),
   ),
   (
-    _test_parse_as_term,
+    _test_parse_completely_as_term,
     "-(x + 3) / 5 - 4", # Note awful operator binding x2
     Expression(
       True,
@@ -1248,7 +1347,7 @@ _test_cases = [
     ),
   ),
   (
-    _test_parse_as_term,
+    _test_parse_completely_as_term,
     "X * Y - -Z", # Note again bad operator binding
     Expression(
       False,
@@ -1277,7 +1376,7 @@ _test_cases = [
     "-((x + 3) / (5 - (4 * (3 - 1))))"
   ),
   (
-    _test_parse_as_statement,
+    _test_parse_completely_as_statement,
     "foo(bar, baz).",
     Rule(
       [
@@ -1294,7 +1393,7 @@ _test_cases = [
     ),
   ),
   (
-    _test_parse_as_statement,
+    _test_parse_completely_as_statement,
     "foo(bar, baz) | -xyzzy :- a, not b.",
     Rule(
       [
@@ -1330,7 +1429,7 @@ _test_cases = [
     ),
   ),
   (
-    _test_parse_as_statement,
+    _test_parse_completely_as_statement,
     """\
 1 <= { x(T) : not T < 3 ; y(T) } :-
   -3 < #count {
@@ -1446,7 +1545,7 @@ _test_cases = [
     "other; a, b : c, not d} < 7, other.",
   ),
   (
-    _test_parse_as_program,
+    parse_asp,
     """\
 a.
 b.
@@ -1467,11 +1566,92 @@ q :- a, b.
     ),
   ),
   (
-    _test_parse_as_program,
+    parse_asp,
     """\
 foo(3, 4).
 bar(X, Y+1) :- foo(X, Y), not bar(X, Y-1).
 bar(3, 5)?
+    """,
+    Program(
+      [
+        Rule(
+          [
+            ClassicalLiteral(
+              False,
+              "foo",
+              [ SimpleTerm("3"), SimpleTerm("4") ]
+            )
+          ]
+        ),
+        Rule(
+          [
+            ClassicalLiteral(
+              False,
+              "bar",
+              [
+                SimpleTerm("X"),
+                Expression(
+                  False,
+                  "+",
+                  SimpleTerm("Y"),
+                  SimpleTerm("1")
+                )
+              ]
+            )
+          ],
+          [
+            NafLiteral(
+              False,
+              ClassicalLiteral(
+                False,
+                "foo",
+                [ SimpleTerm("X"), SimpleTerm("Y") ]
+              )
+            ),
+            NafLiteral(
+              True,
+              ClassicalLiteral(
+                False,
+                "bar",
+                [
+                  SimpleTerm("X"),
+                  Expression(
+                    False,
+                    "-",
+                    SimpleTerm("Y"),
+                    SimpleTerm("1")
+                  )
+                ]
+              )
+            )
+          ]
+        )
+      ],
+      Query(
+        ClassicalLiteral(
+          False,
+          "bar",
+          [
+            SimpleTerm("3"),
+            SimpleTerm("5"),
+          ]
+        )
+      )
+    ),
+  ),
+  (
+    parse_asp,
+    """\
+foo(3, 4).
+% comment
+bar(X, Y+1) %* interrupt *%:- foo(X, Y), %* multi-
+line
+comment
+*% not bar(X, Y-1).
+bar(
+  3, % annoying
+  5
+)?
     """,
     Program(
       [
