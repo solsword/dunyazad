@@ -588,6 +588,20 @@ _test_grammar_2.elements = tuple_with(
   Opt(Attr("recurisve", _test_grammar_2))
 )
 
+# A different recursive grammar
+_test_grammar_3 = Seq(
+  Seq(
+    Token("("),
+    Word,
+  ),
+  Token(")"),
+)
+
+_test_grammar_3.elements = tuple_with(
+  _test_grammar_3.elements,
+  Opt(_test_grammar_3)
+)
+
 ###############
 # Test cases: #
 ###############
@@ -723,5 +737,24 @@ _test_cases = [
     lambda x: x, # test recursive object equality
     _test_grammar_1,
     _test_grammar_2
+  ),
+  (
+    lambda x: x, # test recursive object self-equality
+    _test_grammar_3,
+    _test_grammar_3
+  ),
+  (
+    # test recursive object parsing
+    _test_parse(_test_grammar_3, leftovers="( !)"),
+    "(a)(foo)(bar)( !)",
+    (
+      ( "a", ),
+      (
+        ( "foo", ),
+        (
+          ( "bar", ),
+        )
+      )
+    )
   ),
 ]

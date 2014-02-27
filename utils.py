@@ -78,8 +78,23 @@ def uniquely_defined_by(*attributes):
 def __hash__(self):
   return {hash_expr}
 
-@prevent_recursion(base_case=lambda self, other: id(self) == id(other))
+def eq_smart_base_case(initial_args, recursive_args):
+  initial_self = initial_args[0]
+  initial_other = initial_args[1][0]
+  recursive_self = recursive_args[0]
+  recursive_other = recursive_args[1][0]
+  # If I contain a copy of myself, other should contain a copy of themselves:
+  return (
+    id(initial_self) == id(recursive_self)
+  and
+    id(initial_other) == id(recursive_other)
+  )
+
+@prevent_recursion(smart_base_case=eq_smart_base_case)
 def __eq__(self, other):
+  '''
+  Note: won't work for recursive objects!
+  '''
   return type(self) == type(other) and {eq_expr}
 
 def __ne__(self, other):
@@ -139,32 +154,56 @@ class NotGiven:
 
 # Function decorators:
 
-def prevent_recursion(default_value=NotGiven, base_case=NotGiven):
+def prevent_recursion(
+  default_value=NotGiven,
+  base_case=NotGiven,
+  smart_base_case=NotGiven,
+):
   """
   A decorator that returns the given default value instead of whatever would
   usually be returned when the decorated method (it must be a method) is called
   recursively. Definitely not thread-safe. If no default value is given, it
   returns '<cls:id>' where 'cls' is the class name of the object the method is
-  being called on and 'id' is its id. If a base_case is given, it overrides any
-  default_value that is given, and it is called as a function with the
-  arguments of the method (including self) to produce a default value.
+  being called on and 'id' is its id. The three kinds of defaults override each
+  other: smart_base_case is used first, otherwise base_case is used and only if
+  neither smart_base_case nor base_case is given will default_value be used.
+  Each determines a default value differently:
+
+    default_value - Used directly as the default value.
+
+    base_case - called with the method arguments (including self) to return a
+      default value.
+
+    smart_base_case - called with two tuples to determine a default value. The
+      first tuple is (self, args, kwargs) as passed to the original
+      non-recursive call to the method, while the second tuple is (self, args,
+      kwargs) as passed to the current recursive call (for which the computed
+      default value will be used).
   """
   def decorate(method):
     def recursion_guard(self, *args, **kwargs):
       nonlocal default_value, base_case
       if not hasattr(self, "_is_being_called"):
         self._is_being_called = False
+      if not hasattr(self, "_initially_called_with"):
+        self._initially_called_with = None
       if self._is_being_called:
-        if base_case != NotGiven:
+        if smart_base_case != NotGiven:
+          return smart_base_case(
+            self._initially_called_with,
+            (self, args, kwargs)
+          )
+        elif base_case != NotGiven:
           return base_case(self, *args, **kwargs)
+        elif default_value != NotGiven:
+          return default_value
         else:
-          if default_value == NotGiven:
-            return "<{}:{}>".format(type(self).__name__, id(self))
-          else:
-            return default_value
+          return "<{}:{}>".format(type(self).__name__, id(self))
       else:
         self._is_being_called = True
+        self._initially_called_with = (self, args, kwargs)
         result = method(self, *args, **kwargs)
+        self._initially_called_with = None
         self._is_being_called = False
         return result
     return recursion_guard
