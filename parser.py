@@ -8,6 +8,8 @@ import string
 import re
 import types
 
+import traceback
+
 ############
 # Globals: #
 ############
@@ -246,7 +248,7 @@ class OneOf(GrammarElement):
     for alt in self.elements:
       result, bubbles, leftovers = packrat_parse(text, alt)
       if not isinstance(leftovers, ParseError):
-        yield result, bubbles, leftovers
+        yield (result, bubbles, leftovers)
     yield (
       NoResult,
       (),
@@ -353,26 +355,12 @@ class Flag(GrammarElement):
       return NoResult, bubbles, leftovers
 
 @attr_object("callback", "thing")
-class Munge(GrammarElement):
-  """
-  A Munge grammar element works like a Hook but its callback only affects the
-  result returned: it neither gets as arguments nor is expected to return the
-  bubbles and leftovers.
-  """
-  @prevent_recursion()
-  def __str__(self):
-    return "Munge({}, {})".format(self.callback, self.thing)
-
-  def _parse(self, text):
-    r, b, l = packrat_parse(text, self.thing)
-    return self.callback(r), b, l
-
-@attr_object("callback", "thing")
 class Hook(GrammarElement):
   """
   A Hook grammar element parses text as the given object and then calls the
   given callback function on the result, bubbles, and leftovers before
-  returning the modified results.
+  returning the modified results. Note that the callback function can
+  effectively catch and override a ParseError.
   """
   @prevent_recursion()
   def __str__(self):
@@ -383,7 +371,25 @@ class Hook(GrammarElement):
     r, b, l = self.callback(r, b, l)
     return r, b, l
 
-@attr_object("cls", "thing")
+@attr_object("callback", "thing")
+class Munge(GrammarElement):
+  """
+  A Munge grammar element works like a Hook but its callback only affects the
+  result returned: it neither gets as arguments nor is expected to return the
+  bubbles and leftovers. If the sub-grammar fails, the callback function is not
+  called.
+  """
+  @prevent_recursion()
+  def __str__(self):
+    return "Munge({}, {})".format(self.callback, self.thing)
+
+  def _parse(self, text):
+    r, b, l = packrat_parse(text, self.thing)
+    if isinstance(l, ParseError):
+      return r, b, l
+    return self.callback(r), b, l
+
+@attr_object("cls", "thing", "cleanup")
 class Package(GrammarElement):
   """
   A Package grammar element creates an instance of a specific class after
@@ -391,10 +397,12 @@ class Package(GrammarElement):
   the given text, but it catches AttributeBubble objects in the bubble cloud
   and assigns attributes on the newly created object accordingly. As part of
   this process it calls the constructor of the given class with zero arguments.
+  If a cleanup method name is given that method of the result object is called
+  (with zero arguments) after creating the object and assigning its attributes.
   """
   @prevent_recursion()
   def __str__(self):
-    return "Package({}, {})".format(self.cls, self.thing)
+    return "Package({}, {}, {})".format(self.cls, self.thing, self.cleanup)
 
   def _parse(self, text):
     r, b, l = packrat_parse(text, self.thing)
@@ -405,6 +413,9 @@ class Package(GrammarElement):
         setattr(obj, bubble.name, bubble.value)
       else:
         filtered.append(bubble)
+
+    if self.cleanup and hasattr(obj, self.cleanup):
+      getattr(obj, self.cleanup)()
     return obj, tuple(filtered), l
 
 ###########################
@@ -438,7 +449,7 @@ def packrat_parse(text, thing, devour=_default_devour):
     if hasattr(thing, "_parse"):
       result = thing._parse(text)
       if isinstance(result, types.GeneratorType):
-        r, b, l = next(r)
+        r, b, l = next(result)
       else:
         r, b, l = result
     elif hasattr(thing, "grammar"):
@@ -456,8 +467,11 @@ def packrat_parse(text, thing, devour=_default_devour):
       NoResult,
       (),
       ParseError(
-        "Failed to parse '{}' as {}.\nGot error: {}".format(
-          error_context(text), thing, e
+        "Failed to parse '{}' as:\n  {}\n\nGot error:\n{}\n{}".format(
+          error_context(text),
+          thing,
+          e,
+          ''.join(traceback.format_tb(e.__traceback__))
         )
       )
     )
@@ -493,7 +507,7 @@ def parse_completely(
     l = devour(l)
   if l:
     raise ParseError(
-      "Parse successful but incomplete (remainder '{}').".format(
+      "Parse successful but incomplete. Remainder: '{}'".format(
         error_context(l)
       )
     )

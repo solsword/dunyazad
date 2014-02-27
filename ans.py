@@ -142,7 +142,8 @@ class Predicate:
   """
   def __init__(self, name="_", *args):
     self.name = name
-    self.args = list(args)
+    self.args = args
+    self._polish()
 
   def __str__(self):
     if self.args:
@@ -164,9 +165,26 @@ class Predicate:
     )
 
   def __eq__(self, other):
-    return type(self) == type(other) \
-        and self.name == other.name \
-        and self.args == other.args
+    return (
+      (type(self) == type(other))
+    and
+      (self.name == other.name)
+    and
+      (self.args == other.args)
+    )
+    #r1 = (type(self) == type(other))
+    #if not r1:
+    #  print("Failed: r1")
+    #  return False
+    #r2 = (self.name == other.name)
+    #if not r2:
+    #  print("Failed: r2")
+    #  return False
+    #r3 = (self.args == other.args)
+    #if not r3:
+    #  print("Failed: r3\n{}\n{}".format(self.args, other.args))
+    #  return False
+    #return True
 
   def __ne__(self, other):
     return not self == other
@@ -174,11 +192,8 @@ class Predicate:
   def matches(self, other):
     return self.name == other.name and len(self.args) == len(other.args)
 
-  def polish(self):
-    try:
-      self.name = int(self.name)
-    except ValueError:
-      pass
+  def _polish(self):
+    self.args = list(self.args)
 
 Predicate.grammar = parser.Package(
   Predicate,
@@ -203,17 +218,24 @@ Predicate.grammar = parser.Package(
       "name",
       parser.OneOf(
         Tokens.ANONYMOUS,
-        Tokens.LOOSE_INTEGER,
+        parser.Munge(
+          int,
+          Tokens.LOOSE_INTEGER,
+        ),
         Tokens.KW_INFIMUM,
         Tokens.KW_SUPREMUM,
       )
     ),
-  )
+  ),
+  "_polish"
 )
 
-PredicateStatement = parser.Seq(
-  Predicate,
-  Tokens.Ignore.DOT
+PredicateStatement = parser.Munge(
+  lambda r: r[0],
+  parser.Seq(
+    Predicate,
+    Tokens.Ignore.DOT
+  )
 )
 
 
@@ -632,8 +654,67 @@ Term.elements = tuple_with(
 
 Terms = parser.SepList(Term, sep=Tokens.Ignore.COMMA)
 
-SimpleTerm.grammar = parser.OneOf(
+SimpleTerm.grammar = parser.Package(
+  SimpleTerm,
+  parser.OneOf(
+    parser.Seq(
+      parser.Attr("id", Tokens.ID),
+      parser.Opt(
+        parser.Seq(
+          Tokens.Ignore.PAREN_OPEN,
+          parser.Opt(
+            parser.Attr("terms", Terms),
+          ),
+          Tokens.Ignore.PAREN_CLOSE,
+        )
+      )
+    ),
+    parser.Attr(
+      "id",
+      parser.OneOf(
+        Tokens.NUMBER,
+        Tokens.STRING,
+        Tokens.VARIABLE,
+        Tokens.ANONYMOUS,
+      )
+    ),
+  ),
+)
+
+Expression.grammar = parser.Package(
+  Expression,
   parser.Seq(
+    parser.Flag("negated", Tokens.OP_MINUS),
+    parser.OneOf(
+      parser.Seq(
+        parser.Attr(
+          "lhs",
+          parser.Seq(
+            Tokens.Ignore.PAREN_OPEN,
+            Term,
+            Tokens.Ignore.PAREN_CLOSE,
+          )
+        ),
+        parser.Attr("op", ArithOp),
+        parser.Attr("rhs", Term)
+      ),
+      parser.Seq(
+        parser.Attr("lhs", SimpleTerm),
+        parser.Attr("op", ArithOp),
+        parser.Attr("rhs", Term)
+      ),
+      parser.Attr(
+        "lhs",
+        SimpleTerm,
+      ),
+    )
+  )
+)
+
+ClassicalLiteral.grammar = parser.Package(
+  ClassicalLiteral,
+  parser.Seq(
+    parser.Flag("negated", Tokens.OP_MINUS),
     parser.Attr("id", Tokens.ID),
     parser.Opt(
       parser.Seq(
@@ -644,172 +725,143 @@ SimpleTerm.grammar = parser.OneOf(
         Tokens.Ignore.PAREN_CLOSE,
       )
     )
-  ),
-  parser.Attr(
-    "id",
-    parser.OneOf(
-      Tokens.NUMBER,
-      Tokens.STRING,
-      Tokens.VARIABLE,
-      Tokens.ANONYMOUS,
-    )
-  ),
+  )
 )
 
-Expression.grammar = parser.Seq(
-  parser.Flag("negated", Tokens.OP_MINUS),
-  parser.OneOf(
-    parser.Seq(
-      parser.Attr(
-        "lhs",
-        parser.Seq(
-          Tokens.Ignore.PAREN_OPEN,
-          Term,
-          Tokens.Ignore.PAREN_CLOSE,
+BuiltinAtom.grammar = parser.Package(
+  BuiltinAtom,
+  parser.Seq(
+    parser.Attr("lhs", Term),
+    parser.Attr("op", Comparator),
+    parser.Attr("rhs", Term),
+  )
+)
+
+NafLiteral.grammar = parser.Package(
+  NafLiteral,
+  parser.Seq(
+    parser.Flag("negated", Tokens.NAF),
+    parser.Attr(
+      "contents",
+      parser.OneOf(
+        ClassicalLiteral,
+        BuiltinAtom
+      )
+    )
+  )
+)
+
+WeightAtLevel.grammar = parser.Package(
+  WeightAtLevel,
+  parser.Seq(
+    parser.Attr("weight", Term),
+    parser.Opt(
+      parser.Seq(
+        Tokens.Ignore.AT,
+        parser.Attr("level", Term),
+      )
+    ),
+    parser.Opt(
+      parser.Seq(
+        Tokens.Ignore.COMMA,
+        parser.Attr("terms", Terms)
+      )
+    )
+  )
+)
+
+AggregateElement.grammar = parser.Package(
+  AggregateElement,
+  parser.Seq(
+    parser.Attr("terms", Terms),
+    parser.Opt(
+      parser.Seq(
+        Tokens.Ignore.COLON,
+        parser.Attr(
+          "constraints",
+          parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
         )
-      ),
-      parser.Attr("op", ArithOp),
-      parser.Attr("rhs", Term)
-    ),
-    parser.Seq(
-      parser.Attr("lhs", SimpleTerm),
-      parser.Attr("op", ArithOp),
-      parser.Attr("rhs", Term)
-    ),
-    parser.Attr(
-      "lhs",
-      SimpleTerm,
-    ),
-  )
-)
-
-ClassicalLiteral.grammar = parser.Seq(
-  parser.Flag("negated", Tokens.OP_MINUS),
-  parser.Attr("id", Tokens.ID),
-  parser.Opt(
-    parser.Seq(
-      Tokens.Ignore.PAREN_OPEN,
-      parser.Opt(
-        parser.Attr("terms", Terms),
-      ),
-      Tokens.Ignore.PAREN_CLOSE,
-    )
-  )
-)
-
-BuiltinAtom.grammar = parser.Seq(
-  parser.Attr("lhs", Term),
-  parser.Attr("op", Comparator),
-  parser.Attr("rhs", Term),
-)
-
-NafLiteral.grammar = parser.Seq(
-  parser.Flag("negated", Tokens.NAF),
-  parser.Attr(
-    "contents",
-    parser.OneOf(
-      ClassicalLiteral,
-      BuiltinAtom
-    )
-  )
-)
-
-WeightAtLevel.grammar = parser.Seq(
-  parser.Attr("weight", Term),
-  parser.Opt(
-    parser.Seq(
-      Tokens.Ignore.AT,
-      parser.Attr("level", Term),
-    )
-  ),
-  parser.Opt(
-    parser.Seq(
-      Tokens.Ignore.COMMA,
-      parser.Attr("terms", Terms)
-    )
-  )
-)
-
-AggregateElement.grammar = parser.Seq(
-  parser.Attr("terms", Terms),
-  parser.Opt(
-    parser.Seq(
-      Tokens.Ignore.COLON,
-      parser.Attr(
-        "constraints",
-        parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
       )
     )
   )
 )
 
-Aggregate.grammar = parser.Seq(
-  parser.Flag("negated", Tokens.NAF),
-  parser.Opt(
-    parser.Seq(
-      parser.Attr("l", Term),
-      parser.Attr("lop", Comparator),
-    )
-  ),
-  parser.Attr(
-    "function",
-    parser.OneOf(
-      Tokens.KW_AGGREGATE_COUNT,
-      Tokens.KW_AGGREGATE_MAX,
-      Tokens.KW_AGGREGATE_MIN,
-      Tokens.KW_AGGREGATE_SUM,
-    )
-  ),
-  Tokens.Ignore.CURLY_OPEN,
-  parser.Opt(
+Aggregate.grammar = parser.Package(
+  Aggregate,
+  parser.Seq(
+    parser.Flag("negated", Tokens.NAF),
+    parser.Opt(
+      parser.Seq(
+        parser.Attr("l", Term),
+        parser.Attr("lop", Comparator),
+      )
+    ),
     parser.Attr(
-      "elements",
-      parser.SepList(AggregateElement, sep=Tokens.Ignore.SEMICOLON),
-    )
-  ),
-  Tokens.Ignore.CURLY_CLOSE,
-  parser.Opt(
-    parser.Seq(
-      parser.Attr("uop", Comparator),
-      parser.Attr("u", Term),
-    )
-  ),
+      "function",
+      parser.OneOf(
+        Tokens.KW_AGGREGATE_COUNT,
+        Tokens.KW_AGGREGATE_MAX,
+        Tokens.KW_AGGREGATE_MIN,
+        Tokens.KW_AGGREGATE_SUM,
+      )
+    ),
+    Tokens.Ignore.CURLY_OPEN,
+    parser.Opt(
+      parser.Attr(
+        "elements",
+        parser.SepList(AggregateElement, sep=Tokens.Ignore.SEMICOLON),
+      )
+    ),
+    Tokens.Ignore.CURLY_CLOSE,
+    parser.Opt(
+      parser.Seq(
+        parser.Attr("uop", Comparator),
+        parser.Attr("u", Term),
+      )
+    ),
+  )
 )
 
-ChoiceElement.grammar = parser.Seq(
-  parser.Attr("literal", ClassicalLiteral),
-  parser.Opt(
-    parser.Seq(
-      Tokens.Ignore.COLON,
-      parser.Attr(
-        "constraints",
-        parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
+ChoiceElement.grammar = parser.Package(
+  ChoiceElement,
+  parser.Seq(
+    parser.Attr("literal", ClassicalLiteral),
+    parser.Opt(
+      parser.Seq(
+        Tokens.Ignore.COLON,
+        parser.Attr(
+          "constraints",
+          parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
+        )
       )
     )
   )
 )
 
-Choice.grammar = parser.Seq(
-  parser.Opt(
-    parser.Seq(
-      parser.Attr("l", Term),
-      parser.Attr("lop", Comparator),
-    )
-  ),
-  Tokens.Ignore.CURLY_OPEN,
-  parser.Opt(
-    parser.Attr(
-      "elements",
-      parser.SepList(ChoiceElement, sep=Tokens.Ignore.SEMICOLON)
-    )
-  ),
-  Tokens.Ignore.CURLY_CLOSE,
-  parser.Opt(
-    (
-      parser.Attr("uop", Comparator),
-      parser.Attr("u", Term),
-    )
-  ),
+Choice.grammar = parser.Package(
+  Choice,
+  parser.Seq(
+    parser.Opt(
+      parser.Seq(
+        parser.Attr("l", Term),
+        parser.Attr("lop", Comparator),
+      )
+    ),
+    Tokens.Ignore.CURLY_OPEN,
+    parser.Opt(
+      parser.Attr(
+        "elements",
+        parser.SepList(ChoiceElement, sep=Tokens.Ignore.SEMICOLON)
+      )
+    ),
+    Tokens.Ignore.CURLY_CLOSE,
+    parser.Opt(
+      (
+        parser.Attr("uop", Comparator),
+        parser.Attr("u", Term),
+      )
+    ),
+  )
 )
 
 Disjunction = parser.SepList(ClassicalLiteral, sep=Tokens.Ignore.OR)
@@ -827,14 +879,17 @@ Body = parser.SepList(
   sep=Tokens.Ignore.COMMA
 )
 
-OptimizeElement.grammar = parser.Seq(
-  parser.Attr("weightlevel", WeightAtLevel),
-  parser.Opt(
-    parser.Seq(
-      Tokens.Ignore.COLON,
-      parser.Attr(
-        "literals",
-        parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
+OptimizeElement.grammar = parser.Package(
+  OptimizeElement,
+  parser.Seq(
+    parser.Attr("weightlevel", WeightAtLevel),
+    parser.Opt(
+      parser.Seq(
+        Tokens.Ignore.COLON,
+        parser.Attr(
+          "literals",
+          parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
+        )
       )
     )
   )
@@ -842,62 +897,74 @@ OptimizeElement.grammar = parser.Seq(
 
 OptimizeFunction = parser.OneOf( Tokens.KW_MAXIMIZE, Tokens.KW_MINIMIZE )
 
-Optimization.grammar = parser.Seq(
-  parser.Attr("function", OptimizeFunction),
-  Tokens.Ignore.CURLY_OPEN,
-  parser.Attr(
-    "elements",
-    parser.SepList(OptimizeElement, sep=Tokens.Ignore.SEMICOLON)
-  ),
-  Tokens.Ignore.CURLY_CLOSE,
-  Tokens.Ignore.DOT,
+Optimization.grammar = parser.Package(
+  Optimization,
+  parser.Seq(
+    parser.Attr("function", OptimizeFunction),
+    Tokens.Ignore.CURLY_OPEN,
+    parser.Attr(
+      "elements",
+      parser.SepList(OptimizeElement, sep=Tokens.Ignore.SEMICOLON)
+    ),
+    Tokens.Ignore.CURLY_CLOSE,
+    Tokens.Ignore.DOT,
+  )
 )
 
-WeakConstraint.grammar = parser.Seq(
-  Tokens.Ignore.WCONS,
-  parser.Opt(
-    parser.Attr("body", Body),
-  ),
-  Tokens.Ignore.DOT,
-  Tokens.Ignore.SQUARE_OPEN,
-  parser.Attr("weightlevel", WeightAtLevel),
-  Tokens.Ignore.SQUARE_CLOSE,
-)
-
-Rule.grammar = parser.OneOf(
+WeakConstraint.grammar = parser.Package(
+  WeakConstraint,
   parser.Seq(
-    Tokens.Ignore.CONS,
-    parser.Attr("body", Body),
-    Tokens.Ignore.DOT
-  ),
-  parser.Seq(
-    parser.Attr("head", Head),
+    Tokens.Ignore.WCONS,
     parser.Opt(
-      parser.Seq(
-        Tokens.Ignore.CONS,
-        parser.Attr("body", Body),
+      parser.Attr("body", Body),
+    ),
+    Tokens.Ignore.DOT,
+    Tokens.Ignore.SQUARE_OPEN,
+    parser.Attr("weightlevel", WeightAtLevel),
+    Tokens.Ignore.SQUARE_CLOSE,
+  )
+)
+
+Rule.grammar = parser.Package(
+  Rule,
+  parser.OneOf(
+    parser.Seq(
+      Tokens.Ignore.CONS,
+      parser.Attr("body", Body),
+      Tokens.Ignore.DOT
+    ),
+    parser.Seq(
+      parser.Attr("head", Head),
+      parser.Opt(
+        parser.Seq(
+          Tokens.Ignore.CONS,
+          parser.Attr("body", Body),
+        )
+      ),
+      Tokens.Ignore.DOT
+    ),
+  )
+)
+
+Directive.grammar = parser.Package(
+  Directive,
+  parser.Seq(
+    parser.Attr(
+      "directive",
+      parser.OneOf(
+        Tokens.DIR_HIDE,
+        Tokens.DIR_SHOW,
+        Tokens.DIR_CONST,
+        Tokens.DIR_DOMAIN,
+        Tokens.DIR_EXTERNAL,
       )
     ),
+    parser.Attr(
+      "contents",
+      Tokens.DIRECTIVE_BODY
+    ),
     Tokens.Ignore.DOT
-  ),
-)
-
-Directive.grammar = parser.Seq(
-  parser.Attr(
-    "directive",
-    parser.OneOf(
-      Tokens.DIR_HIDE,
-      Tokens.DIR_SHOW,
-      Tokens.DIR_CONST,
-      Tokens.DIR_DOMAIN,
-      Tokens.DIR_EXTERNAL,
-    )
-  ),
-  parser.Attr(
-    "contents",
-    Tokens.DIRECTIVE_BODY
-  ),
-  Tokens.Ignore.DOT
+  )
 )
 
 Statement = parser.OneOf(
@@ -907,16 +974,22 @@ Statement = parser.OneOf(
   Directive,
 )
 
-Query.grammar = parser.Seq(
-  parser.Attr("literal", ClassicalLiteral),
-  Tokens.Ignore.QUERY_MARK
+Query.grammar = parser.Package(
+  Query,
+  parser.Seq(
+    parser.Attr("literal", ClassicalLiteral),
+    Tokens.Ignore.QUERY_MARK
+  )
 )
 
 Comment.grammar = None
 
-Program.grammar = parser.Seq(
-  parser.Attr("statements", parser.Rep( Statement )),
-  parser.Opt( parser.Attr("query", Query) ),
+Program.grammar = parser.Package(
+  Program,
+  parser.Seq(
+    parser.Attr("statements", parser.Rep( Statement )),
+    parser.Opt( parser.Attr("query", Query) ),
+  )
 )
 
 # Parsing setup:
@@ -992,7 +1065,7 @@ def _test_restring_program(text):
 def _test_bad_fact(text):
   try:
     parser.parse_completely(text, Predicate)
-  except SyntaxError:
+  except parser.ParseError:
     return True
   return False
 
@@ -1026,6 +1099,35 @@ _test_cases = [
     _test_parse_as_predicate,
     "-15",
     (Predicate(-15), '')
+  ),
+  (
+    lambda x: x, # test predicate equality
+    Pr(
+      "p",
+      Pr(
+        "p",
+        Pr(2)
+      ),
+      Pr("v",
+        Pr(3),
+        Pr(4),
+        Pr("s")
+      ),
+      Pr("z")
+    ),
+    Pr(
+      "p",
+      Pr(
+        "p",
+        Pr(2)
+      ),
+      Pr("v",
+        Pr(3),
+        Pr(4),
+        Pr("s")
+      ),
+      Pr("z")
+    ),
   ),
   (
     _test_parse_as_predicate,
@@ -1081,6 +1183,23 @@ _test_cases = [
   ),
   (
     _test_parse_as_predicate,
+    'slot(n("P2.AgitatedInsult","S1"),to,empty).',
+    (
+      Pr(
+        "slot",
+        Pr(
+          "n",
+          Pr('"P2.AgitatedInsult"'),
+          Pr('"S1"'),
+        ),
+        Pr("to"),
+        Pr("empty"),
+      ),
+      '.'
+    )
+  ),
+  (
+    _test_parse_as_predicate_statement,
     'slot(n("P2.AgitatedInsult","S1"),to,empty).',
     (
       Pr(
@@ -1173,7 +1292,7 @@ _test_cases = [
           )
         )
       ),
-      ''
+      ').'
     )
   ),
   (
@@ -1211,23 +1330,6 @@ _test_cases = [
       )
     ),
     "value(5, 6, 9, tr(2, -1, tr(6, 1, tr(1, 1, tr(3, -1, tr(3, 1, none))))))",
-  ),
-  (
-    _test_parse_as_predicate,
-    'slot(n("P2.AgitatedInsult","S1"),to,empty).',
-    (
-      Pr(
-        "slot",
-        Pr(
-          "n",
-          Pr('"P2.AgitatedInsult"'),
-          Pr('"S1"'),
-        ),
-        Pr("to"),
-        Pr("empty"),
-      ),
-      ''
-    )
   ),
   (
     build_schema,
@@ -1290,13 +1392,18 @@ _test_cases = [
   # TODO: add more tests for binding with pattern variables and subtrees.
   (
     _test_parse_completely_as_term,
+    "foo",
+    SimpleTerm("foo"),
+  ),
+  (
+    _test_parse_completely_as_term,
     "foo(bar, 5)",
     SimpleTerm(
       "foo",
-      [
+      (
         SimpleTerm("bar"),
         SimpleTerm("5")
-      ]
+      )
     ),
   ),
   (
@@ -1307,11 +1414,11 @@ _test_cases = [
       "/",
       SimpleTerm(
         "foo",
-        [
-          SimpleTerm( "Var", [ SimpleTerm("bar") ]),
+        (
+          SimpleTerm( "Var", ( SimpleTerm("bar") )),
           SimpleTerm(
             "baz",
-            [
+            (
               SimpleTerm("X"),
               Expression(
                 False,
@@ -1319,11 +1426,11 @@ _test_cases = [
                 SimpleTerm("X"),
                 SimpleTerm("1"),
               )
-            ]
+            )
           ),
-        ]
+        )
       ),
-      SimpleTerm( "bar", [ SimpleTerm("Zed") ])
+      SimpleTerm( "bar", ( SimpleTerm("Zed") ))
     ),
   ),
   (
@@ -1379,7 +1486,7 @@ _test_cases = [
     _test_parse_completely_as_statement,
     "foo(bar, baz).",
     Rule(
-      [
+      (
         ClassicalLiteral(
           False,
           "foo",
@@ -1388,7 +1495,7 @@ _test_cases = [
             SimpleTerm("baz"),
           ]
         )
-      ],
+      ),
       None
     ),
   ),
@@ -1396,21 +1503,21 @@ _test_cases = [
     _test_parse_completely_as_statement,
     "foo(bar, baz) | -xyzzy :- a, not b.",
     Rule(
-      [
+      (
         ClassicalLiteral(
           False,
           "foo",
-          [
+          (
             SimpleTerm("bar"),
             SimpleTerm("baz"),
-          ]
+          )
         ),
         ClassicalLiteral(
           True,
           "xyzzy"
         )
-      ],
-      [
+      ),
+      (
         NafLiteral(
           False,
           ClassicalLiteral(
@@ -1425,7 +1532,7 @@ _test_cases = [
             "b"
           )
         )
-      ]
+      )
     ),
   ),
   (
@@ -1442,16 +1549,16 @@ _test_cases = [
       Choice(
         SimpleTerm("1"),
         "<=",
-        [
+        (
           ChoiceElement(
             ClassicalLiteral(
               False,
               "x",
-              [
+              (
                 SimpleTerm("T")
-              ]
+              )
             ),
-            [
+            (
               NafLiteral(
                 True,
                 BuiltinAtom(
@@ -1460,20 +1567,20 @@ _test_cases = [
                   SimpleTerm("3")
                 )
               )
-            ]
+            )
           ),
           ChoiceElement(
             ClassicalLiteral(
               False,
               "y",
-              [
+              (
                 SimpleTerm("T")
-              ]
+              )
             )
           )
-        ],
+        ),
       ),
-      [ # rule-body
+      ( # rule-body
         Aggregate(
           False,
           Expression(
@@ -1483,14 +1590,14 @@ _test_cases = [
           ),
           "<",
           "#count",
-          [
+          (
             AggregateElement(
-              [
+              (
                 Expression(True, None, SimpleTerm("X")),
                 Expression(False, "+", SimpleTerm("Y"), SimpleTerm("5")),
-                SimpleTerm("foobar", [ SimpleTerm("X") ]),
-              ],
-              [
+                SimpleTerm("foobar", ( SimpleTerm("X") )),
+              ),
+              (
                 NafLiteral(
                   False,
                   BuiltinAtom(
@@ -1499,25 +1606,25 @@ _test_cases = [
                     SimpleTerm("3")
                   )
                 )
-              ]
+              )
             ),
-            AggregateElement( [ SimpleTerm("other"), ] ),
+            AggregateElement( ( SimpleTerm("other"), ) ),
             AggregateElement(
-              [
+              (
                 SimpleTerm("a"),
                 SimpleTerm("b"),
-              ],
-              [
+              ),
+              (
                 NafLiteral(False, ClassicalLiteral(False, "c")),
                 NafLiteral(True, ClassicalLiteral(False, "d")),
-              ]
+              )
             ),
-          ],
+          ),
           "<",
           SimpleTerm("7")
         ),
         NafLiteral(False, ClassicalLiteral(False, "other"))
-      ]   
+      )   
     ),
   ),
   (
@@ -1552,17 +1659,17 @@ b.
 q :- a, b.
     """,
     Program(
-      [
-        Rule( [ ClassicalLiteral(False, "a") ]),
-        Rule( [ ClassicalLiteral(False, "b") ]),
+      (
+        Rule( ( ClassicalLiteral(False, "a") ) ),
+        Rule( ( ClassicalLiteral(False, "b") ) ),
         Rule(
-          [ ClassicalLiteral(False, "q") ],
-          [
+          ( ClassicalLiteral(False, "q") ),
+          (
             NafLiteral(False, ClassicalLiteral(False, "a")),
             NafLiteral(False, ClassicalLiteral(False, "b")),
-          ]
+          )
         )
-      ]
+      )
     ),
   ),
   (
@@ -1573,22 +1680,22 @@ bar(X, Y+1) :- foo(X, Y), not bar(X, Y-1).
 bar(3, 5)?
     """,
     Program(
-      [
+      (
         Rule(
-          [
+          (
             ClassicalLiteral(
               False,
               "foo",
-              [ SimpleTerm("3"), SimpleTerm("4") ]
+              ( SimpleTerm("3"), SimpleTerm("4") )
             )
-          ]
+          )
         ),
         Rule(
-          [
+          (
             ClassicalLiteral(
               False,
               "bar",
-              [
+              (
                 SimpleTerm("X"),
                 Expression(
                   False,
@@ -1596,16 +1703,16 @@ bar(3, 5)?
                   SimpleTerm("Y"),
                   SimpleTerm("1")
                 )
-              ]
+              )
             )
-          ],
-          [
+          ),
+          (
             NafLiteral(
               False,
               ClassicalLiteral(
                 False,
                 "foo",
-                [ SimpleTerm("X"), SimpleTerm("Y") ]
+                 ( SimpleTerm("X"), SimpleTerm("Y") )
               )
             ),
             NafLiteral(
@@ -1613,7 +1720,7 @@ bar(3, 5)?
               ClassicalLiteral(
                 False,
                 "bar",
-                [
+                (
                   SimpleTerm("X"),
                   Expression(
                     False,
@@ -1621,20 +1728,20 @@ bar(3, 5)?
                     SimpleTerm("Y"),
                     SimpleTerm("1")
                   )
-                ]
+                )
               )
             )
-          ]
+          )
         )
-      ],
+      ),
       Query(
         ClassicalLiteral(
           False,
           "bar",
-          [
+          (
             SimpleTerm("3"),
             SimpleTerm("5"),
-          ]
+          )
         )
       )
     ),
@@ -1654,22 +1761,22 @@ bar(
 )?
     """,
     Program(
-      [
+      (
         Rule(
-          [
+          (
             ClassicalLiteral(
               False,
               "foo",
-              [ SimpleTerm("3"), SimpleTerm("4") ]
+              ( SimpleTerm("3"), SimpleTerm("4") )
             )
-          ]
+          )
         ),
         Rule(
-          [
+          (
             ClassicalLiteral(
               False,
               "bar",
-              [
+              (
                 SimpleTerm("X"),
                 Expression(
                   False,
@@ -1677,16 +1784,16 @@ bar(
                   SimpleTerm("Y"),
                   SimpleTerm("1")
                 )
-              ]
+              )
             )
-          ],
-          [
+          ),
+          (
             NafLiteral(
               False,
               ClassicalLiteral(
                 False,
                 "foo",
-                [ SimpleTerm("X"), SimpleTerm("Y") ]
+                ( SimpleTerm("X"), SimpleTerm("Y") )
               )
             ),
             NafLiteral(
@@ -1694,7 +1801,7 @@ bar(
               ClassicalLiteral(
                 False,
                 "bar",
-                [
+                (
                   SimpleTerm("X"),
                   Expression(
                     False,
@@ -1702,20 +1809,20 @@ bar(
                     SimpleTerm("Y"),
                     SimpleTerm("1")
                   )
-                ]
+                )
               )
             )
-          ]
+          )
         )
-      ],
+      ),
       Query(
         ClassicalLiteral(
           False,
           "bar",
-          [
+          (
             SimpleTerm("3"),
             SimpleTerm("5"),
-          ]
+          )
         )
       )
     ),

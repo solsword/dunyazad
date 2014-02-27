@@ -18,6 +18,8 @@ default_tests = [
   "ans",
 ]
 
+stop_on_failure = False
+
 def test(module):
   print("Starting tests for module '{}'...".format(module))
   m = __import__(module)
@@ -53,10 +55,14 @@ instead of:
 {}""".format(f.__name__, repr(i), repr(r), repr(o)),
           file=sys.stderr
         )
+        if stop_on_failure:
+          break
     except Exception as e:
       crashed += 1
-      print("Test case CRASHED: {}".format(e), file=sys.stderr)
+      print("Test case CRASHED:\n{}".format(e), file=sys.stderr)
       sys.excepthook(e.__class__, e, e.__traceback__)
+      if stop_on_failure:
+        break
   print("""
 Stats: {} passed, {} failed, {} crashed.""".format(passed, failed, crashed)
        )
@@ -72,10 +78,18 @@ Stats: {} passed, {} failed, {} crashed.""".format(passed, failed, crashed)
 
 if __name__ == "__main__":
   failed = []
+  if "-s" in sys.argv:
+    stop_on_failure = True
+    sys.argv.remove("-s")
+  if "--stop-on-failure" in sys.argv:
+    stop_on_failure = True
+    sys.argv.remove("--stop-on-failure")
   for m in sys.argv[1:] or default_tests:
     print('-'*80)
     if not test(m):
       failed.append(m)
+    if stop_on_failure:
+      break
     print('-'*80)
   print('='*80)
   if failed:
