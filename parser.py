@@ -8,8 +8,6 @@ import string
 import re
 import types
 
-import traceback
-
 ############
 # Globals: #
 ############
@@ -497,8 +495,7 @@ def packrat_parse(text, thing, devour=_default_devour):
         "Failed to parse '{}' as:\n  {}\n\nGot error:\n{}\n{}".format(
           error_context(text),
           thing,
-          e,
-          ''.join(traceback.format_tb(e.__traceback__))
+          format_exception(e)
         )
       )
     )

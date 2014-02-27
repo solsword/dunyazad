@@ -5,9 +5,15 @@ Utility functions.
 
 import re
 import os
-import itertools
-
 import sys
+import itertools
+import traceback
+
+# formatting an error as Python would:
+def format_exception(e):
+  return ''.join(
+    traceback.format_exception(type(e), e, e.__traceback__)
+  )
 
 # Appending to a tuple:
 

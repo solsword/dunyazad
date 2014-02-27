@@ -112,7 +112,7 @@ def mktask(func, returnsstatus=False, passtask=False):
     else:
       def gen(t):
         func(t)
-        yield tn.TaskStatus.Completed
+        yield tn.TaskStatus.Final.Completed
   else:
     if returnsstatus:
       def gen(t):
@@ -120,7 +120,7 @@ def mktask(func, returnsstatus=False, passtask=False):
     else:
       def gen(t):
         func()
-        yield tn.TaskStatus.Completed
+        yield tn.TaskStatus.Final.Completed
   gen.__name__ = func.__name__
   return tn.Task(gen, source="function '{}'".format(func.__name__))
 
@@ -292,14 +292,7 @@ def asptask(name, code, source="unknown"):
       '\n'.join(str(predicate) + '.' for predicate in t.net.mem.code.story),
     ])
 
-    try:
-      predicates = asp.solve(source)
-    except asp.ASPError as e:
-      if e.code == 20: # clingo return code for unsatisfiable
-        yield tn.TaskStatus.Crashed
-        return # halt this task
-      else:
-        raise e
+    predicates = asp.solve(source)
 
     errors = []
     status = None
@@ -337,15 +330,24 @@ def asptask(name, code, source="unknown"):
           )
         )
       elif schema == "spawn_task":
-        to_spawn[str(binding["spawn_task.Id"])] = {
-          "name": dequote(str(binding["spawn_task.TaskName"])),
-          "args": {}
-        }
+        tid = str(binding["spawn_task.Id"])
+        tname = dequote(str(binding["spawn_task.TaskName"]))
+        if tid not in to_spawn:
+          to_spawn[tid] = {
+            "name": "<unknown>",
+            "args": {},
+          }
+        to_spawn[tid]["name"] = tname
       elif schema == "task_arg":
-        args = to_spawn[str(binding["task_arg.Id"])]["args"]
-        args[dequote(str(binding["task_arg.Key"]))] = dequote(
-          str(binding["task_arg.Value"])
-        )
+        tid = str(binding["task_arg.Id"])
+        tkey = dequote(str(binding["task_arg.Key"]))
+        tval = dequote(str(binding["task_arg.Value"]))
+        if tid not in to_spawn:
+          to_spawn[tid] = {
+            "name": "<unknown>",
+            "args": {},
+          }
+        to_spawn[tid]["args"][tkey] = tval
       elif schema == "run_code":
         to_run.append(unquote(binding["run_code.QuotedCode"]))
 
@@ -357,7 +359,7 @@ def asptask(name, code, source="unknown"):
     if status in tn.TaskStatus.aliases:
       status = tn.TaskStatus.aliases[status]
     elif status == None:
-      status = tn.TaskStatus.Completed
+      status = tn.TaskStatus.Final.Completed
     else:
       raise ASPTaskError(
         "Error: answer set produced invalid status '{}'.".format(status)

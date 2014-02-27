@@ -108,7 +108,8 @@ class Task:
   accordingly, removing the task from the pool of active tasks.
 
   Each task also has a priority, a local memory, a list of dependencies, a
-  current status, and a parent task network (which is None by default).
+  current status, a parent task network (which is None by default), and an
+  error.
 
   Tasks can also be assigned a "source" which indicates where the code came
   from, and which is printed when errors or warnings are issued.
@@ -120,7 +121,8 @@ class Task:
     mem=None,
     deps=None,
     net=None,
-    source="unknown"
+    source="unknown",
+    error=None,
   ):
     self.func = func
     self.name = self.func.__name__
@@ -130,6 +132,7 @@ class Task:
     self.net = net or obj.Obj()
     self.status = TaskStatus.Initial.Ready
     self.source = source
+    self.error = error
     self._gen = None
 
   def ready(self):
@@ -141,7 +144,12 @@ class Task:
     if not self.ready():
       self.status = TaskStatus.Ongoing.Blocked
     else:
-      self.status = next(self._gen, TaskStatus.Final.Completed)
+      try:
+        self.status = next(self._gen, TaskStatus.Final.Completed)
+        self.error = None
+      except Exception as e:
+        self.status = TaskStatus.Final.Crashed
+        self.error = e
     return self.status
 
   def add_dep(self, other, state=TaskStatus.Final.Completed):
@@ -172,6 +180,15 @@ class TaskNet:
     self.active = active or []
     self.finished = finished or []
     self.mem = mem or obj.Obj()
+
+  def collect_unifinished(self):
+    """
+    Returns a list of unfinished tasks: finalized tasks that either failed or
+    crashed, and tasks that aren't finalized.
+    """
+    return self.active + [
+      t for t in self.finished if t.status != TaskStatus.Final.Completed
+    ]
 
   def ready(self):
     """
@@ -261,6 +278,8 @@ class TaskNet:
         choice = random.choice(candidates)
         visited.add(choice)
         return choice
+      else:
+        raise ValueError("Invalid scheduling mode '{}'".format(mode))
 
   def step(self, scheduling="round-robin"):
     """
@@ -277,10 +296,14 @@ class TaskNet:
   def run(self, scheduling="round-robin", maintenance=None):
     """
     Repeatedly calls `step` until there are no more tasks to accomplish, using
-    the given scheduling mode. If a maintenance function is given, it is called
-    with the tasknet, the last-run task, and the status of the last-run task as
-    arguments after every step. The maintenance function is not called if
-    step() returns None (which is the condition for finishing a run).
+    the given scheduling mode. When no more tasks are available, it returns a
+    list of "leftover" tasks: non-finished tasks and finished tasks that either
+    failed or crashed.
+    
+    If a maintenance function is given, it is called with the tasknet, the
+    last-run task, and the status of the last-run task as arguments after every
+    step. The maintenance function is not called if step() returns None (which
+    is the condition for finishing a run).
     """
     if maintenance:
       result = self.step(scheduling=scheduling)
@@ -290,6 +313,7 @@ class TaskNet:
     else:
       while self.step(scheduling=scheduling):
         pass
+    return self.collect_unifinished()
 
 def trace_net(net, task, result):
   """
@@ -345,6 +369,23 @@ def _test_run_net():
   tn.run()
   return tn.mem.string
 
+def _test_net_unfinished():
+  tn = TaskNet()
+  def put_hello(t):
+    t.net.mem.string = "Hello "
+    yield TaskStatus.Final.Completed
+  def put_world(t):
+    t.net.mem.string += "world!"
+    yield TaskStatus.Final.Completed
+  def impossible(t):
+    yield TaskStatus.Final.Failed
+  t1 = Task(put_hello)
+  t2 = Task(put_world)
+  t2.add_dep(t1)
+  t3 = Task(impossible)
+  tn.add_tasks(t1, t2, t3)
+  return [t.name for t in tn.run()]
+
 def _test_net_trace():
   tn = TaskNet()
   def put_hello(t):
@@ -366,5 +407,6 @@ _test_cases = [
   (_test_create_tasknet, True),
   (_test_add_tasks, True),
   (_test_run_net, "Hello world!"),
+  (_test_net_unfinished, ["impossible"]),
   (_test_net_trace, ["Task put_hello: Completed", "Task put_world: Completed"]),
 ]
