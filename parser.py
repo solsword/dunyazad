@@ -19,17 +19,20 @@ MAX_ERROR_CONTEXT = 20
 RegExpType = re._pattern_type
 
 # A dictionary for storing intermediate parsing results:
+# TODO: make this more local and/or provide a way of cleaning it up?
 _ratnest = {}
 
 ######################
 # Utility functions: #
 ######################
 
-def error_context(text):
-  if len(text) <= MAX_ERROR_CONTEXT:
+def error_context(text, limit=NotGiven):
+  if limit == NotGiven:
+    limit = MAX_ERROR_CONTEXT
+  if len(text) <= limit:
     return text
   else:
-    return text[:MAX_ERROR_CONTEXT] + '...'
+    return text[:limit] + '...'
 
 def _default_devour(text):
   """
@@ -91,7 +94,7 @@ class StrToken(GrammarElement):
       ', ' + str(self.preserve) if self.preserve else ''
     )
 
-  def _parse(self, text):
+  def _parse(self, text, devour=_default_devour):
     if text.startswith(self.string):
       r = NoResult
       if self.preserve:
@@ -131,7 +134,7 @@ class REToken(GrammarElement):
   def __str__(self):
     return "REToken({})".format(repr(self.expression.pattern))
 
-  def _parse(self, text):
+  def _parse(self, text, devour=_default_devour):
     m = self.expression.match(text)
     if m:
       match = NoResult if self.omit else m.group(0)
@@ -175,8 +178,8 @@ class Omit(GrammarElement):
   def __str__(self):
     return "Omit({})".format(self.thing)
 
-  def _parse(self, text):
-    r, b, l = packrat_parse(text, self.thing)
+  def _parse(self, text, devour=_default_devour):
+    r, b, l = packrat_parse(text, self.thing, devour=devour)
     return NoResult, (), l
 
 @uniquely_defined_by("elements")
@@ -191,17 +194,17 @@ class Sequence(GrammarElement):
   def __str__(self):
     return 'Sequence({})'.format(', '.join(str(e) for e in self.elements))
 
-  def _parse(self, text):
-    leftovers = text
+  def _parse(self, text, devour=_default_devour):
+    l = text
     results = []
     bubble_cloud = []
     for elem in self.elements:
-      result, bubbles, leftovers = packrat_parse(leftovers, elem)
-      if isinstance(leftovers, ParseError):
-        return NoResult, (), leftovers
-      results.append(result)
-      bubble_cloud.extend(bubbles)
-    return tuple(results), tuple(bubble_cloud), leftovers
+      r, b, l = packrat_parse(l, elem, devour=devour)
+      if isinstance(l, ParseError):
+        return NoResult, (), l
+      results.append(r)
+      bubble_cloud.extend(b)
+    return tuple(results), tuple(bubble_cloud), l
 
 @uniquely_defined_by("elements")
 class Seq(GrammarElement):
@@ -216,18 +219,18 @@ class Seq(GrammarElement):
   def __str__(self):
     return 'Seq({})'.format(', '.join(str(e) for e in self.elements))
 
-  def _parse(self, text):
-    leftovers = text
+  def _parse(self, text, devour=_default_devour):
+    l = text
     results = []
     bubble_cloud = []
     for elem in self.elements:
-      result, bubbles, leftovers = packrat_parse(leftovers, elem)
-      if isinstance(leftovers, ParseError):
-        return NoResult, (), leftovers
-      if result != NoResult:
-        results.append(result)
-      bubble_cloud.extend(bubbles)
-    return tuple(results), tuple(bubble_cloud), leftovers
+      r, b, l = packrat_parse(l, elem, devour=devour)
+      if isinstance(l, ParseError):
+        return NoResult, (), l
+      if r != NoResult:
+        results.append(r)
+      bubble_cloud.extend(b)
+    return tuple(results), tuple(bubble_cloud), l
 
 @uniquely_defined_by("elements")
 class OneOf(GrammarElement):
@@ -244,11 +247,11 @@ class OneOf(GrammarElement):
   def __str__(self):
     return 'OneOf({})'.format(', '.join(str(e) for e in self.elements))
 
-  def _parse(self, text):
+  def _parse(self, text, devour=_default_devour):
     for alt in self.elements:
-      result, bubbles, leftovers = packrat_parse(text, alt)
-      if not isinstance(leftovers, ParseError):
-        yield (result, bubbles, leftovers)
+      r, b, l = packrat_parse(text, alt, devour=devour)
+      if not isinstance(l, ParseError):
+        yield (r, b, l)
     yield (
       NoResult,
       (),
@@ -275,18 +278,18 @@ class Rep(GrammarElement):
       self.thing,
       (', ' + str(self.require_match)) if self.require_match else ''
     )
-  def _parse(self, text):
+  def _parse(self, text, devour=_default_devour):
     results = []
     bubble_cloud = []
     last_good_leftovers = text
-    result, bubbles, leftovers = packrat_parse(text, self.thing)
-    if self.require_match and isinstance(leftovers, ParseError):
-      return NoResult, (), leftovers
-    while not isinstance(leftovers, ParseError):
-      last_good_leftovers = leftovers
-      results.append(result)
-      bubble_cloud.extend(bubbles)
-      result, bubbles, leftovers = packrat_parse(leftovers, self.thing)
+    r, b, l = packrat_parse(text, self.thing, devour=devour)
+    if self.require_match and isinstance(l, ParseError):
+      return NoResult, (), l
+    while not isinstance(l, ParseError):
+      last_good_leftovers = l
+      results.append(r)
+      bubble_cloud.extend(b)
+      r, b, l = packrat_parse(l, self.thing, devour=devour)
     return tuple(results), tuple(bubble_cloud), last_good_leftovers
 
 @uniquely_defined_by("thing")
@@ -301,12 +304,12 @@ class Opt(GrammarElement):
   def __str__(self):
     return 'Opt({})'.format(self.thing)
 
-  def _parse(self, text):
-    result, bubbles, leftovers = packrat_parse(text, self.thing)
-    if isinstance(leftovers, ParseError):
+  def _parse(self, text, devour=_default_devour):
+    r, b, l = packrat_parse(text, self.thing, devour=devour)
+    if isinstance(l, ParseError):
       return NoResult, (), text
     else:
-      return result, bubbles, leftovers
+      return r, b, l
 
 @attr_object("name", "value")
 class AttributeBubble(Bubble):
@@ -316,21 +319,28 @@ class AttributeBubble(Bubble):
   """
   pass
 
-@attr_object("name", "thing")
+@attr_object("name", "thing", "value", "munge")
 class Attr(GrammarElement):
   """
   Parse the given thing and return NoResult as the result, while adding an
-  AttributeBubble to the bubble cloud.
+  AttributeBubble to the bubble cloud. If value is given, it is used in place
+  of the parse result as the attribute's value. If a munge function is given,
+  it is passed the parse result as an argument and the result of that function
+  call is used as the attribute value. munge takes precedence over value.
   """
 
   @prevent_recursion()
   def __str__(self):
     return "Attr({}, {})".format(repr(self.name), self.thing)
 
-  def _parse(self, text):
-    result, bubbles, leftovers = packrat_parse(text, self.thing)
-    bubbles = tuple_with(bubbles, AttributeBubble(self.name, result))
-    return NoResult, bubbles, leftovers
+  def _parse(self, text, devour=_default_devour):
+    r, b, l = packrat_parse(text, self.thing, devour=devour)
+    if self.munge:
+      r = self.munge(r)
+    elif self.value:
+      r = self.value
+    b = tuple_with(b, AttributeBubble(self.name, r))
+    return NoResult, b, l
 
 @attr_object("name", "thing")
 class Flag(GrammarElement):
@@ -345,14 +355,14 @@ class Flag(GrammarElement):
   def __str__(self):
     return "Flag({}, {})".format(self.name, self.thing)
 
-  def _parse(self, text):
-    result, bubbles, leftovers = packrat_parse(text, self.thing)
-    if isinstance(leftovers, ParseError):
-      bubbles = tuple_with(bubbles, AttributeBubble(self.name, False))
-      return NoResult, bubbles, text
+  def _parse(self, text, devour=_default_devour):
+    r, b, l = packrat_parse(text, self.thing, devour=devour)
+    if isinstance(l, ParseError):
+      b = tuple_with(b, AttributeBubble(self.name, False))
+      return NoResult, b, text
     else:
-      bubbles = tuple_with(bubbles, AttributeBubble(self.name, True))
-      return NoResult, bubbles, leftovers
+      b = tuple_with(b, AttributeBubble(self.name, True))
+      return NoResult, b, l
 
 @attr_object("callback", "thing")
 class Hook(GrammarElement):
@@ -366,8 +376,8 @@ class Hook(GrammarElement):
   def __str__(self):
     return "Hook({}, {})".format(self.callback, self.thing)
 
-  def _parse(self, text):
-    r, b, l = packrat_parse(text, self.thing)
+  def _parse(self, text, devour=_default_devour):
+    r, b, l = packrat_parse(text, self.thing, devour=devour)
     r, b, l = self.callback(r, b, l)
     return r, b, l
 
@@ -383,8 +393,8 @@ class Munge(GrammarElement):
   def __str__(self):
     return "Munge({}, {})".format(self.callback, self.thing)
 
-  def _parse(self, text):
-    r, b, l = packrat_parse(text, self.thing)
+  def _parse(self, text, devour=_default_devour):
+    r, b, l = packrat_parse(text, self.thing, devour=devour)
     if isinstance(l, ParseError):
       return r, b, l
     return self.callback(r), b, l
@@ -404,8 +414,8 @@ class Package(GrammarElement):
   def __str__(self):
     return "Package({}, {}, {})".format(self.cls, self.thing, self.cleanup)
 
-  def _parse(self, text):
-    r, b, l = packrat_parse(text, self.thing)
+  def _parse(self, text, devour=_default_devour):
+    r, b, l = packrat_parse(text, self.thing, devour=devour)
     obj = self.cls()
     filtered = []
     for bubble in b:
@@ -447,17 +457,17 @@ def packrat_parse(text, thing, devour=_default_devour):
   r, b, l = NoResult, (), ParseError("No result.")
   try:
     if hasattr(thing, "_parse"):
-      result = thing._parse(text)
+      result = thing._parse(text, devour=devour)
       if isinstance(result, types.GeneratorType):
         r, b, l = next(result)
       else:
         r, b, l = result
     elif hasattr(thing, "grammar"):
-      r, b, l = packrat_parse(text, thing.grammar)
+      r, b, l = packrat_parse(text, thing.grammar, devour=devour)
     elif isinstance(thing, str):
-      r, b, l = packrat_parse(text, StrToken(thing))
+      r, b, l = packrat_parse(text, StrToken(thing), devour=devour)
     elif isinstance(thing, RegExpType):
-      r, b, l = packrat_parse(text, REToken(thing))
+      r, b, l = packrat_parse(text, REToken(thing), devour=devour)
     else:
       raise ParseError(
         "No known method for parsing text as a {}.".format(type(thing))
@@ -483,7 +493,7 @@ def parse(text, thing, devour=_default_devour):
   Wrapper for packrat_parse that returns just a result object and leftover text
   or raises an error.
   """
-  r, b, l = packrat_parse(text, thing)
+  r, b, l = packrat_parse(text, thing, devour=devour)
   if isinstance(l, ParseError):
     raise l
   return r, l
@@ -500,7 +510,7 @@ def parse_completely(
   the devour function will be called on the leftovers before raising an error,
   but this can be turned off by passing devour_leftovers=False.
   """
-  r, b, l = packrat_parse(text, thing)
+  r, b, l = packrat_parse(text, thing, devour=devour)
   if isinstance(l, ParseError):
     raise l
   if devour_leftovers:
@@ -518,8 +528,10 @@ def parse_completely(
 ##########
 
 Integer = Munge( int, Token(re.compile('-?0|([1-9][0-9]*)')))
+
 Word = Token(re.compile('\w+'))
-def SepList(elem, sep=Token(',')):
+
+def SepList(elem, sep=Token(','), require_multiple=False):
   return Munge(
     lambda L: tuple([L[0]] + [e[0] for e in L[1]]),
     Seq(
@@ -528,10 +540,14 @@ def SepList(elem, sep=Token(',')):
         Seq(
           Omit(sep),
           elem
-        )
+        ),
+        require_match=require_multiple
       )
     )
   )
+
+def RequiredFlag(name, grammar):
+  return Attr(name, grammar, value=True)
 
 ######################
 # Testing functions: #

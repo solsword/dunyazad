@@ -22,7 +22,7 @@ class Tokens:
     # Matches a period NOT followed by another, but doesn't eat the following
     # character.
   AT = parser.Token(re.compile(r"@"))
-  OR = parser.Token(re.compile(r"|"))
+  OR = parser.Token(re.compile(r"\|"))
   NAF = parser.Token(re.compile(r"not"))
 
   COMMA = parser.Token(re.compile(r","))
@@ -523,7 +523,7 @@ class Aggregate:
       lop=(self.lop and (str(self.lop) + ' ')) or '',
       function=self.function,
       elements='; '.join(str(e) for e in self.elements),
-      uop=(self.uop and (str(self.uop) + ' ')) or '',
+      uop=(self.uop and (' ' + str(self.uop))) or '',
       u=(self.u and (' ' + str(self.u))) or '',
     )
 
@@ -548,6 +548,12 @@ class Choice:
       uop=(self.uop and (str(self.uop) + ' ')) or '',
       u=(self.u and (str(self.u) + ' ')) or '',
     )
+
+@attr_object("elements")
+class Disjunction:
+  def __str__(self):
+    return ' | '.join(str(e) for e in self.elements)
+
 
 @attr_object("weightlevel", "literals")
 class OptimizeElement:
@@ -583,11 +589,14 @@ class Rule:
   def __str__(self):
     if self.head:
       if self.body:
-        return "{} :- {}.".format(self.head, ', '.join(self.body))
+        return "{} :- {}.".format(
+          self.head,
+          ', '.join(str(e) for e in self.body)
+        )
       else:
         return "{}.".format(self.head)
     else:
-      return ":- {}.".format(', '.join(self.body))
+      return ":- {}.".format(', '.join(str(e) for e in self.body))
 
 @attr_object("literal")
 class Query:
@@ -607,9 +616,9 @@ class Comment:
 @attr_object("statements", "query")
 class Program:
   def __str__(self):
-    return "{}\n{}".format(
+    return "{}{}".format(
       '\n'.join(str(s) for s in self.statements),
-      self.query
+      '\n' + str(self.query) if self.query else ''
     )
 
 # Grammar definitions for answer set elements:
@@ -683,31 +692,33 @@ SimpleTerm.grammar = parser.Package(
 
 Expression.grammar = parser.Package(
   Expression,
-  parser.Seq(
-    parser.Flag("negated", Tokens.OP_MINUS),
-    parser.OneOf(
-      parser.Seq(
-        parser.Attr(
-          "lhs",
+  parser.OneOf(
+    parser.Seq(
+      parser.Flag("negated", Tokens.OP_MINUS),
+      parser.OneOf(
+        parser.Seq(
           parser.Seq(
             Tokens.Ignore.PAREN_OPEN,
-            Term,
+            parser.Attr(
+              "lhs",
+              Term,
+            ),
             Tokens.Ignore.PAREN_CLOSE,
-          )
+          ),
+          parser.Attr("op", ArithOp),
+          parser.Attr("rhs", Term)
         ),
-        parser.Attr("op", ArithOp),
-        parser.Attr("rhs", Term)
-      ),
-      parser.Seq(
-        parser.Attr("lhs", SimpleTerm),
-        parser.Attr("op", ArithOp),
-        parser.Attr("rhs", Term)
-      ),
-      parser.Attr(
-        "lhs",
-        SimpleTerm,
-      ),
-    )
+        parser.Seq(
+          parser.Attr("lhs", SimpleTerm),
+          parser.Attr("op", ArithOp),
+          parser.Attr("rhs", Term)
+        ),
+      )
+    ),
+    parser.Seq(
+      parser.RequiredFlag("negated", Tokens.OP_MINUS),
+      parser.Attr("lhs", SimpleTerm),
+    ),
   )
 )
 
@@ -864,11 +875,22 @@ Choice.grammar = parser.Package(
   )
 )
 
-Disjunction = parser.SepList(ClassicalLiteral, sep=Tokens.Ignore.OR)
+Disjunction.grammar = parser.Package(
+  Disjunction,
+  parser.Attr(
+    "elements",
+    parser.SepList(
+      ClassicalLiteral,
+      sep=Tokens.Ignore.OR,
+      require_multiple=True,
+    )
+  )
+)
 
 Head = parser.OneOf(
   Disjunction,
-  Choice
+  Choice,
+  ClassicalLiteral,
 )
 
 Body = parser.SepList(
@@ -1017,7 +1039,7 @@ def parse_ans(text):
   Parses the given text as an answer set, i.e., a sequence of predicate
   statements. Returns a (possibly empty) tuple of Predicate objects.
   """
-  return parse_completely(
+  return parser.parse_completely(
     text,
     parser.Rep(PredicateStatement),
     devour=devour_asp
@@ -1028,7 +1050,7 @@ def parse_asp(text):
   Parses the given text as an answer set program, i.e., a Program (see above).
   Returns a Program object.
   """
-  return parse_completely(
+  return parser.parse_completely(
     text,
     Program,
     devour=devour_asp
@@ -1408,14 +1430,82 @@ _test_cases = [
   ),
   (
     _test_parse_completely_as_term,
-    "foo(Var(bar), baz(X, X+1)) / bar(Zed)",
+    "foo + 5",
+    Expression(
+      False,
+      "+",
+      SimpleTerm("foo"),
+      SimpleTerm("5")
+    )
+  ),
+  (
+    _test_parse_completely_as_term,
+    "foo * 5 - 3",
+    Expression(
+      False,
+      "*",
+      SimpleTerm("foo"),
+      Expression(
+        False,
+        "-",
+        SimpleTerm("5"),
+        SimpleTerm("3")
+      )
+    )
+  ),
+  (
+    _test_parse_completely_as_term,
+    "baz(X, X+1)",
+    SimpleTerm(
+      "baz",
+      (
+        SimpleTerm("X"),
+        Expression(
+          False,
+          "+",
+          SimpleTerm("X"),
+          SimpleTerm("1"),
+        )
+      )
+    ),
+  ),
+  (
+    _test_parse_completely_as_term,
+    "bar(Var)",
+    SimpleTerm( "bar", ( SimpleTerm("Var"), )),
+  ),
+  (
+    _test_parse_completely_as_term,
+    "foo(bar(Var), baz(X, X+1))",
+    SimpleTerm(
+      "foo",
+      (
+        SimpleTerm( "bar", ( SimpleTerm("Var"), )),
+        SimpleTerm(
+          "baz",
+          (
+            SimpleTerm("X"),
+            Expression(
+              False,
+              "+",
+              SimpleTerm("X"),
+              SimpleTerm("1"),
+            )
+          )
+        ),
+      )
+    ),
+  ),
+  (
+    _test_parse_completely_as_term,
+    "foo(bar(Var), baz(X, X+1)) / bar(Zed)",
     Expression(
       False,
       "/",
       SimpleTerm(
         "foo",
         (
-          SimpleTerm( "Var", ( SimpleTerm("bar") )),
+          SimpleTerm( "bar", ( SimpleTerm("Var"), )),
           SimpleTerm(
             "baz",
             (
@@ -1430,7 +1520,7 @@ _test_cases = [
           ),
         )
       ),
-      SimpleTerm( "bar", ( SimpleTerm("Zed") ))
+      SimpleTerm( "bar", ( SimpleTerm("Zed"), ))
     ),
   ),
   (
@@ -1483,17 +1573,20 @@ _test_cases = [
     "-((x + 3) / (5 - (4 * (3 - 1))))"
   ),
   (
+    _test_restring_term,
+    "foo(bar, baz(Zed))",
+    "foo(bar, baz(Zed))",
+  ),
+  (
     _test_parse_completely_as_statement,
     "foo(bar, baz).",
     Rule(
-      (
-        ClassicalLiteral(
-          False,
-          "foo",
-          [
-            SimpleTerm("bar"),
-            SimpleTerm("baz"),
-          ]
+      ClassicalLiteral(
+        False,
+        "foo",
+        (
+          SimpleTerm("bar"),
+          SimpleTerm("baz"),
         )
       ),
       None
@@ -1501,20 +1594,14 @@ _test_cases = [
   ),
   (
     _test_parse_completely_as_statement,
-    "foo(bar, baz) | -xyzzy :- a, not b.",
+    "foo(bar, baz) :- a, not b.",
     Rule(
-      (
-        ClassicalLiteral(
-          False,
-          "foo",
-          (
-            SimpleTerm("bar"),
-            SimpleTerm("baz"),
-          )
-        ),
-        ClassicalLiteral(
-          True,
-          "xyzzy"
+      ClassicalLiteral(
+        False,
+        "foo",
+        (
+          SimpleTerm("bar"),
+          SimpleTerm("baz"),
         )
       ),
       (
@@ -1536,6 +1623,106 @@ _test_cases = [
     ),
   ),
   (
+    parser._test_parse(ClassicalLiteral),
+    "-xyzzy", 
+    ClassicalLiteral(
+      True,
+      "xyzzy"
+    ),
+  ),
+  (
+    parser._test_parse(Disjunction, leftovers=''),
+    "foo(bar, baz) | -xyzzy", 
+    Disjunction(
+      (
+        ClassicalLiteral(
+          False,
+          "foo",
+          (
+            SimpleTerm("bar"),
+            SimpleTerm("baz"),
+          )
+        ),
+        ClassicalLiteral(
+          True,
+          "xyzzy"
+        ),
+      )
+    ),
+  ),
+  (
+    _test_parse_completely_as_statement,
+    "foo(bar, baz) | -xyzzy :- a, not b.",
+    Rule(
+      Disjunction(
+        (
+          ClassicalLiteral(
+            False,
+            "foo",
+            (
+              SimpleTerm("bar"),
+              SimpleTerm("baz"),
+            )
+          ),
+          ClassicalLiteral(
+            True,
+            "xyzzy"
+          ),
+        )
+      ),
+      (
+        NafLiteral(
+          False,
+          ClassicalLiteral(
+            False,
+            "a"
+          )
+        ),
+        NafLiteral(
+          True,
+          ClassicalLiteral(
+            False,
+            "b"
+          )
+        )
+      )
+    ),
+  ),
+  (
+    parser._test_parse(Choice),
+    "1 <= { x(T) : not T < 3 ; y(T) }",
+    Choice(
+      SimpleTerm("1"),
+      "<=",
+      (
+        ChoiceElement(
+          ClassicalLiteral(
+            False,
+            "x",
+            ( SimpleTerm("T"), )
+          ),
+          (
+            NafLiteral(
+              True,
+              BuiltinAtom(
+                "<",
+                SimpleTerm("T"),
+                SimpleTerm("3")
+              )
+            ),
+          )
+        ),
+        ChoiceElement(
+          ClassicalLiteral(
+            False,
+            "y",
+            ( SimpleTerm("T"), )
+          )
+        )
+      ),
+    )
+  ),
+  (
     _test_parse_completely_as_statement,
     """\
 1 <= { x(T) : not T < 3 ; y(T) } :-
@@ -1554,9 +1741,7 @@ _test_cases = [
             ClassicalLiteral(
               False,
               "x",
-              (
-                SimpleTerm("T")
-              )
+              ( SimpleTerm("T"),)
             ),
             (
               NafLiteral(
@@ -1566,16 +1751,14 @@ _test_cases = [
                   SimpleTerm("T"),
                   SimpleTerm("3")
                 )
-              )
+              ),
             )
           ),
           ChoiceElement(
             ClassicalLiteral(
               False,
               "y",
-              (
-                SimpleTerm("T")
-              )
+              ( SimpleTerm("T"),)
             )
           )
         ),
@@ -1595,7 +1778,7 @@ _test_cases = [
               (
                 Expression(True, None, SimpleTerm("X")),
                 Expression(False, "+", SimpleTerm("Y"), SimpleTerm("5")),
-                SimpleTerm("foobar", ( SimpleTerm("X") )),
+                SimpleTerm("foobar", ( SimpleTerm("X"), )),
               ),
               (
                 NafLiteral(
@@ -1605,7 +1788,7 @@ _test_cases = [
                     SimpleTerm("X"),
                     SimpleTerm("3")
                   )
-                )
+                ),
               )
             ),
             AggregateElement( ( SimpleTerm("other"), ) ),
@@ -1621,7 +1804,7 @@ _test_cases = [
             ),
           ),
           "<",
-          SimpleTerm("7")
+          SimpleTerm("7"),
         ),
         NafLiteral(False, ClassicalLiteral(False, "other"))
       )   
@@ -1647,9 +1830,8 @@ _test_cases = [
     a, b : c, not d
   } < 7,
   other.""",
-    "1 <= { x(T) : not T < 3 ; y(T) } :- " +\
-    "-(3) < #count { -(X), (Y+5), foobar(X) : X = 3; " +\
-    "other; a, b : c, not d} < 7, other.",
+    "1 <= { x(T) : not T < 3; y(T) } :- -(3) < #count { -(X), (Y + 5), "\
+    "foobar(X) : X = 3; other; a, b : c, not d } < 7, other.",
   ),
   (
     parse_asp,
@@ -1660,10 +1842,10 @@ q :- a, b.
     """,
     Program(
       (
-        Rule( ( ClassicalLiteral(False, "a") ) ),
-        Rule( ( ClassicalLiteral(False, "b") ) ),
+        Rule( ClassicalLiteral(False, "a") ),
+        Rule( ClassicalLiteral(False, "b") ),
         Rule(
-          ( ClassicalLiteral(False, "q") ),
+          ClassicalLiteral(False, "q"),
           (
             NafLiteral(False, ClassicalLiteral(False, "a")),
             NafLiteral(False, ClassicalLiteral(False, "b")),
@@ -1682,27 +1864,23 @@ bar(3, 5)?
     Program(
       (
         Rule(
-          (
-            ClassicalLiteral(
-              False,
-              "foo",
-              ( SimpleTerm("3"), SimpleTerm("4") )
-            )
+          ClassicalLiteral(
+            False,
+            "foo",
+            ( SimpleTerm("3"), SimpleTerm("4") )
           )
         ),
         Rule(
-          (
-            ClassicalLiteral(
-              False,
-              "bar",
-              (
-                SimpleTerm("X"),
-                Expression(
-                  False,
-                  "+",
-                  SimpleTerm("Y"),
-                  SimpleTerm("1")
-                )
+          ClassicalLiteral(
+            False,
+            "bar",
+            (
+              SimpleTerm("X"),
+              Expression(
+                False,
+                "+",
+                SimpleTerm("Y"),
+                SimpleTerm("1")
               )
             )
           ),
@@ -1749,6 +1927,161 @@ bar(3, 5)?
   (
     parse_asp,
     """\
+a. %comment b.
+    """,
+    Program(
+      (
+        Rule(
+          ClassicalLiteral(
+            False,
+            "a"
+          ),
+        ),
+      ),
+    ),
+  ),
+  (
+    parse_asp,
+    """\
+% comment
+a. %comment b.
+    """,
+    Program(
+      (
+        Rule(
+          ClassicalLiteral(
+            False,
+            "a"
+          ),
+        ),
+      ),
+    ),
+  ),
+  (
+    parse_asp,
+    """\
+% comment
+bar(X, Y+1) %* interrupt *%:-
+  foo(X, Y),
+  not bar(X, Y-1).
+    """,
+    Program(
+      (
+        Rule(
+          ClassicalLiteral(
+            False,
+            "bar",
+            (
+              SimpleTerm("X"),
+              Expression(
+                False,
+                "+",
+                SimpleTerm("Y"),
+                SimpleTerm("1")
+              )
+            )
+          ),
+          (
+            NafLiteral(
+              False,
+              ClassicalLiteral(
+                False,
+                "foo",
+                ( SimpleTerm("X"), SimpleTerm("Y") )
+              )
+            ),
+            NafLiteral(
+              True,
+              ClassicalLiteral(
+                False,
+                "bar",
+                (
+                  SimpleTerm("X"),
+                  Expression(
+                    False,
+                    "-",
+                    SimpleTerm("Y"),
+                    SimpleTerm("1")
+                  )
+                )
+              )
+            )
+          )
+        ),
+      ),
+    ),
+  ),
+  (
+    parse_asp,
+    """\
+% comment
+bar(X, Y+1) %* interrupt *%:-
+  foo(X, Y),
+  not bar(X, Y-1).
+bar(
+  3, % annoying
+  5
+)?
+    """,
+    Program(
+      (
+        Rule(
+          ClassicalLiteral(
+            False,
+            "bar",
+            (
+              SimpleTerm("X"),
+              Expression(
+                False,
+                "+",
+                SimpleTerm("Y"),
+                SimpleTerm("1")
+              )
+            )
+          ),
+          (
+            NafLiteral(
+              False,
+              ClassicalLiteral(
+                False,
+                "foo",
+                ( SimpleTerm("X"), SimpleTerm("Y") )
+              )
+            ),
+            NafLiteral(
+              True,
+              ClassicalLiteral(
+                False,
+                "bar",
+                (
+                  SimpleTerm("X"),
+                  Expression(
+                    False,
+                    "-",
+                    SimpleTerm("Y"),
+                    SimpleTerm("1")
+                  )
+                )
+              )
+            )
+          )
+        ),
+      ),
+      Query(
+        ClassicalLiteral(
+          False,
+          "bar",
+          (
+            SimpleTerm("3"),
+            SimpleTerm("5"),
+          )
+        )
+      )
+    ),
+  ),
+  (
+    parse_asp,
+    """\
 foo(3, 4).
 % comment
 bar(X, Y+1) %* interrupt *%:- foo(X, Y), %* multi-
@@ -1763,27 +2096,23 @@ bar(
     Program(
       (
         Rule(
-          (
-            ClassicalLiteral(
-              False,
-              "foo",
-              ( SimpleTerm("3"), SimpleTerm("4") )
-            )
+          ClassicalLiteral(
+            False,
+            "foo",
+            ( SimpleTerm("3"), SimpleTerm("4") )
           )
         ),
         Rule(
-          (
-            ClassicalLiteral(
-              False,
-              "bar",
-              (
-                SimpleTerm("X"),
-                Expression(
-                  False,
-                  "+",
-                  SimpleTerm("Y"),
-                  SimpleTerm("1")
-                )
+          ClassicalLiteral(
+            False,
+            "bar",
+            (
+              SimpleTerm("X"),
+              Expression(
+                False,
+                "+",
+                SimpleTerm("Y"),
+                SimpleTerm("1")
               )
             )
           ),
@@ -1837,7 +2166,7 @@ q :- a, b.
     """\
 a.
 b.
-q :- a, b.
+q :- a, b.\
 """,
   ),
   (
@@ -1849,7 +2178,7 @@ bar(3, 5)?
     """,
     """\
 foo(3, 4).
-bar(X, (Y+1)) :- foo(X, Y), not bar(X, (Y-1)).
+bar(X, (Y + 1)) :- foo(X, Y), not bar(X, (Y - 1)).
 bar(3, 5)?""",
   ),
 ]

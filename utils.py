@@ -28,6 +28,17 @@ def unquote(string):
 
 # Class decorators:
 
+def strrepr(cls):
+  """
+  Copies the __str__ function as the __repr__ function.
+  """
+  if "__repr__" in cls.__dict__:
+    raise ValueError(
+      "Tried to overwrite existing __repr__ of class '{}'".format(cls.__name__)
+    )
+  cls.__repr__ = cls.__str__
+  return cls
+
 def instance(cls):
   """
   Replaces the decorated class with an instance of itself, constructed with
@@ -115,22 +126,45 @@ def __ne__(self, other):
 def attr_object(*args):
   """
   A "attr_object" is a class with the listed discrete instance attributes
-  (each of which is optional) that is uniquely defined by those attributes.
+  (each of which is optional) that is uniquely defined by those attributes. The
+  following methods are automatically defined:
+
+    __init__
+    __repr__
+
+  The following additional methods are automatically defined by
+  uniquely_defined_by:
+
+    __hash__
+    __eq__
+    __ne__
   """
   if not args:
     raise ValueError("Tried to create attr_object class without any contents.")
   def decorate(cls):
+    nonlocal args
     init_args = ', '.join("{}=None".format(a) for a in args)
     init_body = '\n  '.join("self.{var} = {var}".format(var=a) for a in args)
+    repr_str = "{}({})".format(
+      cls.__name__,
+      ', '.join('{}' for a in args)
+    )
+    repr_fmt_args = ', '.join("repr(self.{})".format(a) for a in args)
     code = """\
 def __init__(self, {init_args}):
   {init_body}
+
+def __repr__(self):
+  return "{repr_str}".format({repr_fmt_args})
 """.format(
   init_args=init_args,
   init_body=init_body,
+  repr_str=repr_str,
+  repr_fmt_args=repr_fmt_args,
 )
     exec(code, locals(), globals())
     cls.__init__ = __init__
+    cls.__repr__ = __repr__
     return uniquely_defined_by(*args)(cls)
   return decorate
 

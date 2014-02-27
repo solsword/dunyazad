@@ -40,26 +40,28 @@ def test(module):
         i = NoRepr
         r = f()
 
+      tc_str = "{}({})".format(f.__name__, repr(i))
+
       if type(r) == types.GeneratorType:
         r = list(r)
 
       if r == o:
         passed += 1
-        print("Test passed! {}({})".format(f.__name__, repr(i)))
+        print("Test passed! {}".format(tc_str))
       else:
         failed += 1
         print("""\
-Test case FAILED: {}({}) produced:
+Test case FAILED: {} produced:
 {}
 instead of:
-{}""".format(f.__name__, repr(i), repr(r), repr(o)),
+{}""".format(tc_str, repr(r), repr(o)),
           file=sys.stderr
         )
         if stop_on_failure:
           break
     except Exception as e:
       crashed += 1
-      print("Test case CRASHED:\n{}".format(e), file=sys.stderr)
+      print("Test case {} CRASHED:\n{}".format(tc, e), file=sys.stderr)
       sys.excepthook(e.__class__, e, e.__traceback__)
       if stop_on_failure:
         break
