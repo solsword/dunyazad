@@ -1,5 +1,5 @@
-1 { l_protagonist(id(chr, C)) : character(C) } 1.
-1 { l_antagonist(id(chr, C)) : character(C) } 1.
+{ l_protagonist(id(chr, C)) : character(C) } = 1.
+{ l_antagonist(id(chr, C)) : character(C) } = 1.
 
 :- l_protagonist(C), l_antagonist(C).
 

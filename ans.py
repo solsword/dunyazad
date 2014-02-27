@@ -193,7 +193,7 @@ class Predicate:
     return self.name == other.name and len(self.args) == len(other.args)
 
   def _polish(self):
-    self.args = list(self.args)
+    self.args = tuple(self.args)
 
 Predicate.grammar = parser.Package(
   Predicate,
@@ -807,13 +807,20 @@ Aggregate.grammar = parser.Package(
         parser.Attr("lop", Comparator),
       )
     ),
-    parser.Attr(
-      "function",
-      parser.OneOf(
-        Tokens.KW_AGGREGATE_COUNT,
-        Tokens.KW_AGGREGATE_MAX,
-        Tokens.KW_AGGREGATE_MIN,
-        Tokens.KW_AGGREGATE_SUM,
+    parser.OneOf(
+      parser.Attr(
+        "function",
+        parser.OneOf(
+          Tokens.KW_AGGREGATE_COUNT,
+          Tokens.KW_AGGREGATE_MAX,
+          Tokens.KW_AGGREGATE_MIN,
+          Tokens.KW_AGGREGATE_SUM,
+        )
+      ),
+      parser.Attr(
+        "function",
+        parser.Omit(),
+        value="#count"
       )
     ),
     Tokens.Ignore.CURLY_OPEN,
@@ -867,7 +874,7 @@ Choice.grammar = parser.Package(
     ),
     Tokens.Ignore.CURLY_CLOSE,
     parser.Opt(
-      (
+      parser.Seq(
         parser.Attr("uop", Comparator),
         parser.Attr("u", Term),
       )
@@ -1054,6 +1061,52 @@ def parse_asp(text):
     text,
     Program,
     devour=devour_asp
+  )
+
+def ruleset(*programs):
+  """
+  Takes zero or more Program objects and returns a set() containing all of the
+  Rules from those programs. Other Statements (weak constraints, optimize
+  statements, and directives) are ignored, as are queries if present. If no
+  programs are given, an empty set is returned.
+  """
+  result = set()
+  for p in programs:
+    for s in p.statements:
+      if isinstance(s, Rule):
+        result.add(s)
+  return result
+
+def concatenate_programs(*progs):
+  """
+  Takes one or more Program objects and returns a single unified Program object
+  that combines them. Raises a ValueError if there is more than one Query
+  object between the programs given.
+  """
+  statements = []
+  query = None
+  for p in progs:
+    statements.extend(p.statements)
+    if p.query:
+      if query == None:
+        query = p.query
+      else:
+        raise ValueError(
+          "Cannot create a merged program with more than one query."
+        )
+  return Program(tuple(statements), query)
+
+def load_logic(dir):
+  """
+  Loads all .lp files in the given directory (and its subdirectories) as
+  Program objects and returns a ruleset distilled from all of them.
+  """
+  return ruleset(
+    *process_file_contents(
+      dir,
+      parse_asp,
+      include=lambda f: f.endswith(".lp"),
+    )
   )
 
 # Testing:
@@ -2181,4 +2234,103 @@ foo(3, 4).
 bar(X, (Y + 1)) :- foo(X, Y), not bar(X, (Y - 1)).
 bar(3, 5)?""",
   ),
+  (
+    parser._test_parse(Choice, leftovers=''),
+    "1 = { l_selected(P) : provocation(P) } = 1",
+    Choice(
+      SimpleTerm("1"),
+      "=",
+      (
+        ChoiceElement(
+          ClassicalLiteral(
+            False,
+            "l_selected",
+            ( SimpleTerm("P"),)
+          ),
+          (
+            NafLiteral(
+              False,
+              ClassicalLiteral(
+                False,
+                "provocation",
+                ( SimpleTerm("P"), )
+              )
+            ),
+          ),
+        ),
+      ),
+      "=",
+      SimpleTerm("1")
+    ),
+  ),
+  (
+    parse_asp,
+    "1 = { l_selected(P) : provocation(P) } = 1.",
+    Program(
+      (
+        Rule(
+          Choice(
+            SimpleTerm("1"),
+            "=",
+            (
+              ChoiceElement(
+                ClassicalLiteral(
+                  False,
+                  "l_selected",
+                  ( SimpleTerm("P"),)
+                ),
+                (
+                  NafLiteral(
+                    False,
+                    ClassicalLiteral(
+                      False,
+                      "provocation",
+                      ( SimpleTerm("P"), )
+                    )
+                  ),
+                ),
+              ),
+            ),
+            "=",
+            SimpleTerm("1")
+          ),
+        ),
+      )
+    )
+  ),
+  (
+    parse_asp,
+    "next_chr_id(1) :- { character(_) } = 0.",
+    Program(
+      (
+        Rule(
+          ClassicalLiteral(
+            False,
+            "next_chr_id",
+            ( SimpleTerm("1"),)
+          ),
+          (
+            Aggregate(
+              False,
+              None,
+              None,
+              "#count",
+              (
+                AggregateElement(
+                  (
+                    SimpleTerm(
+                      "character",
+                      ( SimpleTerm("_"), )
+                    ),
+                  ),
+                ),
+              ),
+              "=",
+              SimpleTerm("0")
+            ),
+          )
+        ),
+      )
+    )
+  )
 ]

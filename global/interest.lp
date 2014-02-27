@@ -1,15 +1,11 @@
-provocation(
-  outrage;
-  sympathy;
-  curiosity
-).
+provocation( outrage ).
+provocation( sympathy ).
+provocation( curiosity ).
 
-temptation(
-  beauty;
-  wealth;
-  deliciousness;
-  excitement;
-  coincidence;
-  justice;
-  exoticness
-).
+temptation( beauty ).
+temptation( wealth ).
+temptation( deliciousness ).
+temptation( excitement ).
+temptation( coincidence ).
+temptation( justice ).
+temptation( exoticness ).

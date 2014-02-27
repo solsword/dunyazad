@@ -2,7 +2,9 @@
 % From global/interest.lp:
 %   provocation(_)
 
-1 { l_selected(P) : provocation(P) } 1.
+{ l_selected(P) : provocation(P) } = 1.
+
+l_selected(outrage).
 
 spawn_task( 1, "provoke_outrage" ) :- l_selected(outrage).
 spawn_task( 1, "provoke_sympathy" ) :- l_selected(sympathy).

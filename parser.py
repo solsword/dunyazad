@@ -172,13 +172,16 @@ def Token(expr, preserve=NotGiven):
 @attr_object("thing")
 class Omit(GrammarElement):
   """
-  Parse something but return nothing (NoResult and no bubbles).
+  Parse something but return nothing (NoResult and no bubbles). If nothing to
+  parse is given, then just acts as a NoOp.
   """
   @prevent_recursion()
   def __str__(self):
-    return "Omit({})".format(self.thing)
+    return "Omit({})".format(str(self.thing) if self.thing else '')
 
   def _parse(self, text, devour=_default_devour):
+    if self.thing == None:
+      return NoResult, (), text
     r, b, l = packrat_parse(text, self.thing, devour=devour)
     return NoResult, (), l
 
@@ -364,22 +367,36 @@ class Flag(GrammarElement):
       b = tuple_with(b, AttributeBubble(self.name, True))
       return NoResult, b, l
 
-@attr_object("callback", "thing")
+@uniquely_defined_by("callback", "thing", "handle_errors")
 class Hook(GrammarElement):
   """
   A Hook grammar element parses text as the given object and then calls the
   given callback function on the result, bubbles, and leftovers before
   returning the modified results. Note that the callback function can
-  effectively catch and override a ParseError.
+  effectively catch and override a ParseError if handle_errors is given as
+  False, otherwise if the leftovers from the inner grammar is a ParseError it
+  will automatically be returned without calling the callback.
   """
+  def __init__(self, callback, thing, handle_errors=True):
+    self.callback = callback
+    self.thing = thing
+    self.handle_errors = handle_errors
+
   @prevent_recursion()
-  def __str__(self):
-    return "Hook({}, {})".format(self.callback, self.thing)
+  def __repr__(self):
+    return "Hook({}, {}{})".format(
+      self.callback,
+      self.thing,
+      ', ' + str(self.handle_errors) if (not self.handle_errors) else '',
+    )
 
   def _parse(self, text, devour=_default_devour):
     r, b, l = packrat_parse(text, self.thing, devour=devour)
-    r, b, l = self.callback(r, b, l)
-    return r, b, l
+    if self.handle_errors and isinstance(l, ParseError):
+      return NoResult, (), l
+    else:
+      r, b, l = self.callback(r, b, l)
+      return r, b, l
 
 @attr_object("callback", "thing")
 class Munge(GrammarElement):

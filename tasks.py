@@ -5,6 +5,7 @@ Defines some default tasks and task building blocks.
 
 import copy
 import re
+import sys
 
 from warnings import *
 
@@ -246,6 +247,7 @@ def asptask(name, code, source="unknown"):
            (network-) global memory.
   """
   def gen(t):
+    nonlocal name, code, source
     if not t.mem.code:
       raise ASPTaskError(
         "Task '{}' has no code (missing t.mem.code)!".format(name)
@@ -260,12 +262,12 @@ def asptask(name, code, source="unknown"):
       "%%%%%%%%%%%%%%",
       "% Task code: %",
       "%%%%%%%%%%%%%%",
-      '\n'.join(str(p) + '.' for p in t.mem.code),
+      '\n'.join(str(rule) for rule in t.mem.code),
       "%%%%%%%%%%%%%%%%%",
       "% Local memory: %",
       "%%%%%%%%%%%%%%%%%",
       '\n'.join(
-        str(p) + '.' for p in get_mem_predicates(
+        str(predicate) + '.' for predicate in get_mem_predicates(
           t.mem,
           exclude=[re.compile("code")]
         )
@@ -274,7 +276,7 @@ def asptask(name, code, source="unknown"):
       "% Global memory: %",
       "%%%%%%%%%%%%%%%%%%",
       '\n'.join(
-        str(p) + '.' for p in get_mem_predicates(
+        str(predicate) + '.' for predicate in get_mem_predicates(
           t.net.mem,
           exclude=[re.compile("code")],
           basename="glmem"
@@ -283,15 +285,21 @@ def asptask(name, code, source="unknown"):
       "%%%%%%%%%%%%%%%%%%%",
       "% Universal code: %",
       "%%%%%%%%%%%%%%%%%%%",
-      '\n'.join(str(p) + '.' for p in t.net.mem.code.universal),
+      '\n'.join(str(rule) for rule in t.net.mem.code.universal),
       "%%%%%%%%%%%%%%%",
       "% Story code: %",
       "%%%%%%%%%%%%%%%",
-      '\n'.join(str(p) + '.' for p in t.net.mem.code.story),
+      '\n'.join(str(predicate) + '.' for predicate in t.net.mem.code.story),
     ])
-    results = asp.solve(source)
-    # TODO: avoid this?
-    predicates = ans.as_predicate_statements(results)
+
+    try:
+      predicates = asp.solve(source)
+    except asp.ASPError as e:
+      if e.code == 20: # clingo return code for unsatisfiable
+        yield tn.TaskStatus.Crashed
+        return # halt this task
+      else:
+        raise e
 
     errors = []
     status = None
@@ -301,34 +309,43 @@ def asptask(name, code, source="unknown"):
     to_spawn = {}
     lmemlist = []
     gmemlist = []
-    for (schema, binding) in bindings(active_schemas, predicates):
+    for (schema, binding) in ans.bindings(active_schemas, predicates):
       if schema == "error":
-        errors.append(str(binding["error.Message"]))
+        errors.append(dequote(str(binding["error.Message"])))
       elif schema == "status":
+        s = dequote(str(binding["status.String"]))
         if status == None:
-          status = binding["status.String"].name
+          status = s
         else:
-          status = status + " and " + binding["status.String"].name
+          status = status + " and " + s
       elif schema == "story_add":
         addlist.append(binding["story_add.Predicate"])
       elif schema == "story_remove":
         rmlist.append(binding["story_remove.Predicate"])
       elif schema == "local_mem":
         lmemlist.append(
-          (binding["local_mem.Address"].name, binding["local_mem.Value"])
+          (
+            dequote(str(binding["local_mem.Address"].name)),
+            binding["local_mem.Value"]
+          )
         )
       elif schema == "global_mem":
         gmemlist.append(
-          (binding["global_mem.Address"].name, binding["global_mem.Value"])
+          (
+            dequote(str(binding["global_mem.Address"])),
+            binding["global_mem.Value"]
+          )
         )
       elif schema == "spawn_task":
-        to_spawn[binding["spawn_task.Id"]] = {
-          "name": binding["spawn_task.TaskName"],
+        to_spawn[str(binding["spawn_task.Id"])] = {
+          "name": dequote(str(binding["spawn_task.TaskName"])),
           "args": {}
         }
       elif schema == "task_arg":
-        args = to_spawn[binding["task_arg.Id"]]["args"]
-        args[binding["task_arg.Key"]] = binding["task_arg.Value"]
+        args = to_spawn[str(binding["task_arg.Id"])]["args"]
+        args[dequote(str(binding["task_arg.Key"]))] = dequote(
+          str(binding["task_arg.Value"])
+        )
       elif schema == "run_code":
         to_run.append(unquote(binding["run_code.QuotedCode"]))
 
@@ -337,8 +354,10 @@ def asptask(name, code, source="unknown"):
         "Error(s) while resolving answer set task:\n" + '\n'.join(errors)
       )
 
-    if status in TaskStatus.aliases:
-      status = TaskStatus.aliases[status]
+    if status in tn.TaskStatus.aliases:
+      status = tn.TaskStatus.aliases[status]
+    elif status == None:
+      status = tn.TaskStatus.Completed
     else:
       raise ASPTaskError(
         "Error: answer set produced invalid status '{}'.".format(status)
@@ -354,8 +373,13 @@ def asptask(name, code, source="unknown"):
         "lmemlist": lmemlist,
         "gmemlist": gmemlist,
       }
-      exec(
+      compiled = compile(
         code,
+        "<snippet from ASP task '{}' in {}>".format(name, source),
+        'exec'
+      )
+      exec(
+        compiled,
         {},
         code_locals
       )
@@ -396,12 +420,7 @@ def asptask(name, code, source="unknown"):
 
   gen.__name__ = name
   mem = obj.Obj()
-  # TODO: use actual predicates+constraints instead of strings?
-  singledot = re.compile(
-    # a period neither preceded nor followed by a period:
-    r"(?<!\.)\.(?!\.)"
-  )
-  mem.code = singledot.split(code.replace('\n', ' '))
+  mem.code = ans.ruleset(ans.parse_asp(code))
   return tn.Task(gen, mem=mem, source=source)
 
 def load_tasks(dir):
@@ -423,18 +442,36 @@ def load_tasks(dir):
       with open(f) as fin:
         contents = fin.read()
       code_locals = {}
-      exec(
-        contents,
-        globals(),
-        code_locals
-      )
+      try:
+        code = compile(
+          contents,
+          f,
+          'exec',
+        )
+        exec(
+          code,
+          globals(),
+          code_locals
+        )
+      except Exception as e:
+        sys.stderr.write(
+          "Error while loading Python task file '{}':\n".format(f)
+        )
+        raise e
       func = code_locals["run"]
       func.__name__ = taskname
       yield tn.Task(func, source=f)
     elif f.endswith(".lp"):
       with open(f) as fin:
         contents = fin.read()
-      yield asptask(taskname, contents, source=f)
+      try:
+        result = asptask(taskname, contents, source=f)
+      except Exception as e:
+        sys.stderr.write(
+          "Error while loading ASP task file '{}':\n".format(f)
+        )
+        raise e
+      yield result
 
 # Load tasks from the default directory on module load (the loading function is
 # defined in utils.py):

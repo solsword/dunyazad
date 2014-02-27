@@ -6,6 +6,7 @@ The main file for story generation.
 
 import tasks
 import tasknet as tn
+import ans
 
 from utils import *
 
@@ -19,7 +20,7 @@ def main():
   net.mem.code.story.
   """
   net = tn.TaskNet()
-  net.mem.code.universal = load_logic(GLOBAL_RULES_DIR)
+  net.mem.code.universal = ans.load_logic(GLOBAL_RULES_DIR)
   net.mem.code.story = set()
   tasks.spawn_task(net, "tell_story")
   net.run()

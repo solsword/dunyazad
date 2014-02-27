@@ -15,35 +15,55 @@ class TaskStatus:
   def __str__(self):
     return self.alias
 
-def task_status(cls):
-  """
-  Creates and returns an instance of the given class but also registers it as a
-  TaskStatus by adding it to TaskStatus' __dict__ and to the dictionary of
-  aliases.
-  """
-  setattr(TaskStatus, cls.__name__, cls)
-  TaskStatus.aliases[cls.alias] = cls
-  return cls
+@abstract
+class Initial(TaskStatus):
+  pass
+TaskStatus.Initial = Initial
 
-@task_status
-class Ready(TaskStatus):
+@abstract
+class Ready(TaskStatus.Initial):
   alias = "ready"
+TaskStatus.Initial.Ready = Ready
 
-@task_status
-class Completed(TaskStatus):
-  alias = "completed"
+@abstract
+class Intermediate(TaskStatus):
+  pass
+TaskStatus.Intermediate = Intermediate
 
-@task_status
-class Failed(TaskStatus):
-  alias = "failed"
-
-@task_status
-class InProgress(TaskStatus):
+@abstract
+class InProgress(TaskStatus.Intermediate):
   alias = "in_progress"
+TaskStatus.Intermediate.InProgress = InProgress
 
-@task_status
-class Blocked(TaskStatus):
+@abstract
+class Blocked(TaskStatus.Intermediate):
   alias = "blocked"
+TaskStatus.Intermediate.Blocked = Blocked
+
+@abstract
+class Final(TaskStatus):
+  pass
+TaskStatus.Final = Final
+
+@abstract
+class Completed(TaskStatus.Final):
+  alias = "completed"
+TaskStatus.Final.Completed = Completed
+
+@abstract
+class Failed(TaskStatus.Final):
+  alias = "failed"
+TaskStatus.Final.Failed = Failed
+
+@abstract
+class Crashed(TaskStatus.Final):
+  alias = "crashed"
+TaskStatus.Final.Crashed = Crashed
+
+# Collect all aliases into an aliases dictionary:
+for attr, val in walk_attributes(TaskStatus):
+  if hasattr(val, "alias"):
+    TaskStatus.aliases[val.alias] = val
 
 
 class Dependency:
@@ -52,7 +72,7 @@ class Dependency:
   state. If the dependent task isn't in the appropriate state, attempts to run
   the depending task will automatically return a "blocked" status.
   """
-  def __init__(self, head, tail, requires=TaskStatus.Completed):
+  def __init__(self, head, tail, requires=TaskStatus.Final.Completed):
     self.head = head
     self.tail = tail
     self.requires = requires
@@ -84,8 +104,8 @@ class Task:
   A task has a generator function that gets run when the task is up for
   execution. This function should perform a small chunk of work and then
   quickly yield one of the TaskStatus objects back to the task scheduler. If it
-  yields Succeeded or Failed the task network will be updated accordingly,
-  removing the task from the pool of active tasks.
+  yields Completed, Failed, or Crashed the task network will be updated
+  accordingly, removing the task from the pool of active tasks.
 
   Each task also has a priority, a local memory, a list of dependencies, a
   current status, and a parent task network (which is None by default).
@@ -108,7 +128,7 @@ class Task:
     self.deps = deps or set()
     self.mem = mem or obj.Obj()
     self.net = net or obj.Obj()
-    self.status = TaskStatus.Ready
+    self.status = TaskStatus.Initial.Ready
     self.source = source
     self._gen = None
 
@@ -119,15 +139,15 @@ class Task:
     if not self._gen:
       self._gen = self.func(self)
     if not self.ready():
-      self.status = TaskStatus.Blocked
+      self.status = TaskStatus.Final.Blocked
     else:
-      self.status = next(self._gen, TaskStatus.Completed)
+      self.status = next(self._gen, TaskStatus.Final.Completed)
     return self.status
 
-  def add_dep(self, other, state=TaskStatus.Completed):
+  def add_dep(self, other, state=TaskStatus.Final.Completed):
     self.deps.add(Dependency(self, other, requires=state))
 
-  def rm_dep(self, other, state=TaskStatus.Completed):
+  def rm_dep(self, other, state=TaskStatus.Final.Completed):
     self.deps.remove(Dependency(self, other, requires=state))
 
   def __str__(self):
@@ -189,7 +209,7 @@ class TaskNet:
     """
     Runs the given task (which should be on the active list; returns an error
     if isn't). Automatically handles last-task tracking and moves the task onto
-    the finished list if it returns a status of either Completed or Failed.
+    the finished list if it returns a Final status.
     """
     if task not in self.active:
       raise MissingTaskException(
@@ -197,7 +217,7 @@ class TaskNet:
       )
     st = task.run()
     self.last = task
-    if st in (TaskStatus.Completed, TaskStatus.Failed):
+    if isinstance(st, TaskStatus.Final):
       self.active.remove(task)
       self.finished.append(task)
 
@@ -265,10 +285,10 @@ def _test_tasknet_basic():
   tn = TaskNet()
   def put_hello(t):
     t.net.mem.string = "Hello "
-    yield TaskStatus.Completed
+    yield TaskStatus.Final.Completed
   def put_world(t):
     t.net.mem.string += "world!"
-    yield TaskStatus.Completed
+    yield TaskStatus.Final.Completed
   t1 = Task(put_hello)
   t2 = Task(put_world)
   t2.add_dep(t1)

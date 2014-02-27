@@ -16,15 +16,43 @@ def tuple_with(src, add):
 
 # Quoting and unquoting:
 
+def is_quoted(string):
+  return string[0] == '"' and string[-1] == '"'
+
 def quote(string):
   return '"' + string.replace("\\", "\\\\").replace('"', r'\"') + '"'
 
 escape_sequence = re.compile(r'\\(["\\])')
 def unquote(string):
-  if string[0] == '"' and string[-1] == '"':
+  if is_quoted(string):
     return escape_sequence.sub(r'\1', string)[1:-1]
   else:
     raise ValueError("'unquote' called on non-quoted string.")
+
+def dequote(string):
+  if is_quoted(string):
+    return unquote(string)
+  else:
+    return string
+
+# Walking object attributes:
+def walk_attributes(o, seen=set()):
+  """
+  A generator that walks all of the non-internal attributes of the given
+  object recursively in a depth-first order. An attribute is considered
+  internal (and thus skipped along with its children) if it begins and ends
+  with '__'. For each attribute touched this function yields a tuple of the
+  attribute name and the attribute value. Recursive objects will be yielded as
+  the value for whatever attribute they are but their children will be ignored.
+  """
+  if id(o) in seen:
+    return
+  seen.add(id(o))
+  for attr in o.__dict__:
+    if not (attr.startswith("__") and attr.endswith("__")):
+      yield attr, getattr(o, attr)
+      for sub in walk_attributes(o, seen):
+        yield sub
 
 # Class decorators:
 
@@ -263,18 +291,25 @@ def walk_files(dir, include=None, exclude=None):
       if safe:
         yield filename
 
-def load_logic(dir):
+def process_file_contents(dir, process, include=None, exclude=None):
   """
-  Loads every .lp file in the given directory (and all subdirectories) together
-  into a big string and parses it into a set of rules.
+  Loads every file that matches the given filters in the given directory (and
+  all subdirectories) and calls the given function on its text, returning a
+  flat list of the results.
   """
-  raw = ""
-  rules = set()
-  for f in walk_files(dir, include=lambda f: f.endswith(".lp")):
+  results = []
+  for f in walk_files(dir, include, exclude):
     with open(f, 'r') as fin:
-      raw += fin.read()
-      raw += "\n"
-  return rules
+      try:
+        results.append(process(fin.read()))
+      except Exception as e:
+        sys.stderr.write(
+          "Error while processing file '{}':\n".format(
+            f
+          )
+        )
+        raise e
+  return results
 
 _test_cases = [
   (quote, r"test", r'"test"'),
