@@ -26,19 +26,19 @@ class Ready(TaskStatus.Initial):
 TaskStatus.Initial.Ready = Ready
 
 @abstract
-class Intermediate(TaskStatus):
+class Ongoing(TaskStatus):
   pass
-TaskStatus.Intermediate = Intermediate
+TaskStatus.Ongoing = Ongoing
 
 @abstract
-class InProgress(TaskStatus.Intermediate):
+class InProgress(TaskStatus.Ongoing):
   alias = "in_progress"
-TaskStatus.Intermediate.InProgress = InProgress
+TaskStatus.Ongoing.InProgress = InProgress
 
 @abstract
-class Blocked(TaskStatus.Intermediate):
+class Blocked(TaskStatus.Ongoing):
   alias = "blocked"
-TaskStatus.Intermediate.Blocked = Blocked
+TaskStatus.Ongoing.Blocked = Blocked
 
 @abstract
 class Final(TaskStatus):
@@ -139,7 +139,7 @@ class Task:
     if not self._gen:
       self._gen = self.func(self)
     if not self.ready():
-      self.status = TaskStatus.Final.Blocked
+      self.status = TaskStatus.Ongoing.Blocked
     else:
       self.status = next(self._gen, TaskStatus.Final.Completed)
     return self.status
@@ -207,9 +207,10 @@ class TaskNet:
 
   def run_task(self, task):
     """
-    Runs the given task (which should be on the active list; returns an error
-    if isn't). Automatically handles last-task tracking and moves the task onto
-    the finished list if it returns a Final status.
+    Runs the given task (which should be on the active list; raises an error if
+    isn't). Automatically handles last-task tracking and moves the task onto
+    the finished list if it returns a Final status. This function returns the
+    status returned by the task.
     """
     if task not in self.active:
       raise MissingTaskException(
@@ -217,9 +218,10 @@ class TaskNet:
       )
     st = task.run()
     self.last = task
-    if isinstance(st, TaskStatus.Final):
+    if issubclass(st, TaskStatus.Final):
       self.active.remove(task)
       self.finished.append(task)
+    return st
 
   def next(self, mode="round-robin", visited=set()):
     """
@@ -263,25 +265,72 @@ class TaskNet:
   def step(self, scheduling="round-robin"):
     """
     Determines the next task using the given scheduling mode (see `next`) and
-    runs it (see `run_task`). Returns True if a step was executed and False if
-    there were no tasks to execute.
+    runs it (see `run_task`). Returns a tuple of the task that was run and its
+    resulting status, or None if there were no tasks to execute.
     """
     n = self.next(mode=scheduling)
     if n:
-      self.run_task(n)
-      return True
+      return (n, self.run_task(n))
     else:
-      return False
+      return None
 
-  def run(self, scheduling="round-robin"):
+  def run(self, scheduling="round-robin", maintenance=None):
     """
     Repeatedly calls `step` until there are no more tasks to accomplish, using
-    the given scheduling mode.
+    the given scheduling mode. If a maintenance function is given, it is called
+    with the tasknet, the last-run task, and the status of the last-run task as
+    arguments after every step. The maintenance function is not called if
+    step() returns None (which is the condition for finishing a run).
     """
-    while self.step(scheduling=scheduling):
-      pass
+    if maintenance:
+      result = self.step(scheduling=scheduling)
+      while result:
+        maintenance(self, *result)
+        result = self.step(scheduling=scheduling)
+    else:
+      while self.step(scheduling=scheduling):
+        pass
 
-def _test_tasknet_basic():
+def trace_net(net, task, result):
+  """
+  Designed to be passed as a maintenance function to TaskNet.run, this will
+  print a simple trace of activity.
+  """
+  print(
+    "Task {}: {}".format(
+      task.name, result.__name__
+    )
+  )
+
+def compile_trace(destination):
+  """
+  Given a destination list, returns a maintenance function that appends a trace
+  string to the given list every time it is called.
+  """
+  def trace(net, task, result):
+    nonlocal destination
+    destination.append("Task {}: {}".format(task.name, result.__name__))
+  return trace
+
+def _test_create_tasknet():
+  tn = TaskNet()
+  return True
+
+def _test_add_tasks():
+  tn = TaskNet()
+  def put_hello(t):
+    t.net.mem.string = "Hello "
+    yield TaskStatus.Final.Completed
+  def put_world(t):
+    t.net.mem.string += "world!"
+    yield TaskStatus.Final.Completed
+  t1 = Task(put_hello)
+  t2 = Task(put_world)
+  t2.add_dep(t1)
+  tn.add_tasks(t1, t2)
+  return True
+
+def _test_run_net():
   tn = TaskNet()
   def put_hello(t):
     t.net.mem.string = "Hello "
@@ -296,6 +345,26 @@ def _test_tasknet_basic():
   tn.run()
   return tn.mem.string
 
+def _test_net_trace():
+  tn = TaskNet()
+  def put_hello(t):
+    t.net.mem.string = "Hello "
+    yield TaskStatus.Final.Completed
+  def put_world(t):
+    t.net.mem.string += "world!"
+    yield TaskStatus.Final.Completed
+  t1 = Task(put_hello)
+  t2 = Task(put_world)
+  t2.add_dep(t1)
+  tn.add_tasks(t1, t2)
+  trace = []
+  tn.run(maintenance=compile_trace(trace))
+  return trace
+
 _test_cases = [
-  (_test_tasknet_basic, "Hello world!")
+  (issubclass, (TaskStatus.Final.Completed, TaskStatus.Final), True),
+  (_test_create_tasknet, True),
+  (_test_add_tasks, True),
+  (_test_run_net, "Hello world!"),
+  (_test_net_trace, ["Task put_hello: Completed", "Task put_world: Completed"]),
 ]

@@ -90,8 +90,8 @@ if __name__ == "__main__":
     print('-'*80)
     if not test(m):
       failed.append(m)
-    if stop_on_failure:
-      break
+      if stop_on_failure:
+        break
     print('-'*80)
   print('='*80)
   if failed:

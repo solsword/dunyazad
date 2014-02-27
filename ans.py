@@ -334,8 +334,10 @@ def build_schema(predicate):
   names start with uppercase letters into simple Variable objects, thus
   producing a schema.
   """
-  for i, arg in enumerate(predicate.args):
-    predicate.args[i] = build_schema(arg)
+  new_args = []
+  for arg in predicate.args:
+    new_args.append(build_schema(arg))
+  predicate.args = tuple(new_args)
   if type(predicate.name) == str \
   and predicate.name[0] in string.ascii_uppercase:
     return Variable(predicate.name, *predicate.args)
