@@ -1,0 +1,91 @@
+States for a fantastical fantasy merchant milieu:
+
+States:
+  Character:
+    supernatural - This character is a supernatural being
+
+    beautiful - Lovely to behold
+    wounded - In need of treatment to recover from a wound
+    dead - Kicked the bucket
+    maimed - A long-term impairment from a wound
+    sickly - A weak constitution; prone to sickness
+    sick - A short-term illness that can lead to death
+    afflicted - A long-term affliction that isn't life-threatening
+    drunk - Very tipsy
+
+    Mood:
+      neutral
+      happy
+      jubilant
+      sad
+      despairing
+      angry
+      enraged
+
+    Wealth:
+      beggar - Nothing to your name
+      serf - Suffering from poverty
+      commoner - Not wealthy, but not suffering because of it
+      tradesman - Works a profession; has some savings
+      merchant - Somewhat wealthy; access to credit; buys and sells in quantity
+      noble - Rich enough to avoid work; regular luxuries
+      ruler - Fabulous wealth; constant luxury and opulence
+
+    Power/Status:
+      pathetic - At the mercy of everyone
+      lower_class - Has minimal rights, but not well-respected
+      upper_class - Wealthy or otherwise respected
+      noble - A position of fiat authority
+      ruler - The highest position of authority
+
+  Item:
+    valuable
+
+    unowned - not owned_by anyone
+
+    Condition:
+      whole
+      broken
+      destroyed
+
+  Location:
+    inaccessible - not accessible_from anywhere
+
+Relationships:
+  Character-Character:
+    X jealous_of Y
+    X pities Y
+    X grateful_to Y - short-term/moderate gratefulness
+    X spiteful_towards Y - short-term/moderate spite
+    X indebted_to Y - A life-debt or other long-term gratefulness
+    X married_to Y
+
+    Affinity/Acquaintance:
+      X loves Y
+      X friends_with Y
+      X dislikes Y
+      X enemy_of Y
+      X acquainted_with Y
+      X doesnt_know Y
+
+    Family:
+      X father_of Y
+      X mother_of Y
+      X child_of Y
+      X sibling_of Y
+      X relative_of Y
+
+  Character-Location:
+    X at L
+
+  Item-Character:
+    I owned_by X
+    I controlled_by X
+    I carried_by X
+
+  Item-Location:
+    I at L
+
+  Location-Location:
+    L accessible_from L
+    L is_inside L
