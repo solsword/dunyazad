@@ -1,0 +1,22 @@
+character protagonist.
+
+property valued of protagonist.
+positive valued.
+
+property bad of protagonist.
+negative bad.
+
+event loss.
+loss initiates bad.
+loss terminates valued.
+loss is harmful for protagonist.
+
+property gained of protagonist.
+positive gained.
+
+event regain.
+regain initiates gained.
+regain terminates loss.
+regain is helpful for protagonist.
+
+regain after loss.
