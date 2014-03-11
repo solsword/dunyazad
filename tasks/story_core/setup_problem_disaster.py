@@ -1,8 +1,10 @@
 def run(self):
   subtask(
     self,
-    'add_character',
-    **{ 'args.role':'protagonist', 'args.name':'Komim', }
+    'add_event',
+    **{
+      'args.type':'protagonist',
+    }
   )
   subtask(
     self,
@@ -20,4 +22,5 @@ def run(self):
     **{ 'args.role':'stranger', 'args.name':'Quollips', }
   )
   yield tn.TaskStatus.Ongoing.InProgress
+  #self.add_story_fact(id_pr("evt", 1))
   spawn_task(self.net, 'setup_provocation')

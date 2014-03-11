@@ -6,7 +6,7 @@ The main file for story generation.
 
 import traceback
 
-import tasks
+import storytasks
 import tasknet as tn
 import ans
 
@@ -28,7 +28,7 @@ def main():
   net = tn.TaskNet()
   net.mem.code.universal = ans.load_logic(GLOBAL_RULES_DIR)
   net.mem.code.story = set()
-  tasks.spawn_task(net, "tell_story")
+  storytasks.spawn_task(net, "tell_story")
   print('-'*80)
   print("Trace:")
   print('-'*80)

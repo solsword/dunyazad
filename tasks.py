@@ -1,6 +1,6 @@
 """
-tasks.py
-Defines some default tasks and task building blocks.
+storytasks.py
+Defines some default tasks and task building blocks for story tasks.
 """
 
 import copy
@@ -15,6 +15,7 @@ import ans
 import obj
 
 from utils import *
+from storyutils import *
 
 # Global task directory (on module import, tasks from this directory will be
 # loaded).
@@ -23,6 +24,35 @@ TASK_DIRECTORY = "tasks"
 # This global variable stores tasks loaded from files in the tasks/
 # subdirectory:
 TASK_LIST = {}
+
+class StoryTask(tn.Task):
+  """
+  A StoryTask is just a Task with some extra convenience methods for
+  story-related operations.
+  """
+  def add_story_fact(self, predicate):
+    """
+    Adds the given predicate to the story facts for this task's task network.
+    """
+    self.net.mem.code.story.add(p)
+
+  def remove_story_facts(self, *predicates):
+    """
+    Removes the given predicate(s) from this task's network's story.
+    """
+    self.net.mem.code.story = set(
+      ans.filter(
+        self.net.mem.code.story,
+        forbid=predicates
+      )
+    )
+
+  def story_facts(self):
+    """
+    Returns a set of Predicates specifying the story that this task is
+    operating on. Actually just grabs self.net.mem.code.story.
+    """
+    return self.net.mem.code.story
 
 class TaskOverwriteWarning(Warning):
   pass
@@ -58,7 +88,7 @@ def clone_task(task, **kwargs):
   for key in kwargs:
     newmem[key] = kwargs[key]
 
-  return tn.Task(
+  return StoryTask(
     task.func,
     priority=task.priority,
     mem=newmem,
@@ -122,7 +152,7 @@ def mktask(func, returnsstatus=False, passtask=False):
         func()
         yield tn.TaskStatus.Final.Completed
   gen.__name__ = func.__name__
-  return tn.Task(gen, source="function '{}'".format(func.__name__))
+  return StoryTask(gen, source="function '{}'".format(func.__name__))
 
 def get_mem_predicates(mem, exclude=[], basename="mem"):
   """
@@ -393,20 +423,15 @@ def asptask(name, code, source="unknown"):
 
     # Process additions and removals:
     for p in addlist:
-      t.net.mem.code.story.add(p)
+      t.add_story_fact(p)
+
+    t.remove_story_facts(*rmlist)
 
     for (addr, val) in lmemlist:
       t.mem[addr] = val
 
     for (addr, val) in gmemlist:
       t.net.mem[addr] = val
-
-    t.net.mem.code.story = set(
-      ans.filter(
-        t.net.mem.code.story,
-        forbid=rmlist
-      )
-    )
 
     # Spawn tasks:
     for id in to_spawn:
@@ -423,7 +448,7 @@ def asptask(name, code, source="unknown"):
   gen.__name__ = name
   mem = obj.Obj()
   mem.code = ans.ruleset(ans.parse_asp(code))
-  return tn.Task(gen, mem=mem, source=source)
+  return StoryTask(gen, mem=mem, source=source)
 
 def load_tasks(dir):
   """
@@ -462,7 +487,7 @@ def load_tasks(dir):
         raise e
       func = code_locals["run"]
       func.__name__ = taskname
-      yield tn.Task(func, source=f)
+      yield StoryTask(func, source=f)
     elif f.endswith(".lp"):
       with open(f) as fin:
         contents = fin.read()
