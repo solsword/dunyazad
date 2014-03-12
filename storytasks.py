@@ -47,10 +47,10 @@ class StoryTask(tn.Task):
       )
     )
 
-  def story_facts(self):
+  def story(self):
     """
     Returns a set of Predicates specifying the story that this task is
-    operating on. Actually just grabs self.net.mem.code.story.
+    operating on. Just grabs self.net.mem.code.story.
     """
     return self.net.mem.code.story
 
