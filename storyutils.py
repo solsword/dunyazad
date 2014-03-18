@@ -1,7 +1,7 @@
 """
 storyutils.py
 Convenience functions for dealing with stories encoded as a bunch of
-predicates (some specific to the Dunyazad encoding format).
+predicates (mostly specific to the Dunyazad encoding format).
 """
 
 import ans
@@ -13,6 +13,11 @@ SbT = ans.SbT
 
 # A pattern for matching id(Type, ID) predicates:
 ID_PATTERN = Pr("id", Vr("Type"), Vr("ID"))
+CONTENT_PATTERN = Pr(
+  "content",
+    Sbt("ID"),
+    Sbt("Content")
+)
 
 ##############################
 # General utility functions: #
@@ -40,6 +45,25 @@ def next_id(story, type):
       highest = id_int
   return highest + 1
 
+def get_content(story, schema):
+  """
+  Yields the content predicate(s) for everything in the story whose ID matches
+  the given schema. Ideally this should be a single result when a variable-free
+  schema is given.
+  """
+  for (schema, binding) in ans.bindings({"content": CONTENT_PATTERN}, story):
+    if bind(schema, binding["content.ID"]):
+      yield binding["content.Content"]
+
+def find_stuff(story, schema):
+  """
+  Yields the ID predicate(s) for everything in the story whose content matches
+  the given schema.
+  """
+  for (schema, binding) in ans.bindings({"content": CONTENT_PATTERN}, story):
+    if bind(schema, binding["content.Content"]):
+      yield binding["content.ID"]
+
 #####################################
 # Predicate construction functions: #
 #####################################
@@ -59,14 +83,14 @@ def next_id_prs(story, type, n=1):
   nxt = next_id(story, type)
   return [ id_pr(type, i) for i in range(nxt, nxt+n) ]
 
-def content_pr(item, *content):
+def content_pr(item, content):
   """
   Returns a Predicate specifying the content of the given item.
   """
   return Pr(
     "content",
     item,
-    *[ ensure_predicate(p) for p in content ]
+    ensure_predicate(content)
   )
 
 def link_prs(story, frm, to, ltype):
@@ -79,17 +103,17 @@ def link_prs(story, frm, to, ltype):
   link = next_id_prs(story, "lnk", 1)[0]
   return [
     link,
-    content_pr(lnk, frm, to, ensure_predicate(ltype))
+    content_pr( lnk, Pr("link", frm, to, ensure_predicate(ltype)) )
   ]
 
-def linked_node_prs(story, item, ltype, ntype, *contents):
+def linked_node_prs(story, item, ltype, ntype, contents):
   """
   Returns a list of Predicates denoting a linked node with the given link type,
   node type, and node contents.
   """
   node = next_id_prs(story, ntype, 1)[0]
   result = [ node ]
-  result.append( content_pr(node, *contents) )
+  result.append( content_pr(node, contents) )
   result.extend( link_prs(story, item, node, ltype) )
   return result
 
@@ -107,8 +131,11 @@ def intrinsic_prs(story, item, property, value):
     item,
     "intrinsic",
     "prop",
-    property,
-    value
+    Pr(
+      Pr("property"),
+      property,
+      value
+    )
   )
 
 #############################

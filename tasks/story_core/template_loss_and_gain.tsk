@@ -1,22 +1,22 @@
-character protagonist.
+character $protagonist.
 
-property valued of protagonist.
-positive valued.
+$protagonist has some property $valued.
+$valued has interpretation positive.
 
-property bad of protagonist.
-negative bad.
+$protagonist has some property $bad.
+$bad has interpretation negative.
 
-event loss.
-loss initiates bad.
-loss terminates valued.
-loss is harmful for protagonist.
+event $loss.
+$loss initiates $bad.
+$loss terminates $valued.
+$loss has interpretation harmful_to($protagonist).
 
-property gained of protagonist.
-positive gained.
+$protagonist has some property $gained.
+positive $gained.
 
-event regain.
-regain initiates gained.
-regain terminates loss.
-regain is helpful for protagonist.
+event $regain.
+$regain initiates $gained.
+$regain terminates $loss.
+$regain has interpretation helpful_for($protagonist).
 
-regain after loss.
+$regain is after $loss.
