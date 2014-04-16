@@ -13,11 +13,6 @@ SbT = ans.SbT
 
 # A pattern for matching id(Type, ID) predicates:
 ID_PATTERN = Pr("id", Vr("Type"), Vr("ID"))
-CONTENT_PATTERN = Pr(
-  "content",
-    Sbt("ID"),
-    Sbt("Content")
-)
 
 ##############################
 # General utility functions: #
@@ -45,25 +40,6 @@ def next_id(story, type):
       highest = id_int
   return highest + 1
 
-def get_content(story, schema):
-  """
-  Yields the content predicate(s) for everything in the story whose ID matches
-  the given schema. Ideally this should be a single result when a variable-free
-  schema is given.
-  """
-  for (schema, binding) in ans.bindings({"content": CONTENT_PATTERN}, story):
-    if bind(schema, binding["content.ID"]):
-      yield binding["content.Content"]
-
-def find_stuff(story, schema):
-  """
-  Yields the ID predicate(s) for everything in the story whose content matches
-  the given schema.
-  """
-  for (schema, binding) in ans.bindings({"content": CONTENT_PATTERN}, story):
-    if bind(schema, binding["content.Content"]):
-      yield binding["content.ID"]
-
 #####################################
 # Predicate construction functions: #
 #####################################
@@ -83,41 +59,19 @@ def next_id_prs(story, type, n=1):
   nxt = next_id(story, type)
   return [ id_pr(type, i) for i in range(nxt, nxt+n) ]
 
-def content_pr(item, content):
-  """
-  Returns a Predicate specifying the content of the given item.
-  """
-  return Pr(
-    "content",
-    item,
-    ensure_predicate(content)
-  )
-
-def link_prs(story, frm, to, ltype):
+def link_pr(story, frm, to, ltype):
   """
   Takes id predicate constructions for source and destination story objects and
-  returns a list of Predicates describing a link of the given type between
-  them. The first item in the result list is always the id predicate for the
-  new link object.
+  returns a Predicates describing a link of the given type between them.
   """
-  link = next_id_prs(story, "lnk", 1)[0]
-  return [
-    link,
-    content_pr( lnk, Pr("link", frm, to, ensure_predicate(ltype)) )
-  ]
+  return Pr(
+    "link",
+    ensure_predicate(ltype),
+    ensure_predicate(frm),
+    ensure_predicate(to)
+  )
 
-def linked_node_prs(story, item, ltype, ntype, contents):
-  """
-  Returns a list of Predicates denoting a linked node with the given link type,
-  node type, and node contents.
-  """
-  node = next_id_prs(story, ntype, 1)[0]
-  result = [ node ]
-  result.append( content_pr(node, contents) )
-  result.extend( link_prs(story, item, node, ltype) )
-  return result
-
-def intrinsic_prs(story, item, property, value):
+def intrinsic_pr(story, item, property, value):
   """
   Returns a list of Predicates denoting an intrinsic property of the given item
   (which should be a Predicate with the same structure as the return value from
@@ -126,16 +80,11 @@ def intrinsic_prs(story, item, property, value):
   property. The new property id Predicate will always be the first element of
   the result list.
   """
-  return linked_node_prs(
-    story,
-    item,
+  return Pr(
     "intrinsic",
-    "prop",
-    Pr(
-      Pr("property"),
-      property,
-      value
-    )
+    ensure_predicate(item),
+    ensure_predicate(property),
+    ensure_predicate(value),
   )
 
 #############################
@@ -144,21 +93,39 @@ def intrinsic_prs(story, item, property, value):
 
 def add_link(story, frm, to, ltype):
   """
-  Adds a link of the given type from the given source (should be an id_pr
-  result) to the given destination (same). Returns the id predicate for the
-  newly-created link.
+  Adds a link of the given type from the given source to the given destination.
   """
-  predicates = link_prs(story, frm, to, ltype)
-  story.update(predicates)
-  return predicates[0]
+  story.add(link_pr(story, frm, to, ltype))
 
-def add_character(story, name="Merquivest Monogarymbalid", role="stranger"):
+def add_character(story, name='"Merquivest Monogarymbalid"', role="stranger"):
   """
   Adds a new character to the story with the given name and role. Returns the
   id Predicate for the added character.
   """
   character = next_id_prs(story, "chr", 1)[0]
   story.add(character)
-  story.update( intrinsic_prs(story, character, "name", name) )
-  story.update( intrinsic_prs(story, character, "role", role) )
+  story.add( intrinsic_pr(story, character, "name", name) )
+  story.add( intrinsic_pr(story, character, "role", role) )
   return character
+
+def add_item(story, name='"polka-dot umbrella"', typ="key"):
+  """
+  Adds a new item to the story with the given name and type. Returns the id
+  Predicate for the added item.
+  """
+  item = next_id_prs(story, "itm", 1)[0]
+  story.add(item)
+  story.add( intrinsic_pr(story, item, "name", name) )
+  story.add( intrinsic_pr(story, item, "type", typ) )
+  return item
+
+def add_location(story, name='"center of the sun"', typ="geographic_region"):
+  """
+  Adds a new location to the story with the given name and type. Returns the id
+  Predicate for the added location.
+  """
+  location = next_id_prs(story, "loc", 1)[0]
+  story.add(location)
+  story.add( intrinsic_pr(story, location, "name", name) )
+  story.add( intrinsic_pr(story, location, "type", typ) )
+  return location
