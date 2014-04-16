@@ -2334,5 +2334,95 @@ bar(3, 5)?""",
         ),
       )
     )
-  )
+  ),
+  (
+    parse_asp,
+    """\
+1 = {
+  bound(Ref, id(Type, ID)) :
+    proposed(id(Type, ID)),
+    not story(id(Type, ID))
+} :-
+  edit(new, Type, Ref).
+""",
+    Program(
+      (
+        Rule(
+          Choice(
+            SimpleTerm('1', None),
+            '=',
+            (
+              ChoiceElement(
+                ClassicalLiteral(
+                  False,
+                  'bound',
+                  (
+                    SimpleTerm('Ref', None),
+                    SimpleTerm(
+                      'id',
+                      (
+                        SimpleTerm('Type', None),
+                        SimpleTerm('ID', None)
+                      )
+                    )
+                  )
+                ),
+                (
+                  NafLiteral(
+                    False,
+                    ClassicalLiteral(
+                      False,
+                      'proposed',
+                      (
+                        SimpleTerm(
+                          'id',
+                          (
+                            SimpleTerm('Type', None),
+                            SimpleTerm('ID', None)
+                          )
+                        ),
+                      )
+                    )
+                  ),
+                  NafLiteral(
+                    True,
+                    ClassicalLiteral(
+                      False,
+                      'story',
+                      (
+                        SimpleTerm(
+                          'id',
+                          (
+                            SimpleTerm('Type', None),
+                            SimpleTerm('ID', None)
+                          )
+                        ),
+                      )
+                    )
+                  )
+                )
+              ),
+            ),
+            None,
+            None
+          ),
+          (
+            NafLiteral(
+              False,
+              ClassicalLiteral(
+                False,
+                'edit',
+                (
+                  SimpleTerm('new', None),
+                  SimpleTerm('Type', None),
+                  SimpleTerm('Ref', None)
+                )
+              )
+            ),
+          )
+        ),
+      ),
+      None
+    )
+  ),
 ]
