@@ -1,4 +1,4 @@
-% mod.lp
+% edit.lp
 % Rules about how to construct a modified story state given the existing story
 % state and some rules about what the modification is. Allows for writing
 % simple/generic modifications and solving for modified stories consistent with
