@@ -22,8 +22,10 @@ current_ending(T) :-
   story(current, happens(T, Evt)),
   not not_current_last(T).
 % Ensure that only one of the two methods above was used:
-:- 1 < { current_beginning(T) : time(T) }.
-:- 1 < { current_ending(T) : time(T) }.
+error(m("No story beginning.")) :-
+  1 < { current_beginning(T) : current_beginning(T) }.
+error(m("No story ending.")) :-
+  1 < { current_ending(T) : current_ending(T) }.
 
 active_timestep(T) :-
   story(current, happens(T, Evt)).
@@ -35,8 +37,8 @@ error(m("Unordered event.", ID)) :-
 
 % A notion of "is_before" ordering based on timesteps:
 story(Story, ordered(id(evt, Before), is_before, id(evt, After))) :-
-  id(evt, Before),
-  id(evt, After),
+  story(Story, id(evt, Before)),
+  story(Story, id(evt, After)),
   story(Story, happens(Tafter, id(evt, After))),
   story(Story, happens(Tbefore, id(evt, Before))),
   Tafter > Tbefore.

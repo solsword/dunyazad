@@ -402,42 +402,6 @@ def _test_net_trace():
   tn.run(maintenance=compile_trace(trace))
   return trace
 
-def _test_add_character_task():
-  import ans, storytasks
-  net = TaskNet()
-  net.mem.code.universal = ans.load_logic("global")
-  net.mem.code.story = set()
-  storytasks.spawn_task(net, "add_character")
-  leftovers = net.run()
-  unfinished = [t for t in leftovers if t.status != TaskStatus.Final.Crashed]
-  crashed = [t for t in leftovers if t.status == TaskStatus.Final.Crashed]
-  print('-'*80)
-  print("Unfinished:")
-  print('-'*80)
-  print('\n'.join(str(t) for t in unfinished))
-  print('-'*80)
-  print("Crashed:")
-  print('-'*80)
-  print(
-    '\n'.join(
-      "{}\n{}".format(
-        t,
-        format_exception(t.error) if t.error else '<no error?!>'
-      ) for t in crashed
-    )
-  )
-  print('-'*80)
-  print("Story:")
-  print('-'*80)
-  print(
-    '\n'.join(
-      sorted(
-        str(predicate) + '.' for predicate in net.mem.code.story
-      )
-    )
-  )
-  print('-'*80)
-
 _test_cases = [
   (issubclass, (TaskStatus.Final.Completed, TaskStatus.Final), True),
   (_test_create_tasknet, True),
@@ -445,5 +409,4 @@ _test_cases = [
   (_test_run_net, "Hello world!"),
   (_test_net_unfinished, ["impossible"]),
   (_test_net_trace, ["Task put_hello: Completed", "Task put_world: Completed"]),
-  (_test_add_character_task, None),
 ]

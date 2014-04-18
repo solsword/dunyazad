@@ -30,11 +30,17 @@ class StoryTask(tn.Task):
   A StoryTask is just a Task with some extra convenience methods for
   story-related operations.
   """
+  def empty_story(self):
+    """
+    Resets the task's network's story to an empty set.
+    """
+    self.net.mem.code.story = set();
+
   def add_story_fact(self, predicate):
     """
     Adds the given predicate to the story facts for this task's task network.
     """
-    self.net.mem.code.story.add(p)
+    self.net.mem.code.story.add(predicate)
 
   def remove_story_facts(self, *predicates):
     """
@@ -187,13 +193,47 @@ def get_mem_predicates(mem, exclude=[], basename="mem"):
       ans.as_predicate(value),
     )
 
+def assemble_problem(task):
+  return '\n'.join([
+    "%%%%%%%%%%%%%%",
+    "% Task code: %",
+    "%%%%%%%%%%%%%%",
+    '\n'.join(str(rule) for rule in task.mem.code),
+    "%%%%%%%%%%%%%%%%%",
+    "% Local memory: %",
+    "%%%%%%%%%%%%%%%%%",
+    '\n'.join(
+      str(predicate) + '.' for predicate in get_mem_predicates(
+        task.mem,
+        exclude=[re.compile("code")]
+      )
+    ),
+    "%%%%%%%%%%%%%%%%%%",
+    "% Global memory: %",
+    "%%%%%%%%%%%%%%%%%%",
+    '\n'.join(
+      str(predicate) + '.' for predicate in get_mem_predicates(
+        task.net.mem,
+        exclude=[re.compile("code")],
+        basename="glmem"
+      )
+    ),
+    "%%%%%%%%%%%%%%%%%%%",
+    "% Universal code: %",
+    "%%%%%%%%%%%%%%%%%%%",
+    '\n'.join(str(rule) for rule in task.net.mem.code.universal),
+    "%%%%%%%%%%%%%%%",
+    "% Story code: %",
+    "%%%%%%%%%%%%%%%",
+    '\n'.join(str(predicate) + '.' for predicate in task.net.mem.code.story),
+  ])
+
 class ASPTaskError(Exception):
   pass
 
 # Schemas for binding active predicates:
 active_schemas = {
-  "story_add": ans.Pr("story_add", ans.SbT("Predicate")),
-  "story_remove": ans.Pr("story_remove", ans.SbT("Predicate")),
+  "proposed": ans.Pr("story", ans.Pr("proposed"), ans.SbT("Predicate")),
   "local_mem": ans.Pr("local_mem", ans.Vr("Address"), ans.SbT("Value")),
   "global_mem": ans.Pr("global_mem", ans.Vr("Address"), ans.SbT("Value")),
   "run_code": ans.Pr( "run_code", ans.Vr("QuotedCode")),
@@ -203,7 +243,6 @@ active_schemas = {
   "task_arg": ans.Pr("task_arg", ans.Vr("Id"), ans.Vr("Key"), ans.SbT("Value")),
 }
 
-# TODO: Rejigger this! 
 def asptask(name, code, source="unknown"):
   """
   Takes a name and a string (full of ASP predicates and/or constraints) and
@@ -223,8 +262,8 @@ def asptask(name, code, source="unknown"):
     2. Combines any source code found into a single ASP problem and solves it
        by calling `clingo` (see the asp module).
     3. Scans the resulting answer set for the following predicates and behaves
-       accordingly, updating the code in net.mem.code.story if directed to do
-       so and yielding an appropriate status:
+       accordingly, updating the code in net.mem.code.story and yielding an
+       appropriate status:
      error(<predicate>)
        If any error predicates are generated, an exception will be raised and
        none of the other predicates in this list will be heeded.
@@ -233,14 +272,9 @@ def asptask(name, code, source="unknown"):
        is the result, it will automatically be removed from the active tasks
        list. If multiple status() predicates are detected an error is
        generated.
-     story_add(<predicate>)
-       The given predicate structure will be added to the story predicates.
-       Note that add actions are processed before remove actions, so if a
-       predicate is listed for both removal and addition it will be absent from
-       the story after modifications have been processed.
-     story_remove(<predicate>)
-       The given predicate will be removed from the story predicates. The
-       predicate must exactly match an entire story predicate.
+     story(proposed, <predicate>)
+       The given predicate structure will be used as part of the current story
+       going onwards, in the form story(current, <predicate>).
      local_mem(<address>, <predicate>)
        The given local memory address will be set to the given predicate.
      global_mem(<address>, <predicate>)
@@ -289,46 +323,12 @@ def asptask(name, code, source="unknown"):
       raise ASPTaskError(
         "No universal constraints object (missing t.net.mem.code.universal)!"
       )
-    source = '\n'.join([
-      "%%%%%%%%%%%%%%",
-      "% Task code: %",
-      "%%%%%%%%%%%%%%",
-      '\n'.join(str(rule) for rule in t.mem.code),
-      "%%%%%%%%%%%%%%%%%",
-      "% Local memory: %",
-      "%%%%%%%%%%%%%%%%%",
-      '\n'.join(
-        str(predicate) + '.' for predicate in get_mem_predicates(
-          t.mem,
-          exclude=[re.compile("code")]
-        )
-      ),
-      "%%%%%%%%%%%%%%%%%%",
-      "% Global memory: %",
-      "%%%%%%%%%%%%%%%%%%",
-      '\n'.join(
-        str(predicate) + '.' for predicate in get_mem_predicates(
-          t.net.mem,
-          exclude=[re.compile("code")],
-          basename="glmem"
-        )
-      ),
-      "%%%%%%%%%%%%%%%%%%%",
-      "% Universal code: %",
-      "%%%%%%%%%%%%%%%%%%%",
-      '\n'.join(str(rule) for rule in t.net.mem.code.universal),
-      "%%%%%%%%%%%%%%%",
-      "% Story code: %",
-      "%%%%%%%%%%%%%%%",
-      '\n'.join(str(predicate) + '.' for predicate in t.net.mem.code.story),
-    ])
-
-    predicates = asp.solve(source)
+    problem = assemble_problem(t)
+    predicates = asp.solve(problem)
 
     errors = []
     status = None
-    addlist = []
-    rmlist = []
+    proplist = []
     to_run = []
     to_spawn = {}
     lmemlist = []
@@ -342,10 +342,8 @@ def asptask(name, code, source="unknown"):
           status = s
         else:
           status = status + " and " + s
-      elif schema == "story_add":
-        addlist.append(binding["story_add.Predicate"])
-      elif schema == "story_remove":
-        rmlist.append(binding["story_remove.Predicate"])
+      elif schema == "proposed":
+        proplist.append(binding["story.Predicate"])
       elif schema == "local_mem":
         lmemlist.append(
           (
@@ -401,8 +399,7 @@ def asptask(name, code, source="unknown"):
       code_locals={
         "status": status,
         "task": t,
-        "addlist": addlist,
-        "rmlist": rmlist,
+        "proplist": proplist,
         "lmemlist": lmemlist,
         "gmemlist": gmemlist,
       }
@@ -417,16 +414,14 @@ def asptask(name, code, source="unknown"):
         code_locals
       )
       status = code_locals["status"]
-      addlist = code_locals["addlist"]
-      rmlist = code_locals["rmlist"]
+      proplist = code_locals["proplist"]
       lmemlist = code_locals["lmemlist"]
       gmemlist = code_locals["gmemlist"]
 
-    # Process additions and removals:
-    for p in addlist:
-      t.add_story_fact(p)
-
-    t.remove_story_facts(*rmlist)
+    # Process the new story and memory elements:
+    t.empty_story()
+    for p in proplist:
+      t.add_story_fact(ans.Pr("story", ans.Pr("current"), p))
 
     for (addr, val) in lmemlist:
       t.mem[addr] = val
@@ -501,7 +496,74 @@ def load_tasks(dir):
         raise e
       yield result
 
+def dump_failed_asp_tasks(net, task, result, counterbox=[0]):
+  """
+  A maintenance function for a task network that dumps failed tasks to a file
+  in the "dumps" directory.
+  """
+  if (
+    result in (tn.TaskStatus.Final.Failed, tn.TaskStatus.Final.Crashed)
+  and
+    task.mem.code
+  ):
+    if not os.path.exists("dumps"):
+      os.mkdir("dumps")
+    filename = "dumps/{}-{}.td".format(task.name, counterbox[0])
+    with open(filename, 'w') as fout:
+      fout.write(
+        "% Dump of task:\n% {}\n% {}\n".format(
+          task,
+          '\n% '.join(str(task.error).split('\n'))
+        )
+      )
+      fout.write("% vim: syn=gringo\n")
+      fout.write(assemble_problem(task))
+    sys.stderr.write(
+      "Dumped failed task dump to file '{}'.\n".format(filename)
+    )
+    counterbox[0] += 1
+
 # Load tasks from the default directory on module load (the loading function is
 # defined in utils.py):
 for t in load_tasks(TASK_DIRECTORY):
   register_task(t)
+
+def _test_add_character_task():
+  import ans, storytasks
+  net = tn.TaskNet()
+  net.mem.code.universal = ans.load_logic("global")
+  net.mem.code.story = set()
+  storytasks.spawn_task(net, "add_character")
+  leftovers = net.run(maintenance=dump_failed_asp_tasks)
+  unfinished = [t for t in leftovers if t.status != tn.TaskStatus.Final.Crashed]
+  crashed = [t for t in leftovers if t.status == tn.TaskStatus.Final.Crashed]
+  print('-'*80)
+  print("Unfinished:")
+  print('-'*80)
+  print('\n'.join(str(t) for t in unfinished))
+  print('-'*80)
+  print("Crashed:")
+  print('-'*80)
+  print(
+    '\n'.join(
+      "{}\n{}".format(
+        t,
+        format_exception(t.error) if t.error else '<no error?!>'
+      ) for t in crashed
+    )
+  )
+  print('-'*80)
+  print("Story:")
+  print('-'*80)
+  print(
+    '\n'.join(
+      sorted(
+        str(predicate) + '.' for predicate in net.mem.code.story
+      )
+    )
+  )
+  print('-'*80)
+
+_test_cases = [
+  (_test_add_character_task, None),
+]

@@ -8,4 +8,5 @@ story(current).
 story(proposed).
 
 % Errors shall be minimized:
-#minimize { error(Message) : error(Message) }.
+:- error(Message).
+%#minimize { 1,error(Message) : error(Message) }.

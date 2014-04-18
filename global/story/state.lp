@@ -27,7 +27,8 @@ error(
   )
 ) :-
   story(Story, at(T, property(Subject, Prop, V1))),
-  story(Story, at(T, property(Subject, Prop, V2))).
+  story(Story, at(T, property(Subject, Prop, V2))),
+  V1 != V2.
 
 error(
   m(
