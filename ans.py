@@ -468,6 +468,11 @@ class SimpleTerm:
     else:
       return "{}".format(self.id)
 
+@attr_object("lower", "upper")
+class Interval:
+  def __str__(self):
+    return "{}..{}".format(self.lower, self.upper)
+
 @attr_object("negated", "id", "terms")
 class ClassicalLiteral:
   def __str__(self):
@@ -648,6 +653,7 @@ Comparator = parser.OneOf(
 )
 
 Term = parser.OneOf(
+  Interval,
   Expression,
   SimpleTerm,
 )
@@ -664,6 +670,15 @@ Term.elements = tuple_with(
 )
 
 Terms = parser.SepList(Term, sep=Tokens.Ignore.COMMA)
+
+Interval.grammar = parser.Package(
+  Interval,
+  parser.Seq(
+    parser.Attr("lower", SimpleTerm),
+    Tokens.INTERVAL,
+    parser.Attr("upper", SimpleTerm),
+  ),
+)
 
 SimpleTerm.grammar = parser.Package(
   SimpleTerm,
@@ -2013,6 +2028,36 @@ a. %comment b.
     ),
   ),
   (
+    parser._test_parse(Interval),
+    "1..X",
+    Interval(
+      SimpleTerm("1"),
+      SimpleTerm("X")
+    )
+  ),
+  (
+    parse_asp,
+    """\
+time(1..1000).
+    """,
+    Program(
+      (
+        Rule(
+          ClassicalLiteral(
+            False,
+            "time",
+            (
+              Interval(
+                SimpleTerm("1"),
+                SimpleTerm("1000")
+              ),
+            )
+          ),
+        ),
+      ),
+    ),
+  ),
+  (
     parse_asp,
     """\
 % comment
@@ -2344,7 +2389,7 @@ bar(3, 5)?""",
     not story(id(Type, ID))
 } :-
   edit(new, Type, Ref).
-""",
+    """,
     Program(
       (
         Rule(
@@ -2419,6 +2464,146 @@ bar(3, 5)?""",
                 )
               )
             ),
+          )
+        ),
+      ),
+      None
+    )
+  ),
+  (
+    parse_asp,
+    """\
+:- 1 < { current_ending(T) : time(T) }.
+    """,
+    Program(
+      (
+        Rule(
+          None,
+          (
+            Aggregate(
+              False,
+              SimpleTerm('1', None),
+              '<',
+              '#count',
+              (
+                AggregateElement(
+                  (
+                    SimpleTerm(
+                      'current_ending',
+                      (
+                        SimpleTerm('T', None),
+                      )
+                    ),
+                  ),
+                  (
+                    NafLiteral(
+                      False,
+                      ClassicalLiteral(
+                        False,
+                        'time',
+                        (
+                          SimpleTerm('T', None),
+                        )
+                      )
+                    ),
+                  )
+                ),
+              ),
+              None,
+              None
+            ),
+          )
+        ),
+      ),
+      None
+    )
+  ),
+  (
+    parse_asp,
+    """\
+error(m("Unordered event.", ID)) :-
+  story(Story, id(evt, ID)),
+  0 = { story(Story, happens(T, id(evt, ID))) : time(T) }.
+    """,
+    Program(
+      (
+        Rule(
+          ClassicalLiteral(
+            False,
+            'error',
+            (
+              SimpleTerm(
+                'm',
+                (
+                  SimpleTerm('"Unordered event."', None),
+                  SimpleTerm('ID', None)
+                )
+              ),
+            )
+          ),
+          (
+            NafLiteral(
+              False,
+              ClassicalLiteral(
+                False,
+                'story',
+                (
+                  SimpleTerm('Story', None),
+                  SimpleTerm(
+                    'id',
+                    (
+                      SimpleTerm('evt', None),
+                      SimpleTerm('ID', None)
+                    )
+                  )
+                )
+              )
+            ),
+            Aggregate(
+              False,
+              SimpleTerm('0', None),
+              '=',
+              '#count',
+              (
+                AggregateElement(
+                  (
+                    SimpleTerm(
+                      'story',
+                      (
+                        SimpleTerm('Story', None),
+                        SimpleTerm(
+                          'happens',
+                          (
+                            SimpleTerm('T', None),
+                            SimpleTerm(
+                              'id',
+                              (
+                                SimpleTerm('evt', None),
+                                SimpleTerm('ID', None)
+                              )
+                            )
+                          )
+                        )
+                      )
+                    ),
+                  ),
+                  (
+                    NafLiteral(
+                      False,
+                      ClassicalLiteral(
+                        False,
+                        'time',
+                        (
+                          SimpleTerm('T', None),
+                        )
+                      )
+                    ),
+                  )
+                ),
+              ),
+              None,
+              None
+            )
           )
         ),
       ),

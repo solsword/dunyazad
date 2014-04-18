@@ -8,9 +8,11 @@ States:
     wounded - In need of treatment to recover from a wound
     dead - Kicked the bucket
     maimed - A long-term impairment from a wound
+
     sickly - A weak constitution; prone to sickness
     sick - A short-term illness that can lead to death
     afflicted - A long-term affliction that isn't life-threatening
+
     drunk - Very tipsy
 
     Mood:
