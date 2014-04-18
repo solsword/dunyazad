@@ -19,6 +19,18 @@ error(
 
 error(
   m(
+    "Multivalued property.",
+    Story,
+    T,
+    property(Subject, Prop, V1),
+    property(Subject, Prop, V2)
+  )
+) :-
+  story(Story, at(T, property(Subject, Prop, V1))),
+  story(Story, at(T, property(Subject, Prop, V2))).
+
+error(
+  m(
     "Failed to maintain state/relationship compatability.",
     Story,
     T,
@@ -56,33 +68,37 @@ error(
   story(Story, at(T, rel(Subject, Rel, O2))),
   exclusive(Rel).
 
-% Construction primitives:
-%-------------------------
-
-% "value" statements create collections of exlusive states.
-
-state(S) :- value(Category, S).
-
-incompatible(S1, S2) :- value(Category, S1), value(Category, S2).
-
 % General behavior:
 %------------------
 
-% States and relationships carry over from timestep to timestep unless
-% terminated:
+% States, properties, and relationships carry over from timestep to timestep
+% unless terminated...
 
 story(Story, at(T+1, state(Subject, State))) :-
+  active_timestep(T),
   story(Story, at(T, state(Subject, State))),
   not story(Story, terminated(T, state(Subject, State))).
 
+story(Story, at(T+1, property(Subject, Prop, Val))) :-
+  active_timestep(T),
+  story(Story, at(T, property(Subject, Prop, Val))),
+  not story(Story, terminated(T, property(Subject, Prop, Val))).
+
 story(Story, at(T+1, rel(Subject, State, Object))) :-
+  active_timestep(T),
   story(Story, at(T, rel(Subject, State, Object))),
   not story(Story, terminated(T, rel(Subject, State, Object))).
 
-% And once initiated are present at the next timestep:
+% ...and once initiated are present at the next timestep.
 
 story(Story, at(T+1, state(Subject, State))) :-
+  active_timestep(T),
   story(Story, initiated(T, state(Subject, State))).
 
+story(Story, at(T+1, property(Subject, Prop, Val))) :-
+  active_timestep(T),
+  story(Story, initiated(T, property(Subject, Prop, Val))).
+
 story(Story, at(T+1, rel(Subject, State, Object))) :-
+  active_timestep(T),
   story(Story, initiated(T, rel(Subject, State, Object))).

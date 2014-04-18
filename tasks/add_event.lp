@@ -10,7 +10,7 @@ l_type(Type) :- mem("args.type", Type).
 :- { l_type(Type) : l_type(Type) } > 1.
 :- { l_type(Type) : l_type(Type) } < 1.
 
-story_add( id(evt, N) ) :- l_id(N).
-story_add( intrinsic( id(evt, N), type, Type ) ) :- l_type(Type), l_id(N).
+edit(append_event, l_new_event).
+assert(at(1, property(l_new_event, type, Type))) :- l_type(Type).
 
-local_mem( "result.id", N ) :- l_id(N).
+local_mem( "result.id", N ) :- bound(l_new_event, id(evt, N)).

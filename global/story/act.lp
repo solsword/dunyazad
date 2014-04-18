@@ -31,6 +31,20 @@ satisfied(Story, Evt, precondition(Action, not_state(Arg, State))) :-
   story(Story, happens(T, Evt)),
   not story(Story, at(T, state(Target, State))).
 
+satisfied(Story, Evt, precondition(Action, property(Arg, Prop, Val))) :-
+  precondition(Action, property(Arg, Prop, Val)),
+  story(Story, action(Evt, Action)),
+  story(Story, arg(Evt, Arg, Target)),
+  story(Story, happens(T, Evt)),
+  story(Story, at(T, property(Target, Prop, Val))).
+
+satisfied(Story, Evt, precondition(Action, not_property(Arg, Prop, Val))) :-
+  precondition(Action, not_property(Arg, Prop, Val)),
+  story(Story, action(Evt, Action)),
+  story(Story, arg(Evt, Arg, Target)),
+  story(Story, happens(T, Evt)),
+  not story(Story, at(T, property(Target, Prop, Val))).
+
 satisfied(Story, Evt, precondition(Action, rel(A1, Rel, A2))) :-
   precondition(Action, rel(A1, Rel, A2)),
   story(Story, action(Evt, Action)),
@@ -76,6 +90,20 @@ satisfied(Story, Evt, consequence(Action, not_state(Arg, State))) :-
   story(Story, happens(T, Evt)),
   not story(Story, at(T+1, state(Target, State))).
 
+satisfied(Story, Evt, consequence(Action, property(Arg, Prop, Val))) :-
+  consequence(Action, property(Arg, Prop, Val)),
+  story(Story, action(Evt, Action)),
+  story(Story, arg(Evt, Arg, Target)),
+  story(Story, happens(T, Evt)),
+  story(Story, at(T+1, property(Target, Prop, Val))).
+
+satisfied(Story, Evt, consequence(Action, not_property(Arg, Prop, Val))) :-
+  consequence(Action, not_property(Arg, Prop, Val)),
+  story(Story, action(Evt, Action)),
+  story(Story, arg(Evt, Arg, Target)),
+  story(Story, happens(T, Evt)),
+  not story(Story, at(T+1, property(Target, Prop, Val))).
+
 satisfied(Story, Evt, consequence(Action, rel(A1, Rel, A2))) :-
   consequence(Action, rel(A1, Rel, A2)),
   story(Story, action(Evt, Action)),
@@ -107,6 +135,20 @@ story(Story, terminated(T, state(Target, Previous))) :-
   story(Story, happens(T, Evt)),
   story(Story, at(T, state(Target, Previous))),
   incompatible(Previous, State).
+
+story(Story, terminated(T, property(Target, Prop, Val))) :-
+  consequence(Action, not_property(Arg, Prop, Val)),
+  story(Story, action(Evt, Action)),
+  story(Story, arg(Evt, Arg, Target)),
+  story(Story, happens(T, Evt)).
+
+story(Story, terminated(T, property(Target, Prop, Previous))) :-
+  consequence(Action, property(Arg, Prop, Val)),
+  story(Story, action(Evt, Action)),
+  story(Story, arg(Evt, Arg, Target)),
+  story(Story, happens(T, Evt)),
+  story(Story, at(T, property(Target, Prop, Previous))),
+  incompatible(Previous, Prop, Val).
 
 story(Story, terminated(T, rel(T1, Rel, T2))) :-
   consequence(Action, not_rel(A1, Rel, A2)),
@@ -148,6 +190,12 @@ story(Story, terminated(T, state(Target, State))) :-
 % Consequences initiate new states/relations:
 story(Story, initiated(T, state(Target, State))) :-
   consequence(Action, state(Arg, State)),
+  story(Story, action(Evt, Action)),
+  story(Story, arg(Evt, Arg, Target)),
+  story(Story, happens(T, Evt)).
+
+story(Story, initiated(T, property(Target, Prop, Val))) :-
+  consequence(Action, property(Arg, Prop, Val)),
   story(Story, action(Evt, Action)),
   story(Story, arg(Evt, Arg, Target)),
   story(Story, happens(T, Evt)).

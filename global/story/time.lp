@@ -5,7 +5,7 @@ time(1..1000).
 
 % The current story has a beginning and an end:
 % If there are no events, they're both at 1:
-0 <= { current_beginning(1); current_ending(1) }.
+0 <= { current_beginning(0); current_ending(0) }.
 % Otherwise compute them:
 not_current_first(T) :-
   story(current, happens(T, Evt)),
@@ -24,6 +24,9 @@ current_ending(T) :-
 % Ensure that only one of the two methods above was used:
 :- 1 < { current_beginning(T) : time(T) }.
 :- 1 < { current_ending(T) : time(T) }.
+
+active_timestep(T) :-
+  story(current, happens(T, Evt)).
 
 % All events in every story must happen at some point!
 error(m("Unordered event.", ID)) :-

@@ -1,16 +1,21 @@
-{
+1 = {
   l_prot(id(chr, N)) :
     id(chr, N),
     intrinsic( id(chr, N), role, protagonist )
-} = 1.
+}.
 
-{
+1 = {
   l_ant(id(chr, N)) :
     id(chr, N),
     intrinsic( id(chr, N), role, antagonist )
-} = 1.
+}.
 
+edit(some, chr, l_prot).
+ensure(at(1, property(l_prot, role, protagonist))).
+edit(some, chr, l_ant).
+ensure(at(1, property(l_ant, role, antagonist))).
 
-story_add( id(evt, N) ) :- l_id(N).
-story_add( intrinsic( id(chr, N), name, Name ) ) :- l_name(Name), l_id(N).
-story_add( intrinsic( id(chr, N), role, Role ) ) :- l_role(Role), l_id(N).
+edit(append_event, l_disaster).
+assert(arg(l_disaster, subject, l_ant)).
+assert(arg(l_disaster, object, l_prot)).
+ensure(harmful(l_disaster, l_prot)).

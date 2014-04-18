@@ -87,6 +87,14 @@ error(m("Some created an unused id.", edit(some, Type, Ref))) :-
   edit(some, Type, Ref),
   story(proposed, id(Type, ID)).
 
+% existing:
+% Just binds an existing id...
+1 = {
+  error(m("Nothing exists to bind to!", edit(existing, Type, Ref)));
+  bound(Ref, id(Type, ID)) : story(current, id(Type, ID))
+} :-
+  edit(existing, Type, Ref).
+
 % Event manipulation:
 %--------------------
 
@@ -107,6 +115,7 @@ story(proposed, happens(T, Evt)) :-
   current_ending(E),
   max_appends(MApp),
   max_insertions(MIns),
+  T > E,
   T <= E + MApp + MIns,
   bound(Ref, Evt),
   edit(append_event, Ref).
@@ -203,9 +212,9 @@ bumped(happens(T, Evt)) :-
       Before <= T
   }.
 % Instead of happening when you did in the old story, happen later:
-drop(Original) :- bump(Original).
+drop(Original) :- bumped(Original).
 story(proposed, happens(NewT, Evt)) :-
-  bump(happens(T, Evt)),
+  bumped(happens(T, Evt)),
   time(NewT),
   current_ending(E),
   max_appends(MApp),

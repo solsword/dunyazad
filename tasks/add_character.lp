@@ -1,8 +1,4 @@
-l_id(N+1) :- id(chr, N), not id(chr, N+1).
-{ l_id(1) }.
-
-:- { l_id(N) : l_id(N) } > 1.
-:- { l_id(N) : l_id(N) } < 1.
+% Locals
 
 l_name(Name) :- mem("args.name", Name).
 { l_name("merquivest") }.
@@ -16,8 +12,10 @@ l_role(Role) :- mem("args.role", Role).
 :- { l_role(Role) : l_role(Role) } > 1.
 :- { l_role(Role) : l_role(Role) } < 1.
 
-story_add( id(chr, N) ) :- l_id(N).
-story_add( intrinsic( id(chr, N), name, Name ) ) :- l_name(Name), l_id(N).
-story_add( intrinsic( id(chr, N), role, Role ) ) :- l_role(Role), l_id(N).
+% Edits
 
-local_mem( "result.id", N ) :- l_id(N).
+edit(new, chr, l_newchr).
+assert(at(1, property(l_newchr, name, Name))) :- l_name(Name).
+assert(at(1, property(l_newchr, role, Role))) :- l_role(Role).
+
+local_mem( "result.id", N ) :- bound(l_newchr, id(chr, N)).
