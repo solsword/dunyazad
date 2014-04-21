@@ -5,6 +5,7 @@ Python interface to clingo.
 
 import subprocess
 import io
+import re
 
 import ans
 import parser
@@ -33,7 +34,20 @@ ClingoOutput = parser.Hook(
     parser.Rep(
       ans.Predicate
     ),
-    "SATISFIABLE"
+    "SATISFIABLE",
+  )
+)
+
+ClingoOptOutput = parser.Hook(
+  clean_clingo_parse,
+  parser.Seq(
+    parser.Rep(
+      ans.Predicate
+    ),
+    parser.Seq(
+      "Optimization:", parser.Token(re.compile("-?[0-9]+")),
+      "OPTIMUM FOUND",
+    )
   )
 )
 
@@ -51,7 +65,20 @@ def solve(code):
   )
   stdout, stderr = clingo.communicate(code.encode())
   ret = clingo.returncode
-  if ret != 10: # clingo returns 10 on success for some reason
+  # clingo returns 10 on normal success and 30 on optimization success
+  if ret == 10:
+    return parser.parse_completely(
+      stdout.decode(),
+      ClingoOutput,
+      devour=ans.devour_asp
+    )
+  elif ret == 30:
+    return parser.parse_completely(
+      stdout.decode(),
+      ClingoOptOutput,
+      devour=ans.devour_asp
+    )
+  else:
     raise ASPError(
       code=ret,
       message="""
@@ -70,8 +97,3 @@ Clingo returned error code {}
 {}
 """.format(ret, code, stdout.decode(), stderr.decode())
     )
-  return parser.parse_completely(
-    stdout.decode(),
-    ClingoOutput,
-    devour=ans.devour_asp
-  )

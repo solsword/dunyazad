@@ -7,6 +7,7 @@
 story(current).
 story(proposed).
 
-% Errors shall be minimized:
-:- error(Message).
-%#minimize { 1,error(Message) : error(Message) }.
+% Errors shall be minimized (disallowing them is more efficient but makes
+% debugging harder):
+%:- error(Message).
+#minimize { 1@0,error(Message) : error(Message) }.

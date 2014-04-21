@@ -1083,14 +1083,13 @@ def parse_asp(text):
 def ruleset(*programs):
   """
   Takes zero or more Program objects and returns a set() containing all of the
-  Rules from those programs. Other Statements (weak constraints, optimize
-  statements, and directives) are ignored, as are queries if present. If no
-  programs are given, an empty set is returned.
+  Rules from those programs. Directives are ignored. If no programs are given,
+  an empty set is returned.
   """
   result = set()
   for p in programs:
     for s in p.statements:
-      if isinstance(s, Rule):
+      if not isinstance(s, Directive):
         result.add(s)
   return result
 
@@ -2280,6 +2279,11 @@ bar(3, 5)?
 foo(3, 4).
 bar(X, (Y + 1)) :- foo(X, Y), not bar(X, (Y - 1)).
 bar(3, 5)?""",
+  ),
+  (
+    _test_restring_program,
+    "#minimize { 1@0, test(Foo) : test(Foo) }.",
+    "#minimize { 1@0, test(Foo) : test(Foo) }.",
   ),
   (
     parser._test_parse(Choice, leftovers=''),

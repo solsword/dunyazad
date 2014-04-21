@@ -537,21 +537,23 @@ def _test_add_character_task():
   leftovers = net.run(maintenance=dump_failed_asp_tasks)
   unfinished = [t for t in leftovers if t.status != tn.TaskStatus.Final.Crashed]
   crashed = [t for t in leftovers if t.status == tn.TaskStatus.Final.Crashed]
-  print('-'*80)
-  print("Unfinished:")
-  print('-'*80)
-  print('\n'.join(str(t) for t in unfinished))
-  print('-'*80)
-  print("Crashed:")
-  print('-'*80)
-  print(
-    '\n'.join(
-      "{}\n{}".format(
-        t,
-        format_exception(t.error) if t.error else '<no error?!>'
-      ) for t in crashed
+  if unfinished:
+    print('-'*80)
+    print("Unfinished:")
+    print('-'*80)
+    print('\n'.join(str(t) for t in unfinished))
+  if crashed:
+    print('-'*80)
+    print("Crashed:")
+    print('-'*80)
+    print(
+      '\n'.join(
+        "{}\n{}".format(
+          t,
+          format_exception(t.error) if t.error else '<no error?!>'
+        ) for t in crashed
+      )
     )
-  )
   print('-'*80)
   print("Story:")
   print('-'*80)
@@ -563,7 +565,8 @@ def _test_add_character_task():
     )
   )
   print('-'*80)
+  return not (unfinished or crashed)
 
 _test_cases = [
-  (_test_add_character_task, None),
+  (_test_add_character_task, True),
 ]
