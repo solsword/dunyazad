@@ -2,14 +2,18 @@
 % Types of things.
 
 % The basic story components:
-type(evt).
-type(chr).
-type(itm).
-type(loc).
+type(chr). % characters
+type(itm). % items
+type(loc). % locations
+type(evt). % events
+type(flt). % fluents
 
-% Each component can have only a few instances. This chokes off certain
+% Most components can have only a few instances. This chokes off certain
 % grounding issues (and also makes sense from a storytelling perspecitve):
-id(1..7).
+possible_id(chr, 1..7).
+possible_id(itm, 1..7).
+possible_id(loc, 1..7).
 
-% Events are a special case:
-evt_id(T) :- time(T).
+% Fluents and events need to be much more numerous:
+possible_id(evt, T) :- time(T).
+possible_id(flt, T) :- time(T).

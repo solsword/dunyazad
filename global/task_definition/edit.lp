@@ -15,19 +15,13 @@ story(proposed, X) :- proposed_by(Proposer, X).
 
 % Available IDs may be assigned to newly created story objects:
 available_id(Type, X) :-
-  id(X),
-  type(Type),
+  possible_id(Type, X),
   not story(current, id(Type, X)).
-
-% Events are a special case:
-available_id(evt, X) :-
-  evt_id(X),
-  not story(current, id(evt, X)).
 
 % We limit the number of event additions in order to avoid having to compute
 % too many possible event orderings:
-max_appends(5).
-max_insertions(5).
+max_appends(7).
+max_insertions(7).
 
 %%%%%%%%%%%%%%%
 % Edit rules: %
@@ -87,13 +81,13 @@ error(m("Some created an unused id.", edit(some, Type, Ref))) :-
   edit(some, Type, Ref),
   story(proposed, id(Type, ID)).
 
-% existing:
+% exists:
 % Just binds an existing id...
 1 = {
-  error(m("Nothing exists to bind to!", edit(existing, Type, Ref)));
+  error(m("Nothing exists to bind to!", edit(exists, Type, Ref)));
   bound(Ref, id(Type, ID)) : story(current, id(Type, ID))
 } :-
-  edit(existing, Type, Ref).
+  edit(exists, Type, Ref).
 
 % Event manipulation:
 %--------------------
@@ -110,13 +104,15 @@ bound(Ref, id(evt, ID)) :-
   proposed_by(edit(append_event, Ref), id(evt, ID)),
   edit(append_event, Ref).
 % ...figures out when the event happens...
-story(proposed, happens(T, Evt)) :-
-  time(T),
+1 = {
+  story(proposed, happens(T, Evt)) :
+    time(T),
+    T > E,
+    T <= E + MApp + MIns
+} :-
   current_ending(E),
   max_appends(MApp),
   max_insertions(MIns),
-  T > E,
-  T <= E + MApp + MIns,
   bound(Ref, Evt),
   edit(append_event, Ref).
 % ...and ensures that the newly-proposed event is after all existing events:
@@ -126,13 +122,13 @@ error(m("Appended event before existing event.", edit(append_event, Ref))) :-
   story(proposed, ordered(id(evt, ID), is_before, id(evt, Other))),
   Other != ID.
 
-% Make usre we're not trying to append too many events:
+% Make sure we're not trying to append too many events:
 error(m("Too many events to append.", Count)) :-
   max_appends(Max),
   Count = { edit(append_event, Ref) : edit(append_event, Ref) },
   Count > Max.
 
-% insert_event:
+% insert_event_after:
 % Creates a marker...
 event_insertion_after(Pre) :-
   edit(insert_event_after, Pre, Ref).
@@ -149,12 +145,14 @@ event_insertion_after(Pre) :-
 } :-
   edit(insert_event_after, Pre, Ref).
 % ...finds a time for the inserted event to occur...
-story(proposed, happens(T, id(evt, ID))) :-
-  time(T),
+1 = {
+  story(proposed, happens(T, id(evt, ID))) :
+    time(T),
+    T <= E + MApp + MIns
+} :-
   current_ending(E),
   max_appends(MApp),
   max_insertions(MIns),
-  T <= E + MApp + MIns,
   bound(Ref, id(evt, ID)),
   edit(insert_event_after, Pre, Ref).
 % ...such that no previously-existing events are between it and the event it
@@ -166,14 +164,11 @@ error(
     happens(AnyTime, Offender)
   )
 ) :-
-  story(current, happens(AnyTime, Offender)),
-  story(proposed, happens(NotQuiteBefore, Pre)),
-  story(proposed, happens(BadTime, Offender)),
-  story(proposed, happens(SomeTime, Evt)),
-  NotQuiteBefore < BadTime,
-  BadTime < SomeTime,
+  edit(insert_event_after, Pre, Ref),
   bound(Ref, Evt),
-  edit(insert_event_after, Pre, Ref).
+  story(current, happens(AnyTime, Offender)),
+  story(proposed, ordered(Pre, is_before, Offender)),
+  story(proposed, ordered(Offender, is_before, Evt)).
 % ...and we allow events to be inserted relative to other new events.
 error(
   m(
@@ -182,15 +177,12 @@ error(
     happens(AnyTime, Offender)
   )
 ) :-
-  story(current, happens(AnyTime, Offender)),
-  story(proposed, happens(NotQuiteBefore, Pre)),
-  story(proposed, happens(BadTime, Offender)),
-  story(proposed, happens(SomeTime, Evt)),
-  NotQuiteBefore < BadTime,
-  BadTime < SomeTime,
+  edit(insert_event_after, PreRef, Ref),
   bound(Ref, Evt),
   bound(PreRef, Pre),
-  edit(insert_event_after, PreRef, Ref).
+  story(current, happens(AnyTime, Offender)),
+  story(proposed, ordered(Pre, is_before, Offender)),
+  story(proposed, happens(Offender, is_before, Evt)).
 
 error(m("Too many events to insert.", Count)) :-
   max_insertions(Max),

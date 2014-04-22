@@ -7,137 +7,109 @@
 %  bound(R2, id(Type, ID)),
 %  R1 != R2.
 
-error(m("Could not satisfy required property.", Property)) :-
-  require(Property),
-  not satisfied(require(Property)).
+error(m("Could not satisfy required property.", Story, Property)) :-
+  require(Story, Property),
+  not satisfied(require(Story, Property)).
 
-error(m("Could not ensure property.", Property)) :-
-  ensure(Property),
-  not satisfied(ensure(Property)).
+% Require means that the stated property should be true in the given story.
 
-% Requiring args, traits, states, properties, and relations (requiring their
-% presence in the input):
+satisfied(require(Story, Ref)) :-
+  require(Story, Ref),
+  bound(Ref, Bound),
+  story(Story, Bound).
 
-satisfied(require(arg(id(evt, EID), Arg, Ref))) :-
-  bound(Ref, id(Type, ID)),
-  require(arg(id(evt, EID), Arg, Ref)),
-  story(current, arg(id(evt, EID), arg, id(Type, ID))).
+satisfied(require(Story, arg(Subj, Arg, Ref))) :-
+  require(Story, arg(Subj, Arg, Ref)),
+  bound(Ref, Bound),
+  story(Story, arg(Subj, Arg, Bound)).
 
-satisfied(require(arg(ERef, Arg, Ref))) :-
-  bound(ERef, id(EType, EID)),
-  bound(Ref, id(Type, ID)),
-  require(arg(ERef, Arg, Ref)),
-  story(current, arg(id(EType, EID), arg, id(Type, ID))).
+satisfied(require(Story, arg(Ref, Arg, Obj))) :-
+  require(Story, arg(Ref, Arg, Obj)),
+  bound(Ref, Bound),
+  story(Story, arg(Bound, Arg, Obj)).
 
-satisfied(require(trait(Ref, Trait))) :-
-  bound(Ref, id(Type, ID)),
-  require(trait(Ref, Trait)),
-  story(current, trait(id(Type, ID), Trait)).
+satisfied(require(Story, arg(SRef, Arg, ORef))) :-
+  require(Story, arg(RefO, Arg, RefA)),
+  bound(SRef, SBound),
+  bound(ORef, OBound),
+  story(Story, arg(SBound, Arg, OBound)).
 
-satisfied(require(at(T, state(Ref, State)))) :-
-  bound(Ref, id(Type, ID)),
-  require(at(T, state(Ref, State))),
-  story(current, at(T, state(id(Type, ID), State))).
+satisfied(require(Story, at(T, Ref))) :-
+  require(Story, at(T, Ref)),
+  bound(Ref, Bound),
+  story(Story, at(T, Bound)).
 
-satisfied(require(at(T, property(Ref, Prop, Val)))) :-
-  bound(Ref, id(Type, ID)),
-  require(at(T, property(Ref, Prop, Val))),
-  story(current, at(T, property(id(Type, ID), Prop, Val))).
+satisfied(require(Story, initiated(T, Ref))) :-
+  require(Story, initiated(T, Ref)),
+  bound(Ref, Bound),
+  story(Story, initiated(T, Bound)).
 
-satisfied(require(at(T, rel(Ref, Rel, id(OType, OID))))) :-
-  bound(Ref, id(Type, ID)),
-  require(at(T, rel(Ref, Rel, id(OType, OID)))),
-  story(current, at(T, rel(id(Type, ID), Rel, id(OType, OID)))).
+satisfied(require(Story, initiated(before(T), Ref))) :-
+  require(Story, initiated(before(T), Ref)),
+  bound(Ref, Bound),
+  story(Story, initiated(Ti, Bound)),
+  Ti < T.
 
-satisfied(require(at(T, rel(id(OType, OID), Rel, Ref)))) :-
-  bound(Ref, id(Type, ID)),
-  require(at(T, rel(id(OType, OID), Rel, Ref))),
-  story(current, at(T, rel(id(OType, OID), Rel, id(Type, ID)))).
+satisfied(require(Story, initiated(after(T), Ref))) :-
+  require(Story, initiated(after(T), Ref)),
+  bound(Ref, Bound),
+  story(Story, initiated(Ti, Bound)),
+  Ti > T.
 
-satisfied(require(at(T, rel(R1, Rel, R2)))) :-
-  bound(R1, id(T1, ID1)),
-  bound(R2, id(T2, ID2)),
-  require(at(T, rel(R1, Rel, R2))),
-  story(current, at(T, rel(id(T1, ID1), Rel, id(T2, ID2)))).
+satisfied(require(Story, terminated(T, Ref))) :-
+  require(Story, terminated(T, Ref)),
+  bound(Ref, Bound),
+  story(Story, terminated(T, Bound)).
 
-% Ensuring args, traits, states, properties, and relations (requiring their
-% presence in the output):
+satisfied(require(Story, terminated(before(T), Ref))) :-
+  require(Story, terminated(before(T), Ref)),
+  bound(Ref, Bound),
+  story(Story, terminated(Tt, Bound)),
+  Tt < T.
 
-satisfied(ensure(arg(id(evt, EID), Arg, Ref))) :-
-  bound(Ref, id(Type, ID)),
-  ensure(arg(id(evt, EID), Arg, Ref)),
-  story(proposed, arg(id(evt, EID), arg, id(Type, ID))).
+satisfied(require(Story, terminated(after(T), Ref))) :-
+  require(Story, terminated(after(T), Ref)),
+  bound(Ref, Bound),
+  story(Story, terminated(Tt, Bound)),
+  Tt > T.
 
-satisfied(ensure(arg(ERef, Arg, Ref))) :-
-  bound(ERef, id(EType, EID)),
-  bound(Ref, id(Type, ID)),
-  ensure(arg(ERef, Arg, Ref)),
-  story(proposed, arg(id(EType, EID), arg, id(Type, ID))).
+satisfied(require(Story, happens(T, Ref))) :-
+  require(Story, happens(T, Ref)),
+  bound(Ref, Bound),
+  story(Story, happens(T, Bound)).
 
-satisfied(ensure(trait(Ref, Trait))) :-
-  bound(Ref, id(Type, ID)),
-  ensure(trait(Ref, Trait)),
-  story(proposed, trait(id(Type, ID), Trait)).
+satisfied(require(Story, happens(before(T), Ref))) :-
+  require(Story, happens(after(T), Ref)),
+  bound(Ref, Bound),
+  story(Story, happens(Th, Bound)),
+  Th < T.
 
-satisfied(ensure(at(T, state(Ref, State)))) :-
-  bound(Ref, id(Type, ID)),
-  ensure(at(T, state(Ref, State))),
-  story(proposed, at(T, state(id(Type, ID), State))).
-
-satisfied(ensure(at(T, property(Ref, Prop, Val)))) :-
-  bound(Ref, id(Type, ID)),
-  ensure(at(T, property(Ref, Prop, Val))),
-  story(proposed, at(T, property(id(Type, ID), Prop, Val))).
-
-satisfied(ensure(at(T, rel(Ref, Rel, id(OType, OID))))) :-
-  bound(Ref, id(Type, ID)),
-  ensure(at(T, rel(Ref, Rel, id(OType, OID)))),
-  story(proposed, at(T, rel(id(Type, ID), Rel, id(OType, OID)))).
-
-satisfied(ensure(at(T, rel(id(OType, OID), Rel, Ref)))) :-
-  bound(Ref, id(Type, ID)),
-  ensure(at(T, rel(id(OType, OID), Rel, Ref))),
-  story(proposed, at(T, rel(id(OType, OID), Rel, id(Type, ID)))).
-
-satisfied(ensure(at(T, rel(R1, Rel, R2)))) :-
-  bound(R1, id(T1, ID1)),
-  bound(R2, id(T2, ID2)),
-  ensure(at(T, rel(R1, Rel, R2))),
-  story(proposed, at(T, rel(id(T1, ID1), Rel, id(T2, ID2)))).
+satisfied(require(Story, happens(after(T), Ref))) :-
+  require(Story, happens(after(T), Ref)),
+  bound(Ref, Bound),
+  story(Story, happens(Th, Bound)),
+  Th > T.
 
 % Asserting args, traits, states, properties, and relations (adding them to the
 % output):
 
-story(proposed, arg(id(evt, EID), Arg, id(Type, ID))) :-
-  bound(Ref, id(Type, ID)),
-  assert(arg(id(evt, EID), Arg, Ref)).
+story(proposed, arg(Thing, Arg, Bound)) :-
+  bound(Ref, Bound),
+  assert(arg(Thing, Arg, Ref)).
 
-story(proposed, arg(id(evt, EID), Arg, id(Type, ID))) :-
-  bound(Ref, id(Type, ID)),
-  bound(ERef, id(evt, EID)),
-  assert(arg(ERef, Arg, Ref)).
+story(proposed, arg(Bound, Arg, Thing)) :-
+  bound(Ref, Bound),
+  assert(arg(Ref, Arg, Thing)).
 
-story(proposed, trait(id(Type, ID), Trait)) :-
-  bound(Ref, id(Type, ID)),
-  assert(trait(Ref, Trait)).
+story(proposed, arg(B1, Arg, B2)) :-
+  bound(R1, B1),
+  bound(R2, B2),
+  assert(arg(R1, Arg, R2)).
 
-story(proposed, at(T, state(id(Type, ID), State))) :-
-  bound(Ref, id(Type, ID)),
-  assert(at(T, state(Ref, State))).
+story(proposed, at(T, Bound)) :-
+  bound(Ref, Bound),
+  assert(at(T, Ref)).
 
-story(proposed, at(T, property(id(Type, ID), Prop, Val))) :-
-  bound(Ref, id(Type, ID)),
-  assert(at(T, property(Ref, Prop, Val))).
-
-story(proposed, at(T, rel(id(Type, ID), Rel, id(OType, OID)))) :-
-  bound(Ref, id(Type, ID)),
-  assert(at(T, rel(Ref, Rel, id(OType, OID)))).
-
-story(proposed, at(T, rel(id(OType, OID), Rel, id(Type, ID)))) :-
-  bound(Ref, id(Type, ID)),
-  assert(at(T, rel(id(OType, OID), Rel, Ref))).
-
-story(proposed, at(T, rel(id(T1, ID1), Rel, id(T2, ID2)))) :-
-  bound(R1, id(T1, ID1)),
-  bound(R2, id(T2, ID2)),
-  assert(at(T, rel(R1, Rel, R2))).
+story(proposed, happens(T, Bound)) :-
+  bound(Ref, Bound),
+  assert(happens(T, Ref)).

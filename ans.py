@@ -63,11 +63,19 @@ class Tokens:
     # either non-backslash, non-quote characters or which are escape codes ('\'
     # plus any character), finished by an ending quote.
 
+  SCRIPT_TYPE_LUA = parser.Token(re.compile(r"lua"))
+  SCRIPT_TYPE_PYTHON = parser.Token(re.compile(r"python"))
+
+  SCRIPT_BODY = parser.Token(re.compile(r"(.|\n)*#end(?=\.)", re.MULTILINE))
+    # Matches any number of characters until the string "#end." and doesn't eat
+    # the final period in "#end."
+
   DIR_HIDE = parser.Token(re.compile(r"#hide"))
   DIR_SHOW = parser.Token(re.compile(r"#show"))
   DIR_CONST = parser.Token(re.compile(r"#const"))
   DIR_DOMAIN = parser.Token(re.compile(r"#domain"))
   DIR_EXTERNAL = parser.Token(re.compile(r"#external"))
+  DIR_SCRIPT = parser.Token(re.compile(r"#script"))
 
   DIRECTIVE_BODY = parser.Token(re.compile(r"[^.]*(?=\.)"))
     # Matches any number of non-period characters followed by a period, but
@@ -201,7 +209,13 @@ Predicate.grammar = parser.Package(
     parser.Seq(
       parser.Attr(
         "name",
-        parser.OneOf( Tokens.STRING, Tokens.LOOSE_CONSTANT )
+        parser.Munge(
+          lambda x: ''.join(x),
+          parser.Seq(
+            parser.Opt( Tokens.AT ),
+            parser.OneOf( Tokens.STRING, Tokens.LOOSE_CONSTANT )
+          )
+        )
       ),
       parser.Opt(
         parser.Seq(
@@ -473,6 +487,14 @@ class Interval:
   def __str__(self):
     return "{}..{}".format(self.lower, self.upper)
 
+@attr_object("function", "args")
+class ScriptCall:
+  def __str__(self):
+    return "@{}({})".format(
+      self.function,
+      ', '.join(str(a) for a in self.args)
+    )
+
 @attr_object("negated", "id", "terms")
 class ClassicalLiteral:
   def __str__(self):
@@ -610,10 +632,15 @@ class Query:
   def __str__(self):
     return "{}?".format(self.literal)
 
+@attr_object("language", "contents")
+class Script:
+  def __str__(self):
+    return "#script ({})\n{}.".format(self.language, self.contents)
+
 @attr_object("directive", "contents")
 class Directive:
   def __str__(self):
-    return "{} {}".format(self.directive, self.contents)
+    return "{} {}.".format(self.directive, self.contents)
 
 @attr_object("text")
 class Comment:
@@ -656,6 +683,7 @@ Term = parser.OneOf(
   Interval,
   Expression,
   SimpleTerm,
+  ScriptCall,
 )
 
 # Because this element is directly recursive it can't be defined as part of the
@@ -739,6 +767,19 @@ Expression.grammar = parser.Package(
   )
 )
 
+ScriptCall.grammar = parser.Package(
+  ScriptCall,
+  parser.Seq(
+    Tokens.Ignore.AT,
+    parser.Attr("function", Tokens.ID),
+    Tokens.Ignore.PAREN_OPEN,
+    parser.Opt(
+      parser.Attr("args", Terms),
+    ),
+    Tokens.Ignore.PAREN_CLOSE,
+  )
+)
+
 ClassicalLiteral.grammar = parser.Package(
   ClassicalLiteral,
   parser.Seq(
@@ -773,6 +814,7 @@ NafLiteral.grammar = parser.Package(
       "contents",
       parser.OneOf(
         ClassicalLiteral,
+        ScriptCall,
         BuiltinAtom
       )
     )
@@ -860,7 +902,10 @@ Aggregate.grammar = parser.Package(
 ChoiceElement.grammar = parser.Package(
   ChoiceElement,
   parser.Seq(
-    parser.Attr("literal", ClassicalLiteral),
+    parser.Attr(
+      "literal",
+      parser.OneOf( ClassicalLiteral, ScriptCall )
+    ),
     parser.Opt(
       parser.Seq(
         Tokens.Ignore.COLON,
@@ -904,7 +949,7 @@ Disjunction.grammar = parser.Package(
   parser.Attr(
     "elements",
     parser.SepList(
-      ClassicalLiteral,
+      parser.OneOf( ClassicalLiteral, ScriptCall ),
       sep=Tokens.Ignore.OR,
       require_multiple=True,
     )
@@ -915,6 +960,7 @@ Head = parser.OneOf(
   Disjunction,
   Choice,
   ClassicalLiteral,
+  ScriptCall,
 )
 
 Body = parser.SepList(
@@ -992,6 +1038,24 @@ Rule.grammar = parser.Package(
   )
 )
 
+Script.grammar = parser.Package(
+  Script,
+  parser.Seq(
+    Tokens.Ignore.DIR_SCRIPT,
+    Tokens.Ignore.PAREN_OPEN,
+    parser.Attr(
+      "language",
+      parser.OneOf(
+        Tokens.SCRIPT_TYPE_LUA,
+        Tokens.SCRIPT_TYPE_PYTHON
+      )
+    ),
+    Tokens.Ignore.PAREN_CLOSE,
+    parser.Attr("contents", Tokens.SCRIPT_BODY),
+    Tokens.Ignore.DOT
+  )
+)
+
 Directive.grammar = parser.Package(
   Directive,
   parser.Seq(
@@ -1010,7 +1074,7 @@ Directive.grammar = parser.Package(
       Tokens.DIRECTIVE_BODY
     ),
     Tokens.Ignore.DOT
-  )
+  ),
 )
 
 Statement = parser.OneOf(
@@ -1018,12 +1082,13 @@ Statement = parser.OneOf(
   WeakConstraint,
   Optimization,
   Directive,
+  Script,
 )
 
 Query.grammar = parser.Package(
   Query,
   parser.Seq(
-    parser.Attr("literal", ClassicalLiteral),
+    parser.Attr("literal", parser.OneOf( ClassicalLiteral, ScriptCall )),
     Tokens.Ignore.QUERY_MARK
   )
 )
@@ -1083,14 +1148,13 @@ def parse_asp(text):
 def ruleset(*programs):
   """
   Takes zero or more Program objects and returns a set() containing all of the
-  Rules from those programs. Directives are ignored. If no programs are given,
-  an empty set is returned.
+  Statements from those programs (Queries are ignored). If no programs are
+  given, an empty set is returned.
   """
   result = set()
   for p in programs:
     for s in p.statements:
-      if not isinstance(s, Directive):
-        result.add(s)
+      result.add(s)
   return result
 
 def concatenate_programs(*progs):
@@ -2284,6 +2348,63 @@ bar(3, 5)?""",
     _test_restring_program,
     "#minimize { 1@0, test(Foo) : test(Foo) }.",
     "#minimize { 1@0, test(Foo) : test(Foo) }.",
+  ),
+  (
+    _test_parse_as_predicate,
+    "@call(function)",
+    (
+      Pr("@call", Pr("function")),
+      ''
+    )
+  ),
+  (
+    parser._test_parse(ScriptCall, leftovers=''),
+    "@call(function)",
+    ScriptCall("call", ( SimpleTerm("function"), )),
+  ),
+  (
+    _test_restring_program,
+    "@call(function).",
+    "@call(function).",
+  ),
+  (
+    _test_restring_program,
+    """\
+#script (python)
+#end.
+    """,
+    "#script (python)\n#end.",
+  ),
+  (
+    parser._test_parse(
+      Script,
+      leftovers='\n    '
+    ),
+    """\
+#script (python)
+def foo(x):
+  return x
+#end.
+    """,
+    Script("python", "def foo(x):\n  return x\n#end")
+  ),
+  (
+    _test_restring_program,
+    """\
+test(X).
+#script (python)
+def join(x, y):
+  return "{}{}".format(x, y)
+#end.
+a(@join(foo, bar)).
+    """,
+    """\
+test(X).
+#script (python)
+def join(x, y):
+  return "{}{}".format(x, y)
+#end.
+a(@join(foo, bar)).""",
   ),
   (
     parser._test_parse(Choice, leftovers=''),
