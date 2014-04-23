@@ -16,6 +16,7 @@ default_tests = [
   "tasknet",
   "obj",
   "ans",
+  "storytasks"
 ]
 
 stop_on_failure = False

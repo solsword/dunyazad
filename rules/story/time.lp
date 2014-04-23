@@ -2,8 +2,8 @@
 % Events are strictly ordered in time.
 
 beginning_of_time(0).
-time(1..7).
-end_of_time(8).
+time(1..100).
+end_of_time(101).
 
 % The current story has a beginning and an end:
 % If there are no events, they're both at 0:

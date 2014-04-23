@@ -44,7 +44,7 @@ error(m("Fluent with unknown argument.", Story, id(flt, F), Arg)) :-
   story(Story, arg(id(flt, F), Arg, Value)),
   not flarg(Type, Arg).
 
-error(m("Fluent with multiple arguments.", Story, id(flt, F), Arg, V1, V2)) :-
+error(m("Fluent with multi-valued argument.",Story, id(flt, F), Arg, V1, V2)) :-
   story(Story, id(flt, F)),
   story(Story, arg(id(flt, F), Arg, V1)),
   story(Story, arg(id(flt, F), Arg, V2)),
@@ -113,7 +113,7 @@ story(Story, arg(setup, initiates, id(flt, F))) :-
   story(Story, arg(id(flt, F), initiated, BoT)),
   beginning_of_time(BoT).
 1 = {
-  error(m("Auto-initiated event.", Story, T, id(flt, F)));
+  error(m("Auto-initiated fluent.", Story, T, id(flt, F)));
   story(Story, arg(Action, initiates, id(flt, F))) :
     story(Story, arg(Evt, action, Action)),
     story(Story, happens(T, Evt))
@@ -137,7 +137,7 @@ story(Story, arg(cleanup, terminates, id(flt, F))) :-
   story(Story, arg(id(flt, F), terminated, EoT)),
   end_of_time(EoT).
 1 = {
-  error(m("Auto-terminated event.", Story, T, id(flt, F)));
+  error(m("Auto-terminated fluent.", Story, T, id(flt, F)));
   story(Story, arg(Action, terminates, id(flt, F))) :
     story(Story, arg(Evt, action, Action)),
     story(Story, happens(T, Evt))

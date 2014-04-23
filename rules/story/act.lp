@@ -12,6 +12,15 @@
 } :-
   story(Story, id(act, A)).
 
+% For each declared argument of its type, every action has an argument:
+1 = {
+  error(m("Action missing argument.", id(act, A), Atype, Arg, Type));
+  story(Story, arg(id(act, A), Arg, id(Type, ID))) : possible_id(Type, ID)
+} :-
+  act_arg(Atype, Arg, Type),
+  story(Story, arg(id(act, A), type, Atype)),
+  story(Story, id(act, A)).
+
 % Preconditions:
 %---------------
 
