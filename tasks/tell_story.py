@@ -20,4 +20,9 @@ def run(self):
     **{ 'args.role':'stranger', 'args.name':'Quollips', }
   )
   yield tn.TaskStatus.Ongoing.InProgress
-  spawn_task(self.net, 'setup_provocation')
+  subtask(self, 'add_event', **{ 'args.type':'filler', })
+  subtask(self, 'add_event', **{ 'args.type':'filler', })
+  subtask(self, 'add_event', **{ 'args.type':'filler', })
+  subtask(self, 'add_event', **{ 'args.type':'filler', })
+  subtask(self, 'add_event', **{ 'args.type':'filler', })
+  yield tn.TaskStatus.Ongoing.InProgress

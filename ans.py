@@ -178,7 +178,9 @@ class Predicate:
     and
       (self.name == other.name)
     and
-      (self.args == other.args)
+      (len(self.args) == len(other.args))
+    and
+      all(self.args[i] == other.args[i] for i in range(len(self.args)))
     )
     #r1 = (type(self) == type(other))
     #if not r1:

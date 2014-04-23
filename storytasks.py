@@ -198,7 +198,7 @@ def assemble_problem(task):
     "%%%%%%%%%%%%%%",
     "% Task code: %",
     "%%%%%%%%%%%%%%",
-    '\n'.join(str(rule) for rule in task.mem.code),
+    '\n'.join(str(rule) for rule in strsorted(task.mem.code)),
     "%%%%%%%%%%%%%%%%%",
     "% Local memory: %",
     "%%%%%%%%%%%%%%%%%",
@@ -221,11 +221,13 @@ def assemble_problem(task):
     "%%%%%%%%%%%%%%%%%%%",
     "% Universal code: %",
     "%%%%%%%%%%%%%%%%%%%",
-    '\n'.join(str(rule) for rule in task.net.mem.code.universal),
+    '\n'.join(str(rule) for rule in strsorted(task.net.mem.code.universal)),
     "%%%%%%%%%%%%%%%",
     "% Story code: %",
     "%%%%%%%%%%%%%%%",
-    '\n'.join(str(predicate) + '.' for predicate in task.net.mem.code.story),
+    '\n'.join(
+      str(predicate) + '.' for predicate in strsorted(task.net.mem.code.story)
+    ),
   ])
 
 class ASPTaskError(Exception):
@@ -326,6 +328,10 @@ def asptask(name, code, source="unknown"):
     problem = assemble_problem(t)
     predicates = asp.solve(problem)
 
+#    print("Predicates:")
+#    for p in predicates:
+#      print(p)
+
     errors = []
     status = None
     proplist = []
@@ -335,6 +341,7 @@ def asptask(name, code, source="unknown"):
     gmemlist = []
     for (schema, binding) in ans.bindings(active_schemas, predicates):
       if schema == "error":
+        print("ERROR!")
         errors.append(dequote(str(binding["error.Message"])))
       elif schema == "status":
         s = dequote(str(binding["status.String"]))
@@ -578,6 +585,46 @@ def _test_add_character_task():
   print('-'*80)
   return not (unfinished or crashed)
 
+def _test_add_event_task():
+  import ans, storytasks
+  net = tn.TaskNet()
+  net.mem.code.universal = ans.load_logic("rules")
+  net.mem.code.story = set()
+  storytasks.spawn_task(net, "add_event")
+  leftovers = net.run(maintenance=asp_task_dumper(lambda r: True))
+  unfinished = [t for t in leftovers if t.status != tn.TaskStatus.Final.Crashed]
+  crashed = [t for t in leftovers if t.status == tn.TaskStatus.Final.Crashed]
+  if unfinished:
+    print('-'*80)
+    print("Unfinished:")
+    print('-'*80)
+    print('\n'.join(str(t) for t in unfinished))
+  if crashed:
+    print('-'*80)
+    print("Crashed:")
+    print('-'*80)
+    print(
+      '\n'.join(
+        "{}\n{}".format(
+          t,
+          format_exception(t.error) if t.error else '<no error?!>'
+        ) for t in crashed
+      )
+    )
+  print('-'*80)
+  print("Story:")
+  print('-'*80)
+  print(
+    '\n'.join(
+      sorted(
+        str(predicate) + '.' for predicate in net.mem.code.story
+      )
+    )
+  )
+  print('-'*80)
+  return not (unfinished or crashed)
+
 _test_cases = [
   (_test_add_character_task, True),
+  (_test_add_event_task, True),
 ]

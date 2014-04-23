@@ -67,7 +67,7 @@ def solve(code):
   ASPError if clingo returns an error code.
   """
   clingo = subprocess.Popen(
-    ["clingo", "--verbose=0", "--quiet=1,1"],
+    ["clingo", "--verbose=0", "--quiet=1,1", "--seed=0"],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,

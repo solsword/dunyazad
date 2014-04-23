@@ -321,6 +321,17 @@ def _test_obj_contents():
   a.a = "baz"
   return list(obj_contents(a))
 
+def _test_obj_contents_nested():
+  a = Obj()
+  a.b.c = Obj()
+  a.b.c.x = "foo"
+  a.b.c.y = "bar"
+  a.b.c.z = Obj()
+  a.b.c.z.g = 1
+  a.b.c.z.h = 2
+  a.a = "baz"
+  return list(obj_contents(a))
+
 def _test_obj_copy():
   a = Obj()
   a.b.c = 3
@@ -346,6 +357,16 @@ _test_cases = [
       ("b.c", 3),
       ("b.x", "foo"),
       ("z", "bar")
+    ]
+  ),
+  (
+    _test_obj_contents_nested,
+    [
+      ("a", "baz"),
+      ("b.c.x", "foo"),
+      ("b.c.y", "bar"),
+      ("b.c.z.g", 1),
+      ("b.c.z.h", 2),
     ]
   ),
   ( _test_obj_copy, True),

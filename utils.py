@@ -9,7 +9,11 @@ import sys
 import itertools
 import traceback
 
-# formatting an error as Python would:
+# Sorting by str(x):
+def strsorted(x):
+  return sorted(x, key=lambda x: str(x))
+
+# Formatting an error as Python would:
 def format_exception(e):
   return ''.join(
     traceback.format_exception(type(e), e, e.__traceback__)
