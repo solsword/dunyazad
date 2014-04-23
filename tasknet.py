@@ -12,8 +12,7 @@ import obj
 @abstract
 class TaskStatus:
   aliases = {}
-  def __str__(self):
-    return self.alias
+  names = {}
 
 @abstract
 class Initial(TaskStatus):
@@ -22,7 +21,7 @@ TaskStatus.Initial = Initial
 
 @abstract
 class Ready(TaskStatus.Initial):
-  alias = "ready"
+  pass
 TaskStatus.Initial.Ready = Ready
 
 @abstract
@@ -32,12 +31,12 @@ TaskStatus.Ongoing = Ongoing
 
 @abstract
 class InProgress(TaskStatus.Ongoing):
-  alias = "in_progress"
+  pass
 TaskStatus.Ongoing.InProgress = InProgress
 
 @abstract
 class Blocked(TaskStatus.Ongoing):
-  alias = "blocked"
+  pass
 TaskStatus.Ongoing.Blocked = Blocked
 
 @abstract
@@ -47,23 +46,24 @@ TaskStatus.Final = Final
 
 @abstract
 class Completed(TaskStatus.Final):
-  alias = "completed"
+  pass
 TaskStatus.Final.Completed = Completed
 
 @abstract
 class Failed(TaskStatus.Final):
-  alias = "failed"
+  pass
 TaskStatus.Final.Failed = Failed
 
 @abstract
 class Crashed(TaskStatus.Final):
-  alias = "crashed"
+  pass
 TaskStatus.Final.Crashed = Crashed
 
 # Collect all aliases into an aliases dictionary:
 for attr, val in walk_attributes(TaskStatus):
-  if hasattr(val, "alias"):
-    TaskStatus.aliases[val.alias] = val
+  if isinstance(val, type) and issubclass(val, TaskStatus):
+    TaskStatus.aliases[val.__name__.lower()] = val
+    TaskStatus.names[val] = val.__name__.lower()
 
 
 class Dependency:

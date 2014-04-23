@@ -54,11 +54,12 @@ def walk_attributes(o, seen=set()):
   if id(o) in seen:
     return
   seen.add(id(o))
-  for attr in o.__dict__:
-    if not (attr.startswith("__") and attr.endswith("__")):
-      yield attr, getattr(o, attr)
-      for sub in walk_attributes(o, seen):
-        yield sub
+  if hasattr(o, "__dict__"):
+    for attr in o.__dict__:
+      if not (attr.startswith("__") and attr.endswith("__")):
+        yield attr, getattr(o, attr)
+        for sub in walk_attributes(getattr(o, attr), seen):
+          yield sub
 
 # Class decorators:
 
