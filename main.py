@@ -13,7 +13,7 @@ import ans
 from utils import *
 
 # Defines where to search for global rules:
-GLOBAL_RULES_DIR = "global"
+GLOBAL_RULES_DIR = "rules"
 
 def trace_story(net, task, result):
   print('\n'.join(sorted(str(p) + '.' for p in net.mem.code.story)))
