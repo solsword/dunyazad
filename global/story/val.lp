@@ -1,12 +1,10 @@
 % val.lp
-% Valorization of events and blame.
+% Valorization of events.
 
-story(Story, val(Val, Evt, Target)) :-
-  val(Action, Val, Arg),
-  story(Story, action(Evt, Action)),
-  story(Story, arg(Evt, Arg, Target)).
+% Actions are valorized:
 
-story(Story, val(Val, Evt, Target)) :-
-  val(Action, Val, Arg),
-  story(Story, action(Evt, Action)),
-  story(Story, arg(Evt, Arg, Target)).
+story(Story, val(Val, Action, Target)) :-
+  story(Story, Action),
+  story(Story, arg(Action, type, Atype)),
+  val(Atype, Val, a(Arg)),
+  story(Story, arg(Action, Arg, Target)).

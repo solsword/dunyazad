@@ -5,7 +5,9 @@
 type(chr). % characters
 type(itm). % items
 type(loc). % locations
+
 type(evt). % events
+type(act). % actions
 type(flt). % fluents
 
 % Most components can have only a few instances. This chokes off certain
@@ -16,4 +18,5 @@ possible_id(loc, 1..7).
 
 % Fluents and events need to be much more numerous:
 possible_id(evt, T) :- time(T).
+possible_id(act, T) :- time(T).
 possible_id(flt, T) :- time(T).

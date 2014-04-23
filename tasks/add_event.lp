@@ -1,6 +1,12 @@
-arg_default(type, "unknown")
+% Arguments
+
+argument(type, "unknown").
+
+% Edits
 
 edit(append_event, l_new_event).
 assert(arg(l_new_event, type, Type)) :- task_arg(type, Type).
 
-local_mem( "result.id", N ) :- bound(l_new_event, id(evt, N)).
+% Results
+
+result(id, ID) :- bound(l_new_event, id(evt, ID)).

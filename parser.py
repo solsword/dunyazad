@@ -12,7 +12,7 @@ import types
 # Globals: #
 ############
 
-MAX_ERROR_CONTEXT = 20
+MAX_ERROR_CONTEXT = 80
 
 RegExpType = re._pattern_type
 

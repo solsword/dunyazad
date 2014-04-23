@@ -2,6 +2,9 @@
 % Various utilities, including script functions.
 
 #script (python)
-def join(a, b):
-  return a + b
+def join(*args):
+  return ''.join(str(a) for a in args)
+
+def mkmem(*args):
+  return '.'.join(str(a) for a in args)
 #end.

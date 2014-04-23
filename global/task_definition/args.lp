@@ -1,9 +1,10 @@
 % args.lp
-% Rules for default task arguments:
+% Rules for default task arguments and results:
 
-argument(Arg) :- mem(@join("args.", Arg), Value).
+1 = {
+  arg_value(Arg, Default);
+  arg_value(Arg, Value) : mem(@mkmem(args, Arg), Value)
+  } :-
+  argument(Arg, Default).
 
-task_arg(Arg, Value) :- mem(@join("args.", Arg), Value).
-{ task_arg(Arg, Default) } :- arg_default(Arg, Default).
-
-1 = { task_arg(Arg, Value) : task_arg(Arg, Value) } :- argument(Arg).
+local_mem(@mkmem(result, Slot), Value) :- result(Slot, Value).
