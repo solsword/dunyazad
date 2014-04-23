@@ -32,7 +32,7 @@ def clean_clingo_opt_parse(r, b, l):
   """
   Converts a parse of clingo optimization output to a set of predicates.
   """
-  return set(r[0][-1]), b, l
+  return set(r[0][-2]), b, l
 
 ClingoOutput = parser.Hook(
   clean_clingo_parse,
