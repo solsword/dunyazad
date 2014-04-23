@@ -28,6 +28,12 @@ def clean_clingo_parse(r, b, l):
   """
   return set(r[0]), b, l
 
+def clean_clingo_opt_parse(r, b, l):
+  """
+  Converts a parse of clingo optimization output to a set of predicates.
+  """
+  return set(r[0][-1]), b, l
+
 ClingoOutput = parser.Hook(
   clean_clingo_parse,
   parser.Seq(
@@ -39,15 +45,18 @@ ClingoOutput = parser.Hook(
 )
 
 ClingoOptOutput = parser.Hook(
-  clean_clingo_parse,
+  clean_clingo_opt_parse,
   parser.Seq(
-    parser.Rep(
-      ans.Predicate
+    parser.SepList(
+      parser.Rep(
+        ans.Predicate
+      ),
+      parser.Seq(
+        "Optimization:",
+        re.compile("-?[0-9]+"),
+      )
     ),
-    parser.Seq(
-      "Optimization:", parser.Token(re.compile("-?[0-9]+")),
-      "OPTIMUM FOUND",
-    )
+    "OPTIMUM FOUND",
   )
 )
 
@@ -58,7 +67,7 @@ def solve(code):
   ASPError if clingo returns an error code.
   """
   clingo = subprocess.Popen(
-    ["clingo", "--verbose=0"],
+    ["clingo", "--verbose=0", "--quiet=1,1"],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,

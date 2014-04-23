@@ -6,8 +6,8 @@ argument(role, "stranger").
 % Edits
 
 edit(new, chr, l_newchr).
-assert(arg(l_newchr, name, Name)) :- task_arg(name, Name).
-assert(arg(l_newchr, role, Role)) :- task_arg(role, Role).
+assert(arg(l_newchr, name, Name)) :- arg_value(name, Name).
+assert(arg(l_newchr, role, Role)) :- arg_value(role, Role).
 
 % Results
 

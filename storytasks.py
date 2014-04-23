@@ -496,32 +496,43 @@ def load_tasks(dir):
         raise e
       yield result
 
-def dump_failed_asp_tasks(net, task, result, counterbox=[0]):
+def asp_task_dumper(result_filter):
   """
-  A maintenance function for a task network that dumps failed tasks to a file
-  in the "dumps" directory.
+  Builds a maintenance function for a task network that dumps all tasks whose
+  result passes the given filter. Matching tasks are dumped into a file in the
+  "dumps" directory.
   """
-  if (
-    result in (tn.TaskStatus.Final.Failed, tn.TaskStatus.Final.Crashed)
-  and
-    task.mem.code
-  ):
-    if not os.path.exists("dumps"):
-      os.mkdir("dumps")
-    filename = "dumps/{}-{}.td".format(task.name, counterbox[0])
-    with open(filename, 'w') as fout:
-      fout.write(
-        "% Dump of task:\n% {}\n% {}\n".format(
-          task,
-          '\n% '.join(str(task.error).split('\n'))
-        )
+  counter = 0
+  def dump_asp_tasks(net, task, result):
+    """
+    A maintenance function for a task network that dumps all tasks to a file in
+    the "dumps" directory.
+    """
+    nonlocal counter, result_filter
+    if (result_filter(result) and task.mem.code):
+      rname = tn.TaskStatus.names[result]
+      if not os.path.exists("dumps"):
+        os.mkdir("dumps")
+      filename = "dumps/{}-{}-{}.td".format(
+        rname,
+        task.name,
+        counter
       )
-      fout.write("% vim: syn=gringo\n")
-      fout.write(assemble_problem(task))
-    sys.stderr.write(
-      "Dumped failed task dump to file '{}'.\n".format(filename)
-    )
-    counterbox[0] += 1
+      with open(filename, 'w') as fout:
+        fout.write(
+          "% Dump of {} task:\n% {}\n% {}\n".format(
+            rname,
+            task,
+            '\n% '.join(str(task.error).split('\n'))
+          )
+        )
+        fout.write("% vim: syn=gringo\n")
+        fout.write(assemble_problem(task))
+      sys.stderr.write(
+        "Dumped {} task to file '{}'.\n".format(rname, filename)
+      )
+      counter += 1
+  return dump_asp_tasks
 
 # Load tasks from the default directory on module load (the loading function is
 # defined in utils.py):
@@ -531,10 +542,10 @@ for t in load_tasks(TASK_DIRECTORY):
 def _test_add_character_task():
   import ans, storytasks
   net = tn.TaskNet()
-  net.mem.code.universal = ans.load_logic("global")
+  net.mem.code.universal = ans.load_logic("rules")
   net.mem.code.story = set()
   storytasks.spawn_task(net, "add_character")
-  leftovers = net.run(maintenance=dump_failed_asp_tasks)
+  leftovers = net.run(maintenance=asp_task_dumper(lambda r: True))
   unfinished = [t for t in leftovers if t.status != tn.TaskStatus.Final.Crashed]
   crashed = [t for t in leftovers if t.status == tn.TaskStatus.Final.Crashed]
   if unfinished:

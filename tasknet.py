@@ -315,6 +315,17 @@ class TaskNet:
         pass
     return self.collect_unifinished()
 
+def combined_maintenance(*args):
+  """
+  Takes any number of maintenance functions and returns one function that calls
+  all of the given ones in the order they are given.
+  """
+  def combined(net, task, result):
+    nonlocal args
+    for mf in args:
+      mf(net, task, result)
+  return combined
+
 def trace_net(net, task, result):
   """
   Designed to be passed as a maintenance function to TaskNet.run, this will

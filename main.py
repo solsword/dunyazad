@@ -32,8 +32,12 @@ def main():
   print('-'*80)
   print("Trace:")
   print('-'*80)
-  leftovers = net.run(maintenance=tn.trace_net)
-  #leftovers = net.run(maintenance=trace_story)
+  leftovers = net.run(
+    maintenance=tn.combined_maintenance(
+      tn.trace_net,
+      storytasks.asp_task_dumper(lambda r: True)
+    )
+  )
   unfinished = [t for t in leftovers if t.status != tn.TaskStatus.Final.Crashed]
   crashed = [t for t in leftovers if t.status == tn.TaskStatus.Final.Crashed]
   print('-'*80)
