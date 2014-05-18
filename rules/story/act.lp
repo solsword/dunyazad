@@ -174,10 +174,10 @@ story(Story, arg(Fluent, terminated, T)) :-
   story(Story, happens(T, id(evt, E))).
 
 % consequence rules can initiate or terminate fluents:
-story(Story, Fluent) :-
-  consequence_initiates(Story, id(act, A), Trigger, Fluent).
-story(Story, arg(id(act, A), initiates, Fluent)) :-
-  consequence_initiates(Story, id(act, A), Trigger, Fluent).
+story(Story, id(flt, FID)) :-
+  consequence_initiates(Story, id(act, A), Trigger, id(flt, FID)).
+story(Story, arg(id(act, A), initiates, id(flt, FID))) :-
+  consequence_initiates(Story, id(act, A), Trigger, id(flt, FID)).
 
 story(Story, Fluent) :-
   consequence_terminates(Story, id(act, A), Trigger, Fluent).
@@ -185,7 +185,7 @@ story(Story, arg(id(act, A), terminates, Fluent)) :-
   consequence_terminates(Story, id(act, A), Trigger, Fluent).
 
 1 = {
-  error(m("No fluent to initiate.", Story, id(act, A), Something));
+%  error(m("No fluent to initiate.", Story, id(act, A), Something));
   consequence_initiates(
     Story,
     id(act, A),

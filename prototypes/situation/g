@@ -1,0 +1,10 @@
+#!/bin/sh
+seed=`head -c 2 /dev/urandom | hexdump -e '"%u"'`
+echo "% vim"": syn=gringo" > events.lp
+echo "% vim"": syn=gringo" > story.lp
+time --format="%E, %K KB" \
+  clingo --verbose=0 --quiet=1,1 --seed=$seed \
+    sit.lp actions.lp states.lp cohere.lp |\
+  head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" | sort >> events.lp
+clingo --verbose=0 --quiet=1,1 events.lp eng.lp |\
+  head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" | sort >> story.lp

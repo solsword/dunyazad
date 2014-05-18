@@ -341,7 +341,7 @@ def asptask(name, code, source="unknown"):
     gmemlist = []
     for (schema, binding) in ans.bindings(active_schemas, predicates):
       if schema == "error":
-        print("ERROR!")
+        print("Error in Clingo output!")
         errors.append(dequote(str(binding["error.Message"])))
       elif schema == "status":
         s = dequote(str(binding["status.String"]))

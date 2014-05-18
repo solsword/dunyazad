@@ -2,8 +2,8 @@
 % Events are strictly ordered in time.
 
 beginning_of_time(0).
-time(1..100).
-end_of_time(101).
+time(1..20).
+end_of_time(21).
 
 % The current story has a beginning and an end:
 % If there are no events, they're both at 0:
@@ -29,8 +29,7 @@ error(m("No story beginning.")) :-
 error(m("No story ending.")) :-
   1 < { current_ending(T) : current_ending(T) }.
 
-active_timestep(Story, T) :-
-  story(Story, happens(T, Evt)).
+active_timestep(Story, T) :- story(Story, happens(T, Evt)).
 
 % All events in every story must happen at some point!
 error(m("Unordered event.", ID)) :-
