@@ -4,10 +4,25 @@ id(chr, 1..3).
 %id(itm, 1..5).
 %id(loc, 1..5).
 
+% Let there be love:
+
+%:- 0 = {
+%    at(T, rel(id(chr, A), id(chr, B), feelings, loves)) :
+%      time(T), id(chr, A), id(chr, B)
+%  }.
+%error(m("Not feeling it.")) :-
+%  0 = {
+%    at(T, rel(id(chr, A), id(chr, B), feelings, loves)) :
+%      time(T), id(chr, A), id(chr, B)
+%  }.
+
 % Timesteps:
 
 time(1..8).
-unmotivated_action_limit(6).
+unmotivated_action_limit(2).
+destiny_action_limit(3).
+unmet_expectation_limit(1).
+boredom_limit(2).
 
 %event(1, fall_ill).
 %event(1, rob).
@@ -15,7 +30,7 @@ unmotivated_action_limit(6).
 %event(3, rob).
 
 beginning(1).
-ending(2).
+ending(8).
 
 % Events, outcomes, and arguments:
 

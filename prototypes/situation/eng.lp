@@ -31,12 +31,15 @@ name_for(chr, "Genu").
 verb_for(fall_ill, "fell ill").
 verb_for(meet, "met").
 verb_for(recover, "recovered").
-verb_for(treat_disease, "treated").
+verb_for(buy_medicine_for, "bought medicine for").
 verb_for(accident, "had an accident").
 verb_for(treat_injury, "treated").
 verb_for(rob, "robbed").
 verb_for(fall_for, "fell for").
 verb_for(confess_to, "confessed to").
+verb_for(borrow_money_from, "borrowed money from").
+verb_for(repay_loan, "repayed a loan from").
+verb_for(give_wealth, "gave money to").
 
 % full text for a timestep:
 
@@ -81,58 +84,69 @@ eng_object(T, "") :-
 #show new_state_text/2.
 
 new_state_text(T, @js(Subject, "was no longer", Status)) :-
-  changed(T, status, id(Type, S), Status),
+  changed(T, status(id(Type, S), Status)),
   status(Type, Status),
   name(id(Type, S), Subject).
 
 new_state_text(T, @js(Subject, "became", Status)) :-
-  changed(T, status, S, _not(Status)),
+  changed(T, status(S, _not(Status))),
   name(S, Subject).
 
 new_state_text(T, @js(@join(Subject, "'s"), State, "became", New)) :-
-  changed(T, state, S, State),
-  at(T+1, state, S, State, New),
+  changed(T, state(S, State)),
+  at(T+1, state(S, State, New)),
   name(S, Subject),
-  State != wealth, State != status.
+  State != wealth.
 
-new_state_text(T, @js(Subject, "became as wealthy as a", New)) :-
-  changed(T, state, S, wealth),
-  at(T+1, state, S, wealth, New),
+new_state_text(T, @js(Subject, "became wealthy")) :-
+  changed(T, state(S, wealth)),
+  at(T+1, state(S, wealth, has_wealth)),
   name(S, Subject).
 
-new_state_text(T, @js(Subject, "became a", New)) :-
-  changed(T, state, S, status),
-  at(T+1, state, S, status, New),
+new_state_text(T, @js(Subject, "became penniless")) :-
+  changed(T, state(S, wealth)),
+  at(T+1, state(S, wealth, needs_money)),
+  name(S, Subject).
+
+new_state_text(T, @js(Subject, "was financially stable again")) :-
+  changed(T, state(S, wealth)),
+  at(T+1, state(S, wealth, normal)),
   name(S, Subject).
 
 new_state_text(T, @js(Subject, "and", Object, "became", New)) :-
-  changed(T, rel, S, relationship, O),
-  at(T+1, rel, S, relationship, New, O),
-  at(T+1, rel, O, relationship, New, S),
+  changed(T, rel(S, O, relationship)),
+  at(T+1, rel(S, O, relationship, New)),
+  at(T+1, rel(O, S, relationship, New)),
   O < S,
   name(S, Subject),
   name(O, Object).
 
 new_state_text(T, @js(Subject, "no longer cared about", Object)) :-
-  changed(T, rel, S, feelings, O),
-  at(T+1, rel, S, feelings, ambivalent, O),
+  changed(T, rel(S, O, feelings)),
+  at(T+1, rel(S, O, feelings, ambivalent)),
+  name(S, Subject),
+  name(O, Object).
+
+new_state_text(T, @js(Subject, "came to dislike", Object)) :-
+  changed(T, rel(S, O, feelings)),
+  at(T+1, rel(S, O, feelings, dislikes)),
   name(S, Subject),
   name(O, Object).
 
 new_state_text(T, @js(Subject, "came to like", Object)) :-
-  changed(T, rel, S, feelings, O),
-  at(T+1, rel, S, feelings, likes, O),
+  changed(T, rel(S, O, feelings)),
+  at(T+1, rel(S, O, feelings, likes)),
   name(S, Subject),
   name(O, Object).
 
 new_state_text(T, @js(Subject, "came to hate", Object)) :-
-  changed(T, rel, S, feelings, O),
-  at(T+1, rel, S, feelings, hates, O),
+  changed(T, rel(S, O, feelings)),
+  at(T+1, rel(S, O, feelings, hates)),
   name(S, Subject),
   name(O, Object).
 
 new_state_text(T, @js(Subject, "came to love", Object)) :-
-  changed(T, rel, S, feelings, O),
-  at(T+1, rel, S, feelings, loves, O),
+  changed(T, rel(S, O, feelings)),
+  at(T+1, rel(S, O, feelings, loves)),
   name(S, Subject),
   name(O, Object).

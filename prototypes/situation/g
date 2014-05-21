@@ -1,10 +1,23 @@
 #!/bin/sh
 seed=`head -c 2 /dev/urandom | hexdump -e '"%u"'`
-echo "% vim"": syn=gringo" > events.lp
-echo "% vim"": syn=gringo" > story.lp
+mkdir -p out
+actions="alist.lp actions.lp"
+states="states.lp"
+coherence="cohere.lp expectations.lp motivation.lp"
+sources="sit.lp $actions $states $coherence"
+echo "% vim"": syn=gringo" > out/events.lp
 time --format="%E, %K KB" \
-  clingo --verbose=0 --quiet=1,1 --seed=$seed \
-    sit.lp actions.lp states.lp cohere.lp |\
-  head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" | sort >> events.lp
-clingo --verbose=0 --quiet=1,1 events.lp eng.lp |\
-  head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" | sort >> story.lp
+  clingo --verbose=0 --quiet=1,1 --seed=$seed $sources |\
+    head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" | sort >> out/events.lp
+echo "% vim"": syn=gringo" > out/story.lp
+clingo --verbose=0 --quiet=1,1 out/events.lp eng.lp |\
+  head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" | \
+  sed "s/new_state_text(\\([0-9]\\+\\),/story(\1, state,     /" |\
+  sed "s/sentence(\\([0-9]\\+\\),/story(\1, event, /" |\
+#  sed "s/).$//" |\
+  sort >> out/story.lp
+
+
+
+#ew_state_text(7,"Jali was no longer injured").
+#sentence(1,"Runar met Jali.").

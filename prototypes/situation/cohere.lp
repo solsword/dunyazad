@@ -14,48 +14,18 @@ introduced(T, Thing) :-
   appears(X, Thing),
   X < T.
 
-error(m("Unintroduced subject.", T, Subj)) :-
+error(m("Unintroduced subject", T, Subj)) :-
   argument(T, subject, Subj),
   not introduced(T, Subj).
 
 % Boredom
 
-error(m("Boring action", T+1, Act)) :-
+error(m("Boring action (repeated immediately)", T+1, Act)) :-
   event(T, Act),
   event(T+1, Act).
 
-% Motivation
-
-% tit-for-tat:
-
-motivated(T, revenge(X)) :-
-  event(T, Act),
-  event(X, Prev),
-  X < T,
-  harmful_to(X, Victim),
-  harmful_to(T, Aggressor),
-  responsible_for(X, Aggressor),
-  responsible_for(T, Victim),
-  Victim != Aggressor.
-
-motivated(T, gratitude(X)) :-
-  event(T, Act),
-  event(X, Prev),
-  X < T,
-  helpful_to(X, Beneficiary),
-  helpful_to(T, Benificent),
-  responsible_for(X, Benificent),
-  responsible_for(T, Beneficiary),
-  Benificent != Beneficiary.
-
-unmotivated(T) :-
-  event(T, Act),
-  0 = { motivated(T, Motive) }.
-
-unmotivated_count(X) :-
-  X = { unmotivated(T) : time(T) }.
-
-error(m("Too many unmotivated actions.")) :-
-  unmotivated_count(X),
-  unmotivated_action_limit(L),
-  X > L.
+error(m("Boring action (too many occurances)", Act, Count)) :-
+  action(Act),
+  boredom_limit(L),
+  Count = { event(T, Act) : time(T) },
+  Count > L.
