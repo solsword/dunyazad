@@ -19,10 +19,14 @@ def format_exception(e):
     traceback.format_exception(type(e), e, e.__traceback__)
   )
 
-# Appending to a tuple:
+# Slugging strings:
+def slug(string):
+  return re.sub(r"[^_0-9a-zA-Z]", '-', string)
 
+# Appending to a tuple:
 def tuple_with(src, add):
   return tuple(list(src) + [add])
+
 
 # Quoting and unquoting:
 
