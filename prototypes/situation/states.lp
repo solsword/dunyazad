@@ -167,18 +167,6 @@ error(m("Reciprocality of relationship broken.")) :-
 
 % there shouldn't be uncaused changes:
 
-error(m("Uncaused status change.", T, Subj, Status)) :-
-  changed(T, status(Subj, Status)),
-  0 = { caused_by(changed(T, status(Subj, Status)), Cause) }.
-
-error(m("Uncaused state change.", T, Subj, State, Value, Other)) :-
-  changed(T, state(Subj, State)),
-  at(T, state(Subj, State, Value)),
-  at(T+1, state(Subj, State, Other)),
-  0 = { caused_by(changed(T, state(Subj, State, Value)), Cause) }.
-
-error(m("Uncaused relation change.", T, From, Rel, Val, To, Other)) :-
-  changed(T, rel(From, To, Rel)),
-  at(T, rel(From, To, Rel, Val)),
-  at(T+1, rel(From, To, Rel, Other)),
-  0 = { caused_by(changed(T, rel(From, To, Rel)), Cause) }.
+error(m("Uncaused change.", T, Fluent)) :-
+  changed(T, Fluent),
+  0 = { caused_by_something(changed(T, Fluent)) }.

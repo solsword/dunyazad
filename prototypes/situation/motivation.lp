@@ -6,28 +6,19 @@ unmotivated(T) :-
   event(T, Act),
   0 = { motivated(T, Motive) }.
 
-unmotivated_count(X) :-
-  X = { unmotivated(T) : time(T) }.
-
 error(m("Too many unmotivated actions.")) :-
-  unmotivated_count(X),
   unmotivated_action_limit(L),
-  X > L.
+  L < { unmotivated(T) : time(T) }.
 
 % And not too many actions should happen just because:
 
-destiny_motivated_count(X) :-
-  X = { motivated(T, destiny) : time(T) }.
-
 error(m("Too many actions motivated by destiny.")) :-
-  destiny_motivated_count(X),
   destiny_action_limit(L),
-  X > L.
+  L < { motivated(T, destiny) : time(T) }.
 
 % self-interest:
 
 motivated(T, self_interest) :-
-  event(T, Act),
   helpful_to(T, Self),
   responsible_for(T, Self).
 
@@ -39,8 +30,6 @@ motivated(T, love) :-
 % tit-for-tat:
 
 motivated(T, revenge(X)) :-
-  event(T, Act),
-  event(X, Prev),
   X < T,
   harmful_to(X, Victim),
   harmful_to(T, Aggressor),
@@ -49,8 +38,6 @@ motivated(T, revenge(X)) :-
   Victim != Aggressor.
 
 motivated(T, gratitude(X)) :-
-  event(T, Act),
-  event(X, Prev),
   X < T,
   helpful_to(X, Beneficiary),
   helpful_to(T, Benificent),
@@ -63,20 +50,16 @@ motivated(T, gratitude(X)) :-
 % "fated" actions are allowed every so often, plus near the beginning of the
 % story
 motivated(T, destiny) :-
-  event(T, Act),
-  responsible_for(T, fate),
-  beginning(B).
+  responsible_for(T, fate).
 
 % positive and negative relationships:
 
 motivated(T, enmity) :-
-  event(T, Act),
   harmful_to(T, Victim),
   responsible_for(T, Vindictive),
   at(T, rel(Vindictive, Victim, feelings, hates)).
 
 motivated(T, friendship) :-
-  event(T, Act),
   helpful_to(T, Friend),
   responsible_for(T, Friendly),
   0 < {
@@ -87,7 +70,6 @@ motivated(T, friendship) :-
 % random kindness to acquaintances and strangers:
 
 motivated(T, charity) :-
-  event(T, Act),
   helpful_to(T, Recipient),
   responsible_for(T, Charitable),
   0 < {
@@ -101,11 +83,10 @@ motivated(T, charity) :-
 
 % Don't help people you dislike without motivation:
 
-error(m("Helpful to hated person.", T, Act, Subj, Obj)) :-
+error(m("Helpful to hated person.", T, Subj, Obj)) :-
   unmotivated(T),
-  event(T, Act),
-  responsible_for(T, Subj),
   helpful_to(T, Obj),
+  responsible_for(T, Subj),
   0 < {
     at(T, rel(Subj, Obj, feelings, dislikes));
     at(T, rel(Subj, Obj, feelings, hates))

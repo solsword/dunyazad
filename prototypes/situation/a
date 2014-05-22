@@ -1,0 +1,14 @@
+#!/bin/sh
+actions="alist.lp actions.lp"
+states="states.lp"
+coherence="cohere.lp expectations.lp motivation.lp"
+sources="sit.lp $actions $states $coherence"
+echo "% vim"": syn=gringo" > out/grounded.gl
+time --format="%E, %K KB" \
+  gringo -t $sources >> out/grounded.gl
+echo "% vim"": syn=gringo" > out/freq-base.gl
+sort out/grounded.gl | cut -d"(" -f1 | uniq -c | sort -r >> out/freq-base.gl
+echo "% vim"": syn=gringo" > out/freq-unary.gl
+sort out/grounded.gl | cut -d"," -f1 | uniq -c | sort -r >> out/freq-unary.gl
+echo "% vim"": syn=gringo" > out/freq-binary.gl
+sort out/grounded.gl | cut -d"," -f1-2 | uniq -c | sort -r >> out/freq-binary.gl

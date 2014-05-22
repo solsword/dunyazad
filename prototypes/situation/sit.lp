@@ -1,5 +1,10 @@
 % Things:
 
+% debug mode
+
+% IDEA: scale characters by using pre-decided relationship constraints (e.g.,
+% supporting characters don't need relationships to other supporting
+% characters).
 id(chr, 1..3).
 %id(itm, 1..5).
 %id(loc, 1..5).
@@ -18,11 +23,11 @@ id(chr, 1..3).
 
 % Timesteps:
 
-time(1..8).
-unmotivated_action_limit(2).
-destiny_action_limit(3).
-unmet_expectation_limit(1).
-boredom_limit(2).
+time(1..12).
+unmotivated_action_limit(3).
+destiny_action_limit(7).
+unmet_expectation_limit(3).
+boredom_limit(5).
 
 %event(1, fall_ill).
 %event(1, rob).
@@ -53,3 +58,7 @@ ending(8).
 % Mimimize errors:
 
 #minimize { 1@0,error(Message) : error(Message) }.
+
+%:- error(Message).
+
+% Put #const debug=0/1 and use it as an extra prerequisite for errors
