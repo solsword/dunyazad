@@ -55,7 +55,7 @@ class Tokens:
 
   NUMBER = parser.Token(re.compile(r"0|([1-9][0-9]*)"))
 
-  ID = parser.Token(re.compile(r"[a-z][A-Za-z0-9_]*"))
+  ID = parser.Token(re.compile(r"[a-z_][A-Za-z0-9_]*"))
   VARIABLE = parser.Token(re.compile(r"[A-Z][A-Za-z0-9_]*"))
 
   STRING = parser.Token(re.compile(r'"([^\\"]|(\\.))*"'))
@@ -815,9 +815,9 @@ NafLiteral.grammar = parser.Package(
     parser.Attr(
       "contents",
       parser.OneOf(
-        ClassicalLiteral,
+        BuiltinAtom,
         ScriptCall,
-        BuiltinAtom
+        ClassicalLiteral,
       )
     )
   )
@@ -845,7 +845,10 @@ WeightAtLevel.grammar = parser.Package(
 AggregateElement.grammar = parser.Package(
   AggregateElement,
   parser.Seq(
-    parser.Attr("terms", Terms),
+    parser.Attr(
+      "terms",
+      parser.SepList(parser.OneOf(NafLiteral, Term), sep=Tokens.Ignore.COMMA)
+    ),
     parser.Opt(
       parser.Seq(
         Tokens.Ignore.COLON,
@@ -1201,6 +1204,12 @@ def _test_parse_as_predicate_statement(text):
 
 def _test_parse_completely_as_term(text):
   return parser.parse_completely(text, Term)
+
+def _test_parse_completely_as_builtinatom(text):
+  return parser.parse_completely(text, BuiltinAtom)
+
+def _test_parse_completely_as_nafliteral(text):
+  return parser.parse_completely(text, NafLiteral)
 
 def _test_parse_completely_as_statement(text):
   return parser.parse_completely(text, Statement)
@@ -1913,7 +1922,14 @@ _test_cases = [
               (
                 Expression(True, None, SimpleTerm("X")),
                 Expression(False, "+", SimpleTerm("Y"), SimpleTerm("5")),
-                SimpleTerm("foobar", ( SimpleTerm("X"), )),
+                NafLiteral(
+                  False,
+                  ClassicalLiteral(
+                    False,
+                    "foobar",
+                    ( SimpleTerm("X"), )
+                  )
+                ),
               ),
               (
                 NafLiteral(
@@ -1926,11 +1942,13 @@ _test_cases = [
                 ),
               )
             ),
-            AggregateElement( ( SimpleTerm("other"), ) ),
+            AggregateElement(
+              ( NafLiteral(False, ClassicalLiteral(False, "other")), )
+            ),
             AggregateElement(
               (
-                SimpleTerm("a"),
-                SimpleTerm("b"),
+                NafLiteral(False, ClassicalLiteral(False, "a")),
+                NafLiteral(False, ClassicalLiteral(False, "b")),
               ),
               (
                 NafLiteral(False, ClassicalLiteral(False, "c")),
@@ -2492,9 +2510,13 @@ a(@join(foo, bar)).""",
               (
                 AggregateElement(
                   (
-                    SimpleTerm(
-                      "character",
-                      ( SimpleTerm("_"), )
+                    NafLiteral(
+                      False,
+                      ClassicalLiteral(
+                        False,
+                        "character",
+                        ( SimpleTerm("_"), )
+                      )
                     ),
                   ),
                 ),
@@ -2615,10 +2637,12 @@ a(@join(foo, bar)).""",
               (
                 AggregateElement(
                   (
-                    SimpleTerm(
-                      'current_ending',
-                      (
-                        SimpleTerm('T', None),
+                    NafLiteral(
+                      False,
+                      ClassicalLiteral(
+                        False,
+                        "current_ending",
+                        ( SimpleTerm("T"), )
                       )
                     ),
                   ),
@@ -2694,19 +2718,23 @@ error(m("Unordered event.", ID)) :-
               (
                 AggregateElement(
                   (
-                    SimpleTerm(
-                      'story',
-                      (
-                        SimpleTerm('Story', None),
-                        SimpleTerm(
-                          'happens',
-                          (
-                            SimpleTerm('T', None),
-                            SimpleTerm(
-                              'id',
-                              (
-                                SimpleTerm('evt', None),
-                                SimpleTerm('ID', None)
+                    NafLiteral(
+                      False,
+                      ClassicalLiteral(
+                        False,
+                        "story",
+                        (
+                          SimpleTerm('Story', None),
+                          SimpleTerm(
+                            'happens',
+                            (
+                              SimpleTerm('T', None),
+                              SimpleTerm(
+                                'id',
+                                (
+                                  SimpleTerm('evt', None),
+                                  SimpleTerm('ID', None)
+                                )
                               )
                             )
                           )
@@ -2735,6 +2763,79 @@ error(m("Unordered event.", ID)) :-
         ),
       ),
       None
+    )
+  ),
+  (
+    parse_asp,
+    """\
+caused_by(changed(T, status(Subj, Status)), Act) :-
+  event(T, Act),
+  outcome(T, Outcome),
+  causes(T, Act, Outcome, status(Arg, NewStatus)),
+  argument(T, Arg, Subj),
+  at(T, status(Subj, Status)),
+  1 <= { NewStatus = _not(Status); Status = _not(NewStatus) }.
+    """,
+    Program((Rule(ClassicalLiteral(False, 'caused_by', (SimpleTerm('changed', (SimpleTerm('T', None), SimpleTerm('status', (SimpleTerm('Subj', None), SimpleTerm('Status', None))))), SimpleTerm('Act', None))), (NafLiteral(False, ClassicalLiteral(False, 'event', (SimpleTerm('T', None), SimpleTerm('Act', None)))), NafLiteral(False, ClassicalLiteral(False, 'outcome', (SimpleTerm('T', None), SimpleTerm('Outcome', None)))), NafLiteral(False, ClassicalLiteral(False, 'causes', (SimpleTerm('T', None), SimpleTerm('Act', None), SimpleTerm('Outcome', None), SimpleTerm('status', (SimpleTerm('Arg', None), SimpleTerm('NewStatus', None)))))), NafLiteral(False, ClassicalLiteral(False, 'argument', (SimpleTerm('T', None), SimpleTerm('Arg', None), SimpleTerm('Subj', None)))), NafLiteral(False, ClassicalLiteral(False, 'at', (SimpleTerm('T', None), SimpleTerm('status', (SimpleTerm('Subj', None), SimpleTerm('Status', None)))))), Aggregate(False, SimpleTerm('1', None), '<=', '#count', (AggregateElement((NafLiteral(False, BuiltinAtom('=', SimpleTerm('NewStatus', None), SimpleTerm('_not', (SimpleTerm('Status', None),)))),), None), AggregateElement((NafLiteral(False, BuiltinAtom('=', SimpleTerm('Status', None), SimpleTerm('_not', (SimpleTerm('NewStatus', None),)))),), None)), None, None))),), None)
+  ),
+  (
+    parse_asp,
+    """\
+1 = {
+  error(m("Unable to assign relation.", T, id(T1, ID), id(T2, To), Rel));
+  at(T, rel(id(T1, ID), id(T2, To), Rel, Value)) : value(Rel, Value)
+} :-
+  id(T1, ID),
+  id(T2, To),
+  relation(T1, T2, Rel),
+  time(T),
+  1 <= { id(T1, ID) != id(T2, To); not nonreflexive(T1, T2, Rel) }.
+    """,
+    Program((Rule(Choice(SimpleTerm('1', None), '=', (ChoiceElement(ClassicalLiteral(False, 'error', (SimpleTerm('m', (SimpleTerm('"Unable to assign relation."', None), SimpleTerm('T', None), SimpleTerm('id', (SimpleTerm('T1', None), SimpleTerm('ID', None))), SimpleTerm('id', (SimpleTerm('T2', None), SimpleTerm('To', None))), SimpleTerm('Rel', None))),)), None), ChoiceElement(ClassicalLiteral(False, 'at', (SimpleTerm('T', None), SimpleTerm('rel', (SimpleTerm('id', (SimpleTerm('T1', None), SimpleTerm('ID', None))), SimpleTerm('id', (SimpleTerm('T2', None), SimpleTerm('To', None))), SimpleTerm('Rel', None), SimpleTerm('Value', None))))), (NafLiteral(False, ClassicalLiteral(False, 'value', (SimpleTerm('Rel', None), SimpleTerm('Value', None)))),))), None, None), (NafLiteral(False, ClassicalLiteral(False, 'id', (SimpleTerm('T1', None), SimpleTerm('ID', None)))), NafLiteral(False, ClassicalLiteral(False, 'id', (SimpleTerm('T2', None), SimpleTerm('To', None)))), NafLiteral(False, ClassicalLiteral(False, 'relation', (SimpleTerm('T1', None), SimpleTerm('T2', None), SimpleTerm('Rel', None)))), NafLiteral(False, ClassicalLiteral(False, 'time', (SimpleTerm('T', None),))), Aggregate(False, SimpleTerm('1', None), '<=', '#count', (AggregateElement((NafLiteral(False, BuiltinAtom('!=', SimpleTerm('id', (SimpleTerm('T1', None), SimpleTerm('ID', None))), SimpleTerm('id', (SimpleTerm('T2', None), SimpleTerm('To', None))))),), None), AggregateElement((NafLiteral(True, ClassicalLiteral(False, 'nonreflexive', (SimpleTerm('T1', None), SimpleTerm('T2', None), SimpleTerm('Rel', None)))),), None)), None, None))),), None)
+  ),
+  (
+    _test_parse_completely_as_builtinatom,
+    "id(T1, ID) < id(T2, To)",
+    BuiltinAtom(
+      '<',
+      SimpleTerm(
+        'id',
+        (
+          SimpleTerm('T1', None),
+          SimpleTerm('ID', None)
+        )
+      ),
+      SimpleTerm(
+        'id',
+        (
+          SimpleTerm('T2', None),
+          SimpleTerm('To', None)
+        )
+      )
+    )
+  ),
+  (
+    _test_parse_completely_as_nafliteral,
+    "id(T1, ID) < id(T2, To)",
+    NafLiteral(
+      False,
+      BuiltinAtom(
+        '<',
+        SimpleTerm(
+          'id',
+          (
+            SimpleTerm('T1', None),
+            SimpleTerm('ID', None)
+          )
+        ),
+        SimpleTerm(
+          'id',
+          (
+            SimpleTerm('T2', None),
+            SimpleTerm('To', None)
+          )
+        )
+      )
     )
   ),
 ]

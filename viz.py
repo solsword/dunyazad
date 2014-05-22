@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
 viz.py
-For visualizing the global rules.
+An ASP program visualizer. The first argument should be a directory to search
+for .lp files in.
 """
 
 import re
+import sys
 
 from graphviz import Digraph
 
@@ -12,12 +14,20 @@ from ans import *
 
 from utils import *
 
-# Defines where to search for global rules:
-GLOBAL_RULES_DIR = "rules"
+# Defines where to search for rules if no argument is given:
+DEFAULT_RULES_DIR = "rules"
+
+OUTPUT_DIR = "viz-output"
 
 def objects(thing):
   result = set()
   if (
+    thing == None
+   or isinstance(thing, Interval)
+   or isinstance(thing, BuiltinAtom)
+  ):
+    pass # we don't bother tracking these
+  elif (
     isinstance(thing, Disjunction)
    or isinstance(thing, Choice)
    or isinstance(thing, Aggregate)
@@ -28,11 +38,9 @@ def objects(thing):
     result |= objects(thing.literal)
   elif isinstance(thing, AggregateElement):
     result |= objects(thing.terms)
-  elif isinstance(thing, list):
+  elif isinstance(thing, list) or isinstance(thing, tuple):
     for t in thing:
       result |= objects(t)
-  elif isinstance(thing, Interval) or isinstance(thing, BuiltinAtom):
-    pass # we don't bother tracking these
   elif isinstance(thing, Expression):
     result |= objects(thing.lhs)
     result |= objects(thing.rhs)
@@ -42,15 +50,24 @@ def objects(thing):
     result.add("{}{}/{}".format(
       '-' if (hasattr(thing, "negated") and thing.negated) else '',
       slug(thing.id),
-      len(thing.terms if hasattr(thing, "terms") else 0)
+      len(thing.terms) if hasattr(thing, "terms") and thing.terms != None else 0
     ))
   elif isinstance(thing, ScriptCall):
-    result.add("@{}/{}".format(slug(thing.function), len(thing.args)))
+    result.add(
+      "@{}/{}".format(
+        slug(thing.function),
+        len(thing.args) if hasattr(thing, "args") and thing.args != None else 0
+      )
+    )
+  else:
+    raise NotImplementedError(
+      "No method for getting objects out of thing: {}".format(thing)
+    )
   return result
 
 if __name__ == "__main__":
   print("Loading rules...")
-  ruleset = load_logic(GLOBAL_RULES_DIR)
+  ruleset = load_logic(sys.argv[1] if sys.argv[1:] else DEFAULT_RULES_DIR)
   print("  ...done.")
 
   nodes = set(["#FAIL", "#AVOID", "#OPT"])
@@ -83,12 +100,13 @@ if __name__ == "__main__":
           nodes |= atoms
           for a in atoms:
             edges.add(("#OPT", a))
+  print("  ...done.")
 
+  print("Constructing GraphViz graph...")
   node_ids = {}
   i = 0
   for n in nodes:
-    node_ids[n] = 'a' + str(i)
-    print("Got node: {} :: {}".format(repr(n), repr(node_ids[n])))
+    node_ids[n] = 'node_{}'.format(i)
     i += 1
 
   # now build it in graphviz format:
@@ -99,8 +117,17 @@ if __name__ == "__main__":
 
   for frm, to in edges:
     if frm in ["#FAIL", "#AVOID", "#OPT"]:
-      graph.edge(node_ids[frm], node_ids[to], constraint=False)
+      graph.edge(node_ids[frm], node_ids[to], constraint="false")
     else:
       graph.edge(node_ids[frm], node_ids[to])
+  print("  ...done.")
 
-  graph.render("viz-test")
+  outfile = os.path.join(OUTPUT_DIR, "rules.gv")
+  if os.path.exists(OUTPUT_DIR):
+    if not os.path.isdir(OUTPUT_DIR):
+      outfile = "viz-output-rules.gv"
+  else:
+    os.mkdir(OUTPUT_DIR)
+  print("Rendering GraphViz graph to '{}.pdf'...".format(outfile))
+  graph.render(outfile)
+  print("  ...done.")
