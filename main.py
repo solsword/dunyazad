@@ -26,7 +26,7 @@ def main():
   net.mem.code.story.
   """
   net = tn.TaskNet()
-  net.mem.code.universal = ans.load_logic(GLOBAL_RULES_DIR)
+  net.mem.code.universal = ans.load_logic_dir(GLOBAL_RULES_DIR)
   net.mem.code.story = set()
   storytasks.spawn_task(net, "tell_story")
   print('-'*80)

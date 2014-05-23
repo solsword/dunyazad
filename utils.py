@@ -306,14 +306,13 @@ def walk_files(dir, include=None, exclude=None):
       if safe:
         yield filename
 
-def process_file_contents(dir, process, include=None, exclude=None):
+def process_file_contents(files, process):
   """
-  Loads every file that matches the given filters in the given directory (and
-  all subdirectories) and calls the given function on its text, returning a
-  flat list of the results.
+  Loads every file from the given list and calls the given function on its
+  text, returning a flat list of the results.
   """
   results = []
-  for f in walk_files(dir, include, exclude):
+  for f in files:
     with open(f, 'r') as fin:
       try:
         results.append(process(fin.read()))
@@ -325,6 +324,14 @@ def process_file_contents(dir, process, include=None, exclude=None):
         )
         raise e
   return results
+
+def process_dir_file_contents(dir, process, include=None, exclude=None):
+  """
+  Loads every file that matches the given filters in the given directory (and
+  all subdirectories) and calls the given function on its text, returning a
+  flat list of the results.
+  """
+  return process_file_contents(walk_files(dir, include, exclude), process)
 
 _test_cases = [
   (quote, r"test", r'"test"'),

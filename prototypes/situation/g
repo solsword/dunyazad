@@ -6,9 +6,10 @@ actions="alist.lp actions.lp"
 states="states.lp"
 coherence="cohere.lp expectations.lp motivation.lp"
 sources="sit.lp $actions $states $coherence"
-echo "% vim"": syn=gringo" > out/stats.lp
+echo "% vim"": syn=lua" > out/stats.lp
 time --format="%E, %K KB" \
-  clingo --stats --seed=$seed $sources >> out/stats.lp
+  clingo --stats --seed=$seed --time-limit=2 $sources |\
+  tail -n 29 | head -n -1 >> out/stats.lp
 echo "% vim"": syn=gringo" > out/events.lp
 time --format="%E, %K KB" \
   clingo --verbose=0 --quiet=1,1 --seed=$seed $sources |\

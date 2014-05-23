@@ -23,8 +23,8 @@ id(chr, 1..3).
 
 % Timesteps:
 
-time(1..12).
-unmotivated_action_limit(3).
+time(1..10).
+unmotivated_action_limit(4).
 destiny_action_limit(7).
 unmet_expectation_limit(3).
 boredom_limit(5).

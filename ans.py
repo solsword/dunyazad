@@ -1181,13 +1181,20 @@ def concatenate_programs(*progs):
         )
   return Program(tuple(statements), query)
 
-def load_logic(dir):
+def load_logic_files(files):
+  """
+  Loads all of the given files as Program objects and returns a ruleset
+  distilled from all of them.
+  """
+  return ruleset(*process_file_contents(files, parse_asp))
+
+def load_logic_dir(dir):
   """
   Loads all .lp files in the given directory (and its subdirectories) as
   Program objects and returns a ruleset distilled from all of them.
   """
   return ruleset(
-    *process_file_contents(
+    *process_dir_file_contents(
       dir,
       parse_asp,
       include=lambda f: f.endswith(".lp"),

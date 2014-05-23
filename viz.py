@@ -67,7 +67,10 @@ def objects(thing):
 
 if __name__ == "__main__":
   print("Loading rules...")
-  ruleset = load_logic(sys.argv[1] if sys.argv[1:] else DEFAULT_RULES_DIR)
+  if sys.argv[1:]:
+    ruleset = load_logic_files(sys.argv[1:])
+  else:
+    ruleset = load_logic_dir(DEFAULT_RULES_DIR)
   print("  ...done.")
 
   nodes = set(["#FAIL", "#AVOID", "#OPT"])

@@ -549,7 +549,7 @@ for t in load_tasks(TASK_DIRECTORY):
 def _test_add_character_task():
   import ans, storytasks
   net = tn.TaskNet()
-  net.mem.code.universal = ans.load_logic("rules")
+  net.mem.code.universal = ans.load_logic_dir("rules")
   net.mem.code.story = set()
   storytasks.spawn_task(net, "add_character")
   leftovers = net.run(maintenance=asp_task_dumper(lambda r: True))
@@ -588,7 +588,7 @@ def _test_add_character_task():
 def _test_add_event_task():
   import ans, storytasks
   net = tn.TaskNet()
-  net.mem.code.universal = ans.load_logic("rules")
+  net.mem.code.universal = ans.load_logic_dir("rules")
   net.mem.code.story = set()
   storytasks.spawn_task(net, "add_event")
   leftovers = net.run(maintenance=asp_task_dumper(lambda r: True))
