@@ -1,22 +1,15 @@
 #!/bin/sh
 seed=`head -c 2 /dev/urandom | hexdump -e '"%u"'`
 mkdir -p out
+. ./sources
 echo $seed > out/seed
-actions="alist.lp actions.lp"
-states="slist.lp states.lp"
-coherence="cohere.lp expectations.lp motivation.lp"
-sources="sit.lp $actions $states $coherence"
 echo "% vim"": syn=lua" > out/stats.lp
 time --format="%E, %K KB" \
-  clingo --stats --seed=$seed --time-limit=2 $sources |\
+  clingo --stats --time-limit=2 $args $sources |\
   tail -n 29 | head -n -1 >> out/stats.lp
 echo "% vim"": syn=gringo" > out/events.lp
 time --format="%E, %K KB" \
-  clingo --verbose=0 --quiet=1,1 --seed=$seed $sources |\
-    head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" | sort >> out/events.lp
-echo "% vim"": syn=gringo" > out/story.lp
-clingo --verbose=0 --quiet=1,1 out/events.lp eng.lp |\
-  head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" | \
-  sed "s/new_state_text(\\([0-9]\\+\\),/story(\1, state,     /" |\
-  sed "s/sentence(\\([0-9]\\+\\),/story(\1, event, /" |\
-  sort >> out/story.lp
+  clingo --verbose=0 --quiet=1,1 $args $sources |\
+    head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\
+    sed "s/^\([a-zA-Z0-9_]\+\)$/\1./" | sort >> out/events.lp
+./e

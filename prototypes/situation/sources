@@ -1,0 +1,6 @@
+#!/bin/sh
+actions="alist.lp actions.lp"
+states="slist.lp states.lp"
+coherence="cohere.lp expectations.lp motivation.lp"
+sources="sit.lp $actions $states $coherence"
+args="--seed=$seed --rand-freq=0.05"

@@ -1,0 +1,8 @@
+%UNSATISFIABLE
+% vim: syntax=gringo
+:- not motivated(5, friendship).
+:- not good.
+good :-
+  at(5, rel(Chr, Helped, feelings, dislikes)),
+  responsible_for(5, Chr),
+  helpful_to(5, Helped).

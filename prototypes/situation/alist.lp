@@ -56,8 +56,6 @@ arg(gamble, subject, chr).
 causes(gamble, success, state_increase(subject, wealth)).
 causes(gamble, failure, state_decrease(subject, wealth)).
 responsible(gamble, subject).
-helpful(gamble, success, subject).
-harmful(gamble, failure, subject).
 
 action(borrow_money_from).
 arg(borrow_money_from, subject, chr).

@@ -1,8 +1,5 @@
 #!/bin/sh
-actions="alist.lp actions.lp"
-states="slist.lp states.lp"
-coherence="cohere.lp expectations.lp motivation.lp"
-sources="sit.lp $actions $states $coherence"
+. ./sources
 echo "% vim"": syn=gringo" > out/grounded.gl
 time --format="%E, %K KB" \
   gringo -t $sources >> out/grounded.gl

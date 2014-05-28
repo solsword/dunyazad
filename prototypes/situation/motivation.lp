@@ -19,6 +19,14 @@ undesirable(10, m("Surplus action motivated by destiny.", T)) :-
   destiny_action_limit(L),
   L < { motivated(X, destiny) : time(X) }.
 
+% And not too many actions should be motivated just by self-interest:
+
+undesirable(10, m("Surplus action motivated by self-interest.", T)) :-
+%error(m("Surplus action motivated by self-interest.", T)) :-
+  motivated(T, self_interest),
+  selfish_action_limit(L),
+  L < { motivated(X, self_interest) : time(X) }.
+
 % Nor should such things happen one after the other:
 undesirable(20, m("Repeated action motivated by destiny.", T+1)) :-
 %error(m("Repeated action motivated by destiny.", T+1)) :-
@@ -64,14 +72,14 @@ motivated(T, destiny) :-
 % positive and negative relationships:
 
 motivated(T, enmity) :-
-  harmful_to(T, Victim),
+  1 <= { harmful_to(T, Victim); causes_problem_for(T, Victim) },
   responsible_for(T, Vindictive),
   at(T, rel(Vindictive, Victim, feelings, hates)).
 
 motivated(T, friendship) :-
-  helpful_to(T, Friend),
+  1 <= { helpful_to(T, Friend); solves_problem_for(T, Friend) },
   responsible_for(T, Friendly),
-  0 < {
+  1 <= {
     at(T, rel(Friendly, Friend, feelings, likes));
     at(T, rel(Friendly, Friend, feelings, loves))
   }.
@@ -79,9 +87,9 @@ motivated(T, friendship) :-
 % random kindness to non-hated acquaintances and strangers:
 
 motivated(T, charity) :-
-  helpful_to(T, Recipient),
   responsible_for(T, Charitable),
-  0 < {
+  solves_problem_for(T, Recipient),
+  1 <= {
     at(T, rel(Charitable, Recipient, relationship, strangers));
     at(T, rel(Charitable, Recipient, relationship, acquaintances))
   },
@@ -96,7 +104,7 @@ error(m("Helpful to hated person.", T, Subj, Obj)) :-
   unmotivated(T),
   helpful_to(T, Obj),
   responsible_for(T, Subj),
-  0 < {
+  1 <= {
     at(T, rel(Subj, Obj, feelings, dislikes));
     at(T, rel(Subj, Obj, feelings, hates))
   }.

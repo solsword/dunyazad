@@ -1,0 +1,31 @@
+#!/bin/sh
+seed=`head -c 2 /dev/urandom | hexdump -e '"%u"'`
+mkdir -p out/test
+. ./sources
+echo $seed > out/seed
+function unit() {
+  local name="$1"
+  local code="$2"
+  local expect="$3"
+  echo "% vim"": syn=gringo" > out/test/test-$name.lp
+  echo "$code" > out/test/test-$name-code.lp
+  clingo $args $sources --verbose=0 out/test/test-$name-code.lp \
+    2> out/test/test-$name-errors \
+    1> out/test/test-$name.lp
+  result=`tail -n 1 out/test/test-$name.lp`
+  if [ "$result" = "$expect" ]
+  then
+    echo "success :: $name ($result)"
+  else
+    echo "FAIL :: $name ($result)"
+  fi
+}
+unit "default" "" "OPTIMUM FOUND"
+for t in `ls -1 unit_tests/*.lpu`
+do
+  name=`echo $t | cut -d/ -f2 | cut -d. -f1`
+  expect=`head -n1 $t | cut -d% -f2`
+  code=`sed "s/^\w*%.*$//" $t | tr "\n" " "`
+  unit "$name" "$code" "$expect"
+  #echo "unit \"$name\" \"$code\" \"$expect\""
+done

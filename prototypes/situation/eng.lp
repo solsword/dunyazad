@@ -7,48 +7,6 @@ def js(*args):
   return ' '.join(str(a) for a in args)
 #end.
 
-% names:
-
-name_for(chr, "Likke").
-name_for(chr, "Runar").
-name_for(chr, "Jali").
-name_for(chr, "Ystred").
-name_for(chr, "Milei").
-name_for(chr, "Genu").
-
-1 = {
-  name(id(Type, ID), Name) : name_for(Type, Name)
-} :-
-  id(Type, ID).
-
-:-
-  name(One, Name),
-  name(Two, Name),
-  One != Two.
-
-% verbs:
-
-verb_for(fall_ill, "fell ill").
-verb_for(meet, "met").
-verb_for(recover, "recovered").
-verb_for(buy_medicine_for, "bought medicine for").
-verb_for(accident, "had an accident").
-verb_for(treat_injury, "treated").
-verb_for(rob, "robbed").
-verb_for(fall_for, "fell for").
-verb_for(confess_to, "confessed to").
-verb_for(borrow_money_from, "borrowed money from").
-verb_for(repay_loan, "repayed a loan from").
-verb_for(give_wealth, "gave money to").
-
-% full text for a timestep:
-
-#show full_text/2.
-
-full_text(T, @join(Sentence, Changes)) :-
-  sentence(T, Sentence),
-  change_text(T, Changes).
-
 % sentence construction:
 
 #show sentence/2.
@@ -78,9 +36,8 @@ eng_object(T, "") :-
   time(T),
   0 = { argument(T, object, O) }.
 
-% change text construction
+% change text construction:
 
-%change_text(T, @jand(
 #show new_state_text/2.
 
 new_state_text(T, @js(Subject, "was no longer", Status)) :-
@@ -99,22 +56,22 @@ new_state_text(T, @js(@join(Subject, "'s"), State, "became", New)) :-
   State != wealth.
 
 new_state_text(T, @js(Subject, "became wealthy")) :-
-  changed(T, state(S, wealth)),
+  changed(T, state(S, wealth, Old)),
   at(T+1, state(S, wealth, has_wealth)),
   name(S, Subject).
 
 new_state_text(T, @js(Subject, "became penniless")) :-
-  changed(T, state(S, wealth)),
+  changed(T, state(S, wealth, Old)),
   at(T+1, state(S, wealth, needs_money)),
   name(S, Subject).
 
 new_state_text(T, @js(Subject, "was financially stable again")) :-
-  changed(T, state(S, wealth)),
+  changed(T, state(S, wealth, Old)),
   at(T+1, state(S, wealth, normal)),
   name(S, Subject).
 
 new_state_text(T, @js(Subject, "and", Object, "became", New)) :-
-  changed(T, rel(S, O, relationship)),
+  changed(T, rel(S, O, relationship, Old)),
   at(T+1, rel(S, O, relationship, New)),
   at(T+1, rel(O, S, relationship, New)),
   O < S,
@@ -122,31 +79,102 @@ new_state_text(T, @js(Subject, "and", Object, "became", New)) :-
   name(O, Object).
 
 new_state_text(T, @js(Subject, "no longer cared about", Object)) :-
-  changed(T, rel(S, O, feelings)),
+  changed(T, rel(S, O, feelings, Old)),
   at(T+1, rel(S, O, feelings, ambivalent)),
   name(S, Subject),
   name(O, Object).
 
 new_state_text(T, @js(Subject, "came to dislike", Object)) :-
-  changed(T, rel(S, O, feelings)),
+  changed(T, rel(S, O, feelings, Old)),
   at(T+1, rel(S, O, feelings, dislikes)),
   name(S, Subject),
   name(O, Object).
 
 new_state_text(T, @js(Subject, "came to like", Object)) :-
-  changed(T, rel(S, O, feelings)),
+  changed(T, rel(S, O, feelings, Old)),
   at(T+1, rel(S, O, feelings, likes)),
   name(S, Subject),
   name(O, Object).
 
 new_state_text(T, @js(Subject, "came to hate", Object)) :-
-  changed(T, rel(S, O, feelings)),
+  changed(T, rel(S, O, feelings, Old)),
   at(T+1, rel(S, O, feelings, hates)),
   name(S, Subject),
   name(O, Object).
 
 new_state_text(T, @js(Subject, "came to love", Object)) :-
-  changed(T, rel(S, O, feelings)),
+  changed(T, rel(S, O, feelings, Old)),
   at(T+1, rel(S, O, feelings, loves)),
+  name(S, Subject),
+  name(O, Object).
+
+new_state_text(T, @js(Subject, "repaid their debt to", Object)) :-
+  changed(T, rel(S, O, debt, Old)),
+  at(T+1, rel(S, O, debt, no_debt_to)),
+  name(S, Subject),
+  name(O, Object).
+
+new_state_text(T, @js(Subject, "owed money to", Object)) :-
+  changed(T, rel(S, O, debt, Old)),
+  at(T+1, rel(S, O, debt, owes_money_to)),
+  name(S, Subject),
+  name(O, Object).
+
+% motive text construction:
+
+#show motive_text/2.
+
+motive_text(T, @js("And then,")) :-
+  1 <= { motivated(T, destiny); unmotivated(T) },
+  time(T),
+  not beginning(T).
+
+motive_text(B, @js("In the beginning,")) :-
+  1 <= { motivated(B, destiny); unmotivated(B) },
+  beginning(B).
+
+
+motive_text(T, @js("Looking out for themself,")) :-
+  motivated(T, self_interest),
+  responsible_for(T, A),
+  name(A, Actor).
+
+motive_text(T, @js("Because", Actor, FPast, Victim)) :-
+  motivated(T, enmity),
+  responsible_for(T, A),
+  1 <= { harmful_to(T, V); causes_problem_for(T, V) },
+  at(T, rel(A, V, feelings, Feeling)),
+  past_tense(Feeling, FPast),
+  name(A, Actor),
+  name(V, Victim).
+
+motive_text(T, @js("Because", Actor, FPast, Victim)) :-
+  motivated(T, friendship),
+  responsible_for(T, A),
+  1 <= { helpful_to(T, V); solves_problem_for(T, V) },
+  at(T, rel(A, V, feelings, Feeling)),
+  past_tense(Feeling, FPast),
+  name(A, Actor),
+  name(V, Victim).
+
+motive_text(T, @js("Because", Subject, "loved", Object)) :-
+  motivated(T, love),
+  responsible_for(T, S),
+  argument(T, object, O),
+  name(S, Subject),
+  name(O, Object).
+
+motive_text(T, @js("Because", S)) :-
+  motivated(T, revenge(P)),
+  sentence(P, S).
+
+motive_text(T, @js("Because", S)) :-
+  motivated(T, gratitude(P)),
+  sentence(P, S).
+
+motive_text(T, @js("Because", Subject, "felt sorry for", Object)) :-
+  motivated(T, charity),
+  responsible_for(T, S),
+  helpful_to(T, O),
   name(S, Subject),
   name(O, Object).
