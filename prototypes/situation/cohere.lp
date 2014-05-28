@@ -24,7 +24,7 @@ error(m("Boring action (repeated immediately)", T+1, Act)) :-
   event(T, Act),
   event(T+1, Act).
 
-error(m("Boring action (too many occurances)", Act, Count)) :-
+undesirable(25, m("Boring action (too many occurances)", Act, Count)) :-
   action(Act),
   boredom_limit(L),
   Count = { event(T, Act) : time(T) },

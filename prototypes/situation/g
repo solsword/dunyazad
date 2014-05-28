@@ -3,7 +3,7 @@ seed=`head -c 2 /dev/urandom | hexdump -e '"%u"'`
 mkdir -p out
 echo $seed > out/seed
 actions="alist.lp actions.lp"
-states="states.lp"
+states="slist.lp states.lp"
 coherence="cohere.lp expectations.lp motivation.lp"
 sources="sit.lp $actions $states $coherence"
 echo "% vim"": syn=lua" > out/stats.lp

@@ -1,3 +1,24 @@
+% Shorthand for action setups.
+
+% initiates_acquaintanceship causes the subject and object to become acquainted
+causes_if(
+  Action,
+  Outcome,
+  rel(object, subject, relationship, strangers),
+  rel(object, subject, relationship, acquaintances)
+) :-
+  causes(Action, Outcome, Something),
+  initiates_acquaintanceship(Action).
+
+causes_if(
+  Action,
+  Outcome,
+  rel(subject, object, relationship, strangers),
+  rel(subject, object, relationship, acquaintances)
+) :-
+  causes(Action, Outcome, Something),
+  initiates_acquaintanceship(Action).
+
 % Action implementation.
 
 % "conditions" as states over arguments:
@@ -47,6 +68,17 @@ condition_holds(T, rel(Arg, OArg, Rel, Value)) :-
 %  argument(T, OArg, Obj),
 %  at(T+1, rel(Subj, Obj, Rel, Value)).
 
+condition_holds(T, rel_category(Arg, OArg, Rel, Category)) :-
+  argument(T, Arg, id(T1, S)),
+  argument(T, OArg, id(T2, O)),
+  at(T, rel(id(T1, S), id(T2, O), Rel, Value)),
+  category(T1, T2, Rel, Value, Category).
+%condition_holds_after(T, rel_category(Arg, OArg, Rel, Category)) :-
+%  argument(T, Arg, id(T1, S)),
+%  argument(T, OArg, id(T2, O)),
+%  at(T+1, rel(id(T1, S), id(T2, O), Rel, Value)),
+%  category(T1, T2, Rel, Value, Category).
+
 % causality (note: this is enforced below for now):
 %error(m("Violated causality.", T, Condition)) :-
 %  causes(T, Condition),
@@ -63,7 +95,7 @@ condition_holds(T, rel(Arg, OArg, Rel, Value)) :-
 % general constraints:
 
 %error(m("Nonreflexive action applied to self.", T, Act, Self)) :-
-error(m("Nonreflexive action applied to self.")) :-
+error(m("Nonreflexive action applied to self.", T)) :-
   event(T, Act),
   nonreflexive(Act),
   argument(T, subject, Self),
@@ -209,6 +241,18 @@ harmful_to(T, Subj) :-
 helpful_to(T, Subj) :-
   event(T, Act),
   helpful(Act, Arg),
+  argument(T, Arg, Subj).
+
+harmful_to(T, Subj) :-
+  event(T, Act),
+  outcome(T, Outcome),
+  harmful(Act, Outcome, Arg),
+  argument(T, Arg, Subj).
+
+helpful_to(T, Subj) :-
+  event(T, Act),
+  outcome(T, Outcome),
+  harmful(Act, Outcome, Arg),
   argument(T, Arg, Subj).
 
 % responsibility

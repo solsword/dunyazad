@@ -13,9 +13,10 @@ unmet(expectation(T, Condition)) :-
 
 % limit how many unmet expectations are allowed:
 
-error(m("Too many unmet expectations")) :-
+undesirable(10, m("Surplus unmet expectation", T, C)) :-
+  unmet(expectation(T, C)),
   unmet_expectation_limit(L),
-  L < { unmet(expectation(T, C)) : expectation(T, C) }.
+  L < { unmet(expectation(X, Y)) : expectation(X, Y) }.
 
 % we expect things will get better:
 expectation(T, status(id(Type, ID), _not(Status))) :-

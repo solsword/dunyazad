@@ -6,15 +6,24 @@ unmotivated(T) :-
   event(T, Act),
   0 = { motivated(T, Motive) }.
 
-error(m("Too many unmotivated actions.")) :-
+undesirable(10, m("Surplus unmotivated action.", T)) :-
+  unmotivated(T),
   unmotivated_action_limit(L),
-  L < { unmotivated(T) : time(T) }.
+  L < { unmotivated(X) : time(X) }.
 
 % And not too many actions should happen just because:
 
-error(m("Too many actions motivated by destiny.")) :-
+undesirable(10, m("Surplus action motivated by destiny.", T)) :-
+%error(m("Surplus action motivated by destiny.", T)) :-
+  motivated(T, destiny),
   destiny_action_limit(L),
-  L < { motivated(T, destiny) : time(T) }.
+  L < { motivated(X, destiny) : time(X) }.
+
+% Nor should such things happen one after the other:
+undesirable(20, m("Repeated action motivated by destiny.", T+1)) :-
+%error(m("Repeated action motivated by destiny.", T+1)) :-
+  motivated(T, destiny),
+  motivated(T+1, destiny).
 
 % self-interest:
 
@@ -67,7 +76,7 @@ motivated(T, friendship) :-
     at(T, rel(Friendly, Friend, feelings, loves))
   }.
 
-% random kindness to acquaintances and strangers:
+% random kindness to non-hated acquaintances and strangers:
 
 motivated(T, charity) :-
   helpful_to(T, Recipient),

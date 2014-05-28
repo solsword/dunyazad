@@ -24,18 +24,22 @@ id(chr, 1..3).
 % Timesteps:
 
 time(1..10).
-unmotivated_action_limit(4).
-destiny_action_limit(7).
-unmet_expectation_limit(3).
-boredom_limit(5).
+unmotivated_action_limit(3).
+destiny_action_limit(4).
+unmet_expectation_limit(1).
+boredom_limit(2).
 
 %event(1, fall_ill).
 %event(1, rob).
+%argument(1, subject, id(chr, 1)).
+%argument(1, object, id(chr, 2)).
+%at(1,rel(id(chr,1),id(chr,2),relationship,strangers)).
+%at(1,rel(id(chr,2),id(chr,1),relationship,strangers)).
 %event(2, rob).
 %event(3, rob).
 
 beginning(1).
-ending(8).
+ending(10).
 
 % Events, outcomes, and arguments:
 
@@ -55,10 +59,9 @@ ending(8).
   event(T, Act),
   arg(Act, Arg, Type).
 
-% Mimimize errors:
+% Disallow errors and minimize undesireable stuff:
 
-#minimize { 1@0,error(Message) : error(Message) }.
+:- error(Message).
+%#minimize { 1@0,error(Message) : error(Message) }.
 
-%:- error(Message).
-
-% Put #const debug=0/1 and use it as an extra prerequisite for errors
+#minimize { X@1,undesirable(X, Message) : undesirable(X, Message) }.

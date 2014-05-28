@@ -19,18 +19,7 @@ arg(buy_medicine_for, subject, chr).
 arg(buy_medicine_for, object, chr).
 causes(buy_medicine_for, success, status(object, _not(sick))).
 causes(buy_medicine_for, success, state_decrease(subject, wealth)).
-causes_if(
-  buy_medicine_for,
-  success,
-  rel(subject, object, relationship, strangers),
-  rel(subject, object, relationship, acquaintances)
-).
-causes_if(
-  buy_medicine_for,
-  success,
-  rel(object, subject, relationship, strangers),
-  rel(object, subject, relationship, acquaintances)
-).
+initiates_acquaintanceship(buy_medicine_for).
 causes_maybe(
   buy_medicine_for,
   success,
@@ -51,18 +40,7 @@ action(treat_injury).
 arg(treat_injury, subject, chr).
 arg(treat_injury, object, chr).
 causes(treat_injury, success, status(object, _not(injured))).
-causes_if(
-  treat_injury,
-  success,
-  rel(subject, object, relationship, strangers),
-  rel(subject, object, relationship, acquaintances)
-).
-causes_if(
-  treat_injury,
-  success,
-  rel(object, subject, relationship, strangers),
-  rel(object, subject, relationship, acquaintances)
-).
+initiates_acquaintanceship(treat_injury).
 causes_maybe(
   treat_injury,
   success,
@@ -72,6 +50,14 @@ precondition(treat_injury, status(object, injured)).
 helpful(treat_injury, object).
 responsible(treat_injury, subject).
 nonreflexive(treat_injury).
+
+action(gamble).
+arg(gamble, subject, chr).
+causes(gamble, success, state_increase(subject, wealth)).
+causes(gamble, failure, state_decrease(subject, wealth)).
+responsible(gamble, subject).
+helpful(gamble, success, subject).
+harmful(gamble, failure, subject).
 
 action(borrow_money_from).
 arg(borrow_money_from, subject, chr).
@@ -116,24 +102,16 @@ arg(rob, object, chr).
 causes(rob, success, state_increase(subject, wealth)).
 causes(rob, success, state_decrease(object, wealth)).
 causes(rob, success, rel(object, subject, feelings, hates)).
-causes_if(
-  rob,
-  success,
-  rel(subject, object, relationship, strangers),
-  rel(subject, object, relationship, acquaintances)
-).
-causes_if(
-  rob,
-  success,
-  rel(object, subject, relationship, strangers),
-  rel(object, subject, relationship, acquaintances)
-).
+initiates_acquaintanceship(rob).
+precondition(rob, rel_category(subject, object, feelings, negative)).
+precondition_or(rob, rel(subject, object, feelings, hates)).
 precondition_not(rob, state(subject, wealth, has_wealth)).
 precondition_not(rob, state(object, wealth, penniless)).
 helpful(rob, subject).
 harmful(rob, object).
 responsible(rob, subject).
 nonreflexive(rob).
+immoral(rob).
 
 action(meet).
 arg(meet, subject, chr).
@@ -155,8 +133,7 @@ arg(fall_for, object, chr).
 causes(fall_for, success, rel(subject, object, feelings, loves)).
 causes(fall_for, success, status(subject, _not(heartbroken))).
 precondition_not(fall_for, rel(subject, object, feelings, loves)).
-precondition_not(fall_for, rel(subject, object, feelings, dislikes)).
-precondition_not(fall_for, rel(subject, object, feelings, hates)).
+precondition_not(fall_for, rel_category(subject, object, feelings, negative)).
 precondition_not(fall_for, rel(subject, object, relationship, strangers)).
 responsible(fall_for, fate).
 nonreflexive(fall_for).
@@ -177,9 +154,15 @@ causes_maybe_ifnot(
 ).
 precondition_not(confess_to, rel(subject, object, relationship, lovers)).
 precondition(confess_to, rel(subject, object, feelings, loves)).
-precondition_not(confess_to, success, rel(object, subject, feelings, hates)).
-precondition_not(confess_to, success, rel(object, subject, feelings, dislikes)).
-precondition_not(confess_to, failure, rel(object, subject, feelings, likes)).
-precondition_not(confess_to, failure, rel(object, subject, feelings, loves)).
+precondition_not(
+  confess_to,
+  success,
+  rel_category(object, subject, feelings, negative)
+).
+precondition_not(
+  confess_to,
+  failure,
+  rel_category(object, subject, feelings, positive)
+).
 responsible(confess_to, subject).
 nonreflexive(confess_to).
