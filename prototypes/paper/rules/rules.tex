@@ -1,0 +1,112 @@
+\documentclass[12pt]{article}
+\usepackage{tgschola}
+\usepackage{booktabs}
+\title{Common Sense}
+\date{}
+\begin{document}
+\maketitle
+
+\section{Gameplay}
+%
+Gameplay consists of building a story, which may or may not make sense.
+%
+Points are scored by creating scenes and by fixing errors.
+%
+Play takes place over four cycles which each have two phases: the bidding phase, where players bid on their cards for that round, and the play phase, where players take turns scoring points and editing the story.
+%
+%
+\section{The Bidding Phase}
+%
+The bidding phase is split into four rounds.
+%
+Each round begins by drawing N+2 cards from the goals deck, where N is the number of players.
+%
+These are placed face-up where all players can see them.
+%
+Next, each player secretly records a bid (a number between 3 and 6 inclusive) and a rank for each card on the table.
+%
+Finally, all players reveal their bids one-at-a-time, starting from their bid for their highest-ranked card.
+%
+After each set of bids is revealed, if any player has a uniquely lowest bid for a card, that player takes that card and withdraws from the bidding process.
+%
+If two or more players are tied in the bidding process, neither gets that card.
+%
+Once bids for the rank-1 cards have been revealed, discard those bids, and any remaining players reveal their rank-2 bids.
+%
+This process continues until either all players have won a card or until all bids have been revealed.
+%
+If there are any players who have not won a card after all bids have been revealed, shuffle the remaining cards and deal one to each remaining player.
+
+
+When a player wins a card, they write their winning bid in the value slot for that card.
+%
+This will be the card's value during the coming play phase.
+%
+Players who do not win any cards and are forced to take a random card should record their card's value as 3.
+%
+Once each player has a card, the next round of bidding begins.
+%
+Once all four rounds of the bidding phase are over, each player should have a hand of four cards.
+
+\section{The Play Phase}
+
+Using their hands constructed during the bidding phase, players take turns playing cards in the play phase.
+%
+The play phase, like the bidding phase, has four identical rounds.
+%
+Starting with the player with the most letters in their name, play proceeds clockwise. 
+%
+During a player's turn, that player may play a single card from their hand, earning points equal to its value (decided during the bidding phase).
+%
+Each card may only be played if its story conditions are met, which sometimes requires judgement by the referee (for example, as to whether an action is "unmotivated;" cards that require judgement will say so explicitly).
+%
+Once a card is played, the player should follow the instructions on that card to modify the story.
+%
+If a player wants to, instead of playing a card from their hand, they may draw two cards at random from the goals deck and add one to their hand (shuffle the other back into the goals deck).
+%
+Cards drawn in this way have a value of 4.
+
+
+If a player has enough points, they can make an extra story modification at the beginning of their turn.
+%
+This does not cost points, but it requires a certain number of points to make certain modifications.
+%
+A player's start-of-turn modification may be used to satisfy a condition of the card that they play that turn.
+%
+Start-of-turn modifications can be made even if a player decides to draw a card instead of playing one in a given turn.
+%
+The start-of-turn modifications are unlocked as follows (only points gained during the current cycle count):
+
+\vspace{1em}
+\begin{tabular}{r|p{5in}}
+points & modification \\
+\midrule
+3 & Add a story action at the beginning or end of the story. Its preconditions must be fulfilled, and any consequences it has must not violate the preconditions of actions that come after it. \\
+4 & Add a story action anywhere in the story. Its preconditions must be fulfilled, and any consequences it has must not violate the preconditions of actions that come after it. \\
+6 & Swap the order of two story actions. \\
+7 & Add a story action at the end or beginning of the story, without regards to preconditions or consequences. \\
+9 & Add a story action anywhere withing the story, without regards to preconditions or consequences. \\
+\end{tabular}
+\vspace{0.3em}
+
+Once a player has played their card for the turn or drawn a card, play passes to the next player.
+%
+Once all players have taken their turns, the round ends and the next play round begins.
+%
+When all four play rounds are complete, players discard their remaining cards and tally their points to add to their total score.
+%
+At this point, a cycle has been completed, and the next cycle starts with a new bidding phase.
+%
+Once four such cycles have been completed, the game is over, and the player with the most points is the winner.
+%
+Traditionally, that player becomes the judge for the next game.
+
+\section{The Judge}
+
+Stories are not easily captured by logical rules.
+%
+For this reason, many cards in the game mention common sense judgements like whether an action is motivated or even just whether the story is coherent.
+%
+In these cases, the judge should decide whether the required property holds or not, based on arguments given by two players: the current player, who gives an initial argument, and the player to that player's left, who provides a rebuttal.
+
+\end{document}
