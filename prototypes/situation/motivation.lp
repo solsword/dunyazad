@@ -56,8 +56,8 @@ motivated(T, revenge(X)) :-
 
 motivated(T, gratitude(X)) :-
   X < T,
-  helpful_to(X, Beneficiary),
-  helpful_to(T, Benificent),
+  1 = { helpful_to(X, Beneficiary); solves_problem_for(X, Beneficiary) },
+  1 = { helpful_to(T, Benificent); solves_problem_for(T, Benificent) },
   responsible_for(X, Benificent),
   responsible_for(T, Beneficiary),
   Benificent != Beneficiary.
@@ -72,13 +72,15 @@ motivated(T, destiny) :-
 % positive and negative relationships:
 
 motivated(T, enmity) :-
-  1 <= { harmful_to(T, Victim); causes_problem_for(T, Victim) },
+  harmful_to(T, Victim),
   responsible_for(T, Vindictive),
   at(T, rel(Vindictive, Victim, feelings, hates)).
 
 motivated(T, friendship) :-
-  1 <= { helpful_to(T, Friend); solves_problem_for(T, Friend) },
   responsible_for(T, Friendly),
+  character(Friend),
+  Friend != Friendly,
+  1 <= { helpful_to(T, Friend); solves_problem_for(T, Friend) },
   1 <= {
     at(T, rel(Friendly, Friend, feelings, likes));
     at(T, rel(Friendly, Friend, feelings, loves))
@@ -89,6 +91,7 @@ motivated(T, friendship) :-
 motivated(T, charity) :-
   responsible_for(T, Charitable),
   solves_problem_for(T, Recipient),
+  not causes_problem_for(T, Charitable), % nobody is super-generous
   1 <= {
     at(T, rel(Charitable, Recipient, relationship, strangers));
     at(T, rel(Charitable, Recipient, relationship, acquaintances))

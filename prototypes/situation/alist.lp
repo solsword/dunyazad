@@ -6,6 +6,7 @@ causes(fall_ill, success, status(subject, sick)).
 precondition_not(fall_ill, status(subject, sick)).
 harmful(fall_ill, subject).
 responsible(fall_ill, fate).
+portrayal(fall_ill, subject, sympathetic).
 
 action(recover).
 arg(recover, subject, chr).
@@ -28,6 +29,7 @@ causes_maybe(
 precondition(buy_medicine_for, status(object, sick)).
 helpful(buy_medicine_for, object).
 responsible(buy_medicine_for, subject).
+portrayal(fall_ill, subject, good).
 
 action(accident).
 arg(accident, subject, chr).
@@ -35,6 +37,7 @@ causes(accident, success, status(subject, injured)).
 precondition_not(accident, status(subject, injured)).
 harmful(accident, subject).
 responsible(accident, fate).
+portrayal(accident, subject, sympathetic).
 
 action(treat_injury).
 arg(treat_injury, subject, chr).
@@ -50,12 +53,19 @@ precondition(treat_injury, status(object, injured)).
 helpful(treat_injury, object).
 responsible(treat_injury, subject).
 nonreflexive(treat_injury).
+portrayal(treat_injury, subject, good).
 
 action(gamble).
 arg(gamble, subject, chr).
 causes(gamble, success, state_increase(subject, wealth)).
 causes(gamble, failure, state_decrease(subject, wealth)).
 responsible(gamble, subject).
+portrayal(gamble, subject, reckless).
+
+action(inherit).
+arg(inherit, subject, chr).
+causes(inherit, success, state(subject, wealth, super_rich)).
+responsible(inherit, subject).
 
 action(borrow_money_from).
 arg(borrow_money_from, subject, chr).
@@ -63,8 +73,19 @@ arg(borrow_money_from, object, chr).
 causes(borrow_money_from, success, state_increase(subject, wealth)).
 causes(borrow_money_from, success, state_decrease(object, wealth)).
 causes(borrow_money_from, success, rel(subject, object, debt, owes_money_to)).
+causes(
+  borrow_money_from,
+  failure,
+  rel_decrease(subject, object, feelings)
+).
+causes_maybe(
+  borrow_money_from,
+  failure,
+  rel_decrease(object, subject, feelings)
+).
 precondition_not(borrow_money_from, rel(subject,object,relationship,strangers)).
 precondition_not(borrow_money_from, state(subject, wealth, has_wealth)).
+precondition_not(borrow_money_from, state(subject, wealth, super_rich)).
 precondition_not(borrow_money_from, state(object, wealth, penniless)).
 precondition_not(borrow_money_from, rel(subject, object, debt, owes_money_to)).
 responsible(borrow_money_from, subject).
@@ -81,6 +102,7 @@ precondition_not(repay_loan, state(subject, wealth, penniless)).
 precondition_not(repay_loan, state(object, wealth, has_wealth)).
 responsible(repay_loan, subject).
 nonreflexive(repay_loan).
+portrayal(repay_loan, subject, good).
 
 action(give_wealth).
 arg(give_wealth, subject, chr).
@@ -93,33 +115,55 @@ precondition_not(give_wealth, state(object, wealth, has_wealth)).
 helpful(give_wealth, object).
 responsible(give_wealth, subject).
 nonreflexive(give_wealth).
+portrayal(give_wealth, subject, good).
 
-action(rob).
-arg(rob, subject, chr).
-arg(rob, object, chr).
-causes(rob, success, state_increase(subject, wealth)).
-causes(rob, success, state_decrease(object, wealth)).
-causes(rob, success, rel(object, subject, feelings, hates)).
-initiates_acquaintanceship(rob).
-precondition(rob, rel_category(subject, object, feelings, negative)).
-precondition_or(rob, rel(subject, object, feelings, hates)).
-precondition_not(rob, state(subject, wealth, has_wealth)).
-precondition_not(rob, state(object, wealth, penniless)).
-helpful(rob, subject).
-harmful(rob, object).
-responsible(rob, subject).
-nonreflexive(rob).
-immoral(rob).
+action(steal_from).
+arg(steal_from, subject, chr).
+arg(steal_from, object, chr).
+causes(steal_from, success, state_increase(subject, wealth)).
+causes(steal_from, success, state_decrease(object, wealth)).
+causes(steal_from, success, rel(object, subject, feelings, hates)).
+initiates_acquaintanceship(steal_from).
+precondition(steal_from, rel_category(subject, object, feelings, negative)).
+precondition_or(steal_from, rel(subject, object, feelings, hates)).
+precondition_not(steal_from, state(subject, wealth, has_wealth)).
+precondition_not(steal_from, state(object, wealth, penniless)).
+helpful(steal_from, subject).
+harmful(steal_from, object).
+responsible(steal_from, subject).
+nonreflexive(steal_from).
+portrayal(steal_from, subject, bad).
+portrayal(steal_from, object, sympathetic).
 
 action(meet).
 arg(meet, subject, chr).
 arg(meet, object, chr).
 causes(meet, success, rel(subject, object, relationship, acquaintances)).
 causes(meet, success, rel(object, subject, relationship, acquaintances)).
-causes_maybe(meet, success, rel(subject, object, feelings, likes)).
-causes_maybe(meet, success, rel(subject, object, feelings, dislikes)).
-causes_maybe(meet, success, rel(object, subject, feelings, likes)).
-causes_maybe(meet, success, rel(object, subject, feelings, dislikes)).
+causes_maybe_if(
+  meet,
+  success,
+  rel(subject, object, feelings, ambivalent),
+  rel(subject, object, feelings, likes)
+).
+causes_maybe_if(
+  meet,
+  success,
+  rel(subject, object, feelings, ambivalent),
+  rel(subject, object, feelings, dislikes)
+).
+causes_maybe_if(
+  meet,
+  success,
+  rel(object, subject, feelings, ambivalent),
+  rel(object, subject, feelings, likes)
+).
+causes_maybe_if(
+  meet,
+  success,
+  rel(object, subject, feelings, ambivalent),
+  rel(object, subject, feelings, dislikes)
+).
 precondition(meet, rel(subject, object, relationship, strangers)).
 precondition(meet, rel(object, subject, relationship, strangers)).
 responsible(meet, fate).
@@ -135,6 +179,7 @@ precondition_not(fall_for, rel_category(subject, object, feelings, negative)).
 precondition_not(fall_for, rel(subject, object, relationship, strangers)).
 responsible(fall_for, fate).
 nonreflexive(fall_for).
+portrayal(fall_for, subject, sympathetic).
 
 action(confess_to).
 arg(confess_to, subject, chr).
@@ -164,3 +209,16 @@ precondition_not(
 ).
 responsible(confess_to, subject).
 nonreflexive(confess_to).
+portrayal(confess_to, failure, subject, sympathetic).
+
+action(poison).
+arg(poison, subject, chr).
+arg(poison, object, chr).
+causes(poison, success, status(object, sick)).
+precondition(poison, rel(subject, object, feelings, hates)).
+precondition_not(poison, status(object, sick)).
+harmful(poison, object).
+responsible(poison, subject).
+nonreflexive(poison).
+portrayal(poison, subject, bad).
+portrayal(poison, object, sympathetic).

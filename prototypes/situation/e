@@ -3,6 +3,7 @@
 echo "% vim"": syn=gringo" > out/story.lp
 clingo --verbose=0 --quiet=1,1 out/events.lp eng.lp englists.lp |\
   head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" | \
+  sed "s/initial_description(/story(0, initial, /" |\
   sed "s/motive_text(\\([0-9]\\+\\),/story(\1, a, motive, /" |\
   sed "s/sentence(\\([0-9]\\+\\),/story(\1, b, event,     /" |\
   sed "s/new_state_text(\\([0-9]\\+\\),/story(\1, c, state,         /" |\

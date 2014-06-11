@@ -26,12 +26,14 @@ verb_for(buy_medicine_for, "bought medicine for").
 verb_for(accident, "had an accident").
 verb_for(treat_injury, "treated").
 verb_for(gamble, "gambled").
-verb_for(rob, "robbed").
+verb_for(inherit, "inherited wealth").
+verb_for(steal_from, "stole from").
 verb_for(fall_for, "fell for").
 verb_for(confess_to, "confessed to").
-verb_for(borrow_money_from, "borrowed money from").
+verb_for(borrow_money_from, "asked for a loan from").
 verb_for(repay_loan, "repayed a loan from").
 verb_for(give_wealth, "gave money to").
+verb_for(poison, "poisoned").
 
 % tenses:
 past_tense(ambivalent, "felt ambivalent towards").

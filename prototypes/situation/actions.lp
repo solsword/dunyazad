@@ -79,6 +79,32 @@ condition_holds_after(T, rel_category(Arg, OArg, Rel, Category)) :-
   at(T+1, rel(id(T1, S), id(T2, O), Rel, Value)),
   category(T1, T2, Rel, Value, Category).
 
+condition_holds(T, rel_increase(SArg, OArg, Rel)) :-
+  argument(T, SArg, Subj),
+  argument(T, OArg, Obj),
+  at(T-1, rel(Subj, Obj, Rel, PVal)),
+  at(T, rel(Subj, Obj, Rel, NVal)),
+  next_higher(Rel, PVal, NVal).
+condition_holds_after(T, rel_increase(SArg, OArg, Rel)) :-
+  argument(T, SArg, Subj),
+  argument(T, OArg, Obj),
+  at(T, rel(Subj, Obj, Rel, PVal)),
+  at(T+1, rel(Subj, Obj, Rel, NVal)),
+  next_higher(Rel, PVal, NVal).
+
+condition_holds(T, rel_decrease(SArg, OArg, Rel)) :-
+  argument(T, SArg, Subj),
+  argument(T, OArg, Obj),
+  at(T-1, rel(Subj, Obj, Rel, PVal)),
+  at(T, rel(Subj, Obj, Rel, NVal)),
+  next_lower(Rel, PVal, NVal).
+condition_holds_after(T, rel_decrease(SArg, OArg, Rel)) :-
+  argument(T, SArg, Subj),
+  argument(T, OArg, Obj),
+  at(T, rel(Subj, Obj, Rel, PVal)),
+  at(T+1, rel(Subj, Obj, Rel, NVal)),
+  next_lower(Rel, PVal, NVal).
+
 % causality (note: this is enforced below for now):
 error(m("Violated causality.", T, Condition)) :-
   causes(T, Condition),
@@ -133,7 +159,7 @@ error(
   event(T, Act),
   outcome(T, Outcome),
   precondition_not(Act, Outcome, Condition),
-  not condition_holds(T, Condition).
+  condition_holds(T, Condition).
 
 % statuses:
 
@@ -201,6 +227,22 @@ caused_by_something(changed(T, rel(From, To, Rel, Value))) :-
 %  argument(T, Arg, From),
 %  argument(T, OArg, To).
 
+caused_by_something(changed(T, rel(Subj, Obj, Rel, Current))) :-
+  causes(T, rel_increase(SArg, OArg, Rel)),
+  argument(T, SArg, Subj),
+  argument(T, OArg, Obj),
+  at(T, rel(Subj, Obj, Rel, Current)),
+  at(T+1, rel(Subj, Obj, Rel, Above)),
+  next_higher(Rel, Current, Above).
+
+caused_by_something(changed(T, rel(Subj, Obj, Rel, Current))) :-
+  causes(T, rel_decrease(SArg, OArg, Rel)),
+  argument(T, SArg, Subj),
+  argument(T, OArg, Obj),
+  at(T, rel(Subj, Obj, Rel, Current)),
+  at(T+1, rel(Subj, Obj, Rel, Below)),
+  next_lower(Rel, Current, Below).
+
 % conditional causality
 
 % unconditional:
@@ -212,25 +254,30 @@ causes(T, Result) :-
 % conditional:
 causes(T, Result) :-
   event(T, Act),
+  outcome(T, Outcome),
   condition_holds(T, Condition),
   causes_if(Act, Outcome, Condition, Result).
 causes(T, Result) :-
   event(T, Act),
+  outcome(T, Outcome),
   not condition_holds(T, Condition),
   causes_ifnot(Act, Outcome, Condition, Result).
 
 % nondeterministic:
 0 <= { causes(T, Result) } <= 1 :-
   event(T, Act),
+  outcome(T, Outcome),
   causes_maybe(Act, Outcome, Result).
 
 % conditional nondeterministic:
 0 <= { causes(T, Result) } <= 1 :-
   event(T, Act),
+  outcome(T, Outcome),
   condition_holds(T, Condition),
   causes_maybe_if(Act, Outcome, Condition, Result).
 0 <= { causes(T, Result) } <= 1 :-
   event(T, Act),
+  outcome(T, Outcome),
   not condition_holds(T, Condition),
   causes_maybe_ifnot(Act, Outcome, Condition, Result).
 
@@ -256,6 +303,24 @@ helpful_to(T, Subj) :-
   outcome(T, Outcome),
   harmful(Act, Outcome, Arg),
   argument(T, Arg, Subj).
+
+% problems
+
+has_problem(T, id(Type, O)) :-
+  at(T, status(id(Type, O), Status)),
+  negative(Type, Status).
+
+has_problem(T, id(Type, O)) :-
+  at(T, status(id(Type, O), _not(Status))),
+  negative(Type, _not(Status)).
+
+has_problem(T, id(Type, O)) :-
+  at(T, state(id(Type, O), State, Value)),
+  negative(Type, State, Value).
+
+has_problem(T, id(T1, S)) :-
+  at(T, rel(id(T1, S), id(T2, O), State, Value)),
+  negative(T1, T2, Rel, Value).
 
 % solving/creating problems
 causes_problem_for(T, id(Type, O)) :-

@@ -4,8 +4,32 @@
 def join(*args):
   return ''.join(str(a) for a in args)
 def js(*args):
-  return ' '.join(str(a) for a in args)
+  return ' '.join(str(a).replace('_', ' ') for a in args if a)
 #end.
+
+% initial state description:
+
+#show initial_description/1.
+
+initial_description(@js(Name, "was", Value)) :-
+  at(1, state(Subj, State, Value)),
+  name(Subj, Name),
+  outstanding(Typ, State, Value).
+
+initial_description(@js(SName, "and", OName, "were", Value)) :-
+  at(1, rel(Subj, Obj, relationship, Value)),
+  Subj < Obj,
+  name(Subj, SName),
+  name(Obj, OName),
+  outstanding(T1, T2, relationship, Value).
+
+initial_description(@js(SName, "and", OName, "had", Rel, Value)) :-
+  at(1, rel(Subj, Obj, Rel, Value)),
+  Subj < Obj,
+  name(Subj, SName),
+  name(Obj, OName),
+  outstanding(T1, T2, Rel, Value),
+  Rel != relationship.
 
 % sentence construction:
 
@@ -55,8 +79,19 @@ new_state_text(T, @js(@join(Subject, "'s"), State, "became", New)) :-
   name(S, Subject),
   State != wealth.
 
+new_state_text(T, @js(Subject, "became super-rich")) :-
+  changed(T, state(S, wealth, Old)),
+  at(T+1, state(S, wealth, super_rich)),
+  name(S, Subject).
+
 new_state_text(T, @js(Subject, "became wealthy")) :-
   changed(T, state(S, wealth, Old)),
+  at(T+1, state(S, wealth, has_wealth)),
+  name(S, Subject),
+  Old != super_rich.
+
+new_state_text(T, @js(Subject, "became merely wealthy")) :-
+  changed(T, state(S, wealth, super_rich)),
   at(T+1, state(S, wealth, has_wealth)),
   name(S, Subject).
 
@@ -65,8 +100,18 @@ new_state_text(T, @js(Subject, "became penniless")) :-
   at(T+1, state(S, wealth, needs_money)),
   name(S, Subject).
 
-new_state_text(T, @js(Subject, "was financially stable again")) :-
-  changed(T, state(S, wealth, Old)),
+new_state_text(T, @js(Subject, "was no longer penniless")) :-
+  changed(T, state(S, wealth, needs_money)),
+  at(T+1, state(S, wealth, normal)),
+  name(S, Subject).
+
+new_state_text(T, @js(Subject, "was no longer wealthy")) :-
+  changed(T, state(S, wealth, has_wealth)),
+  at(T+1, state(S, wealth, normal)),
+  name(S, Subject).
+
+new_state_text(T, @js(Subject, "was no longer super-rich")) :-
+  changed(T, state(S, wealth, super_rich)),
   at(T+1, state(S, wealth, normal)),
   name(S, Subject).
 
@@ -148,6 +193,7 @@ motive_text(T, @js("Because", Actor, FPast, Victim)) :-
   name(A, Actor),
   name(V, Victim).
 
+% TODO: is this broken?!?
 motive_text(T, @js("Because", Actor, FPast, Victim)) :-
   motivated(T, friendship),
   responsible_for(T, A),
