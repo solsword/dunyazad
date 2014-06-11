@@ -26,16 +26,16 @@
      inkscape:pageshadow="2"
      inkscape:zoom="0.70710678"
      inkscape:cx="273.43058"
-     inkscape:cy="379.38956"
+     inkscape:cy="492.52665"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
-     showgrid="true"
+     showgrid="false"
      inkscape:object-nodes="true"
-     inkscape:window-width="1026"
-     inkscape:window-height="680"
+     inkscape:window-width="1920"
+     inkscape:window-height="1014"
      inkscape:window-x="0"
-     inkscape:window-y="360"
-     inkscape:window-maximized="0">
+     inkscape:window-y="27"
+     inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
        id="grid2985"
@@ -55,7 +55,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -123,7 +123,7 @@
            sodipodi:cy="135"
            sodipodi:rx="22.5"
            sodipodi:ry="22.5"
-           d="m 675,135 a 22.5,22.5 0 1 1 -45,0 22.5,22.5 0 1 1 45,0 z"
+           d="m 675,135 c 0,12.42641 -10.07359,22.5 -22.5,22.5 -12.42641,0 -22.5,-10.07359 -22.5,-22.5 0,-12.42641 10.07359,-22.5 22.5,-22.5 12.42641,0 22.5,10.07359 22.5,22.5 z"
            transform="translate(0,62.362183)" />
         <text
            xml:space="preserve"
@@ -207,7 +207,7 @@
            sodipodi:cy="135"
            sodipodi:rx="22.5"
            sodipodi:ry="22.5"
-           d="m 675,135 a 22.5,22.5 0 1 1 -45,0 22.5,22.5 0 1 1 45,0 z"
+           d="m 675,135 c 0,12.42641 -10.07359,22.5 -22.5,22.5 -12.42641,0 -22.5,-10.07359 -22.5,-22.5 0,-12.42641 10.07359,-22.5 22.5,-22.5 12.42641,0 22.5,10.07359 22.5,22.5 z"
            transform="translate(0,62.362183)" />
         <text
            xml:space="preserve"
@@ -244,7 +244,7 @@
            sodipodi:cy="135"
            sodipodi:rx="22.5"
            sodipodi:ry="22.5"
-           d="m 675,135 a 22.5,22.5 0 1 1 -45,0 22.5,22.5 0 1 1 45,0 z"
+           d="m 675,135 c 0,12.42641 -10.07359,22.5 -22.5,22.5 -12.42641,0 -22.5,-10.07359 -22.5,-22.5 0,-12.42641 10.07359,-22.5 22.5,-22.5 12.42641,0 22.5,10.07359 22.5,22.5 z"
            transform="translate(0,62.362183)" />
         <text
            xml:space="preserve"
@@ -281,7 +281,7 @@
            sodipodi:cy="135"
            sodipodi:rx="22.5"
            sodipodi:ry="22.5"
-           d="m 675,135 a 22.5,22.5 0 1 1 -45,0 22.5,22.5 0 1 1 45,0 z"
+           d="m 675,135 c 0,12.42641 -10.07359,22.5 -22.5,22.5 -12.42641,0 -22.5,-10.07359 -22.5,-22.5 0,-12.42641 10.07359,-22.5 22.5,-22.5 12.42641,0 22.5,10.07359 22.5,22.5 z"
            transform="translate(0,62.362183)" />
         <text
            xml:space="preserve"

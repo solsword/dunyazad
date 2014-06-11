@@ -14,7 +14,16 @@ Points are scored by creating scenes and by fixing errors.
 %
 Play takes place over four cycles which each have two phases: the bidding phase, where players bid on their cards for that round, and the play phase, where players take turns scoring points and editing the story.
 %
+
+\section{Setup}
 %
+At the start of the game, one player is selected as the judge.
+%
+The judge sets up an initial story state by adding actions and their consequent states to the timeline.
+%
+This may be but does not have to be a complete and consistent story.
+%
+
 \section{The Bidding Phase}
 %
 The bidding phase is split into four rounds.
@@ -23,7 +32,7 @@ Each round begins by drawing N+2 cards from the goals deck, where N is the numbe
 %
 These are placed face-up where all players can see them.
 %
-Next, each player secretly records a bid (a number between 3 and 6 inclusive) and a rank for each card on the table.
+Next, each player secretly records a bid (a number between 1 and 6 inclusive) and a rank for each card on the table.
 %
 Finally, all players reveal their bids one-at-a-time, starting from their bid for their highest-ranked card.
 %
@@ -108,5 +117,11 @@ Stories are not easily captured by logical rules.
 For this reason, many cards in the game mention common sense judgements like whether an action is motivated or even just whether the story is coherent.
 %
 In these cases, the judge should decide whether the required property holds or not, based on arguments given by two players: the current player, who gives an initial argument, and the player to that player's left, who provides a rebuttal.
+
+\section{Keywords}
+
+\begin{itemize}
+  \item \textbf{consistent} -- A \textbf{consistent} action is an action whose preconditions are fulfilled and whose consequences don't violate the preconditions of any later action. Any action which doesn't meet these criteria is \textbf{inconsistent}.
+\end{itemize}
 
 \end{document}

@@ -7,6 +7,7 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    width="765"
@@ -25,8 +26,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="641.80737"
-     inkscape:cy="485.89361"
+     inkscape:cx="560.69251"
+     inkscape:cy="512.29252"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="true"
@@ -36,7 +37,9 @@
      inkscape:window-x="0"
      inkscape:window-y="27"
      inkscape:window-maximized="1"
-     units="in">
+     units="in"
+     inkscape:snap-grids="true"
+     inkscape:snap-to-guides="true">
     <inkscape:grid
        type="xygrid"
        id="grid2985"
@@ -65,588 +68,700 @@
      inkscape:groupmode="layer"
      id="layer1"
      transform="translate(0,-62.362)">
-    <g
-       id="g4626"
-       transform="translate(67.499996,-180)">
-      <rect
-         transform="matrix(0,-1,1,0,0,0)"
-         y="45.000004"
-         x="-467.362"
-         height="135"
-         width="135"
-         id="rect3855"
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      <g
-         transform="matrix(0,-1,1,0,-84.86218,1052.362)"
-         id="g3909">
-        <path
-           sodipodi:type="arc"
-           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-           id="path3903"
-           sodipodi:cx="652.5"
-           sodipodi:cy="135"
-           sodipodi:rx="22.5"
-           sodipodi:ry="22.5"
-           d="m 675,135 c 0,12.42641 -10.07359,22.5 -22.5,22.5 -12.42641,0 -22.5,-10.07359 -22.5,-22.5 0,-12.42641 10.07359,-22.5 22.5,-22.5 12.42641,0 22.5,10.07359 22.5,22.5 z"
-           transform="translate(0,62.362183)" />
-        <text
-           xml:space="preserve"
-           style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-           x="184.34819"
-           y="-641.25201"
-           id="text3905"
-           sodipodi:linespacing="125%"
-           transform="matrix(0,1,-1,0,0,0)"><tspan
-             sodipodi:role="line"
-             id="tspan3907"
-             x="184.34819"
-             y="-641.25201">A</tspan></text>
-      </g>
-    </g>
-    <g
-       id="g4530"
-       transform="translate(-180,224.99982)">
-      <rect
-         transform="matrix(0,-1,1,0,0,0)"
-         y="225"
-         x="-242.36218"
-         height="135"
-         width="135"
-         id="rect3855-6-5"
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      <g
-         id="g4525">
-        <rect
-           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-           id="rect4127-7"
-           width="45"
-           height="45"
-           x="-352.97498"
-           y="60.682499"
-           transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,0,0)" />
-        <text
-           xml:space="preserve"
-           style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-           x="280.314"
-           y="188.5062"
-           id="text4129-5"
-           sodipodi:linespacing="125%"><tspan
-             sodipodi:role="line"
-             id="tspan4131-6"
-             x="280.314"
-             y="188.5062">P</tspan></text>
-      </g>
-    </g>
-    <text
-       xml:space="preserve"
-       style="font-size:18px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-       x="280.96124"
-       y="382.98599"
-       id="text3905-5"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan3907-5"
-         x="280.96124"
-         y="382.98599" /></text>
     <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3855-6-5-8"
-       width="135"
-       height="135"
-       x="-804.862"
-       y="45"
-       transform="matrix(0,-1,1,0,0,0)" />
-    <text
-       xml:space="preserve"
-       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-       x="100.314"
-       y="751.00604"
-       id="text4129-5-7"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan4131-6-4"
-         x="100.314"
-         y="751.00604">C</tspan></text>
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7943"
+       width="225"
+       height="270"
+       x="22.5"
+       y="84.862" />
     <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:16;stroke-opacity:1;stroke-dasharray:none"
-       id="rect4127-3"
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7945"
        width="45"
        height="45"
-       x="-759.862"
-       y="90"
-       transform="matrix(0,-1,1,0,0,0)"
-       ry="9.8994951" />
-    <g
-       id="g4530-8"
-       transform="translate(-22.5,224.99982)">
-      <rect
-         transform="matrix(0,-1,1,0,0,0)"
-         y="225"
-         x="-242.36218"
-         height="135"
-         width="135"
-         id="rect3855-6-5-9"
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      <g
-         id="g4525-8">
-        <rect
-           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-           id="rect4127-7-6"
-           width="45"
-           height="45"
-           x="-352.97498"
-           y="60.682499"
-           transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,0,0)" />
-        <text
-           xml:space="preserve"
-           style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-           x="280.314"
-           y="188.5062"
-           id="text4129-5-8"
-           sodipodi:linespacing="125%"><tspan
-             sodipodi:role="line"
-             id="tspan4131-6-6"
-             x="280.314"
-             y="188.5062">P</tspan></text>
-      </g>
-    </g>
-    <g
-       id="g4530-6"
-       transform="translate(-180,382.49981)">
-      <rect
-         transform="matrix(0,-1,1,0,0,0)"
-         y="225"
-         x="-242.36218"
-         height="135"
-         width="135"
-         id="rect3855-6-5-93"
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      <g
-         id="g4525-1">
-        <rect
-           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-           id="rect4127-7-8"
-           width="45"
-           height="45"
-           x="-352.97498"
-           y="60.682499"
-           transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,0,0)" />
-        <text
-           xml:space="preserve"
-           style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-           x="280.314"
-           y="188.5062"
-           id="text4129-5-2"
-           sodipodi:linespacing="125%"><tspan
-             sodipodi:role="line"
-             id="tspan4131-6-0"
-             x="280.314"
-             y="188.5062">P</tspan></text>
-      </g>
-    </g>
-    <g
-       id="g4530-8-9"
-       transform="translate(-22.500002,382.49983)">
-      <rect
-         transform="matrix(0,-1,1,0,0,0)"
-         y="225"
-         x="-242.36218"
-         height="135"
-         width="135"
-         id="rect3855-6-5-9-1"
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      <g
-         id="g4525-8-7">
-        <rect
-           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-           id="rect4127-7-6-8"
-           width="45"
-           height="45"
-           x="-352.97498"
-           y="60.682499"
-           transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,0,0)" />
-        <text
-           xml:space="preserve"
-           style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-           x="280.314"
-           y="188.5062"
-           id="text4129-5-8-2"
-           sodipodi:linespacing="125%"><tspan
-             sodipodi:role="line"
-             id="tspan4131-6-6-6"
-             x="280.314"
-             y="188.5062">P</tspan></text>
-      </g>
-    </g>
-    <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3855-6-5-8-6"
-       width="135"
-       height="135"
-       x="-962.36206"
-       y="45"
-       transform="matrix(0,-1,1,0,0,0)" />
+       x="202.5"
+       y="84.862" />
     <text
        xml:space="preserve"
-       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-       x="100.314"
-       y="908.50598"
-       id="text4129-5-7-6"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       x="39"
+       y="121.60201"
+       id="text7947"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan4131-6-4-1"
-         x="100.314"
-         y="908.50598">C</tspan></text>
+         id="tspan7949"
+         x="39"
+         y="121.60201">Fix-up</tspan></text>
     <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:16;stroke-opacity:1;stroke-dasharray:none"
-       id="rect4127-3-2"
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7943-4"
+       width="225"
+       height="270"
+       x="270"
+       y="84.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7945-5"
        width="45"
        height="45"
-       x="-917.36206"
-       y="90"
-       transform="matrix(0,-1,1,0,0,0)"
-       ry="9.8994951" />
-    <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3855-6-5-8-8"
-       width="135"
-       height="135"
-       x="-804.86206"
-       y="202.5"
-       transform="matrix(0,-1,1,0,0,0)" />
+       x="450"
+       y="84.862" />
     <text
        xml:space="preserve"
-       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-       x="257.814"
-       y="751.0061"
-       id="text4129-5-7-3"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       x="286.5"
+       y="121.60202"
+       id="text7947-6"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan4131-6-4-5"
-         x="257.814"
-         y="751.0061">C</tspan></text>
+         id="tspan7949-6"
+         x="286.5"
+         y="121.60202">What about...</tspan></text>
     <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:16;stroke-opacity:1;stroke-dasharray:none"
-       id="rect4127-3-4"
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7943-4-6"
+       width="225"
+       height="270"
+       x="517.5"
+       y="84.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7945-5-6"
        width="45"
        height="45"
-       x="-759.86206"
-       y="247.5"
-       transform="matrix(0,-1,1,0,0,0)"
-       ry="9.8994951" />
-    <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3855-6-5-8-6-3"
-       width="135"
-       height="135"
-       x="-962.36212"
-       y="202.5"
-       transform="matrix(0,-1,1,0,0,0)" />
+       x="697.5"
+       y="84.862" />
     <text
        xml:space="preserve"
-       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-       x="257.814"
-       y="908.50604"
-       id="text4129-5-7-6-2"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       x="534"
+       y="121.60202"
+       id="text7947-6-8"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan4131-6-4-1-8"
-         x="257.814"
-         y="908.50604">C</tspan></text>
+         id="tspan7949-6-3"
+         x="534"
+         y="121.60202">Nope</tspan></text>
     <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:16;stroke-opacity:1;stroke-dasharray:none"
-       id="rect4127-3-2-7"
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7943-4-6-7"
+       width="225"
+       height="270"
+       x="22.5"
+       y="377.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7945-5-6-2"
        width="45"
        height="45"
-       x="-917.36212"
-       y="247.5"
-       transform="matrix(0,-1,1,0,0,0)"
-       ry="9.8994951" />
+       x="202.5"
+       y="377.362" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       x="39"
+       y="414.10202"
+       id="text7947-6-8-6"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan7949-6-3-8"
+         x="39"
+         y="414.10202">But why?</tspan></text>
     <g
-       id="g4626-2"
-       transform="translate(427.5,-180)">
+       id="g3994">
       <rect
-         transform="matrix(0,-1,1,0,0,0)"
-         y="45.000004"
-         x="-467.362"
-         height="135"
-         width="135"
-         id="rect3855-0"
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      <g
-         transform="matrix(0,-1,1,0,-84.86218,1052.362)"
-         id="g3909-5">
-        <path
-           sodipodi:type="arc"
-           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-           id="path3903-9"
-           sodipodi:cx="652.5"
-           sodipodi:cy="135"
-           sodipodi:rx="22.5"
-           sodipodi:ry="22.5"
-           d="m 675,135 c 0,12.42641 -10.07359,22.5 -22.5,22.5 -12.42641,0 -22.5,-10.07359 -22.5,-22.5 0,-12.42641 10.07359,-22.5 22.5,-22.5 12.42641,0 22.5,10.07359 22.5,22.5 z"
-           transform="translate(0,62.362183)" />
-        <text
-           xml:space="preserve"
-           style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-           x="184.34819"
-           y="-641.25201"
-           id="text3905-8"
-           sodipodi:linespacing="125%"
-           transform="matrix(0,1,-1,0,0,0)"><tspan
-             sodipodi:role="line"
-             id="tspan3907-3"
-             x="184.34819"
-             y="-641.25201">A</tspan></text>
-      </g>
-    </g>
-    <g
-       id="g4530-7"
-       transform="translate(180,224.99982)">
+         y="146.362"
+         x="45"
+         height="90"
+         width="180"
+         id="rect7959"
+         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
       <rect
-         transform="matrix(0,-1,1,0,0,0)"
-         y="225"
-         x="-242.36218"
-         height="135"
-         width="135"
-         id="rect3855-6-5-98"
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      <g
-         id="g4525-9">
-        <rect
-           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-           id="rect4127-7-0"
-           width="45"
-           height="45"
-           x="-352.97498"
-           y="60.682499"
-           transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,0,0)" />
-        <text
-           xml:space="preserve"
-           style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-           x="280.314"
-           y="188.5062"
-           id="text4129-5-1"
-           sodipodi:linespacing="125%"><tspan
-             sodipodi:role="line"
-             id="tspan4131-6-1"
-             x="280.314"
-             y="188.5062">P</tspan></text>
-      </g>
-    </g>
+         y="155.362"
+         x="54"
+         height="72"
+         width="162"
+         id="rect7959-3"
+         style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <rect
+         y="248.362"
+         x="45"
+         height="90"
+         width="180"
+         id="rect7959-7"
+         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <rect
+         y="256.362"
+         x="54"
+         height="72"
+         width="162"
+         id="rect7959-3-2"
+         style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
+      <flowRoot
+         id="flowRoot3905"
+         style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+         xml:space="preserve"><flowRegion
+           id="flowRegion3907"><use
+             id="use3909"
+             xlink:href="#rect7959-3"
+             y="0"
+             x="0" /></flowRegion><flowPara
+           id="flowPara3911">Find an action which has an unsatisfied precondition.</flowPara></flowRoot>      <flowRoot
+         id="flowRoot3917"
+         style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium;text-anchor:start;text-align:start;writing-mode:lr"
+         xml:space="preserve"><flowRegion
+           id="flowRegion3919"><use
+             id="use3921"
+             xlink:href="#rect7959-3-2"
+             y="0"
+             x="0" /></flowRegion><flowPara
+           id="flowPara3927"> Remove that action. You may add a consistent action.</flowPara></flowRoot>    </g>
     <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3855-6-5-8-1"
-       width="135"
-       height="135"
-       x="-804.862"
-       y="405"
-       transform="matrix(0,-1,1,0,0,0)" />
-    <text
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-8"
+       width="180"
+       height="90"
+       x="292.5"
+       y="146.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-9"
+       width="162"
+       height="72"
+       x="301.5"
+       y="155.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-7-2"
+       width="180"
+       height="90"
+       x="292.5"
+       y="248.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-2-1"
+       width="162"
+       height="72"
+       x="301.5"
+       y="256.362" />
+    <flowRoot
        xml:space="preserve"
-       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-       x="460.314"
-       y="751.00604"
-       id="text4129-5-7-4"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan4131-6-4-9"
-         x="460.314"
-         y="751.00604">C</tspan></text>
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4020"><flowRegion
+         id="flowRegion4022"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-9"
+           id="use4024" /></flowRegion><flowPara
+         id="flowPara4026">Find an action which has an unsatisfied precondition.</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4028"><flowRegion
+         id="flowRegion4030"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-2-1"
+           id="use4032"
+           width="765"
+           height="990" /></flowRegion><flowPara
+         id="flowPara4034"> Move that action. If the new location is consistent, +1 point.</flowPara></flowRoot>    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-8-8"
+       width="180"
+       height="90"
+       x="540"
+       y="146.362" />
     <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:16;stroke-opacity:1;stroke-dasharray:none"
-       id="rect4127-3-0"
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-9-2"
+       width="162"
+       height="72"
+       x="549"
+       y="155.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-7-2-9"
+       width="180"
+       height="90"
+       x="540"
+       y="248.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-2-1-7"
+       width="162"
+       height="72"
+       x="549"
+       y="256.362" />
+    <flowRoot
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4113"><flowRegion
+         id="flowRegion4115"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-9-2"
+           id="use4117" /></flowRegion><flowPara
+         id="flowPara4119">Find an action which has an unsatisfied precondition.</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4121"><flowRegion
+         id="flowRegion4123"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-2-1-7"
+           id="use4125"
+           width="765"
+           height="990" /></flowRegion><flowPara
+         id="flowPara4127">Remove that action.</flowPara></flowRoot>    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-8-8-6"
+       width="180"
+       height="90"
+       x="45"
+       y="438.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-9-2-6"
+       width="162"
+       height="72"
+       x="54"
+       y="447.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-7-2-9-8"
+       width="180"
+       height="90"
+       x="45"
+       y="540.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-2-1-7-3"
+       width="162"
+       height="72"
+       x="54"
+       y="548.862" />
+    <flowRoot
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4235"><flowRegion
+         id="flowRegion4237"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-9-2-6"
+           id="use4239"
+           width="765"
+           height="990" /></flowRegion><flowPara
+         id="flowPara4241">Convince the judge that an action is unmotivated.</flowPara></flowRoot>    <flowRoot
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4243"><flowRegion
+         id="flowRegion4245"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-2-1-7-3"
+           id="use4247"
+           width="765"
+           height="990" /></flowRegion><flowPara
+         id="flowPara4249">Either add a consistent action or remove any action.</flowPara></flowRoot>    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7943-4-6-7-8"
+       width="225"
+       height="270"
+       x="270"
+       y="377.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7945-5-6-2-2"
        width="45"
        height="45"
-       x="-759.862"
-       y="450"
-       transform="matrix(0,-1,1,0,0,0)"
-       ry="9.8994951" />
-    <g
-       id="g4530-8-6"
-       transform="translate(337.5,224.99982)">
-      <rect
-         transform="matrix(0,-1,1,0,0,0)"
-         y="225"
-         x="-242.36218"
-         height="135"
-         width="135"
-         id="rect3855-6-5-9-7"
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      <g
-         id="g4525-8-8">
-        <rect
-           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-           id="rect4127-7-6-4"
-           width="45"
-           height="45"
-           x="-352.97498"
-           y="60.682499"
-           transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,0,0)" />
-        <text
-           xml:space="preserve"
-           style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-           x="280.314"
-           y="188.5062"
-           id="text4129-5-8-1"
-           sodipodi:linespacing="125%"><tspan
-             sodipodi:role="line"
-             id="tspan4131-6-6-0"
-             x="280.314"
-             y="188.5062">P</tspan></text>
-      </g>
-    </g>
-    <g
-       id="g4530-6-3"
-       transform="translate(180,382.49981)">
-      <rect
-         transform="matrix(0,-1,1,0,0,0)"
-         y="225"
-         x="-242.36218"
-         height="135"
-         width="135"
-         id="rect3855-6-5-93-4"
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      <g
-         id="g4525-1-7">
-        <rect
-           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-           id="rect4127-7-8-9"
-           width="45"
-           height="45"
-           x="-352.97498"
-           y="60.682499"
-           transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,0,0)" />
-        <text
-           xml:space="preserve"
-           style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-           x="280.314"
-           y="188.5062"
-           id="text4129-5-2-9"
-           sodipodi:linespacing="125%"><tspan
-             sodipodi:role="line"
-             id="tspan4131-6-0-1"
-             x="280.314"
-             y="188.5062">P</tspan></text>
-      </g>
-    </g>
-    <g
-       id="g4530-8-9-9"
-       transform="translate(337.5,382.49983)">
-      <rect
-         transform="matrix(0,-1,1,0,0,0)"
-         y="225"
-         x="-242.36218"
-         height="135"
-         width="135"
-         id="rect3855-6-5-9-1-6"
-         style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none" />
-      <g
-         id="g4525-8-7-3">
-        <rect
-           style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-           id="rect4127-7-6-8-9"
-           width="45"
-           height="45"
-           x="-352.97498"
-           y="60.682499"
-           transform="matrix(-0.70710678,-0.70710678,0.70710678,-0.70710678,0,0)" />
-        <text
-           xml:space="preserve"
-           style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-           x="280.314"
-           y="188.5062"
-           id="text4129-5-8-2-3"
-           sodipodi:linespacing="125%"><tspan
-             sodipodi:role="line"
-             id="tspan4131-6-6-6-4"
-             x="280.314"
-             y="188.5062">P</tspan></text>
-      </g>
-    </g>
+       x="450"
+       y="377.362" />
     <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3855-6-5-8-6-9"
-       width="135"
-       height="135"
-       x="-962.36206"
-       y="405"
-       transform="matrix(0,-1,1,0,0,0)" />
-    <text
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-8-8-6-9"
+       width="180"
+       height="90"
+       x="292.5"
+       y="438.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-9-2-6-4"
+       width="162"
+       height="72"
+       x="301.5"
+       y="447.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-7-2-9-8-7"
+       width="180"
+       height="90"
+       x="292.5"
+       y="540.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-2-1-7-3-4"
+       width="162"
+       height="72"
+       x="301.5"
+       y="548.862" />
+    <flowRoot
+       transform="translate(-21.25,-376.112)"
        xml:space="preserve"
-       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-       x="460.314"
-       y="908.50598"
-       id="text4129-5-7-6-6"
-       sodipodi:linespacing="125%"><tspan
-         sodipodi:role="line"
-         id="tspan4131-6-4-1-2"
-         x="460.314"
-         y="908.50598">C</tspan></text>
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4235-5"><flowRegion
+         id="flowRegion4237-8"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-9-2-6-4"
+           id="use4239-7"
+           width="765"
+           height="990"
+           transform="translate(21.25,376.112)" /></flowRegion><flowPara
+         id="flowPara4241-5">Convince the judge that an action is unmotivated.</flowPara></flowRoot>    <flowRoot
+       transform="translate(-21.25,-376.112)"
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4243-9"><flowRegion
+         id="flowRegion4245-1"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-2-1-7-3-4"
+           id="use4247-0"
+           width="765"
+           height="990"
+           transform="translate(21.25,376.112)" /></flowRegion><flowPara
+         id="flowPara4249-2">Remove that action.</flowPara></flowRoot>    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7943-4-6-7-86"
+       width="225"
+       height="270"
+       x="517.5"
+       y="377.362" />
     <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:16;stroke-opacity:1;stroke-dasharray:none"
-       id="rect4127-3-2-1"
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7945-5-6-2-07"
        width="45"
        height="45"
-       x="-917.36206"
-       y="450"
-       transform="matrix(0,-1,1,0,0,0)"
-       ry="9.8994951" />
-    <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3855-6-5-8-8-7"
-       width="135"
-       height="135"
-       x="-804.86206"
-       y="562.5"
-       transform="matrix(0,-1,1,0,0,0)" />
+       x="697.5"
+       y="377.362" />
     <text
        xml:space="preserve"
-       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-       x="617.81396"
-       y="751.0061"
-       id="text4129-5-7-3-1"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       x="534"
+       y="414.10202"
+       id="text7947-6-8-6-2"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan4131-6-4-5-1"
-         x="617.81396"
-         y="751.0061">C</tspan></text>
+         id="tspan7949-6-3-8-5"
+         x="534"
+         y="414.10202">And then...</tspan></text>
     <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:16;stroke-opacity:1;stroke-dasharray:none"
-       id="rect4127-3-4-8"
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-8-8-6-6"
+       width="180"
+       height="90"
+       x="540"
+       y="438.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-9-2-6-2"
+       width="162"
+       height="72"
+       x="549"
+       y="447.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-7-2-9-8-9"
+       width="180"
+       height="90"
+       x="540"
+       y="540.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-2-1-7-3-0"
+       width="162"
+       height="72"
+       x="549"
+       y="548.862" />
+    <flowRoot
+       transform="translate(-21.25,-376.112)"
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4235-2"><flowRegion
+         id="flowRegion4237-1"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-9-2-6-2"
+           id="use4239-4"
+           width="765"
+           height="990"
+           transform="translate(21.25,376.112)" /></flowRegion><flowPara
+         id="flowPara4241-1">If there are more consistent than inconsistent actions.</flowPara></flowRoot>    <flowRoot
+       transform="translate(-21.25,-376.112)"
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4243-98"><flowRegion
+         id="flowRegion4245-0"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-2-1-7-3-0"
+           id="use4247-4"
+           width="765"
+           height="990"
+           transform="translate(21.25,376.112)" /></flowRegion><flowPara
+         id="flowPara4249-0">Add an action. If it's consistent, +1 point.</flowPara></flowRoot>    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7943-4-6-7-9"
+       width="225"
+       height="270"
+       x="22.5"
+       y="669.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7945-5-6-2-09"
        width="45"
        height="45"
-       x="-759.86206"
-       y="607.5"
-       transform="matrix(0,-1,1,0,0,0)"
-       ry="9.8994951" />
-    <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
-       id="rect3855-6-5-8-6-3-4"
-       width="135"
-       height="135"
-       x="-962.36218"
-       y="562.5"
-       transform="matrix(0,-1,1,0,0,0)" />
+       x="202.5"
+       y="669.862" />
     <text
        xml:space="preserve"
-       style="font-size:36px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-       x="617.81396"
-       y="908.50604"
-       id="text4129-5-7-6-2-2"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       x="39"
+       y="706.60205"
+       id="text7947-6-8-6-6"
        sodipodi:linespacing="125%"><tspan
          sodipodi:role="line"
-         id="tspan4131-6-4-1-8-4"
-         x="617.81396"
-         y="908.50604">C</tspan></text>
+         id="tspan7949-6-3-8-59"
+         x="39"
+         y="706.60205"
+         style="font-size:22px">Not just robots.</tspan></text>
     <rect
-       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:16;stroke-opacity:1;stroke-dasharray:none"
-       id="rect4127-3-2-7-3"
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-8-8-6-5"
+       width="180"
+       height="90"
+       x="45"
+       y="731.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-9-2-6-3"
+       width="162"
+       height="72"
+       x="54"
+       y="740.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-7-2-9-8-1"
+       width="180"
+       height="90"
+       x="45"
+       y="833.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-2-1-7-3-7"
+       width="162"
+       height="72"
+       x="54"
+       y="841.362" />
+    <flowRoot
+       transform="translate(-21.25,-376.112)"
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4235-55"><flowRegion
+         id="flowRegion4237-5"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-9-2-6-3"
+           id="use4239-2"
+           width="765"
+           height="990"
+           transform="translate(21.25,376.112)" /></flowRegion><flowPara
+         id="flowPara4241-6">Convince the judge that an action is good for its object.</flowPara></flowRoot>    <flowRoot
+       transform="translate(-21.25,-376.112)"
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4243-4"><flowRegion
+         id="flowRegion4245-6"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-2-1-7-3-7"
+           id="use4247-1"
+           width="765"
+           height="990"
+           transform="translate(21.25,376.112)" /></flowRegion><flowPara
+         id="flowPara4249-3">Add a consequence to that action: the object likes the subject.</flowPara></flowRoot>    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7943-4-6-7-82"
+       width="225"
+       height="270"
+       x="270"
+       y="669.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7945-5-6-2-5"
        width="45"
        height="45"
-       x="-917.36212"
-       y="607.5"
-       transform="matrix(0,-1,1,0,0,0)"
-       ry="9.8994951" />
+       x="450"
+       y="669.862" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       x="286.5"
+       y="706.60205"
+       id="text7947-6-8-6-0"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan7949-6-3-8-4"
+         x="286.5"
+         y="706.60205">But why?</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-8-8-6-93"
+       width="180"
+       height="90"
+       x="292.5"
+       y="731.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-9-2-6-5"
+       width="162"
+       height="72"
+       x="301.5"
+       y="740.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-7-2-9-8-0"
+       width="180"
+       height="90"
+       x="292.5"
+       y="833.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-2-1-7-3-6"
+       width="162"
+       height="72"
+       x="301.5"
+       y="841.362" />
+    <flowRoot
+       transform="translate(-21.25,-376.112)"
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4235-1"><flowRegion
+         id="flowRegion4237-2"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-9-2-6-5"
+           id="use4239-5"
+           width="765"
+           height="990"
+           transform="translate(21.25,376.112)" /></flowRegion><flowPara
+         id="flowPara4241-2">Convince the judge a new consequence is reasonable.</flowPara></flowRoot>    <flowRoot
+       transform="translate(-21.25,-376.112)"
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4243-43"><flowRegion
+         id="flowRegion4245-9"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-2-1-7-3-6"
+           id="use4247-5"
+           width="765"
+           height="990"
+           transform="translate(21.25,376.112)" /></flowRegion><flowPara
+         id="flowPara4486">Add that consequence.</flowPara></flowRoot>    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7943-4-6-7-4"
+       width="225"
+       height="270"
+       x="517.5"
+       y="669.862" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7945-5-6-2-6"
+       width="45"
+       height="45"
+       x="697.5"
+       y="669.862" />
+    <text
+       xml:space="preserve"
+       style="font-size:24px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       x="534"
+       y="706.60205"
+       id="text7947-6-8-6-60"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan7949-6-3-8-2"
+         x="534"
+         y="706.60205">You're Mean!</tspan></text>
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-8-8-6-3"
+       width="180"
+       height="90"
+       x="540"
+       y="731.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-9-2-6-40"
+       width="162"
+       height="72"
+       x="549"
+       y="740.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:2.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-7-2-9-8-00"
+       width="180"
+       height="90"
+       x="540"
+       y="833.362" />
+    <rect
+       style="fill:none;stroke:#000000;stroke-width:0.5;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none"
+       id="rect7959-3-2-1-7-3-3"
+       width="162"
+       height="72"
+       x="549"
+       y="841.362" />
+    <flowRoot
+       transform="translate(-21.25,-376.112)"
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4235-3"><flowRegion
+         id="flowRegion4237-0"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-9-2-6-40"
+           id="use4239-6"
+           width="765"
+           height="990"
+           transform="translate(21.25,376.112)" /></flowRegion><flowPara
+         id="flowPara4241-8">Convince the judge that an action is bad for its object.</flowPara></flowRoot>    <flowRoot
+       transform="translate(-21.25,-376.112)"
+       xml:space="preserve"
+       style="font-size:16px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       id="flowRoot4243-3"><flowRegion
+         id="flowRegion4245-2"><use
+           x="0"
+           y="0"
+           xlink:href="#rect7959-3-2-1-7-3-3"
+           id="use4247-08"
+           width="765"
+           height="990"
+           transform="translate(21.25,376.112)" /></flowRegion><flowPara
+         id="flowPara4249-92">Add a consequence to that action: the object dislikes the subject.</flowPara></flowRoot>    <text
+       xml:space="preserve"
+       style="font-size:22px;font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       x="286.5"
+       y="402.10202"
+       id="text7947-6-8-6-3-4"
+       sodipodi:linespacing="125%"><tspan
+         sodipodi:role="line"
+         id="tspan7949-6-3-8-3-1"
+         x="286.5"
+         y="402.10202">That's not</tspan><tspan
+         sodipodi:role="line"
+         x="286.5"
+         y="429.60202"
+         id="tspan3296-6">       realistic.</tspan></text>
   </g>
 </svg>
