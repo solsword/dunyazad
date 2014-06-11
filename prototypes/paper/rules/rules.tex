@@ -22,7 +22,10 @@ At the start of the game, one player is selected as the judge.
 The judge sets up an initial story state by adding actions and their consequent states to the timeline.
 %
 This may be but does not have to be a complete and consistent story.
+
+The timeline and action templates should be laid out beforehand, and the action templates should be filled in per section \ref{actions} below.
 %
+The judge may also modify these default precondition and consequence layouts during setup.
 
 \section{The Bidding Phase}
 %
@@ -122,6 +125,234 @@ In these cases, the judge should decide whether the required property holds or n
 
 \begin{itemize}
   \item \textbf{consistent} -- A \textbf{consistent} action is an action whose preconditions are fulfilled and whose consequences don't violate the preconditions of any later action. Any action which doesn't meet these criteria is \textbf{inconsistent}.
+\end{itemize}
+
+\section{Action Setup}
+\label{actions}
+
+The default action setup is as follows:
+
+\begin{itemize}
+  \item Fall Ill
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject is not sick.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject is sick.
+    \end{itemize}
+
+  \item Recover
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject is sick.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject is not sick.
+    \end{itemize}
+
+  \item Buy Medicine For
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject is not penniless.
+      \item Object is sick.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Object is healthy.
+      \item Subject's wealth decreases.
+    \end{itemize}
+
+  \item Meet
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject and object are strangers.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject and object are acquaintances.
+    \end{itemize}
+
+  \item Borrow Money (+):
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject and object aren't strangers.
+      \item Subject needs money.
+      \item Object is super-rich.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject is financially stable.
+      \item Object is financially stable.
+      \item Subject owes money to object.
+    \end{itemize}
+
+  \item Borrow Money (-):
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject needs money.
+      \item Object is super-rich.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject is desperate.
+      \item Object dislikes subject.
+    \end{itemize}
+
+  \item Repay Loan
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject doesn't need money.
+      \item Subject owes money to object.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject's wealth decreases.
+      \item Object's wealth increases.
+      \item Subject has no debt to object.
+    \end{itemize}
+
+  \item Give Wealth To
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject and object aren't strangers.
+      \item Subject is wealthy.
+      \item Object isn't wealthy.
+      \item Object isn't super-rich.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject's wealth decreases.
+      \item Object's wealth increases.
+    \end{itemize}
+
+  \item Gamble (+):
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject isn't wealthy.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject's wealth increases.
+    \end{itemize}
+
+  \item Gamble (-):
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject doesn't need money.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject's wealth decreases.
+    \end{itemize}
+
+  \item Steal From (+):
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject isn't wealthy.
+      \item Object doesn't need money.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject's wealth increases.
+      \item Object's wealth decreases.
+    \end{itemize}
+
+  \item Steal From (-):
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject isn't wealthy.
+      \item Object doesn't need money.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Object hates subject.
+    \end{itemize}
+
+  \item Fall For:
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject and object aren't strangers.
+      \item Subject doesn't love object.
+      \item Subject doesn't hate object.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject loves object.
+    \end{itemize}
+
+  \item Confess To (+):
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject loves object.
+      \item Subject and object aren't strangers.
+      \item Object doesn't hate subject.
+      \item Object doesn't dislike subject.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject and object are lovers.
+      \item Subject isn't melancholy.
+    \end{itemize}
+
+  \item Confess To (-):
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject loves object.
+      \item Subject and object aren't strangers.
+      \item Object doesn't love subject.
+      \item Object doesn't like subject.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Subject is melancholy.
+    \end{itemize}
+
+  \item Break Up With:
+
+    Preconditions:
+    \begin{itemize}
+      \item Subject doesn't love object.
+      \item Subject and object are lovers.
+    \end{itemize}
+
+    Consequences:
+    \begin{itemize}
+      \item Object is melancholy.
+      \item Subject and object are acquaintances.
+    \end{itemize}
 \end{itemize}
 
 \end{document}

@@ -7,88 +7,73 @@
 %  bound(R2, id(Type, ID)),
 %  R1 != R2.
 
-error(m("Could not satisfy required property.", Story, Property)) :-
-  require(Story, Property),
-  not satisfied(require(Story, Property)).
-
 % Require means that the stated property should be true in the given story.
 
-satisfied(require(Story, Ref)) :-
-  require(Story, Ref),
-  bound(Ref, Bound),
-  story(Story, Bound).
-
-satisfied(require(Story, arg(Subj, Arg, Ref))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, arg(Subj, Arg, Ref)),
   bound(Ref, Bound),
-  story(Story, arg(Subj, Arg, Bound)).
+  not story(Story, arg(Subj, Arg, Bound)).
 
-satisfied(require(Story, arg(Ref, Arg, Obj))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, arg(Ref, Arg, Obj)),
   bound(Ref, Bound),
-  story(Story, arg(Bound, Arg, Obj)).
+  not story(Story, arg(Bound, Arg, Obj)).
 
-satisfied(require(Story, arg(SRef, Arg, ORef))) :-
-  require(Story, arg(RefO, Arg, RefA)),
+error(m("Failed to satisfy requirements on", SRef, ORef)) :-
+  require(Story, arg(SRef, Arg, ORef)),
   bound(SRef, SBound),
   bound(ORef, OBound),
-  story(Story, arg(SBound, Arg, OBound)).
+  not story(Story, arg(SBound, Arg, OBound)).
 
-satisfied(require(Story, at(T, Ref))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, at(T, Ref)),
   bound(Ref, Bound),
-  story(Story, at(T, Bound)).
+  not story(Story, at(T, Bound)).
 
-satisfied(require(Story, initiated(T, Ref))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, initiated(T, Ref)),
   bound(Ref, Bound),
-  story(Story, initiated(T, Bound)).
+  not story(Story, initiated(T, Bound)).
 
-satisfied(require(Story, initiated(before(T), Ref))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, initiated(before(T), Ref)),
   bound(Ref, Bound),
-  story(Story, initiated(Ti, Bound)),
-  Ti < T.
+  0 = { story(Story, initiated(Ti, Bound)) : Ti < T }.
 
-satisfied(require(Story, initiated(after(T), Ref))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, initiated(after(T), Ref)),
   bound(Ref, Bound),
-  story(Story, initiated(Ti, Bound)),
-  Ti > T.
+  0 = { story(Story, initiated(Ti, Bound)): Ti > T }.
 
-satisfied(require(Story, terminated(T, Ref))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, terminated(T, Ref)),
   bound(Ref, Bound),
-  story(Story, terminated(T, Bound)).
+  not story(Story, terminated(T, Bound)).
 
-satisfied(require(Story, terminated(before(T), Ref))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, terminated(before(T), Ref)),
   bound(Ref, Bound),
-  story(Story, terminated(Tt, Bound)),
-  Tt < T.
+  0 = { story(Story, terminated(Tt, Bound)): Tt < T }.
 
-satisfied(require(Story, terminated(after(T), Ref))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, terminated(after(T), Ref)),
   bound(Ref, Bound),
-  story(Story, terminated(Tt, Bound)),
-  Tt > T.
+  0 = { story(Story, terminated(Tt, Bound)): Tt > T }.
 
-satisfied(require(Story, happens(T, Ref))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, happens(T, Ref)),
   bound(Ref, Bound),
-  story(Story, happens(T, Bound)).
+  not story(Story, happens(T, Bound)).
 
-satisfied(require(Story, happens(before(T), Ref))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, happens(after(T), Ref)),
   bound(Ref, Bound),
-  story(Story, happens(Th, Bound)),
-  Th < T.
+  0 = { story(Story, happens(Th, Bound)): Th < T }.
 
-satisfied(require(Story, happens(after(T), Ref))) :-
+error(m("Failed to satisfy requirement on", Ref)) :-
   require(Story, happens(after(T), Ref)),
   bound(Ref, Bound),
-  story(Story, happens(Th, Bound)),
-  Th > T.
+  0 = { story(Story, happens(Th, Bound)): Th > T }.
 
 % Asserting args, traits, states, properties, and relations (adding them to the
 % output):
