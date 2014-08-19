@@ -5,11 +5,11 @@
 %    at(T, rel(A, B, feelings, loves)) :
 %      time(T), character(A), character(B)
 %  }.
-%error(m("Not feeling it.")) :-
-%  0 = {
-%    at(T, rel(A, B, feelings, loves)) :
-%      time(T), character(A), character(B)
-%  }.
+error(m("Not feeling it.")) :-
+  0 = {
+    at(T, rel(A, B, feelings, loves)) :
+      time(T), character(A), character(B)
+  }.
 
 % Somone should be super-rich:
 %:- 0 = { at(T, state(Chr, wealth, super_rich)) : time(T), character(Chr) }.

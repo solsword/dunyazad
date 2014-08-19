@@ -1,273 +1,258 @@
 % fluents.lp
-% Rules about fluents (states, properties, and relations).
+% Fluent coherence.
 
-% Fluent Structure:
-%------------------
+% basic initiation and termination:
 
-% Fluents have ids, and have args as follows:
+holds(after(evt(X)), fl(Fl, Args)) :-
+  holds(before(evt(X)), fl(Fl, Args)),
+  not terminates(evt(X), fl(Fl, Args)).
 
-% states: type ('state'), subject, value
-% properties: type ('property'), subject, domain, value
-% relations: type ('relation'), subject, value, object
+holds(after(evt(X)), fl(Fl, Args)) :-
+  initiates(evt(X), fl(Fl, Args)).
 
-fltype(state).
-fltype(property).
-fltype(relation).
+holds(before(evt(X)), fl(Fl, Args)) :-
+  holds(after(evt(B)), fl(Fl, Args)),
+  event_next(evt(B), evt(X)).
 
-flarg(T, type) :- fltype(T).
-flarg(T, initiated) :- fltype(T).
-flarg(T, terminated) :- fltype(T).
-flarg(T, subject) :- fltype(T).
-flarg(T, value) :- fltype(T).
+% conflicting fluents cannot coexist:
 
-flarg(property, domain).
-flarg(relation, object).
+error(m("Conflicting fluents.")) :-
+  holds(T, fl(Fl, Args)),
+  holds(T, fl(Fcon, Acon)),
+  conflicts(fl(Fl, Args), fl(Fcon, Acon)).
 
-1 = {
-  error(m("Fluent with no type.", Story, id(flt, F)));
-  story(Story, arg(id(flt, F), type, Type)) : fltype(Type)
-} :-
-  story(Story, id(flt, F)).
+% fluent conflict is reciprocal:
+conflicts(F1, F2) :- conflicts(F2, F1).
 
-error(m("Fluent missing argument.", Story, id(flt, F), Arg)) :-
-  story(Story, id(flt, F)),
-  story(Story, arg(id(flt, F), type, Type)),
-  flarg(Type, Arg),
-  0 = {
-    story(Story, arg(id(flt, F), Arg, Val)) :
-      story(Story, arg(id(flt, F), Arg, Val))
-  }.
+% fluents cannot hold without satisfying dependencies:
 
-error(m("Fluent with unknown argument.", Story, id(flt, F), Arg)) :-
-  story(Story, id(flt, F)),
-  story(Story, arg(id(flt, F), type, Type)),
-  story(Story, arg(id(flt, F), Arg, Value)),
-  not flarg(Type, Arg).
+error(m("Unmet fluent dependency.")) :-
+  holds(T, fl(Fdep, Adep)),
+  depends(fl(Fdep, Adep), fl(Fl, Args)),
+  not holds(T, fl(Fl, Args)).
 
-error(m("Fluent with multi-valued argument.",Story, id(flt, F), Arg, V1, V2)) :-
-  story(Story, id(flt, F)),
-  story(Story, arg(id(flt, F), Arg, V1)),
-  story(Story, arg(id(flt, F), Arg, V2)),
-  V1 != V2.
+% binary statuses:
 
-error(m("Conflicting states.", Story, T, F1, F2, S, V)) :-
-  story(Story, at(T, F1)),
-  story(Story, at(T, F2)),
-  story(Story, arg(F1, type, state)),
-  story(Story, arg(F2, type, state)),
-  story(Story, arg(F1, subject, S)),
-  story(Story, arg(F2, subject, S)),
-  story(Story, arg(F1, value, V)),
-  story(Story, arg(F2, value, V)),
-  F1 != F2.
+status_opposite(Status, _not(Status)) :-
+  status(Type, Status).
 
-error(m("Conflicting properties.", Story, T, F1, F2, S, D)) :-
-  story(Story, at(T, F1)),
-  story(Story, at(T, F2)),
-  story(Story, arg(F1, type, property)),
-  story(Story, arg(F2, type, property)),
-  story(Story, arg(F1, subject, S)),
-  story(Story, arg(F2, subject, S)),
-  story(Story, arg(F1, domain, D)),
-  story(Story, arg(F2, domain, D)),
-  F1 != F2.
+status_opposite(_not(Status), Status) :-
+  status(Type, Status).
 
-error(m("Conflicting relations.", Story, T, F1, F2, S, V, O)) :-
-  story(Story, at(T, F1)),
-  story(Story, at(T, F2)),
-  story(Story, arg(F1, type, relation)),
-  story(Story, arg(F2, type, relation)),
-  story(Story, arg(F1, subject, S)),
-  story(Story, arg(F2, subject, S)),
-  story(Story, arg(F1, value, V)),
-  story(Story, arg(F2, value, V)),
-  story(Story, arg(F1, object, O)),
-  story(Story, arg(F2, object, O)),
-  F1 != F2.
+fluent(a(Type), status(Status)) :-
+  status(Type, Status).
 
-% Base behvaior:
-%---------------
+fluent(a(Type), status(_not(Status))) :-
+  status(Type, Status).
 
-% All fluents are initiated and terminated, and are "at" all timesteps in
-% between (starting the timestep after they're initiated and ending the
-% timestep on which they're terminated).
+conflicts(
+  fl(status(Status), a(id(Type, Id))),
+  fl(status(_not(Status)), a(id(Type, Id)))
+) :-
+  id(Type, Id),
+  status(Type, Status).
 
-story(Story, at(T, id(flt, F))) :-
-  time(T),
-  story(Story, arg(id(flt, F), initiated, Ti)),
-  story(Story, arg(id(flt, F), terminated, Tt)),
-  T > Ti, T <= Tt.
+depends(
+  fl(status(Req), a(id(Type, Id))),
+  fl(status(Dep), a(id(Type, Id)))
+) :-
+  id(Type, Id),
+  status(Type, Req),
+  status_depends_status(Req, Dep).
 
-1 = {
-  error(
-    m("Non-hypothetical fluent never initiated.", Story, id(flt, F))
-  );
-  story(Story, arg(id(flt, F), initiated, T)) : active_timestep(Story, T);
-  story(Story, arg(id(flt, F), initiated, BoT)) : beginning_of_time(BoT)
-} :-
-  story(Story, id(flt, F)),
-  not story(Story, hypothetical(id(flt, F))).
+depends(
+  fl(status(Req), a(id(Type, Id))),
+  fl(state(Dep, DVal), a(id(Type, Id)))
+) :-
+  id(Type, Id),
+  status(Type, Req),
+  status_depends_state(Req, Dep, DVal).
 
-% Fluents are initiated by something even if that thing is "setup":
-story(Story, arg(setup, initiates, id(flt, F))) :-
-  story(Story, arg(id(flt, F), initiated, BoT)),
-  beginning_of_time(BoT).
-1 = {
-  error(m("Auto-initiated fluent.", Story, T, id(flt, F)));
-  story(Story, arg(Action, initiates, id(flt, F))) :
-    story(Story, arg(Evt, action, Action)),
-    story(Story, happens(T, Evt))
-} :-
-  story(Story, id(flt, F)),
-  story(Story, arg(id(flt, F), initiated, T)),
-  active_timestep(Story, T).
+conflicts(
+  fl(status(Status), a(id(Type, Id))),
+  fl(status(Conflict), a(id(Type, Id)))
+) :-
+  id(Type, Id),
+  status(Type, Status),
+  status_conflicts_status(Status, Conflict).
 
-1 = {
-  error(
-    m("Non-hypothetical fluent never terminated.", Story, id(flt, F))
-  );
-  story(Story, arg(id(flt, F), terminated, T)) : active_timestep(Story, T);
-  story(Story, arg(id(flt, F), terminated, EoT)) : end_of_time(EoT)
-} :-
-  story(Story, id(flt, F)),
-  not story(Story, hypothetical(id(flt, F))).
+conflicts(
+  fl(status(Status), a(id(Type, Id))),
+  fl(state(Conflict, CVal), a(id(Type, Id)))
+) :-
+  id(Type, Id),
+  status(Type, Status),
+  status_conflicts_state(Status, Conflict, CVal).
 
-% Fluents are terminated by something even if that thing is "cleanup":
-story(Story, arg(cleanup, terminates, id(flt, F))) :-
-  story(Story, arg(id(flt, F), terminated, EoT)),
-  end_of_time(EoT).
-1 = {
-  error(m("Auto-terminated fluent.", Story, T, id(flt, F)));
-  story(Story, arg(Action, terminates, id(flt, F))) :
-    story(Story, arg(Evt, action, Action)),
-    story(Story, happens(T, Evt))
-} :-
-  story(Story, id(flt, F)),
-  story(Story, arg(id(flt, F), terminated, T)),
-  active_timestep(Story, T).
+% exclusive multi-valued states:
 
-% No fluent should be initiated after it is terminated:
-error(m("Non-hypothetical fluent never holds.", Story, id(flt, F))) :-
-  story(Story, id(flt, F)),
-  not story(Story, hypothetical(id(flt, F))),
-  0 = { story(Story, at(T, id(flt, F))) : time(T) }.
+fluent(a(Type), state(State, Value)) :-
+  state(Type, State),
+  value(State, Value).
 
-% Fluent ontology rules:
-%-----------------------
+conflicts(
+  fl(state(State, Value), a(id(Type, Id))),
+  fl(state(State, Vother), a(id(Type, Id)))
+) :-
+  id(Type, Id),
+  state(Type, State),
+  state_value(State, Value),
+  state_value(State, Vother),
+  Value != Vother.
 
-% Rather than allowing arbitrary fluents, for the sake of consistency, an
-% ontology of fluents of various types limits the allowed argument values. 
+depends(
+  fl(state(State, Value), a(id(Type, Id))),
+  fl(status(Dep), a(id(Type, Id)))
+) :-
+  id(Type, Id)
+  state(Type, State),
+  state_depends_status(State, Value, Dep).
 
-% Every fluent has a subject:
-1 = {
-  error(m("Fluent missing subject.", Story, id(flt, F)));
-  story(Story, arg(id(flt, F), subject, id(Type, ID))) :
-    story(Story, id(Type, ID))
-} :-
-  story(Story, id(flt, F)).
+depends(
+  fl(state(State, Value), a(id(Type, Id))),
+  fl(state(Dep, DVal), a(id(Type, Id)))
+) :-
+  id(Type, Id)
+  state(Type, State),
+  state_depends_state(State, Value, Dep, DVal).
 
-1 = {
-  error(m("State subject/value mismatch.", Story, id(flt, F), id(Type, ID)));
-  story(Story, arg(id(flt, F), value, Value)) : state(Type, Value)
-} :-
-  story(Story, id(flt, F)),
-  story(Story, arg(id(flt, F), type, state)),
-  story(Story, arg(id(flt, F), subject, id(Type, ID))).
+conflicts(
+  fl(state(State, Value), a(id(Type, Id))),
+  fl(status(Status), a(id(Type, Id)))
+) :-
+  id(Type, Id),
+  state(Type, State),
+  state_conflicts_status(State, Value, Status).
 
-1 = {
-  error(m("Property subject/domain mismatch.",Story, id(flt, F), id(Type, ID)));
-  story(Story, arg(id(flt, F), domain, Domain)) : property(Type, Domain)
-} :-
-  story(Story, id(flt, F)),
-  story(Story, arg(id(flt, F), type, property)),
-  story(Story, arg(id(flt, F), subject, id(Type, ID))).
+conflicts(
+  fl(state(State, Value), a(id(Type, Id))),
+  fl(state(Conflict, CVal), a(id(Type, Id)))
+) :-
+  id(Type, Id),
+  state(Type, State),
+  state_conflicts_state(State, Value, Conflict, CVal).
 
-1 = {
-  error(m("Invalid property value.", Story, id(flt, F), Domain));
-  story(Story, arg(id(flt, F), value, Value)) : value(Domain, Value)
-} :-
-  story(Story, id(flt, F)),
-  story(Story, arg(id(flt, F), type, property)),
-  story(Story, arg(id(flt, F), domain, Domain)).
+% exclusive multi-valued relationships:
 
-1 = {
-  error(m("Relation subject/value mismatch.",Story,id(flt, F), id(SType, SID)));
-  story(Story, arg(id(flt, F), value, Value)) :
-    relation(SType, Value, OType),
-    type(OType);
-  story(Story, arg(id(flt, F), value, Value)) :
-    relation(any, Value, OType),
-    type(OType);
-  story(Story, arg(id(flt, F), value, Value)) :
-    relation(SType, Value, any);
-  story(Story, arg(id(flt, F), value, Value)) :
-    relation(any, Value, any)
-} :-
-  story(Story, id(flt, F)),
-  story(Story, arg(id(flt, F), type, relation)),
-  story(Story, arg(id(flt, F), subject, id(SType, SID))).
+fluent(a(T1, T2), rel(Rel, Value)) :-
+  rel(T1, T2, Rel),
+  rel_value(Rel, Value).
 
-1 = {
-  error(
-    m(
-      "Relation subject/value/object mismatch.",
-      Story,
-      id(flt, F),
-      id(SType, SID),
-      Value
-    )
-  );
-  story(Story, arg(id(flt, F), object, id(OType, OID))) :
-    relation(SType, Value, OType),
-    story(Story, id(OType, OID));
-  story(Story, arg(id(flt, F), object, id(OType, OID))) :
-    relation(any, Value, OType),
-    story(Story, id(OType, OID));
-  story(Story, arg(id(flt, F), object, id(OType, OID))) :
-    relation(SType, Value, any),
-    story(Story, id(OType, OID));
-  story(Story, arg(id(flt, F), object, id(OType, OID))) :
-    relation(any, Value, any),
-    story(Story, id(OType, OID))
-} :-
-  story(Story, id(flt, F)),
-  story(Story, arg(id(flt, F), type, relation)),
-  story(Story, arg(id(flt, F), subject, id(SType, SID))),
-  story(Story, arg(id(flt, F), value, Value)).
+conflicts(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(rel(Rel, Vother), a(id(T1, I1), id(T2, I2)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_value(Rel, Value),
+  rel_value(Rel, Vother),
+  Value != Vother.
 
-% Basic constraints:
-%-------------------
+depends(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(status(Status), a(id(T1, I1)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_depends_subject_status(Rel, Value, Status).
 
-% Constraints such as incompatible, dependent, and exclusive define how fluents
-% interact.
+depends(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(status(Status), a(id(T2, I2)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_depends_object_status(Rel, Value, Status).
 
-% TODO: Allow constructive compatability?
+depends(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(state(State, SVal), a(id(T1, I1)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_depends_subject_state(Rel, Value, State, SVal).
 
-error(m("Incompatible fluents.", Story, T, F1, F2)) :-
-  incompatible(V1, V2),
-  story(Story, at(T, F1)),
-  story(Story, at(T, F2)),
-  story(Story, arg(F1, value, V1)),
-  story(Story, arg(F2, value, V2)),
-  F1 != F2.
+depends(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(state(State, SVal), a(id(T2, I2)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_depends_object_state(Rel, Value, State, SVal).
 
-error(m("Unmet dependency.", Story, T, Dep, Depends, Value)) :-
-  dependent(Depends, Value),
-  story(Story, at(T, Dep)),
-  story(Story, arg(Dep, value, Depends)),
-  0 = {
-    Sat :
-      story(Story, at(T, Sat)),
-      story(Story, arg(Sat, value, Value)),
-      Sat != Dep
-  }.
+depends(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(rel(DRel, DVal), a(id(T1, I1), id(T2, I2)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_depends_subject_object_rel(Rel, Value, DRel, DVal).
 
-error(m("Failed to maintain exclusivity.", Story, T, R1, R2, V, O1, O2)) :-
-  exclusive(V),
-  story(Story, at(T, R1)),
-  story(Story, at(T, R2)),
-  story(Story, arg(R1, value, V)),
-  story(Story, arg(R2, value, V)),
-  story(Story, arg(R1, object, O1)),
-  story(Story, arg(R2, object, O2)),
-  R1 != R2.
+depends(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(rel(DRel, DVal), a(id(T2, I2), id(T1, I1)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_depends_object_subject_rel(Rel, Value, DRel, DVal).
+
+conflicts(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(status(Status), a(id(T1, I1)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_conflicts_subject_status(Rel, Value, Status).
+
+conflicts(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(status(Status), a(id(T2, I2)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_conflicts_object_status(Rel, Value, Status).
+
+conflicts(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(state(State, SVal), a(id(T1, I1)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_conflicts_subject_state(Rel, Value, State, SVal).
+
+conflicts(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(state(State, SVal), a(id(T2, I2)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_conflicts_object_state(Rel, Value, State, SVal).
+
+conflicts(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(rel(CRel, CVal), a(id(T1, I1), id(T2, I2)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_conflicts_subject_object_rel(Rel, Value, CRel, CVal).
+
+conflicts(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(rel(CRel, CVal), a(id(T2, I2), id(T1, I1)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  rel(T1, T2, Rel),
+  rel_conflicts_object_subject_rel(Rel, Value, CRel, CVal).

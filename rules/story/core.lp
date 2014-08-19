@@ -1,13 +1,14 @@
 % core.lp
-% Core story predicates.
+% Core story rules.
 
-% There are two stories: the current story and the proposed story. Many rules
-% operate over both, but some are specific to one or the other, or even ferry
-% propositions and constraints between them.
-story(current).
-story(proposed).
+% Errors are not allowed.
+:- error(M).
 
-% Errors shall be minimized (disallowing them is more efficient but makes
-% debugging harder):
-%:- error(Message).
-#minimize { 1@0,error(Message) : error(Message) }.
+% There is a single assumed reader:
+id(reader, 0).
+
+% There is a cast of characters:
+id(chr, 0..8).
+
+% There are some key items:
+id(itm, 0..3).
