@@ -1,0 +1,36 @@
+% posession.lp
+% Items and inventories.
+
+% Fluents:
+% --------
+
+status(itm, destroyed).
+status_default(destroyed, _not(destroyed)).
+
+brel(itm, chr, is_carried_by).
+default_rel_value(is_carried_by, false).
+rel_exclusive(is_carried_by, true).
+
+brel(itm, chr, is_owned_by).
+default_rel_value(is_owned_by, false).
+rel_exclusive(is_owned_by, true).
+
+% Actions:
+% --------
+
+action(give_item).
+argument(give_item, subject, chr).
+argument(give_item, object, chr).
+argument(give_item, item, itm).
+precondition(give_item, fl(rel(is_carried_by, true), a(item, subject))).
+precondition(give_item, fl(colocated, a(subject, object))).
+causes(give_item, fl(rel(is_carried_by, true), a(item, object))).
+causes(give_item, fl(rel(is_carried_by, false), a(item, subject))).
+
+action(bestow_item).
+argument(bestow_item, subject, chr).
+argument(bestow_item, object, chr).
+argument(bestow_item, item, itm).
+precondition(bestow_item, fl(rel(is_owned_by, true), a(item, subject))).
+causes(bestow_item, fl(rel(is_owned_by, true), a(item, object))).
+causes(bestow_item, fl(rel(is_owned_by, false), a(item, subject))).

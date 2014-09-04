@@ -3,15 +3,15 @@
 
 % basic initiation and termination:
 
-holds(after(evt(X)), fl(Fl, Args)) :-
-  holds(before(evt(X)), fl(Fl, Args)),
+holds(after, evt(X), fl(Fl, Args)) :-
+  holds(before, evt(X), fl(Fl, Args)),
   not terminates(evt(X), fl(Fl, Args)).
 
-holds(after(evt(X)), fl(Fl, Args)) :-
+holds(after, evt(X), fl(Fl, Args)) :-
   initiates(evt(X), fl(Fl, Args)).
 
-holds(before(evt(X)), fl(Fl, Args)) :-
-  holds(after(evt(B)), fl(Fl, Args)),
+holds(before, evt(X), fl(Fl, Args)) :-
+  holds(after, evt(B), fl(Fl, Args)),
   event_next(evt(B), evt(X)).
 
 % conflicting fluents cannot coexist:
@@ -135,7 +135,7 @@ conflicts(
 % exclusive multi-valued relationships:
 
 fluent(a(T1, T2), rel(Rel, Value)) :-
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_value(Rel, Value).
 
 conflicts(
@@ -144,7 +144,7 @@ conflicts(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_value(Rel, Value),
   rel_value(Rel, Vother),
   Value != Vother.
@@ -155,7 +155,7 @@ depends(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_depends_subject_status(Rel, Value, Status).
 
 depends(
@@ -164,7 +164,7 @@ depends(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_depends_object_status(Rel, Value, Status).
 
 depends(
@@ -173,7 +173,7 @@ depends(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_depends_subject_state(Rel, Value, State, SVal).
 
 depends(
@@ -182,7 +182,7 @@ depends(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_depends_object_state(Rel, Value, State, SVal).
 
 depends(
@@ -191,7 +191,7 @@ depends(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_depends_subject_object_rel(Rel, Value, DRel, DVal).
 
 depends(
@@ -200,7 +200,7 @@ depends(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_depends_object_subject_rel(Rel, Value, DRel, DVal).
 
 conflicts(
@@ -209,7 +209,7 @@ conflicts(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_conflicts_subject_status(Rel, Value, Status).
 
 conflicts(
@@ -218,7 +218,7 @@ conflicts(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_conflicts_object_status(Rel, Value, Status).
 
 conflicts(
@@ -227,7 +227,7 @@ conflicts(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_conflicts_subject_state(Rel, Value, State, SVal).
 
 conflicts(
@@ -236,7 +236,7 @@ conflicts(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_conflicts_object_state(Rel, Value, State, SVal).
 
 conflicts(
@@ -245,7 +245,7 @@ conflicts(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_conflicts_subject_object_rel(Rel, Value, CRel, CVal).
 
 conflicts(
@@ -254,5 +254,27 @@ conflicts(
 ) :-
   id(T1, I1),
   id(T2, I2),
-  rel(T1, T2, Rel),
+  relationship(T1, T2, Rel),
   rel_conflicts_object_subject_rel(Rel, Value, CRel, CVal).
+
+conflicts(
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I2))),
+  fl(rel(Rel, Value), a(id(T1, I1), id(T2, I3)))
+) :-
+  id(T1, I1),
+  id(T2, I2),
+  id(T2, I3),
+  I2 != I3,
+  relationship(T1, T2, Rel),
+  rel_exclusive(Rel, Value).
+
+% Shorthand for binary relationships:
+
+relationship(T1, T2, Rel) :-
+  brel(T1, T2, Rel).
+
+rel_value(Rel, true) :-
+  brel(T1, T2, Rel).
+
+rel_value(Rel, false) :-
+  brel(T1, T2, Rel).

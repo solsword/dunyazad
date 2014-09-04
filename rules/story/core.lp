@@ -11,4 +11,7 @@ id(reader, 0).
 id(chr, 0..8).
 
 % There are some key items:
-id(itm, 0..3).
+id(itm, 0..10).
+
+% And some locations:
+id(loc, 0..20).
