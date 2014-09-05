@@ -1,15 +1,17 @@
-The news of the sprouting of the Tree of Wishes reached all the way across the continent to the port city of Ulms-Iber on the Dawnsea, capitol of the country of Kolum.
+The news of the sprouting of the Tree of Wishes reached all the way across the continent to the port city of Ulms-Iber on the Dawnssea, capitol of the country of Kolum.
 It had been a dusty year in Ulms-Iber, full of petty arguments and not-great news, so a hopeful rumor was well-received, even if it was no more than that.
 Haareng and the Twilight Ocean were so far from Kolum that to most in Ulms-Iber, the news of the sprouting sounded like something from a fairy-tale.
 But there were those who took it seriously:
-Travelling merchants asked each other for information about Haareng, nobles considered the political implications, and in a quiet corner of the city, someone started packing for a very long journey.
+Travelling merchants asked each other for information about Haareng, nobles considered the political implications, and in a quiet corner of the city, someone started preparing for a very long journey.
 
 But who would start a journey based on little more than a myth?
 What kind of person would consider leaving behind even an uncomfortable life to journey across a continent?
 
 
-1. Perhaps someone whose life was more than merely uncomfortable? Someone desperate enough that the rumor of a wish seemed a better prospect than what Ulms-Iber had to offer?
+\begin{enumerate}
+  \item \textbf{Perhaps someone whose life was more than merely uncomfortable? Someone desperate enough that the rumor of a wish seemed a better prospect than what Ulms-Iber had to offer?}
 
-2. Perhaps someone whose life was too comfortable, who longed for a taste of adventure and perhaps didn't comprehend what that really meant? Someone who wasn't afraid to leave a life behind because they took it completely for granted?
+  \item Perhaps someone whose life was too comfortable, who longed for a taste of adventure and perhaps didn't comprehend what that really meant? Someone who wasn't afraid to leave a life behind because they took it completely for granted?
 
-3. Perhaps someone with a strong sense of duty? Someone who had the best interests of a nation at heart, and who saw no alternative to a desperate chance?
+  \item Perhaps someone with a strong sense of duty? Someone who had the best interests of a nation at heart, and who saw no alternative to a desperate chance?
+\end{enumerate}

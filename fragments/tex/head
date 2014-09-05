@@ -1,0 +1,6 @@
+\documentclass[12pt]{article}
+
+\newcommand{\sep}{\begin{center}\rule{6em}{0.4pt}\end{center}\vspace{1em}}
+
+\begin{document}
+

@@ -1,0 +1,167 @@
+Arel decided that the Westgate was the safest option: being close to the Stumbling Boar was a risk but it also meant she could leave more quickly.
+It was also the right direction to reach Haareng, she thought.
+Now she faced another choice, however: in her condition she probably couldn't walk for more than half a day, and everything outside the walls of Ulms-Iber was foreign to her.
+Should she steal some money from a merchant while she's still in the city, try to steal some food from a stall, or just leave?
+
+\begin{enumerate}
+  \item She should try to steal some money from a merchant, like she'd done a hundred times before. It's true that sometimes she'd been forced to run to one of the bolt-holes scattered throughout the city, and if that happened it would delay her escape from the city, but she'd not actually been caught once (which was why she still had both hands).
+  \item \textbf{She should try to steal some food from a stall. Normally this was forbidden, since the merchants all paid protection money these days, but Arel had done it a couple of times when Milo had given permission. Stealing from a stall was harder than lifting a purse because the people who ran stalls were more savvy than the easiest marks, but what Arel needed most right then was food, not money, and there was no guarantee she'd be able to exchange money for food outside the city.}
+  \item She should just leave. Now that she was no longer obedient to king Lom, even if she hadn't acted on that attitude yet, a part of her was silently screaming in fear every second she stayed in the city. Milo's absence that morning might even be an opportunity, and if so, she should grasp it while still she could.
+\end{enumerate}
+
+\sep
+
+Arel swung by the lower market on her way to the Westgate.
+As easy as it would be to steal someone's purse, she couldn't buy something with the money in the city without attracting attention, and what she needed most right now was food.
+Unlike Oli she wasn't prepared to settle for starving in the wilds.
+
+She hadn't stolen food from a stall in a long time, but her hands were still quick and her eyes were sharp.
+She had to do it unnoticed, though: there would be no point in running to a bolt-hole if she were discovered.
+Luckily, the merchants who paid protection money let down their guard a bit.
+There was some unsanctioned thievery of course, but it wasn't common enough to warrant true vigilance.
+
+Of course, in her current beggar's rags, anyone smart would be keeping an eye on her if she wandered near their stall.
+Not everyone in the world was smart though.
+She drifted down a row of stalls near the edge of the market, quietly noting which merchants took note of her approach.
+Her clothing might make her look like someone desperate for a meal, but it also kept her anonymous: nobody really wanted to pay attention to a beggar.
+She picked her mark and walked on quite a ways, circling back through a warren of alleyways to approach again from a different street.
+
+As expected, nobody seemed to realize she was the same beggar as the one who had just walked past, given how quickly she had circled around.
+When she came to her mark, the proprietor was still negotiating avidly with a customer who had brought a cart and was obviously looking to buy in bulk, and she easily palmed as many vegetables as she could comfortably carry under her robe and walked on without him being any the wiser.
+She could only hope that none of king Lom's observers had noticed, but she was relatively confident she had gotten away with it.
+No time to stop and enjoy her plunder, though: she headed for the Westgate, taking twisting alleys and side lanes to avoid notice as much as possible.
+
+When she reached the gate, she slumped down near the mouth of an alleyway with a clear view of the traffic, just another beggar in a city full of them.
+The guards at the gate were clearly not too serious about their duties, waving most traffic through without so much as a word.
+They even seemed to have a flagon of wine in the guardhouse at the gate, which she saw passed out to the two guards on duty once in a while.
+She watched patiently as the traffic passed by:
+Carts loaded with merchandise both entering and leaving the city, some solitary travellers with walking staves wearing long robes against the heat, a few peasants from the fields outside with some business in the city, and even a group of pilgrims with broad hats and intricate pendants.
+
+She had to think of a way to get through the gate without attracting the notice of the guards.
+They doubtless had some part in king Lom's business, just like her, and if they grew too suspicious she'd end up like Oli.
+She immediately wished she had asked him which gate he had tried to leave by, but all she could do now was hope it hadn't been the Westgate.
+Thinking about the traffic through the gate, she decided she had a few options, although she didn't exactly like any of them:
+
+\begin{enumerate}
+  \item She could try to tag along at the back of a caravan passing through. The carts were big and dusty and the guards might not notice an extra person at the end of the line. Caravans always had plenty of guards and laborers walking alongside, but her clothes would stand out, and if the people of the caravan noticed her they might suspect she was trying to rob them and turn her in.
+  \item She could ask to join a band of pilgrims, if another group passed by. She didn't know much about the Spirits, but she had heard that pilgrims usually traveled in open groups and welcomed any who wanted to join them. The guards would probably be hesitant to stop someone on a religious mission, and the pilgrims weren't likely to immediately report her even if they wouldn't let her join them.
+  \item \textbf{She could pretend to be on king Lom's business outside the walls. She was pretty confident that the gate guards were in his pay one way or another, and they'd probably let her through, but they'd almost certainly report the incident to their superiors, and she didn't know whether they'd send someone to follow her or not. If she was lucky, nobody would care enough to bother coming after her once she was gone.}
+\end{enumerate}
+
+\sep
+
+Arel approached the guards alone, wearing her beggar's rags.
+She chose to approach a few hundred feet ahead of a caravan, so the guards wouldn't have much time to think about their decisions.
+Her heart almost lept into her throat when she saw them immediately take note of her approach.
+This wasn't going to be easy.
+
+``Now where do you think you're going, fisher?'' the words were like ice-water on her spine.
+Dressed as a beggar, why would they know she was a thief?
+She didn't recognize either of the guards at the gate...
+Had Milo already told them to look out for her?
+That shouldn't be possible; he had been gone when she left and she wouldn't even be expected back at the Stumbling Boar by now.
+She wasn't about to abandon her plan now though.
+
+Even as a familiar feeling of futility settled over her, she said ``The king told me to visit someone out in the fields.''
+
+``So even a beggar like you can get an audience with the king himself?'' the guard laughed in a nasty way.
+His partner eyed the approaching caravan, but the first guard called out in the direction of the gatehouse:
+
+``Hey Milo, some see what we've got over here!''
+Arel found herself horrified for the second time in their short conversation.
+Sure enough, Milo appeared at the entrance to the guardhouse, holding the flagon of wine.
+
+``You want sh'more already, you greedy bastards?'' he yelled, before focusing his bleary eyes on the person standing at the gate.
+Suddenly he seemed to become a lot more sober.
+Staring directly at Arel from not more than twenty paces away, he said in a cold, almost quiet voice:
+
+``Come here now.''
+
+\vspace{1em}
+
+Arel felt suddenly calm.
+The despair that had been clinging to her a second ago was somehow gone, all she felt was purpose and a sense of simplicity.
+She living in the world of yesterday where Milo's word was absolute.
+She was living in a new world where she was going to go to Haareng and fulfil a wish.
+With calm, serious eyes, she said one word, ``No,'' and then she ran.
+The gates were open, the guards weren't expecting it, and before they had even turned to see where she was her foot had touched down outside the walls.
+
+She was hungry and exhausted, but her body felt light as a feather, and her head was filled with a single thought: run.
+She didn't look back; didn't see whatever happened behind her, barely even heard shouts and sounds of pursuit.
+For a few minutes after the initial seconds she heard heavy boots and panting breath behind her, and even Milo's voice shouting ``Arel!'' but fueled by an oddly overwhelming sense of rightness she ran on, head down, bare feet pounding on the dry road, adrenaline filling her veins.
+The guards were wearing armor and soon found that they couldn't keep up.
+Milo should have been able to chase her down: he was a strong man, and she was a half-starved teen, but he'd gone through more than a flagon of strong wine with his friends that morning, and he'd been drinking more than they had.
+
+He wasn't going to give up easily though, and Arel found that her initial burst of speed was fading.
+She started gasping for breath, her legs and lungs suddenly felt like they were on fire.
+Milo was a good distance behind but he hadn't stopped, and she found she couldn't keep up a full sprint.
+Loping now and gulping air, she found her exhilaration being slowly replaced by fear, but she kept going.
+She focused all of her thoughts on running, willing her uncooperative legs to keep moving.
+The running had turned from a dream into a nightmare, but she kept going.
+
+Finally, having pushed her body to its limits, she dropped to the ground.
+Milo was nowhere to be seen, but the idea that she had actually escaped seemed ridiculous.
+She crawled to the ditch at the side of the road and lay in the dust, coughing and choking.
+Even thinking felt like a monumental effort, so she just lay there.
+
+It wasn't until she opened her eyes that she realized she had lost consciousness.
+She was immediately assaulted by a combination of exhaustion, pain, thirst, hunger, and fear.
+She didn't know how far she had run, or how long had passed since she'd crawled into the ditch, but she knew she couldn't stay where she was.
+
+Looking around, she found her surroundings completely alien.
+Open land stretched away for what seemed like forever; crops growing on either side of the road.
+She could still see the city, and when she looked back it appeared both frighteningly close and endlessly distant.
+She had never been this far from a building in her life.
+
+There were farmhouses spaced along the road, and nearby something that looked like a run-down shack.
+A little ways ahead the road turned to skirt a bit of marshy land, and in the distance ahead she could see foothills rising to meet mountains, but mostly her surroundings seemed overwhelmingly empty.
+
+Her body seemed to decide that she had had enough time to look around, and insisted that her biggest problem right now was thirst.
+Her throat felt lined with dust, and even crouching on the ground, she felt a bit faint and dizzy.
+She didn't see anything that looked like a well nearby, so she only had two options:
+
+\begin{enumerate}
+  \item She could drag herself to the nearest farmhouse and beg for water. Surely that wasn't too much to grant a stranger. It might make following her trail easier, but was that really such an important concern right now?
+  \item \textbf{She could head towards the swampy area ahead and look for a puddle to drink from. It certainly didn't sound appealing, but in her present condition, she wasn't sure if she could deal with human contact, and the bushes growing in the low land might leave her a little less exposed than she was currently.}
+\end{enumerate}
+
+\sep
+
+She gathered her energy and stumbled onwards in the dry ditch.
+It took her far longer than she had expected to reach the bend in the road, and when she got there, she didn't see any standing water.
+There ground was soggy in places though, and she wound up pulling up clumps of dirt and grass and squeezing precious drops of muddy water into her mouth.
+The scrawny bushes growing in the small marsh did little to ease her feeling of exposure, but at least she couldn't see the Westgate directly from where she was any more.
+
+She found herself chewing on some moss and thought about food.
+Immediately she remembered, as if crystal clear, the moment at the gate when she had started running.
+In that desperate instant, the vegetables she had stolen from the careless merchant in the city had been forgotten, and for all she knew they were still lying on the ground before the gate, crushed into the dust beneath the hooves of oxen and the wheels of caravans.
+Her mood returned to a familiar darkness, but at least she no longer felt dizzy and faint.
+Just exhausted, hungry, and afraid.
+
+She realized reluctantly that her hunger would have to wait.
+She was no stranger to skipping meals, and the most pressing problem was being discovered by Milo or someone he sent after her.
+She knew that she wouldn't be able to travel much father, either, so she'd have to find some way to hide herself.
+Stuffing handfuls of wet moss into the pockets of her tattered robe, she considered her options.
+
+\begin{enumerate}
+  \item \textbf{She could crawl into a nearby field and hope that she wasn't discovered. Some of the crops were high enough already to cover her from the road if she lay down, and there were far too many farm plots along the road for anyone to search them thoroughly.}
+  \item She could sneak into a barn or farm shack and try to hide there, but if someone was looking for here they might go so far as to check buildings along the road. The idea of being surrounded by walls was appealing to her though.
+  \item She could try to walk further on the road and see if a better hiding place presented itself, but she could see pretty far in this flat country and nothing obvious lay on the road ahead.
+\end{enumerate}
+
+\sep
+
+Arel decided that hiding in a field would be the safest option.
+Not far ahead was a field with some waist-high grass growing in it, so she approached it and carefully walked along the edge without disturbing the plants.
+The green stalks were planted too closely for her to slip amongst them, so she walked away from the main road until she came to the far edge of the field.
+
+A thin track separated that field from the next, and to her dismay she saw that the next field was growing some kind of flower, which barely came halfway to her knees.
+Sleeping there she'd be hidden from the road, but completely exposed to anyone coming from the other direction.
+Still, she lay down to test the hiding spot and she couldn't actually see any farmhouses from it directly.
+When she thought about getting up again and finding a better spot, the fact that she was already prone quickly became quite convincing.
+
+Exhausted and hungry, her mouth full of dirt and uncertain of what to expect from the next day, she finally let sleep take her.
+Based on physical exertion alone she should have slept quite soundly, but the strange environment and a thousand nagging doubts made her sleep fitful.
+Between the unfamiliar night noises of the countryside and a host of nightmares, she found herself constantly jerking awake, but as soon as she did so, her fatigue would drag her back to sleep.
+When morning finally came, she stared blearily at the brightening sky in confusion for a minute before she realized what it meant:
+Today was her first day outside the city.
