@@ -1,12 +1,14 @@
 Arel bumped into someone and stumbled to the ground.
-``Watch where you're walking, waif!'' and the stranger moved on, no sympathy for a dusty beggar dressed in rags.
+
+“Watch where you're walking, waif!” and the stranger moved on, no sympathy for a dusty beggar dressed in rags.
+
 Picking herself up, she limped along, skirting the lower market of Ulms-Iber on side-streets where beggars were tolerated.
 A lanky teen wearing a tattered robe and head-wrap, she attracted little notice from the people of the city: Just another vagrant, another sign of the times.
 She in turn paid them little mind, too focused on her own bleak thoughts.
 
 She hated the city, nothing but dust and closed doors.
 She hated the people who turned away, too uncomfortable to even look at her.
-Even those who offered her money were hesitant, as if she might somehow betray their paltry `trust.'
+Even those who offered her money were hesitant, as if she might somehow betray their paltry ‘trust.’
 Mixed with hatred was an exhausting cloud of despair.
 Nothing to look forward to, only problems in the future.
 As bleak as her present condition was, where would she be a year from now, or five?
@@ -16,16 +18,16 @@ Not King Mera of Kolum of course, but the king of Muck, Lom the One-Eyed, Master
 She hefted the purse she had lifted from the stranger earlier and knocked twice on an unmarked door.
 The shutter opened and closed, and then the door did the same, leaving the alley empty.
 
-``Catch any fish?'' Milo's words were quiet but firm.
+“Catch any fish?” Milo's words were quiet but firm.
 
 Arel silently dropped the purse into an outstretched hand.
 
-``Stay in for a while then. Wouldn't want anyone to mistake you for a thief.''
+“Stay in for a while then. Wouldn't want anyone to mistake you for a thief.”
 
 Arel went down the hallway to the back room, ignoring the sounds of laughter from the tavern in the front.
 She sat down on a cot and closed her eyes.
 These hours spent confined in the dark back room were perhaps the least favorite part of her days.
-At least out on the streets she had something to occupy her mind, scanning the crowds for targets and reeling in her `catch.'
+At least out on the streets she had something to occupy her mind, scanning the crowds for targets and reeling in her ‘catch.’
 Here in the back room, hiding from the outside world, there was nothing to do but think, and thinking these days felt like an endless parade of misery.
 
 Two years ago she had learned the hard way that money wasn't worth a thing unless you had power.
@@ -41,16 +43,18 @@ For a moment at least she could be like the merchants that ate in the market eve
 Maybe the vendor who sold her the meal thought he was doing her a favor, but he certainly wasn't stupid enough not to report her, and he handed over the money she had paid along with his usual sum just to be safe.
 
 She then found out that actually, any money dropped on the street did belong to Lom, and that by kicking you in the stomach, even a meal you've already eaten can be taken away from you.
-Of course, nobody believed that she'd really just found the money either, and so she was `promoted' from beggar to cutpurse.
+Of course, nobody believed that she'd really just found the money either, and so she was ‘promoted’ from beggar to cutpurse.
 
 She was good at lifting purses, and her old self would probably have enjoyed it, but some part of her had finally given in, and she didn't seem to be capable of enjoying anything any more.
 She spent more and more of her days somewhere between anger and despair, and she wasn't even angry at Milo or king Lom: she knew better now than to defy them.
 She had grown more violent recently, but she didn't feel any joy or release in it: it just seemed an appropriate way of responding to the world.
 
-The door opened and someone was roughly shoved inside, falling to the floor.
+*page_break
+
+The door opened, interrupting Arel's dark thoughts, and someone was shoved inside, falling to the floor.
 She heard Milo's rough voice from the corridor:
 
-``...and don't think to try that again!''
+“...and don't think to try that again!”
 
 The door slammed and locked this time.
 The form on the floor moaned softly but didn't seem inclined to stand; she vaguely recognized him as Oli, another of Milo's fishers.
@@ -59,35 +63,35 @@ Arel just sat there as he lay on the floor and groaned: whatever he had done was
 
 After a while he seemed to come to his senses and noticed her.
 
-``Arel.''
+“Arel.”
 
-``Oli.''
+“Oli.”
 
 They were both silent for a bit.
 
 Oli finally mustered the strength to crawl onto one of the cots, at which point he groaned again and closed his eyes.
 
-``Want to know what I did this time?'' it sounded as though even talking was painful for him.
+“Want to know what I did this time?” it sounded as though even talking was painful for him.
 Arel didn't really, but she waited for him to continue, since she knew he would regardless.
 Oli grunted and winced.
 
-``I tried to get out of this damned hell-hole!''
+“I tried to get out of this damned hell-hole!”
 
 Oli's vehemence was surprising, but Arel still didn't say anything.
 This was different from his usual antics, she guessed.
 
-``Had enough, and thought I'd just walk out of the city and starve to death in the wilds if that's what it took.''
+“Had enough, and thought I'd just walk out of the city and starve to death in the wilds if that's what it took.”
 
 Arel blinked.
 Not much point in that, and look where it had landed him regardless.
 
-``There's a rumor, had you heard? The king of Haareng has a tree that will grant a wish. Seems like a good excuse, right?''
+“There's a rumor, had you heard? The king of Haareng has a tree that will grant a wish. Seems like a good excuse, right?”
 
-``I don't even know where Haareng is...'' he mumbled.
+“I don't even know where Haareng is...” he mumbled.
 
-``The guards at the gate were looking out for me though. Guess king Lom's got a lot of friends in this--'' he spat ``--city.''
+“The guards at the gate were looking out for me though. Guess king Lom's got a lot of friends in this—” he spat “—city.”
 
-He continued softly, ``...I get it, you don't even care, do you. Might be nice, not to feel anything.''
+He continued softly, “...I get it, you don't even care, do you. Might be nice, not to feel anything.”
 
 It was true that she didn't care, but she certainly didn't feel nothing.
 She felt awful.
@@ -95,7 +99,8 @@ All the time.
 Rage and misery, even apathy could only dull their edge a bit.
 She turned away from him.
 
-``...well at least you're not like those bastards!'' again she heard a spark of real anger in his voice.
+“...well at least you're not like those bastards!” again she heard a spark of real anger in his voice.
+
 She knew, though, that there was nothing anyone could do about king Lom.
 That was one of the foundations of her reality, just one of the unchangeable properties of the world.
 King Lom ruled Ulms-Iber, not just the back streets but all of it, and to go against him resulted in punishment, just as surely as throwing a ball up meant that it would come back down.
@@ -103,7 +108,7 @@ A familiar surge of frustration sent her thoughts back into a spiral of misery.
 
 In the evening when Milo let her out, Oli was unconscious.
 
-``Good job this morning. Catch another big one if you can.''
+“Good job this morning. Catch another big one if you can.”
 
 Milo let her out the side door and into the alley.
 The sun was just beginning to set, so most customers would be heading for home, as merchants packed up their stalls.
@@ -111,16 +116,16 @@ If she didn't find a mark fast, she'd have to find someone shopping at the night
 She relaxed just a bit as she started moving towards the market, letting her brain focus on the task at hand.
 
 There, a teenager, maybe her own age, buying dried fruits from an open stall.
-Probably gullible, and--she saw him hand over a silver piece and watched the merchant dig for change--rich.
+Probably gullible, and—she saw him hand over a silver piece and watched the merchant dig for change—rich.
 She hesitated a bit as her mark tied his coin pouch securely to his belt and looked around suspiciously, as if afraid someone was watching him.
 After the incident with Oli earlier, finding such a perfect mark felt somehow off.
 Not only was he rich, but he had no idea how to protect his purse, and she knew that his suspicions, though well-founded, would only serve to distract him from her task.
 
 She approached as usual, a beggar with a slight limp walking along the edge of the dimly-lit street, clutching an empty bowl.
-As he walked past, her limp turned into a stumble and she lurched next to him, quickly cutting the exposed string of his pouch and secreting it into her cloak, at the same time hooking a weighted `bird' in its place so he wouldn't notice the absence.
+As he walked past, her limp turned into a stumble and she lurched next to him, quickly cutting the exposed string of his pouch and secreting it into her cloak, at the same time hooking a weighted ‘bird’ in its place so he wouldn't notice the absence.
 
-``Oh!'' he looked around quickly before looking at her, just the reaction she had been expecting.
-What he said next surprised her though: ``I'm sorry.''
+“Oh!” he looked around quickly before looking at her, just the reaction she had been expecting.
+What he said next surprised her though: “I'm sorry.”
 Confused, she merely coughed and limped back towards the edge of the road.
 She was the one who was supposed to apologize.
 She felt him look at her awkwardly for another moment before turning back to his path.
@@ -140,19 +145,19 @@ She lay down and went to sleep quickly, exhaustion taking over from hunger.
 Before she drifted off she vaguely hoped that Milo wouldn't wake her for a night shift tonight.
 
 When he inevitably did, she smothered her thoughts and stood up blearily, heading towards the door.
-He grabber her arm, though, and whispered ``Wait.''
+He grabber her arm, though, and whispered “Wait.”
 She turned to look at him with a blank expression.
 Besides Oli, two other fishers were sleeping in the back room now, but Milo knew she didn't like to work with a partner.
 He gestured towards Oli, miming picking him up.
 For a second, her mind raced, thinking of... too many things.
 
-Was she finally going to become one of the `them' that Oli had mentioned just that morning?
-She \emph{did not want} that.
+Was she finally going to become one of the ‘them’ that Oli had mentioned just that morning?
+She [i]did not want[/i] that.
 She didn't even care for Oli particularly; that morning he had only talked to her because she was a person to talk to.
 What meagre camaraderie existed between Milo's fishers couldn't be called as much as friendship even, and she didn't share Oli's anger at Milo and what he represented.
 But part of her fundamentally refused to become... something.
 
-But her merciless internal logic marched onwards.
+Her internal logic marched onwards, though.
 Milo was asking her to do something.
 No, he was telling her to do it.
 What would she do?
@@ -161,18 +166,18 @@ There was no other choice, she had learned that.
 
 Milo saw her hesitation and shook his head, pointing to Oli.
 
-``Look,'' he whispered.
+“Look,” he whispered.
 
 She looked at Oli, sleeping soundly, his face a mass of bruises.
 She blankly looked back at Milo, and he grabbed her arm and placed her hand against his forehead.
 A shiver went through her as her thoughts spun out of control.
 
-``Oh.'' she said quite loudly.
+“Oh.” she said quite loudly.
 
 Milo gave her a harried look and put a finger to his lips.
 He mimed picking up again.
 This time she complied, grabbing Oli's clammy shoulders and hoisting him, along with Milo, before quietly carrying him outside.
-Later she would remember the sheer \emph{wrongness} of the corpse, the flesh cold and stiff where it should have been warm and flexible, but she barely thought anything at all as she and Milo carried it through the streets.
+Later she would remember the sheer [i]wrongness[/i] of the corpse, the flesh cold and stiff where it should have been warm and flexible, but she barely thought anything at all as she and Milo carried it through the streets.
 She didn't even wonder where they were going until they came close to the seawall.
 
 They put the corpse down as Milo walked ahead to talk to a guard, and then they carried it through an empty guardhouse and up two flights of stairs to the top of the wall.
@@ -181,7 +186,7 @@ The crashing waves below couldn't quite mask the sound of the body hitting the r
 Milo grabbed her by the collar and hauled her up to face him.
 He looked a bit different than usual, but there was no mistaking the finality in his voice:
 
-``It's too bad that Oli killed himself. I don't know how he managed to get up the wall without the guards noticing, but it's happened before. Now let's get back to the Stumbling Boar and get to sleep.''
+“It's too bad that Oli killed himself. I don't know how he managed to get up the wall without the guards noticing, but it's happened before. Now let's get back to the Stumbling Boar and get to sleep.”
 
 Arel stared at him blankly for a second, and then looked down.
 Milo seemed satisfied with that and they made their way back to the tavern.
@@ -195,32 +200,34 @@ She honestly had never thought of Oli as a friend or even fellow, despite their 
 She had seen corpses before at public executions and abandoned in alleyways, even.
 Trying to piece together some coherent train of thought, she reached backwards, and latched onto something.
 
-She hadn't wanted to become one of `them.'
+She hadn't wanted to become one of ‘them.’
 She wasn't even certain what that meant, but she knew that there was a difference between Milo, an impersonal force of the world, and herself, a... person?
 Her thoughts stumbled again.
 Milo had looked... scared, up on the wall.
 Maybe he too was a person.
 She dropped that mystery and started over again.
 
-She hadn't wanted to become one of `them.'
+She hadn't wanted to become one of ‘them.’
 What would she do now?
 But the harsh voice that normally thrust her forward on the path of obedience and survival seemed to be gone.
 The first hints of dawn were starting to creep into the room, and she asked herself again: what would she do now?
 She didn't know any more, but arbitrarily she decided that this day would not be the same as the ones before it.
 She made the decision not out of desperation but out of a kind of innocent curiosity.
 
-``What if today were not like yesterday?''
-``That would be interesting.''
+“What if today were not like yesterday?”
+“That would be interesting.”
 
 And suddenly Oli's words from the previous morning came back to her:
 
-``...get out of this damned hell-hole!''
+“...get out of this damned hell-hole!”
 
 He had done it, at the end, she thought, and so would she, only better.
 She would get out of the city alive, and why not?
 She would visit the King of Haareng and make a wish.
 
-Suddenly her hunger and exhaustion returned, and with them the crushing weight of despair.
+*page_break
+
+Suddenly her hunger and exhaustion returned, and with them the crushing weight of depression.
 She flopped down on the cot and let it wash over her, misery blotting out her other thoughts.
 
 About mid-morning her hunger woke her.
@@ -237,7 +244,7 @@ Return the purse to Milo.
 Somehow today she wasn't following her usual routine though.
 
 She was still standing in the alley outside the Stumbling Boar, in fact.
-And when she thought ``What am I doing?'' the answer surprised her.
+And when she thought “What am I doing?” the answer surprised her.
 She was leaving Ulms-Iber.
 She was leaving Ulms-Iber to travel to Haareng and get a wish from the King there.
 Even more surprising than that thought was the fact that there was no counter-thought, no immediate and devastating reply from the other half of her brain.
@@ -248,14 +255,35 @@ She was still leaving Ulms-Iber.
 She was still headed to Haareng.
 Those were the new facts of her existence, and it was as if the old ones had been shorn away.
 
-Having figured out what she was doing, Arel was faced with a decision: should she try to sneak out through one of the city gates, as Ori had done, or should she try to stow away aboard a ship, and leave by sea? She knew that Haareng was on the Twighlight Ocean, which was far to the west, and that Ulms-Iber was a port on the Dawnssea, but beyond that, she had no knowledge of geography.
+Now she faced a choice, however: in her condition she probably couldn't travel for more than a few days, and everything outside the walls of Ulms-Iber was foreign to her.
+Should she steal some money from a merchant while she was still in the city, try to steal some food from a stall, or just leave as quickly as possible?
 
-\begin{enumerate}
-  \item She should try to leave by the Northgate, where heavy traffic may mean distracted guards. The Northgate was also furthest from the Stumbling Boar and Milo's territory, although king Lom has people throughout the city.
+*choice
+  #She should try to steal some money from a merchant, like she'd done a hundred times before. It was true that sometimes she'd been forced to run to one of the bolt-holes scattered throughout the city, and if that happened it would delay her departure, but she'd not actually been caught once (which was why she still had both hands).
+    *gosub_scene arel_pre_departure steal_money
+    *goto after_stealing
 
-  \item She should try to leave by the Southgate, which also has heavy traffic, but which was much closer to the Stumbling Boar.
+  #She should try to steal some food from a stall. Normally this was forbidden, since the merchants all paid protection money these days, but Arel had done it a couple of times when Milo had given permission. Stealing from a stall was harder than lifting a purse because the people who ran stalls were more savvy than the easiest marks, but what Arel needed most right then was food, not money, and there was no guarantee she'd be able to exchange money for food outside the city.
+    *gosub_scene arel_pre_departure steal_food
+    *goto after_stealing
 
-  \item \textbf{She should try to leave by the Westgate, where little traffic might mean lazy guards, although it was quite close to the Stumbling Boar.}
+  #She should just leave. Now that she was no longer obedient to king Lom, even if she hadn't acted on that attitude yet, a part of her was silently screaming in fear every second she stayed in the city. Milo's absence that morning might even be an opportunity, and if so, she should grasp it while still she could.
+    *gosub_scene arel_pre_departure steal_nothing
+    *goto after_stealing
 
-  \item She should try to leave by stowing away on a merchant vessel. Arel had no experience with ships, but had heard of fugitives being caught hiding on boats before, and it seemed least likely that Milo would look for her at the docks.
-\end{enumerate}
+*label after_stealing
+
+Arel now had to decide how to get out of the city: should she try to sneak out through one of the city gates, as Ori had done, or should she try to stow away aboard a ship, and leave by sea? She knew that Haareng was on the Twighlight Ocean, which was far to the west, and that Ulms-Iber was a port on the Dawnssea, but beyond that, she had no knowledge of geography.
+
+*choice
+  #She should try to leave by the Northgate, where heavy traffic might mean distracted guards. The Northgate was also furthest from the Stumbling Boar and Milo's territory, although king Lom had people throughout the city.
+    *goto_scene arel_departure_northgate
+
+  #She should try to leave by the Southgate, which also had heavy traffic, but which was much closer to the Stumbling Boar.
+    *goto_scene arel_departure_southgate
+
+  #She should try to leave by the Westgate, where little traffic might mean lazy guards, although it was quite close to the Stumbling Boar.
+    *goto_scene arel_departure_westgate
+
+  #She should try to leave by stowing away on a merchant vessel. Arel had no experience with ships, but had heard of fugitives being caught hiding on boats before, and it seemed least likely that Milo would look for her at the docks.
+    *goto_scene arel_departure_harbor

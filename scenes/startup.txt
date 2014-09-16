@@ -1,0 +1,9 @@
+*title The Legend of the Tree of Life and Death
+*author Dunyazad
+*scene_list
+  startup
+  prologue
+
+*create what_arel_stole_in_the_intro "unknown"
+
+*finish

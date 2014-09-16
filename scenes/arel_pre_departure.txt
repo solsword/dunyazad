@@ -1,0 +1,28 @@
+*label steal_money
+*return
+
+*label steal_food
+
+Arel headed over to the lower market.
+As easy as it would be to steal someone's purse, she couldn't buy something with the money in the city without attracting attention, and what she needed most right now was food.
+Unlike Oli she wasn't prepared to settle for starving in the wilds.
+
+She hadn't stolen food from a stall in a long time, but her hands were still quick and her eyes were sharp.
+She had to do it unnoticed, though: there would be no point in running to a bolt-hole if she were discovered.
+Luckily, the merchants who paid protection money let down their guard a bit.
+There was some unsanctioned thievery of course, but it wasn't common enough to warrant true vigilance.
+
+Of course, in her current beggar's rags, anyone smart would be keeping an eye on her if she wandered near their stall.
+Not everyone in the world was smart though.
+She drifted down a row of stalls near the edge of the market, remembering which merchants took note of her approach.
+Her clothing might make her look like someone desperate for a meal, but it also kept her anonymous: nobody really wanted to pay attention to a beggar.
+She picked her mark and walked on quite a ways, circling back through a warren of alleyways to approach again from a different street.
+
+As expected, nobody seemed to realize she was the same beggar as the one who had just walked past, given how quickly she had circled around.
+When she came to her mark, the proprietor was still negotiating avidly with a customer who had brought a cart and was obviously looking to buy in bulk, and she easily palmed as many vegetables as she could comfortably carry under her robe and walked on without him being any the wiser.
+She could only hope that none of king Lom's observers had noticed, but she was relatively confident she had gotten away with it.
+No time to stop and enjoy her plunder, though: she needed to get out of the city as soon as possible.
+*return
+
+*label steal_nothing
+*return

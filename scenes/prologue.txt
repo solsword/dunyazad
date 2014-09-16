@@ -1,0 +1,53 @@
+Legends thrive in every place and age.
+They are told around the campfires of shepherds and the fountains of nobles; they drift through the consciousness of one age and pass on to the next.
+Always changing as times and tellers change, yet they have an odd persistence, coming back to the same themes again and again.
+Legends connect an endless multitude of listeners to a common dream, and thereby to each other; they knit together the fabric of culture.
+
+This is a tale of the Age of Spirits; told by merchants and travellers, warriors and sages, it has fragmented into a thousand variations.
+Whether sung by a bard to a tavern of strangers or repeated by a grandmother to a circle of children, it has captured the imagination of audiences across the lands.
+And so, in this Age of The Sun, let me tell you a story both new and old, both remembered and forgotten: The Legend of the Tree of Life and Death...
+
+*page_break
+
+In the Age of Spirits, a kingdom called Haareng stretched along the coast of the Twighlight Ocean, from the Bay of Firs in the north to the Giant's Forest in the south.
+Its people were prosperous, tilling fertile land and trading with other nations along the coast.
+Its capitol, Amerel, was a bustling port at the mouth of the Veren River, and it was said that treasures from across the world were collected there by King Ogin.
+
+Although the vaults of King Ogin were said to contain countless wonders, the king's most prized possession was kept not in a locked chest, but in the king's garden.
+Amidst exotic flowers and lush grasses there grew a gnarled tree, leafless branches stretching in all directions.
+This was the Tree of Life and Death, known better by its other name, the Tree of Wishes.
+Although it showed no outward sign of life, the tree nonetheless gave an impression of overwhelming vitality, such that no-one who saw it doubted that it still lived.
+
+According to the people of Amerel, the Tree of Wishes was a vital national treasure.
+Hadn't the king used it to end the drought four years ago, and to stop the flooding before that?
+No-one knew exactly how, but the tree surely granted wishes, perhaps to those who ate its fruit, or smelled its flowers.
+When the island raiders were plaguing the coast, hadn't a sudden storm decimated their fleet?
+And before that, when the giants came out of their forest, the previous king had convinced them to return.
+If not for the Tree of Wishes, all of Haareng might be destroyed, but because of it, it would surely continue to prosper.
+
+Every spring, the royal gardeners would inspect the tree thoroughly, looking for any sign of new life.
+In living memory, the tree had only sprouted twelve times, each time growing a new branch which bore leaves, then in the next year a single flower which would mature into a fruit.
+So when it was announced that a new branch had sprouted, the people of Amerel rejoiced, and the news spread throughout the kingdom and beyond.
+Passed from traveller to merchant, travelling with caravans across deserts and crossing oceans on ships, the news spread wide and far...
+
+*page_break
+
+The news of the sprouting of the Tree of Wishes reached all the way across the continent to the port city of Ulms-Iber on the Dawnssea, capitol of the country of Kolum.
+It had been a dusty year in Ulms-Iber, full of petty arguments and not-great news, so a hopeful rumor was well-received, even if it was no more than that.
+Haareng and the Twilight Ocean were so far from Kolum that to most in Ulms-Iber, the news of the sprouting sounded like something from a fairy-tale.
+But there were those who took it seriously:
+Travelling merchants asked each other for information about Haareng, nobles considered the political implications, and in a quiet corner of the city, someone started preparing for a very long journey.
+
+But who would start a journey based on little more than a myth?
+What kind of person would consider leaving behind even an uncomfortable life to journey across a continent?
+
+
+*choice
+  #Perhaps someone whose life was more than merely uncomfortable? Someone desperate enough that the rumor of a wish seemed a better prospect than what Ulms-Iber had to offer?
+    *goto_scene arel_intro
+
+  #Perhaps someone whose life was too comfortable, who longed for a taste of adventure and perhaps didn't comprehend what that really meant? Someone who wasn't afraid to leave a life behind because they took it completely for granted?
+    *goto_scene wulem_intro
+
+  #Perhaps someone with a strong sense of duty? Someone who had the best interests of a nation at heart, and who saw no alternative to a desperate chance?
+    *goto_scene eran_intro
