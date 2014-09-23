@@ -2,6 +2,7 @@
 *author Dunyazad
 *scene_list
   startup
+  arel_departure_westgate
   prologue
 
 *create what_arel_stole_in_the_intro "unknown"

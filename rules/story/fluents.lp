@@ -17,8 +17,8 @@ holds(before, evt(X), fl(Fl, Args)) :-
 % conflicting fluents cannot coexist:
 
 error(m("Conflicting fluents.")) :-
-  holds(T, fl(Fl, Args)),
-  holds(T, fl(Fcon, Acon)),
+  holds(T, E, fl(Fl, Args)),
+  holds(T, E, fl(Fcon, Acon)),
   conflicts(fl(Fl, Args), fl(Fcon, Acon)).
 
 % fluent conflict is reciprocal:
@@ -27,9 +27,9 @@ conflicts(F1, F2) :- conflicts(F2, F1).
 % fluents cannot hold without satisfying dependencies:
 
 error(m("Unmet fluent dependency.")) :-
-  holds(T, fl(Fdep, Adep)),
+  holds(T, E, fl(Fdep, Adep)),
   depends(fl(Fdep, Adep), fl(Fl, Args)),
-  not holds(T, fl(Fl, Args)).
+  not holds(T, E, fl(Fl, Args)).
 
 % binary statuses:
 
@@ -88,7 +88,7 @@ conflicts(
 
 fluent(a(Type), state(State, Value)) :-
   state(Type, State),
-  value(State, Value).
+  state_value(State, Value).
 
 conflicts(
   fl(state(State, Value), a(id(Type, Id))),
@@ -104,7 +104,7 @@ depends(
   fl(state(State, Value), a(id(Type, Id))),
   fl(status(Dep), a(id(Type, Id)))
 ) :-
-  id(Type, Id)
+  id(Type, Id),
   state(Type, State),
   state_depends_status(State, Value, Dep).
 
@@ -112,7 +112,7 @@ depends(
   fl(state(State, Value), a(id(Type, Id))),
   fl(state(Dep, DVal), a(id(Type, Id)))
 ) :-
-  id(Type, Id)
+  id(Type, Id),
   state(Type, State),
   state_depends_state(State, Value, Dep, DVal).
 

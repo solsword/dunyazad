@@ -2,12 +2,13 @@
 % Management of the timeline and event info.
 
 1 = {
-  last_event(evt(X)),
-  event_next(evt(X), evt(Y)) : evt(Y), Y != X
+  last_event(evt(X));
+  event_next(evt(X), evt(Y)) : evt(Y), Y > X
 } :-
   evt(X).
 
 first_event(evt(X)) :-
+  evt(X),
   0 = {
     event_next(evt(Y), evt(X)) : evt(Y), Y != X
   }.

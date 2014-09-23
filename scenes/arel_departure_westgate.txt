@@ -1,5 +1,3 @@
-*temp say_no false
-
 Arel decided that the Westgate was the safest option: being close to the Stumbling Boar was a risk but it also meant she could leave more quickly, and it was the right direction to reach Haareng, she thought. She headed for the Westgate, taking twisting alleys and side lanes to avoid notice as much as possible.
 
 When she reached the gate, she slumped down near the mouth of an alleyway with a clear view of the traffic, just another beggar in a city full of them.
@@ -11,13 +9,11 @@ Carts loaded with merchandise both entering and leaving the city, some solitary 
 She had to think of a way to get through the gate without attracting the notice of the guards.
 They doubtless had some part in king Lom's business, just like her, and if they grew too suspicious she'd end up like Oli.
 She immediately wished she had asked him which gate he had tried to leave by, but all she could do now was hope it hadn't been the Westgate.
-Thinking about the traffic through the gate, she decided she had a few options, although she didn't exactly like any of them:
+Thinking about the traffic through the gate, she decided she had only two options, and she didn't exactly like either of them:
 
 *choice
   #She could try to tag along at the back of a caravan passing through. The carts were big and dusty and the guards might not notice an extra person at the end of the line. Caravans always had plenty of guards and laborers walking alongside, but her clothes would stand out, and if the people of the caravan noticed her they might suspect she was trying to rob them and turn her in.
     *goto follow_caravan
-  #She could ask to join a band of pilgrims, if another group passed by. She didn't know much about the Spirits, but she had heard that pilgrims usually traveled in open groups and welcomed any who wanted to join them. The guards would probably be hesitant to stop someone on a religious mission, and the pilgrims weren't likely to immediately report her even if they wouldn't let her join them.
-    *goto join_pilgrims
   #She could pretend to be on king Lom's business outside the walls. She was pretty confident that the gate guards were in his pay one way or another, and they'd probably let her through, but they'd almost certainly report the incident to their superiors, and she didn't know whether they'd send someone to follow her or not. If she was lucky, nobody would care enough to bother coming after her once she was gone.
     *goto fool_guards
 
@@ -46,13 +42,9 @@ Arel froze for barely a second, but that was enough to attract the attention of 
 The guard who had seen her earlier looked back and shrugged his shoulders.
 Both gate guards took a step towards her, and glanced at each other.
 At that moment, the door of the gatehouse opened and Milo stepped out, holding a flagon of wine.
+
 “Do you fiiine fellows want some mor—” he broke off mid-sentence, as he saw Arel, his eyes going wide.
 *goto staring_at
-
-*comment -----------------------------------------------------------------------
-*label join_pilgrims
-
-TODO: HERE!
 
 *comment -----------------------------------------------------------------------
 *label fool_guards
@@ -87,24 +79,15 @@ Suddenly he seemed to become a lot more sober.
 Staring directly at Arel from not more than twenty paces away, he said in a cold, almost quiet voice:
 
 “Come here now.”
-*set say_no true
-*goto run
 
-*comment -----------------------------------------------------------------------
-*label run
 *line_break
 
 Arel felt suddenly calm.
 The despair that had been clinging to her a second ago was somehow gone, all she felt was purpose and a sense of simplicity.
 She was no longer living in the world of yesterday where Milo's word was absolute.
 She was living in a new world where she was going to go to Haareng and claim a wish.
-*if say_no
-  With calm, serious eyes, she said one word, “No,” and then she ran.
-  *goto after_say_no
-*else
-  She looked at the guards and took a breath as if about to make a reply, and then she started to run.
-  *goto after_say_no
-*label after_say_no
+
+With calm, serious eyes, she said one word, “No,” and then she ran.
 The gates were open, the guards weren't expecting it, and before they had even turned to see where she was her foot had touched down outside the walls.
 
 She was hungry and exhausted, but her body felt light as a feather, and her head was filled with a single thought: run.
@@ -131,21 +114,36 @@ She didn't know how far she had run, or how long had passed since she'd crawled 
 
 Looking around, she found her surroundings completely alien.
 Open land stretched away for what seemed like forever; crops growing on either side of the road.
+A little ways ahead the road turned to skirt a bit of marshy land, and in the distance ahead she could see foothills rising to meet mountains, but mostly her surroundings seemed simply empty.
 She could still see the city, and when she looked back it appeared both frighteningly close and endlessly distant.
 She had never been this far from a building in her life.
 
-There were farmhouses spaced along the road, and nearby something that looked like a run-down shack.
-A little ways ahead the road turned to skirt a bit of marshy land, and in the distance ahead she could see foothills rising to meet mountains, but mostly her surroundings seemed simply empty.
+Apart from the lack of buildings she found the lack of people distressing.
+There were farmhouses spaced along the road, and she could see some farmers working in the fields here and there, but nobody was actually near her.
+The utter lack of attention she was receiving had more to do with simple geography than with her social status.
 
 Her body seemed to decide that she had had enough time to look around, and insisted that her biggest problem right now was thirst.
 Her throat felt lined with dust, and even crouching on the ground, she felt a bit faint and dizzy.
 She didn't see anything that looked like a well nearby, so she only had two options:
 
-TODO: AFTER THIS!
-*comment *choice
-*comment   #She could drag herself to the nearest farmhouse and beg for water. Surely that wasn't too much to grant a stranger. It might make following her trail easier, but was that really such an important concern right now?
-*comment   #She could head towards the swampy area ahead and look for a puddle to drink from. It certainly didn't sound appealing, but in her present condition, she wasn't sure if she could deal with human contact, and the bushes growing in the low land might leave her a little less exposed than she was currently.
+*choice
+  #She could drag herself to the nearest farmhouse and beg for water. Surely that wasn't too much to grant a stranger. It might make following her trail easier, but was that really such an important concern right now?
+    *goto beg_for_water
+  #She could head towards the swampy area ahead and look for a puddle to drink from. It certainly didn't sound appealing, but in her present condition, she wasn't sure if she could deal with human contact, and the bushes growing in the low land might leave her a little less exposed than she was currently.
+    *goto drink_from_swamp
 
+*comment -----------------------------------------------------------------------
+*label beg_for_water
+
+She gathered her energy and forced herself to her feet.
+Every step seemed to take minutes, but she slowly stumbled towards the nearest farmhouse.
+As she approached, a thin trail of smoke from the chimney gave her assurance that at least someone was home.
+
+The farmhouse was set a few hundred paces back from the road, and its inhabitants were clearly poor.
+
+
+*comment -----------------------------------------------------------------------
+*label drink_from_swamp
 
 She gathered her energy and stumbled onwards in the dry ditch.
 It took her far longer than she had expected to reach the bend in the road, and when she got there, she didn't see any standing water.
@@ -153,8 +151,7 @@ There ground was soggy in places though, and she wound up pulling up clumps of d
 The scrawny bushes growing in the small marsh did little to ease her feeling of exposure, but at least she couldn't see the Westgate directly from where she was any more.
 
 She found herself chewing on some moss and thought about food.
-Immediately she remembered, as if crystal clear, the moment at the gate when she had started running.
-In that desperate instant, the vegetables she had stolen from the careless merchant in the city had been forgotten, and for all she knew they were still lying on the ground before the gate, crushed into the dust beneath the hooves of oxen and the wheels of caravans.
+*gosub recall_bitterly
 Her mood returned to a familiar darkness, but at least she no longer felt dizzy and faint.
 Just exhausted, hungry, and afraid.
 
@@ -183,3 +180,15 @@ Based on physical exertion alone she should have slept quite soundly, but the st
 Between the unfamiliar night noises of the countryside and a host of nightmares, she found herself constantly jerking awake, but as soon as she did so, her fatigue would drag her back to sleep.
 When morning finally came, she stared blearily at the brightening sky in confusion for a minute before she realized what it meant:
 Today was her first day outside the city.
+*finish
+
+*comment -----------------------------------------------------------------------
+*label recall_bitterly
+Immediately she remembered, as if crystal clear, the moment at the gate when she had started running.
+*if what_arel_stole_in_the_intro = "food"
+  In that desperate instant, the vegetables she had stolen from the careless merchant in the city had been forgotten, and for all she knew they were still lying on the ground before the gate, crushed into the dust beneath the hooves of oxen and the wheels of caravans.
+  *goto after_recalling
+*else
+  *goto after_recalling
+*label after_recalling
+*return

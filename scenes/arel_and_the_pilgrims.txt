@@ -1,0 +1,40 @@
+  #She could ask to join a band of pilgrims, if another group passed by. She didn't know much about the Spirits, but she had heard that pilgrims usually traveled in open groups and welcomed any who wanted to join them. The guards would probably be hesitant to stop someone on a religious mission, and the pilgrims weren't likely to immediately report her even if they wouldn't let her join them.
+    *goto join_pilgrims
+
+*comment -----------------------------------------------------------------------
+*label join_pilgrims
+
+Arel decided that joining a group of pilgrims would be her best chance to make it safely out of the city, but that meant that she had to wait until another group passed by.
+With every passing minute, the danger of being missed at the Stumbling Boar increased, but she didn't fancy her chances of getting through the gate any other way.
+After what seemed like an eternity, she finally saw another group of pilgrims headed for the gate.
+
+She got up and approached them slowly, making sure she was facing away from the gatehouse.
+The pilgrims wore dusty robes, in better repair than hers but not any fancier, as well as broad hats or head scarves to protect them from the sun.
+There were seven of them, and most were carrying some kind of charm or pendant as a sign of their mission.
+They were also carrying heavy packs, presumably full of supplies for their journey, and one of them led a donkey bearing more goods.
+As she approached, they slowed, and one who seemed to be a leader of sorts stepped forwards.
+
+“Good day; may the Spirits guide you,” Arel mimicked the greeting she had heard pilgrims use before in the city.
+
+The leader was already reaching for his purse, but stopped when he saw she wasn't holding out her bowl and gave her a quizzical look, “Good day…?”
+
+“Please, kind pilgrims, may I join your mission?” she couldn't think of anything useful to say other than what she wanted.
+
+The leader was taken aback and glanced at his comrades. They in turn looked at her with some confusion, but to her dismay, the glances passing between the group quickly became awkward.
+
+“Well…” even before the leader started to hedge, Arel knew her plan was a failure.
+
+Why had she thought that pilgrims would accept someone like her, a beggar?
+From their awkward glances, she could tell they weren't comfortable with the idea of letting her join them.
+And why should they be?
+These pilgrims were about to set off on a long journey to worship some distant Spirit.
+She was clearly penniless, so she'd be a liability along the way.
+And why should they even trust a complete stranger?
+She might be planning to rob them or worse.
+She looked down and started to turn away, but the pilgrim leading the donkey spoke up:
+
+“And why not, Larr?”
+
+“”
+
+“”

@@ -1,8 +1,13 @@
+*comment -----------------------------------------------------------------------
 *label steal_money
+*set what_arel_stole_in_the_intro "money"
+
 *return
 
+*comment -----------------------------------------------------------------------
 *label steal_food
 
+*set what_arel_stole_in_the_intro "food"
 Arel headed over to the lower market.
 As easy as it would be to steal someone's purse, she couldn't buy something with the money in the city without attracting attention, and what she needed most right now was food.
 Unlike Oli she wasn't prepared to settle for starving in the wilds.
@@ -19,10 +24,12 @@ Her clothing might make her look like someone desperate for a meal, but it also 
 She picked her mark and walked on quite a ways, circling back through a warren of alleyways to approach again from a different street.
 
 As expected, nobody seemed to realize she was the same beggar as the one who had just walked past, given how quickly she had circled around.
-When she came to her mark, the proprietor was still negotiating avidly with a customer who had brought a cart and was obviously looking to buy in bulk, and she easily palmed as many vegetables as she could comfortably carry under her robe and walked on without him being any the wiser.
+When she came to her mark, the proprietor was still negotiating avidly with a customer who had brought a cart and was obviously looking to buy in bulk, and she easily palmed as many vegetables as could comfortably fit in her pockets and walked on without him being any the wiser.
 She could only hope that none of king Lom's observers had noticed, but she was relatively confident she had gotten away with it.
 No time to stop and enjoy her plunder, though: she needed to get out of the city as soon as possible.
 *return
 
+*comment -----------------------------------------------------------------------
 *label steal_nothing
+*set what_arel_stole_in_the_intro "nothing"
 *return
