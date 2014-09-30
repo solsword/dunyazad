@@ -8,6 +8,8 @@ time --format="%E, %K KB" \
   clingo --stats --time-limit=2 $args $sources |\
   tail -n 29 | head -n -1 >> out/stats.lp
 echo "% vim"": syn=gringo" > out/events.lp
+echo "Sources:"
+echo $sources
 time --format="%E, %K KB" \
   clingo --verbose=0 --quiet=1,1 $args $sources |\
     head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\

@@ -2,6 +2,7 @@
 actions="actions.lp"
 fluents="fluents.lp"
 core="core.lp events.lp"
-content="content/possession.lp content/sickness.lp content/wealth.lp"
+#content="content/possession.lp content/sickness.lp content/wealth.lp"
+content="content/*.lp"
 sources="test.lp $core $actions $fluents $content"
 args="--seed=$seed --rand-freq=0.05"

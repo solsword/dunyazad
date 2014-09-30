@@ -270,11 +270,30 @@ conflicts(
 
 % Shorthand for binary relationships:
 
-relationship(T1, T2, Rel) :-
-  brel(T1, T2, Rel).
+relationship(T1, T2, Rel) :- brel(T1, T2, Rel).
+rel_value(Rel, true) :- brel(T1, T2, Rel).
+rel_value(Rel, false) :- brel(T1, T2, Rel).
 
-rel_value(Rel, true) :-
-  brel(T1, T2, Rel).
+% Shorthand for exclusive binary relations
 
-rel_value(Rel, false) :-
-  brel(T1, T2, Rel).
+relationship(T1, T2, Rel) :- ebrel(T1, T2, Rel).
+rel_value(Rel, true) :- ebrel(T1, T2, Rel).
+rel_value(Rel, false) :- ebrel(T1, T2, Rel).
+default_rel_value(Rel, false) :- ebrel(T1, T2, Rel).
+rel_exclusive(Rel, true) :- ebrel(T1, T2, Rel).
+
+% State/rel ordering transitive closure:
+
+state_value_order_total(State, Before, After) :-
+  state_value_order(State, Before, After).
+
+state_value_order_total(State, Before, After) :-
+  state_value_order_total(State, Before, Between),
+  state_value_order(State, Between, After).
+
+rel_value_order_total(State, Before, After) :-
+  rel_value_order(State, Before, After).
+
+rel_value_order_total(State, Before, After) :-
+  rel_value_order_total(State, Before, Between),
+  rel_value_order(State, Between, After).
