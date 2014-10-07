@@ -1,23 +1,24 @@
 % events.lp
-% Management of the timeline and event info.
+% Management of the choice structure and event info.
 
-1 = {
-  last_event(evt(X));
-  event_next(evt(X), evt(Y)) : evt(Y), Y > X
-} :-
-  evt(X).
+#const max_options=7.
 
-first_event(evt(X)) :-
-  evt(X),
-  0 = {
-    event_next(evt(Y), evt(X)) : evt(Y), Y != X
-  }.
+evt(e(provocation, 1)).
 
-error(m("Multiple first events")) :-
-  first_event(evt(X)), first_event(evt(Y)), X != Y.
+1 <= {
+  evt(e(option, X)) : X = 1..max_options
+} <= max_options.
 
-error(m("Multiple last events")) :-
-  last_event(evt(X)), last_event(evt(Y)), X != Y.
+evt(e(outcome, X)) :-
+  evt(e(option, X)).
+
+event_next(evt(e(provocation, 1)), evt(e(option, X))) :-
+  evt(e(option, X)).
+
+event_next(evt(e(option, X)), evt(e(outcome, X))) :-
+  evt(e(option, X)).
+
+first_event(evt(e(provocation, 1))).
 
 % transitive afterness:
 event_after(evt(Before), evt(After)) :-

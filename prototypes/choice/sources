@@ -1,0 +1,5 @@
+#!/bin/sh
+actions="actions.lp"
+core="core.lp choice_structure.lp"
+sources="test.lp $core $actions"
+args="--seed=$seed --rand-freq=0.05"

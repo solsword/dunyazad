@@ -4,9 +4,19 @@
 % Something happens at every event:
 
 1 = {
-  happens(evt(X), act(Act)) : action(Act)
+  happens(evt(e(provocation, X)), act(Act)) : provocation_act(Act)
 } :-
-  evt(X).
+  evt(e(provocation, X)).
+
+1 = {
+  happens(evt(e(option, X)), act(Act)) : option_act(Act)
+} :-
+  evt(e(option, X)).
+
+1 = {
+  happens(evt(e(outcome, X)), act(Act)) : outcome_act(Act)
+} :-
+  evt(e(outcome, X)).
 
 % Arguments:
 % ----------

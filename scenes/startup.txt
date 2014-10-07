@@ -2,8 +2,11 @@
 *author Dunyazad
 *scene_list
   startup
-  arel_departure_westgate
+  roc_attack
   prologue
+  arel_departure_westgate
+
+*comment arel_departure_westgate
 
 *create what_arel_stole_in_the_intro "unknown"
 
