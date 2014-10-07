@@ -1,0 +1,72 @@
+Several days later, they came to a small village called Hemambal at the foot of the Blue Mountains.
+They stopped there to rest before going over the Three Pines Pass, which would take them into the country of Kelam beyond the mountains.
+Arel had noticed that the peaks seemed to get larger every day, and now they loomed above the travellers, their summits streaked with snow.
+Few traders went this way; there were busier trade routes to the south, but for a small company on foot the pass shouldn't be too difficult.
+They would need a full load of supplies though: it would be a full week before they reached the nearest town in Kelam.
+
+The locals were happy to sell them enough to top up their packs, but also gave them a warning: it had been longer than usual since the last travelers came from across the mountains, and some of the woodsmen claimed to have seen a giant bird flying near the pass.
+Most agreed that such stories were far-fetched, and traffic over the pass had always been irregular.
+If something was preventing travel, it was probably just damage to the trail.
+
+Arel and her companions set out the next day under clear skies.
+They spent the first full day climbing up and down foothills that gradually got steeper.
+The trail was well-maintained, and they made good time despite their heavy
+packs.
+They spent the night in a trail lodge along with a local hunter who was tracking the movements of a herd of deer.
+
+The next day took them deeper into the mountains, their progress slowed by the steep trail and interminable switchbacks.
+Now they were climbing among the mountains, following rocky valleys and taking an increasingly narrow path up steep cliffs.
+The trees around them began to change, oaks and cottonwoods gradually replaced with pines and aspens.
+The weather remained fair, but the heat of the late summer sun seemed to withdraw a bit as they climbed higher.
+That night they broke out their tents in an alpine valley, tying the donkey to a tree within reach of a clear mountain stream.
+
+Their view of the plains they had journeyed across was breathtaking, and at night, the stars seemed to have doubled in number.
+But they were also exhausted after a long day of hard walking, and after a brief meal cooked over an open fire, they headed straight for their bedrolls.
+Tomorrow they would be heading over the first saddle of the pass into a high valley the locals called “Turm's Cradle” after the tallest of the three peaks that surrounded it.
+If everything went well, the day after that they'd make it over the second saddle and be on their way down the other side of the Blue Mountains.
+
+*page_break
+
+On the third day, the trail seemed impossibly steep.
+Back on the plains, the mountains had seemed small and far away.
+At their feet, they had seemed to loom large and dominate the sky, but now, they just seemed to go on forever, an endless succession of ridges and cliffs.
+Every time they thought they were nearing the saddle, another higher ridge appeared before them, so that by the time they actually got there, they almost didn't believe it.
+But there they stood, at the high point of the trail, looking into a high valley between three massive mountains, their peaks still streaked with snow even in the heat of summer.
+
+Arel had thought that the pass seemed impossibly high, but looking up to the peaks around her, she suddenly felt grateful that they could pass through the mountains without climbing even higher.
+The whole group stopped to catch their breaths and enjoy the stunning views on both sides.
+The slopes they had climbed and the valley before them were covered with rich pine forests, but the ridge they were on now sported only tough mountain grasses, and a fresh wind streamed past into the valley before them.
+
+Suddenly, a harsh scream echoed across the valley.
+It sounded somewhat like a hawk or eagle, but even from what was clearly a vast distance they could tell that it was many times louder.
+They immediately scanned the sky for the source of the noise, and saw it: a bird flying quickly towards them from the south end of the valley.
+At a distance it almost seemed like a normal hawk, but they quickly realized that it must be much faster, and much larger.
+
+Larr yelled “Run!” and they did, breaking down the slope towards the treeline before them.
+The giant bird bore down on them with impossible speed, but they hadn't been far from the forest.
+After a short sprint, they were in the trees, trying to make themselves as small as possible.
+
+All except the donkey, that is.
+It just stood there at the top of the pass, knees locked, the whites of its eyes clearly showing.
+From the cover of the trees, they got a clear look at the monstrous bird as it swooped down, sharp claws big enough to close around the donkey's chest and belly.
+The beast screamed as it was nearly torn in half, and gobs of blood spattered across the ground as the bird flew off with its prize, heading back towards the south end of the valley.
+
+“A roc,” breathed one of the pilgrims, too stunned to process what had just happened.
+
+Arel was thinking ahead, however, “That was almost half of our supplies, not to mention our tents!”
+
+“And how will we get across the other ridge?” asked Larr.
+From their brief view, they had seen that the forest in the valley stopped at least a mile short of the second saddle of the pass, giving way to open meadows. Even if they ignored the lost supplies, they were still in grave danger.
+
+As their situation sunk in, one of the pilgrims asked “What should we do?”
+
+*choice
+  #They should quickly turn back towards Hemambal, while the roc was distracted by its next meal. They could probably make it back with the supplies that they had, and the forest would cover most of their descent.
+    *comment TODO HERE
+    *finish
+  #They should follow the roc, and try to retrieve their supplies. Without food and shelter, they might not survive long in the wilderness even if the giant bird weren't a problem.
+    *comment TODO HERE
+    *finish
+  #They should head onwards despite their loss. Perhaps the roc would be sated by its meal for a day, and they would have enough time to make it out of the valley tomorrow morning.
+    *comment TODO HERE
+    *finish
