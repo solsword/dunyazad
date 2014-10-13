@@ -1,5 +1,6 @@
 #!/bin/sh
 actions="actions.lp"
 core="core.lp choice_structure.lp"
-sources="test.lp $core $actions"
+sources="test.lp utils.lp english.lp $core $actions"
+surf_sources="out/events.lp utils.lp english.lp surface.lp"
 args="--seed=$seed --rand-freq=0.05"

@@ -10,7 +10,15 @@ time --format="%E, %K KB" \
 echo "% vim"": syn=gringo" > out/events.lp
 echo "Sources:"
 echo $sources
+echo "Solving..."
 time --format="%E, %K KB" \
   clingo --verbose=0 --quiet=1,1 $args $sources |\
     head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\
     sed "s/^\([a-zA-Z0-9_]\+\)$/\1./" | sort >> out/events.lp
+echo "  ...done"
+echo "Adding surface text..."
+time --format="%E, %K KB" \
+  clingo --verbose=0 --quiet=1,1 $args $surf_sources |\
+    head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\
+    sed "s/^\([a-zA-Z0-9_]\+\)$/\1./" | sort >> out/surface.lp
+echo "  ...done"

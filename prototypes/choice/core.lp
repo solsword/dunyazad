@@ -1,6 +1,8 @@
 % core rules:
 % -----------
 
+:- error(Message).
+
 #const max_options=5.
 
 2 <= {
