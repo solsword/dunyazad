@@ -1,283 +1,369 @@
-% actions.lp
-% Action rules.
+% actions:
+% --------
 
-% Something happens at every event:
+% flee
+action(flee).
 
-1 = {
-  happens(evt(e(provocation, X)), act(Act)) : provocation_act(Act)
-} :-
-  evt(e(provocation, X)).
+argument(flee, fearful, actor).
+argument(flee, from, actor).
+initiator(flee, fearful).
 
-1 = {
-  happens(evt(e(option, X)), act(Act)) : option_act(Act)
-} :-
-  evt(e(option, X)).
+outcome(flee, escape).
+outcome(flee, failure).
 
-1 = {
-  happens(evt(e(outcome, X)), act(Act)) : outcome_act(Act)
-} :-
-  evt(e(outcome, X)).
-
-% Arguments:
-% ----------
-
-% Action arguments:
+option_text(X, @join("Flee from ", TheFrom, ".")) :-
+  action(X, flee),
+  arg(X, from, From),
+  det(From, TheFrom).
 
 1 = {
-  arg(evt(X), Arg, id(Type, Id)) : id(Type, Id)
+  action_text(
+    X,
+    @capitalize(
+      @join(
+        ProFearful, " ", ConjFlee, " from ", TheFrom,
+        ", narrowly managing to escape."
+      )
+    )
+%  );
+%  action_text(
+%    X,
+%    @capitalize(
+%      @join(
+%        ProAsking, " ", ConjOffer, " ", TheListening, " ", ThePrice,
+%        ", and ", ProListening, " ", ConjAgree, " to ", ProAskingPossessive,
+%        " offer."
+%      )
+%    )
+  )
 } :-
-  happens(evt(X), act(Act)),
-  argument(Act, Arg, Type).
+  action(X, flee),
+  outcome(X, escape),
+  arg(X, fearful, Fearful),
+  arg(X, from, From),
+  number(Fearful, FearfulNumber),
+  number(From, FromNumber),
+  conjugation(flee, present, FearfulNumber, second, ConjFlee),
+  pro(Fearful, second, subjective, object, ProFearful),
+  det(From, TheFrom),
+  pro(From, third, subjective, object, ProFrom).
 
-Min <= {
-  arg(evt(X), Arg, id(Type, Id)) : id(Type, Id)
-} <= Max :-
-  happens(evt(X), act(Act)),
-  variable_argument(Act, Arg, Type, Min, Max).
+1 = {
+  action_text(
+    X,
+    @capitalize(
+      @join(
+        ProFearful, " ", ConjFlee, " blindly from ", TheFrom,
+        ", but ", ProFearful, " ", ConjFail, " to escape."
+      )
+    )
+%  );
+%  action_text(
+%    X,
+%    @capitalize(
+%      @join(
+%        ProAsking, " ", ConjOffer, " ", TheListening, " ", ThePrice,
+%        ", and ", ProListening, " ", ConjAgree, " to ", ProAskingPossessive,
+%        " offer."
+%      )
+%    )
+  )
+} :-
+  action(X, flee),
+  outcome(X, failure),
+  arg(X, fearful, Fearful),
+  arg(X, from, From),
+  number(Fearful, FearfulNumber),
+  number(From, FromNumber),
+  conjugation(flee, present, FearfulNumber, second, ConjFlee),
+  conjugation(fail, present, FearfulNumber, third, ConjFail),
+  pro(Fearful, second, subjective, object, ProFearful),
+  det(From, TheFrom),
+  pro(From, third, subjective, object, ProFrom).
 
-% automatic arguments:
+deals_with(X, threatening(From, Fearful)) :-
+  action(X, flee),
+  outcome(X, escape),
+  arg(X, fearful, Fearful),
+  arg(X, from, From),
+  problem(threatening(From, Fearful)).
 
-arg(evt(X), Arg, id(Type, ID)) :-
-  happens(evt(X), act(Act)),
-  auto_argument(Act, Arg, Type, fl(status(Status), a(Arg))),
-  holds(before, evt(X), fl(status(Status), a(id(Type, ID)))).
+0 <= {
+  consequence(X, injured(Fearful))
+} <= 1 :-
+  action(X, flee),
+  arg(X, fearful, Fearful),
+  outcome(X, failure).
 
-arg(evt(X), Arg, id(Type, ID)) :-
-  happens(evt(X), act(Act)),
-  auto_argument(Act, Arg, Type, fl(status(Status), a(OtherArg))),
-  condition_holds(before, evt(X), fl(status(Status), a(OtherArg))),
-  arg(evt(X), OtherArg, id(Type, ID)).
+% bargain
+action(bargain).
 
-arg(evt(X), Arg, id(Type, ID)) :-
-  happens(evt(X), act(Act)),
-  auto_argument(Act, Arg, Type, fl(state(State, Value), a(Arg))),
-  holds(before, evt(X), fl(state(State, Value), a(id(Type, ID)))).
+argument(bargain, asking, actor).
+argument(bargain, listening, actor).
+argument(bargain, price, item).
+initiator(bargain, asking).
 
-arg(evt(X), Arg, id(Type, ID)) :-
-  happens(evt(X), act(Act)),
-  auto_argument(Act, Arg, Type, fl(state(State, Value), a(OtherArg))),
-  condition_holds(before, evt(X), fl(state(State, Value), a(OtherArg))),
-  arg(evt(X), OtherArg, id(Type, ID)).
+outcome(bargain, deal).
+outcome(bargain, no_deal).
 
-arg(evt(X), Arg, id(Type, ID)) :-
-  happens(evt(X), act(Act)),
-  auto_argument(Act, Arg, Type, fl(rel(Rel, Value), a(Arg, OtherArg))),
-  arg(evt(X), OtherArg, OtherConcrete),
-  holds(before, evt(X), fl(rel(Rel, Value), a(id(Type, ID), OtherConcrete))).
+:-
+  action(X, bargain),
+  arg(X, asking, Asking),
+  arg(X, price, Price),
+  0 = {
+    has_item(Asking, Price)
+  }.
 
-arg(evt(X), Arg, id(Type, ID)) :-
-  happens(evt(X), act(Act)),
-  auto_argument(Act, Arg, Type, fl(rel(Rel, Value), a(OtherArg, Arg))),
-  arg(evt(X), OtherArg, OtherConcrete),
-  holds(before, evt(X), fl(rel(Rel, Value), a(OtherConcrete, id(Type, ID)))).
+:-
+  action(X, bargain),
+  arg(X, asking, Asking),
+  unintelligent(Asking).
 
-arg(evt(X), Arg, id(Type, ID)) :-
-  happens(evt(X), act(Act)),
-  auto_argument(Act, Arg, Type, subject, fl(rel(Rel,Value), a(SubjArg,ObjArg))),
-  arg(evt(X), SubjArg, id(Type, ID)),
-  condition_holds(before, evt(X), fl(rel(Rel, Value), a(SubjArg, ObjArg))).
+:-
+  action(X, bargain),
+  arg(X, listening, Listening),
+  unintelligent(Listening).
 
-arg(evt(X), Arg, id(Type, ID)) :-
-  happens(evt(X), act(Act)),
-  auto_argument(Act, Arg, Type, object, fl(rel(Rel, Value), a(SubjArg,ObjArg))),
-  arg(evt(X), ObjArg, id(Type, ID)),
-  condition_holds(before, evt(X), fl(rel(Rel, Value), a(SubjArg, ObjArg))).
+% TODO: Better text here
+option_text(X, @join("Bargain with ", TheListening, ".")) :-
+  action(X, bargain),
+  arg(X, listening, Listening),
+  det(Listening, TheListening).
 
+1 = {
+  action_text(
+    X,
+    @capitalize(
+      @join(
+        ProAsking, " ", ConjOffer, " ", TheListening, " ", ThePrice,
+        ", which ", ProListening, " ", ConjFind, " fair."
+      )
+    )
+  );
+  action_text(
+    X,
+    @capitalize(
+      @join(
+        ProAsking, " ", ConjOffer, " ", TheListening, " ", ThePrice,
+        ", and ", ProListening, " ", ConjAgree, " to ", ProAskingPossessive,
+        " offer."
+      )
+    )
+  )
+} :-
+  action(X, bargain),
+  outcome(X, deal),
+  arg(X, asking, Asking),
+  arg(X, listening, Listening),
+  arg(X, price, Price),
+  number(Asking, AskNumber),
+  number(Listening, ListNumber),
+  conjugation(offer, present, AskNumber, second, ConjOffer),
+  conjugation(find, present, ListNumber, third, ConjFind),
+  conjugation(agree, present, ListNumber, third, ConjAgree),
+  pro(Asking, second, subjective, object, ProAsking),
+  pro(Asking, second, possessive, modifier, ProAskingPossessive),
+  det(Listening, TheListening),
+  pro(Listening, third, subjective, object, ProListening),
+  det(Price, ThePrice).
 
-% Causation:
-% ----------
-% generic 'causes' -> concrete 'caused'
+1 = {
+  action_text(
+    X,
+    @capitalize(
+      @join(
+        ProAsking, " ", ConjOffer, " ", TheListening, " ", ThePrice,
+        ", but ", ProListening, " refuse ", ProAskingPossessive, " offer."
+      )
+    )
+%  );
+%  action_text(
+%    X,
+%    @join(
+%      ""
+%    )
+  )
+} :-
+  action(X, bargain),
+  outcome(X, no_deal),
+  arg(X, asking, Asking),
+  arg(X, listening, Listening),
+  arg(X, price, Price),
+  number(Asking, AskNumber),
+  number(Listening, ListNumber),
+  conjugation(offer, present, AskNumber, second, ConjOffer),
+  conjugation(find, present, ListNumber, third, ConjFind),
+  pro(Asking, second, subjective, object, ProAsking),
+  pro(Asking, second, possessive, modifier, ProAskingPossessive),
+  det(Listening, TheListening),
+  pro(Listening, third, subjective, object, ProListening),
+  det(Price, ThePrice).
 
-caused(evt(X), fl(Fl, Args)) :-
-  happens(evt(X), act(Act)),
-  causes(Act, Fl, Args).
+1 = {
+  deals_with(X, threatening(Listening, Someone))
+    : problem(threatening(Listening, Someone))
+  % TODO: other problems that can be solved by bargaining?
+} :-
+  action(X, bargain),
+  outcome(X, deal),
+  arg(X, asking, Asking),
+  arg(X, listening, Listening).
 
-caused(evt(X), fl(Fl, Args)) :-
-  happens(evt(X), act(Act)),
-  causes_if(Act, Cond, Fl, Args),
-  condition_holds(before, evt(X), Cond).
+consequence(X, obtains(Listening, Item)) :-
+  action(X, bargain),
+  outcome(X, deal),
+  arg(X, listening, Listening),
+  arg(X, price, Item).
 
-% state/rel relative causation
+consequence(X, relinquishes(Asking, Item)) :-
+  action(X, bargain),
+  outcome(X, deal),
+  arg(X, asking, Asking),
+  arg(X, price, Item).
 
-caused(evt(X), fl(state(State, NVal), a(Arg))) :-
-  happens(evt(X), act(Act)),
-  causes_relative(Act, increase, state(State), a(Arg)),
-  arg(evt(X), Arg, Concrete),
-  holds(before, evt(X), fl(state(State, PVal), a(Concrete))),
-  state_value_order(State, PVal, NVal).
+% trade
+action(trade).
 
-caused(evt(X), fl(state(State, NVal), a(Arg))) :-
-  happens(evt(X), act(Act)),
-  causes_relative(Act, decrease, state(State), a(Arg)),
-  arg(evt(X), Arg, Concrete),
-  holds(before, evt(X), fl(state(State, PVal), a(Concrete))),
-  state_value_order(State, NVal, PVal).
+argument(trade, buyer, actor).
+argument(trade, seller, actor).
+argument(trade, price, item).
+argument(trade, goods, item).
+initiator(trade, buyer).
 
-caused(evt(X), fl(rel(Rel, NVal), a(Arg1, Arg2))) :-
-  happens(evt(X), act(Act)),
-  causes_relative(Act, increase, rel(Rel), a(Arg1, Arg2)),
-  arg(evt(X), Arg1, C1),
-  arg(evt(X), Arg2, C2),
-  holds(before, evt(X), fl(rel(Rel, PVal), a(C1, C2))),
-  rel_value_order(Rel, PVal, NVal).
+outcome(trade, deal).
+outcome(trade, no_deal).
 
-caused(evt(X), fl(rel(Rel, NVal), a(Arg1, Arg2))) :-
-  happens(evt(X), act(Act)),
-  causes_relative(Act, decrease, rel(Rel), a(Arg1, Arg2)),
-  arg(evt(X), Arg1, C1),
-  arg(evt(X), Arg2, C2),
-  holds(before, evt(X), fl(rel(Rel, PVal), a(C1, C2))),
-  rel_value_order(Rel, NVal, PVal).
+:-
+  action(X, trade),
+  arg(X, asking, Asking),
+  unintelligent(Asking).
 
-% TODO: conditional relative causation?
+:-
+  action(X, trade),
+  arg(X, listening, Listening),
+  unintelligent(Listening).
 
-% state/rel relative operations min/max limits
+option_text(X, @join("Trade with ", TheSeller, ".")) :-
+  action(X, trade),
+  arg(X, seller, Seller),
+  det(Seller, TheSeller).
 
-error(m("Can't increase state above max.", evt(X), State, PVal)) :-
-  happens(evt(X), act(Act)),
-  causes_relative(Act, increase, state(State), a(Arg)),
-  arg(evt(X), Arg, Concrete),
-  holds(before, evt(X), fl(state(State, PVal), a(Concrete))),
-  0 = { state_value_order(State, PVal, AnyVal) : state_value(State, AnyVal) }.
+1 = {
+  action_text(
+    X,
+    @capitalize(
+      @join(
+        ProBuyer, " ", ConjOffer, " ", ThePrice, " in exchange for ",
+        TheGoods, ", and ", TheSeller, " ", ConjAgree, " to ",
+        ProBuyerPossessive, " offer."
+      )
+    )
+%  );
+%  action_text(
+%    X,
+%    @capitalize(
+%      @join(
+%        ProAsking, " ", ConjOffer, " ", TheListening, " ", ThePrice,
+%        ", and ", ProListening, " ", ConjAgree, " to ", ProAskingPossessive,
+%        " offer."
+%      )
+%    )
+  )
+} :-
+  action(X, trade),
+  outcome(X, deal),
+  arg(X, buyer, Buyer),
+  arg(X, seller, Seller),
+  arg(X, price, Price),
+  arg(X, goods, Goods),
+  number(Buyer, BuyerNumber),
+  number(Seller, SellerNumber),
+  conjugation(offer, present, BuyerNumber, second, ConjOffer),
+  conjugation(agree, present, SellerNumber, third, ConjAgree),
+  pro(Buyer, second, subjective, object, ProBuyer),
+  pro(Buyer, second, possessive, modifier, ProBuyerPossessive),
+  det(Seller, TheSeller),
+  pro(Seller, third, subjective, object, ProSeller),
+  det(Price, ThePrice),
+  det(Goods, TheGoods).
 
-error(m("Can't decrease state below min.", evt(X), State, PVal)) :-
-  happens(evt(X), act(Act)),
-  causes_relative(Act, decrease, state(State), a(Arg)),
-  arg(evt(X), Arg, Concrete),
-  holds(before, evt(X), fl(state(State, PVal), a(Concrete))),
-  0 = { state_value_order(State, AnyVal, PVal) : state_value(State, AnyVal) }.
+1 = {
+  action_text(
+    X,
+    @capitalize(
+      @join(
+        ProBuyer, " ", ConjOffer, " ", ThePrice, " in exchange for ",
+        TheGoods, ", but ", TheSeller, " ", ConjRefuse, " ",
+        ProBuyerPossessive, " offer."
+      )
+    )
+%  );
+%  action_text(
+%    X,
+%    @capitalize(
+%      @join(
+%        ProAsking, " ", ConjOffer, " ", TheListening, " ", ThePrice,
+%        ", and ", ProListening, " ", ConjAgree, " to ", ProAskingPossessive,
+%        " offer."
+%      )
+%    )
+  )
+} :-
+  action(X, trade),
+  outcome(X, no_deal),
+  arg(X, buyer, Buyer),
+  arg(X, seller, Seller),
+  arg(X, price, Price),
+  arg(X, goods, Goods),
+  number(Buyer, BuyerNumber),
+  number(Seller, SellerNumber),
+  conjugation(offer, present, BuyerNumber, second, ConjOffer),
+  conjugation(refuse, present, SellerNumber, third, ConjRefuse),
+  pro(Buyer, second, subjective, object, ProBuyer),
+  pro(Buyer, second, possessive, modifier, ProBuyerPossessive),
+  det(Seller, TheSeller),
+  pro(Seller, third, subjective, object, ProSeller),
+  det(Price, ThePrice),
+  det(Goods, TheGoods).
 
-error(m("Can't increase rel above max.", evt(X), Rel, PVal)) :-
-  happens(evt(X), act(Act)),
-  causes_relative(Act, increase, rel(Rel), a(Arg1, Arg2)),
-  arg(evt(X), Arg1, C1),
-  arg(evt(X), Arg2, C2),
-  holds(before, evt(X), fl(rel(Rel, PVal), a(C1, C2))),
-  0 = { rel_value_order(Rel, PVal, AnyVal) : rel_value(Rel, AnyVal) }.
+:-
+  action(X, bargain),
+  arg(X, buyer, Buyer),
+  arg(X, price, Price),
+  0 = {
+    has_item(Buyer, Price)
+  }.
 
-error(m("Can't decrease rel below min.", evt(X), Rel, PVal)) :-
-  happens(evt(X), act(Act)),
-  causes_relative(Act, decrease, rel(Rel), a(Arg1, Arg2)),
-  arg(evt(X), Arg1, C1),
-  arg(evt(X), Arg2, C2),
-  holds(before, evt(X), fl(rel(Rel, PVal), a(C1, C2))),
-  0 = { rel_value_order(Rel, AnyVal, PVal) : rel_value(Rel, AnyVal) }.
+:-
+  action(X, bargain),
+  arg(X, seller, Seller),
+  arg(X, goods, Goods),
+  0 = {
+    has_item(Seller, Goods)
+  }.
 
+consequence(X, obtains(Buyer, Goods)) :-
+  action(X, trade),
+  outcome(X, deal),
+  arg(X, buyer, Buyer),
+  arg(X, goods, Goods).
 
-% Initiation and termination:
-% ---------------------------
+consequence(X, obtains(Seller, Price)) :-
+  action(X, trade),
+  outcome(X, deal),
+  arg(X, seller, Seller),
+  arg(X, price, Price).
 
-initiates(evt(X), fl(Fl, a(Concrete))) :-
-  caused(evt(X), fl(Fl, a(Arg))),
-  arg(evt(X), Arg, Concrete).
+consequence(X, relinquishes(Buyer, Price)) :-
+  action(X, trade),
+  outcome(X, deal),
+  arg(X, buyer, Buyer),
+  arg(X, price, Price).
 
-initiates(evt(X), fl(Fl, a(C1, C2))) :-
-  caused(evt(X), fl(Fl, a(Arg1, Arg2))),
-  arg(evt(X), Arg1, C1),
-  arg(evt(X), Arg2, C2).
+consequence(X, relinquishes(Seller, Goods)) :-
+  action(X, trade),
+  outcome(X, deal),
+  arg(X, seller, Seller),
+  arg(X, goods, Goods).
 
-terminates(evt(X), fl(status(Prev), a(Concrete))) :-
-  caused(evt(X), fl(status(Status), a(Arg))),
-  arg(evt(X), Arg, Concrete),
-  status_opposite(Status, Prev),
-  holds(before, evt(X), fl(status(Prev), a(Concrete))).
-
-terminates(evt(X), fl(state(State, PVal), a(Concrete))) :-
-  caused(evt(X), fl(state(State, Value), a(Arg))),
-  arg(evt(X), Arg, Concrete),
-  holds(before, evt(X), fl(state(State, PVal), a(Concrete))),
-  PVal != Value.
-
-terminates(evt(X), fl(rel(Rel, PVal), a(C1, C2))) :-
-  caused(evt(X), fl(rel(Rel, Value), a(Arg1, Arg2))),
-  arg(evt(X), Arg1, C1),
-  arg(evt(X), Arg2, C2),
-  holds(before, evt(X), fl(rel(Rel, PVal), a(C1, C2))),
-  PVal != Value.
-
-
-% Conditions:
-% -----------
-
-condition_holds(When, evt(X), fl(Fl, a(Arg))) :-
-  arg(evt(X), Arg, Val),
-  holds(When, evt(X), fl(Fl, a(Val))).
-
-condition_holds(When, evt(X), fl(Fl, a(A1, A2))) :-
-  arg(evt(X), A1, V1),
-  arg(evt(X), A2, V2),
-  holds(When, evt(X), fl(Fl, a(V1, V2))).
-
-% Threshold conditions:
-% TODO: Are these too spammy?
-
-condition_holds(
-  When,
-  evt(X),
-  fl(greater_than(state(State, Threshold)), Args)
-) :-
-  condition_holds(When, evt(X), fl(state(State, Value), Args)),
-  state_value_order_total(State, Threshold, Value).
-
-condition_holds(
-  When,
-  evt(X),
-  fl(less_than(state(State, Threshold)), Args)
-) :-
-  condition_holds(When, evt(X), fl(state(State, Value), Args)),
-  state_value_order_total(State, Value, Threshold).
-
-condition_holds(
-  When,
-  evt(X),
-  fl(greater_than(rel(Rel, Threshold)), Args)
-) :-
-  condition_holds(When, evt(X), fl(rel(Rel, Value), Args)),
-  rel_value_order_total(Rel, Threshold, Value).
-
-condition_holds(
-  When,
-  evt(X),
-  fl(less_than(rel(Rel, Threshold)), Args)
-) :-
-  condition_holds(When, evt(X), fl(rel(Rel, Value), Args)),
-  rel_value_order_total(Rel, Value, Threshold).
-
-% Automatic conditions:
-
-condition_holds(When, evt(X), fl(colocated, a(Arg1, Arg2))) :-
-  arg(evt(X), Arg1, Chr1),
-  arg(evt(X), Arg2, Chr2),
-  Chr1 != Chr2,
-  holds(When, evt(X), fl(rel(located_at, true), a(Chr1, Loc))),
-  holds(When, evt(X), fl(rel(located_at, true), a(Chr2, Loc))).
-
-% Precondition requirements:
-
-error(m("Positive precondition unsatisfied.", evt(X))) :-
-  happens(evt(X), act(Act)),
-  precondition(Act, fl(Fl, Args)),
-  not condition_holds(before, evt(X), fl(Fl, Args)).
-
-error(m("Negative precondition unsatisfied.", evt(X))) :-
-  happens(evt(X), act(Act)),
-  precondition_not(Act, fl(Fl, Args)),
-  condition_holds(before, evt(X), fl(Fl, Args)).
-
-% These are unnecessary as long as threshold conditions are around:
-%
-%error(m("'Greater than' precondition unsatisfied.", evt(X))) :-
-%  happens(evt(X), act(Act)),
-%  threshold_precondition(Act, greater_than, fl(state(State, Threshold), Args)),
-%  0 = {
-%    condition_holds(before, evt(X), fl(state(State, Value), Args))
-%      : state_value_order_total(State, Threshold, Value)
-%  }.
-%
-%error(m("'Less than' precondition unsatisfied.", evt(X))) :-
-%  happens(evt(X), act(Act)),
-%  threshold_precondition(Act, less_than, fl(state(State, Threshold), Args)),
-%  0 = {
-%    condition_holds(before, evt(X), fl(state(State, Value), Args))
-%      : state_value_order_total(State, Value, Threshold)
-%  }.
+% TODO: captured?

@@ -25,8 +25,10 @@ travel_mode(walking).
 
 environment(hills).
 
-%setup(being_robbed).
-setup(roc_attack).
+1 = {
+  setup(being_robbed);
+  setup(roc_attack)
+}.
 
 % roc attack
 inst(actor, roc) :- setup(roc_attack).

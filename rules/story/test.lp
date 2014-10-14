@@ -1,71 +1,80 @@
-% test.lp
-% Contains extra statements for testing the system without running the whole
-% python task loop.
+% setup:
+% ------
 
-% test code:
+inst(actor, the_party).
+name(inst(actor, the_party), "party").
+number(inst(actor, the_party), plural).
+gender(inst(actor, the_party), neuter).
 
-%:- 0 = { arg(evt(X), witnesses, Y) : evt(X) }.
-%:- 0 = { happens(Evt, act(m_gossip)) }.
+inst(item, supplies).
+name(inst(item, supplies), "supplies").
+number(inst(item, supplies), plural).
+gender(inst(item, supplies), neuter).
+has_item(inst(actor, the_party), inst(item, supplies)).
 
-% Situation setup:
+inst(party_member, "Arel").
+name(inst(party_member, "Arel"), "Arel").
+number(inst(party_member, "Arel"), singular).
+gender(inst(party_member, "Arel"), feminine).
+inst(party_member, "Jain").
+name(inst(party_member, "Jain"), "Jain").
+number(inst(party_member, "Jain"), singular).
+gender(inst(party_member, "Jain"), masculine).
 
-% The series of events:
-evt(0..6).
+travel_mode(walking).
 
-% The party of characters:
-id(chr, 0..4).
+environment(hills).
 
-%name(id(chr, 0), "Arel").
-holds(before, evt(0), fl(rel(chr_at, true), a(id(chr, 0), id(loc, 0)))).
-holds(before, evt(0), fl(rel(chr_at, true), a(id(chr, 1), id(loc, 0)))).
-holds(before, evt(0), fl(rel(chr_at, true), a(id(chr, 2), id(loc, 0)))).
-holds(before, evt(0), fl(rel(chr_at, true), a(id(chr, 3), id(loc, 0)))).
-holds(before, evt(0), fl(rel(chr_at, true), a(id(chr, 4), id(loc, 0)))).
+%setup(being_robbed).
+setup(roc_attack).
 
-% There's a single monster:
-id(monster, 0).
-holds(before, evt(0), fl(rel(mnst_at, true), a(id(monster, 0), id(loc, 3)))).
+% roc attack
+inst(actor, roc) :- setup(roc_attack).
+name(inst(actor, roc), "roc").
+number(inst(actor, roc), singular).
+gender(inst(actor, roc), neuter).
+unintelligent(inst(actor, roc)) :- setup(roc_attack).
 
-% There's a key item:
-id(itm, 0).
-holds(before, evt(0), fl(rel(itm_at, true), a(id(itm, 0), id(loc, 2)))).
+inst(item, roc_feather) :- setup(roc_attack).
+name(inst(item, roc_feather), "roc feather").
+number(inst(item, roc_feather), singular).
+gender(inst(item, roc_feather), neuter).
 
-% And some locations:
-id(loc, 0..5).
+trophy(inst(actor, roc), inst(item, roc_feather)) :- setup(roc_attack).
 
-% Defaults:
+problem(threatening(inst(actor, roc), inst(actor, the_party))) :-
+  setup(roc_attack).
 
-holds(before, Beginning, fl(status(Default), a(id(Type, ID)))) :-
-  first_event(Beginning),
-  id(Type, ID),
-  status(Type, Status),
-  default_status(Status, Default),
-  0 = {
-    holds(before, Beginning, fl(status(NonDefault), a(id(Type, ID))))
-      : status_opposite(Default, NonDefault)
-  }.
+intro_text(
+  @join("You ", Travel, ", when suddenly, a giant bird swoops down from the skies, clearly intent on attacking your party!")
+) :-
+  travel_text(Travel),
+  setup(roc_attack).
 
-holds(before, Beginning, fl(state(State, Default), a(id(Type, ID)))) :-
-  first_event(Beginning),
-  id(Type, ID),
-  state(Type, State),
-  default_state_value(State, Default),
-  0 = {
-    holds(before, Beginning, fl(state(State, NonDefault), a(id(Type, ID))))
-      : state_value(State, NonDefault), NonDefault != Default
-  }.
 
-holds(before, Beginning, fl(rel(Rel, Default), a(id(T1, I1), id(T2, I2)))) :-
-  first_event(Beginning),
-  id(T1, I1),
-  id(T2, I2),
-  relationship(T1, T2, Rel),
-  default_rel_value(Rel, Default),
-  0 = {
-    holds(
-      before,
-      Beginning,
-      fl(rel(Rel, NonDefault), a(id(T1, I1), id(T2, I2)))
-    )
-      : rel_value(Rel, NonDefault), NonDefault != Default
-  }.
+% merchants being robbed
+inst(item, treasure).
+name(inst(item, treasure), "treasure").
+number(inst(item, treasure), singular).
+gender(inst(item, treasure), neuter).
+
+has_item(inst(actor, the_party), inst(item, treasure)).
+
+inst(actor, bandits) :- setup(being_robbed).
+name(inst(actor, bandits), "bandits").
+number(inst(actor, bandits), plural).
+gender(inst(actor, bandits), neuter).
+
+inst(actor, merchants) :- setup(being_robbed).
+name(inst(actor, merchants), "merchants").
+number(inst(actor, merchants), plural).
+gender(inst(actor, merchants), neuter).
+
+problem(threatening(inst(actor, bandits), inst(actor, merchants))) :-
+  setup(being_robbed).
+
+intro_text(
+  @join("You ", Travel, " and come across a small band of merchants being attacked by a group of bandits.")
+) :-
+  travel_text(Travel),
+  setup(being_robbed).

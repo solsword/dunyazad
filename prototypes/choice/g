@@ -8,6 +8,7 @@ time --format="%E, %K KB" \
   clingo --stats --time-limit=2 $args $sources |\
   tail -n 29 | head -n -1 >> out/stats.lp
 echo "% vim"": syn=gringo" > out/events.lp
+echo "% vim"": syn=gringo" > out/surface.lp
 echo "Sources:"
 echo $sources
 echo "Solving..."
@@ -16,9 +17,14 @@ time --format="%E, %K KB" \
     head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\
     sed "s/^\([a-zA-Z0-9_]\+\)$/\1./" | sort >> out/events.lp
 echo "  ...done"
-echo "Adding surface text..."
+echo "Finishing surface text..."
 time --format="%E, %K KB" \
-  clingo --verbose=0 --quiet=1,1 $args $surf_sources |\
+  clingo --verbose=0 --quiet=1,1 $args $finish_sources |\
     head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\
     sed "s/^\([a-zA-Z0-9_]\+\)$/\1./" | sort >> out/surface.lp
+echo "  ...done"
+echo "Writing scene..."
+grep "scene_text" < out/surface.lp |\
+  sed "s/^[^\"]*\"\([^\"]*\)\"/\1/" |\
+  sed "s/\\\\n/\n/g" > out/scene.txt
 echo "  ...done"

@@ -1,13 +1,31 @@
-% core.lp
-% Core story rules.
+% core rules:
+% -----------
 
-% Errors are not allowed.
-:- error(M).
+:- error(Message).
 
-% Default story elements:
+#const max_options=5.
 
-% There is a single assumed reader:
-id(reader, 0).
+2 <= {
+  option(X) : X = 1..max_options
+} <= max_options.
 
-% There is a single "plot" (used for holding flags and other plot information):
-id(plot, 0).
+1 = {
+  action(option(X), Act) : action(Act)
+} :-
+  option(X).
+
+1 = {
+  outcome(X, Outcome) : outcome(Action, Outcome)
+} :-
+  action(X, Action).
+
+1 = {
+  arg(X, Arg, inst(Type, Inst)) : inst(Type, Inst)
+} :-
+  action(X, Action),
+  argument(Action, Arg, Type).
+
+initiator(X, Initiator) :-
+  action(X, Action),
+  initiator(Action, InitArg),
+  arg(X, InitArg, Initiator).
