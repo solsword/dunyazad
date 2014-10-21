@@ -25,8 +25,10 @@ travel_mode(walking).
 
 environment(hills).
 
-%setup(being_robbed).
-setup(roc_attack).
+1 = {
+  setup(being_robbed);
+  setup(roc_attack)
+}.
 
 % roc attack
 inst(actor, roc) :- setup(roc_attack).
@@ -44,13 +46,6 @@ trophy(inst(actor, roc), inst(item, roc_feather)) :- setup(roc_attack).
 
 problem(threatening(inst(actor, roc), inst(actor, the_party))) :-
   setup(roc_attack).
-
-intro_text(
-  @join("You ", Travel, ", when suddenly, a giant bird swoops down from the skies, clearly intent on attacking your party!")
-) :-
-  travel_text(Travel),
-  setup(roc_attack).
-
 
 % merchants being robbed
 inst(item, treasure).
@@ -71,10 +66,4 @@ number(inst(actor, merchants), plural).
 gender(inst(actor, merchants), neuter).
 
 problem(threatening(inst(actor, bandits), inst(actor, merchants))) :-
-  setup(being_robbed).
-
-intro_text(
-  @join("You ", Travel, " and come across a small band of merchants being attacked by a group of bandits.")
-) :-
-  travel_text(Travel),
   setup(being_robbed).

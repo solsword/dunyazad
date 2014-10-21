@@ -14,3 +14,15 @@ time --format="%E, %K KB" \
   clingo --verbose=0 --quiet=1,1 $args $sources |\
     head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\
     sed "s/^\([a-zA-Z0-9_]\+\)$/\1./" | sort >> out/events.lp
+
+
+echo "% vim"": syn=gringo" > out/core.lp
+grep "action(option" < out/events.lp >> out/core.lp
+echo "" >> out/core.lp
+grep "arg(option" < out/events.lp >> out/core.lp
+echo "" >> out/core.lp
+grep "outcome(option" < out/events.lp >> out/core.lp
+echo "" >> out/core.lp
+grep "consequence(option" < out/events.lp >> out/core.lp
+echo "" >> out/core.lp
+grep "deals_with(option" < out/events.lp >> out/core.lp

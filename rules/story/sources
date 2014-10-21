@@ -1,8 +1,5 @@
 #!/bin/sh
-actions="actions.lp"
-fluents="fluents.lp"
-core="core.lp events.lp"
-#content="content/possession.lp content/sickness.lp content/wealth.lp"
+core="choice_structure.lp core.lp"
 content="content/*.lp"
-sources="test.lp $core $actions $fluents $content"
+sources="test.lpt $core $content"
 args="--seed=$seed --rand-freq=0.05"
