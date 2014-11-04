@@ -1,4 +1,4 @@
-*title The Legend of the Tree of Life and Death
+*title Þe Legend of þe Tree of Life and Deaþ
 *author Dunyazad
 *scene_list
   startup

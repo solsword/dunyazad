@@ -60,11 +60,13 @@ ClingoOptOutput = parser.Hook(
   )
 )
 
-def solve(code):
+def solve(code, is_opt=False):
   """
   Takes a string containing some answer set code and runs clingo on it,
   returning a set of Predicate objects parsed from clingo's output. Raises an
-  ASPError if clingo returns an error code.
+  ASPError if clingo returns an error code. If is_opt is given and not False,
+  then the output will be assumed to be the result of an optimization problem
+  rather than a simple satisfiability problem.
   """
   clingo = subprocess.Popen(
     ["clingo", "--verbose=0", "--quiet=1,1", "--seed=0"],
@@ -74,20 +76,8 @@ def solve(code):
   )
   stdout, stderr = clingo.communicate(code.encode())
   ret = clingo.returncode
-  # clingo returns 10 on normal success and 30 on optimization success
-  if ret == 10:
-    return parser.parse_completely(
-      stdout.decode(),
-      ClingoOutput,
-      devour=ans.devour_asp
-    )
-  elif ret == 30:
-    return parser.parse_completely(
-      stdout.decode(),
-      ClingoOptOutput,
-      devour=ans.devour_asp
-    )
-  else:
+  # clingo returns either 10 or 30 on success (not sure what the difference is)
+  if ret not in [10, 30]:
     raise ASPError(
       code=ret,
       message="""
@@ -105,4 +95,16 @@ Clingo returned error code {}
 ---------
 {}
 """.format(ret, code, stdout.decode(), stderr.decode())
+    )
+  if is_opt:
+    return parser.parse_completely(
+      stdout.decode(),
+      ClingoOptOutput,
+      devour=ans.devour_asp
+    )
+  else:
+    return parser.parse_completely(
+      stdout.decode(),
+      ClingoOutput,
+      devour=ans.devour_asp
     )

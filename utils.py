@@ -4,6 +4,7 @@ Utility functions.
 '''
 
 import re
+import random
 import os
 import sys
 import itertools
@@ -87,12 +88,15 @@ def instance(cls):
   Replaces the decorated class with an instance of itself, constructed with
   zero arguments. Attributes from the class (except those that start and begin
   with "__") are copied onto the instance, so they behave as if they were
-  instance attributes rather than class attributes.
+  instance attributes rather than class attributes. If not defined already, a
+  __str__ function will be added to the class which returns the class' name.
   """
   result = cls()
   for attr in cls.__dict__:
     if not (attr.startswith("__") and attr.endswith("__")):
       setattr(result, attr, cls.__dict__[attr])
+  if "__str__" not in cls.__dict__:
+    cls.__str__ = lambda self: cls.__name__
   return result
 
 def abstract(cls):

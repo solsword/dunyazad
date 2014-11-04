@@ -36,6 +36,12 @@ class StoryTask(tn.Task):
     """
     self.net.mem.code.story = set();
 
+  def set_story(self, new_story):
+    """
+    Sets the task's network's story to the given predicate set.
+    """
+    self.net.mem.code.story = new_story;
+
   def add_story_fact(self, predicate):
     """
     Adds the given predicate to the story facts for this task's task network.
@@ -234,8 +240,13 @@ class ASPTaskError(Exception):
   pass
 
 # Schemas for binding active predicates:
+story_schemas = {
+  "at": ans.PVr("at", "at", ans.Vr("Node"), ans.SbT("Predicate")),
+  "st": ans.PVr("st", "st", ans.Vr("Node"), ans.SbT("Predicate")),
+  "snd": ans.PVr("snd", "story_node", ans.Vr("Node")),
+  "ssc": ans.PVr("ssc", "successor", ans.Vr("From"),ans.Vr("Opt"),ans.Vr("To")),
+}
 active_schemas = {
-  "proposed": ans.Pr("story", ans.Pr("proposed"), ans.SbT("Predicate")),
   "local_mem": ans.Pr("local_mem", ans.Vr("Address"), ans.SbT("Value")),
   "global_mem": ans.Pr("global_mem", ans.Vr("Address"), ans.SbT("Value")),
   "run_code": ans.Pr( "run_code", ans.Vr("QuotedCode")),
@@ -266,6 +277,9 @@ def asptask(name, code, source="unknown"):
     3. Scans the resulting answer set for the following predicates and behaves
        accordingly, updating the code in net.mem.code.story and yielding an
        appropriate status:
+     <story predicate>
+       See the story_schemas variable. Predicates matching any of these
+       schemata will be used as part of the current story going onwards.
      error(<predicate>)
        If any error predicates are generated, an exception will be raised and
        none of the other predicates in this list will be heeded.
@@ -274,9 +288,6 @@ def asptask(name, code, source="unknown"):
        is the result, it will automatically be removed from the active tasks
        list. If multiple status() predicates are detected an error is
        generated.
-     story(proposed, <predicate>)
-       The given predicate structure will be used as part of the current story
-       going onwards, in the form story(current, <predicate>).
      local_mem(<address>, <predicate>)
        The given local memory address will be set to the given predicate.
      global_mem(<address>, <predicate>)
@@ -301,11 +312,8 @@ def asptask(name, code, source="unknown"):
          task:
            The current Task object. This can be used to access both local and
            global memory as normal.
-         addlist:
-           A list of Predicate objects that are about to be added to the story.
-         rmlist:
-           A list of Predicate objects that are about to be removed from the
-           story.
+         story_predicates:
+           A set of predicate objects that will overwrite the current story.
          lmemlist:
            A list of Address, Value objects that are about to be set in local
            memory.
@@ -334,11 +342,13 @@ def asptask(name, code, source="unknown"):
 
     errors = []
     status = None
-    proplist = []
+    story_predicates = set()
     to_run = []
     to_spawn = {}
     lmemlist = []
     gmemlist = []
+    for (schema, binding) in ans.bindings(story_schemas, predicates):
+      story_predicates.add(binding[schema])
     for (schema, binding) in ans.bindings(active_schemas, predicates):
       if schema == "error":
         print("Error in Clingo output!")
@@ -349,8 +359,6 @@ def asptask(name, code, source="unknown"):
           status = s
         else:
           status = status + " and " + s
-      elif schema == "proposed":
-        proplist.append(binding["story.Predicate"])
       elif schema == "local_mem":
         lmemlist.append(
           (
@@ -406,7 +414,7 @@ def asptask(name, code, source="unknown"):
       code_locals={
         "status": status,
         "task": t,
-        "proplist": proplist,
+        "story_predicates": story_predicates,
         "lmemlist": lmemlist,
         "gmemlist": gmemlist,
       }
@@ -421,14 +429,12 @@ def asptask(name, code, source="unknown"):
         code_locals
       )
       status = code_locals["status"]
-      proplist = code_locals["proplist"]
+      story_predicates = code_locals["story_predicates"]
       lmemlist = code_locals["lmemlist"]
       gmemlist = code_locals["gmemlist"]
 
     # Process the new story and memory elements:
-    t.empty_story()
-    for p in proplist:
-      t.add_story_fact(ans.Pr("story", ans.Pr("current"), p))
+    t.set_story(story_predicates)
 
     for (addr, val) in lmemlist:
       t.mem[addr] = val

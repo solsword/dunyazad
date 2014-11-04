@@ -552,7 +552,7 @@ class Aggregate:
       n="not " if self.negated else "",
       l=(self.l and (str(self.l) + ' ')) or '',
       lop=(self.lop and (str(self.lop) + ' ')) or '',
-      function=self.function,
+      function=(self.function if self.function != "#count" else ""), # TODO: REALLY THIS?
       elements='; '.join(str(e) for e in self.elements),
       uop=(self.uop and (' ' + str(self.uop))) or '',
       u=(self.u and (' ' + str(self.u))) or '',

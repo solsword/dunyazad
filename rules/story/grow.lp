@@ -12,11 +12,13 @@ before(Prev, New) :-
   before(Int, New).
 
 % Nodes which have no options yet are unfinished:
-unfinished_node(N) :-
+optcount(N, X) :-
   story_node(N),
-  0 = {
-    at(N, option(X)) : opt_num(X)
+  X = {
+    at(N, option(O)) : opt_num(O)
   }.
+
+unfinished_node(N) :- optcount(N, 0).
 
 % Succession involves either an existing node that matches the outcome state of
 % the branching node, or a new node.
@@ -49,6 +51,24 @@ st(New, NSt) :-
   new_node(New),
   successor(Old, Opt, New),
   at(Old, consequence(Opt, NSt)).
+
+error(m("New node picked up extra state", New, State)) :-
+  new_node(New),
+  successor(Old, Opt, New),
+  st(New, State),
+  0 = {
+    st(Old, State);
+    at(Old, consequence(Opt, State))
+  }.
+
+error(m("New node lost a state", New, State)) :-
+  new_node(New),
+  successor(Old, Opt, New),
+  st(Old, State),
+  0 = {
+    st(New, State);
+    at(Old, consequence(Opt, _not, State))
+  }.
 
 % The concept of a "state match":
 state_match(Prev, option(Opt), New) :-
