@@ -5,27 +5,43 @@
 
 #const max_options=5.
 
+opt_num(1..max_options).
+
 2 <= {
-  option(X) : X = 1..max_options
-} <= max_options.
+  at(N, option(X)) : opt_num(X)
+} <= max_options :-
+  active_node(N).
 
 1 = {
-  action(option(X), Act) : action(Act)
+  at(N, action(option(X), Act)) : action(Act)
 } :-
-  option(X).
+  at(N, option(X)),
+  active_node(N).
 
 1 = {
-  outcome(X, Outcome) : outcome(Action, Outcome)
+  at(N, outcome(X, Outcome)) : outcome(Action, Outcome)
 } :-
-  action(X, Action).
+  at(N, action(X, Action)),
+  active_node(N).
 
 1 = {
-  arg(X, Arg, inst(Type, Inst)) : inst(Type, Inst)
+  at(N, arg(X, Arg, inst(Type, Inst))) : st(N, inst(Type, Inst))
 } :-
-  action(X, Action),
-  argument(Action, Arg, Type).
+  at(N, action(X, Action)),
+  argument(Action, Arg, Type),
+  active_node(N).
 
-initiator(X, Initiator) :-
-  action(X, Action),
+at(N, initiator(X, Initiator)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, InitArg, Initiator)),
   initiator(Action, InitArg),
-  arg(X, InitArg, Initiator).
+  active_node(N).
+
+exclusive(has_item).
+
+at(N, consequence(X, _not, relation(Rel, Old, Obj))) :-
+  at(N, consequence(X, relation(Rel, New, Obj))),
+  exclusive(Rel),
+  st(N, relation(Rel, Old, Obj)),
+  Old != New,
+  active_node(N).

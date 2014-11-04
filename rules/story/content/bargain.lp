@@ -9,42 +9,41 @@ initiator(bargain, asking).
 outcome(bargain, deal).
 outcome(bargain, no_deal).
 
-:-
-  action(X, bargain),
-  arg(X, asking, Asking),
-  arg(X, price, Price),
+error(m("Bargain without price.", N, X, Asking, Price)) :-
+  at(N, action(X, bargain)),
+  at(N, arg(X, asking, Asking)),
+  at(N, arg(X, price, Price)),
   0 = {
-    has_item(Asking, Price)
-  }.
+    st(N, relation(has_item, Asking, Price))
+  },
+  active_node(N).
 
-:-
-  action(X, bargain),
-  arg(X, asking, Asking),
-  unintelligent(Asking).
+error(m("Unintelligent bargainer.", N, X, Asking)) :-
+  at(N, action(X, bargain)),
+  at(N, arg(X, asking, Asking)),
+  st(N, state(unintelligent, Asking)),
+  active_node(N).
 
-:-
-  action(X, bargain),
-  arg(X, listening, Listening),
-  unintelligent(Listening).
+error(m("Unintelligent listener.", N, X, Listening)) :-
+  at(N, action(X, bargain)),
+  at(N, arg(X, listening, Listening)),
+  st(N, state(unintelligent, Listening)),
+  active_node(N).
 
 1 = {
-  deals_with(X, threatening(Listening, Someone))
-    : problem(threatening(Listening, Someone))
+  at(N, deals_with(X, threatening(Listening, Someone)))
+    : st(N, problem(threatening(Listening, Someone)))
   % TODO: other problems that can be solved by bargaining?
 } :-
-  action(X, bargain),
-  outcome(X, deal),
-  arg(X, asking, Asking),
-  arg(X, listening, Listening).
+  at(N, action(X, bargain)),
+  at(N, outcome(X, deal)),
+  at(N, arg(X, asking, Asking)),
+  at(N, arg(X, listening, Listening)),
+  active_node(N).
 
-consequence(X, obtains(Listening, Item)) :-
-  action(X, bargain),
-  outcome(X, deal),
-  arg(X, listening, Listening),
-  arg(X, price, Item).
-
-consequence(X, relinquishes(Asking, Item)) :-
-  action(X, bargain),
-  outcome(X, deal),
-  arg(X, asking, Asking),
-  arg(X, price, Item).
+at(N, consequence(X, relation(has_item, Listening, Item))) :-
+  at(N, action(X, bargain)),
+  at(N, outcome(X, deal)),
+  at(N, arg(X, listening, Listening)),
+  at(N, arg(X, price, Item)),
+  active_node(N).

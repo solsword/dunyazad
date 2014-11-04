@@ -10,52 +10,46 @@ initiator(trade, buyer).
 outcome(trade, deal).
 outcome(trade, no_deal).
 
-:-
-  action(X, trade),
-  arg(X, asking, Asking),
-  unintelligent(Asking).
+error(m("Unintelligent buyer.", N, X, Buyer)) :-
+  at(N, action(X, trade)),
+  at(N, arg(X, buyer, Buyer)),
+  st(N, state(unintelligent, Buyer)),
+  active_node(N).
 
-:-
-  action(X, trade),
-  arg(X, listening, Listening),
-  unintelligent(Listening).
+error(m("Unintelligent seller.", N, X, Seller)) :-
+  at(N, action(X, trade)),
+  at(N, arg(X, seller, Seller)),
+  st(N, state(unintelligent, Seller)),
+  active_node(N).
 
-:-
-  action(X, bargain),
-  arg(X, buyer, Buyer),
-  arg(X, price, Price),
+error(m("Buyer doesn't have price.", N, X, Buyer, Price)) :-
+  at(N, action(X, bargain)),
+  at(N, arg(X, buyer, Buyer)),
+  at(N, arg(X, price, Price)),
   0 = {
-    has_item(Buyer, Price)
-  }.
+    st(N, relation(has_item, Buyer, Price))
+  },
+  active_node(N).
 
-:-
-  action(X, bargain),
-  arg(X, seller, Seller),
-  arg(X, goods, Goods),
+error(m("Seller doesn't have goods.", N, X, Seller, Goods)) :-
+  at(N, action(X, bargain)),
+  at(N, arg(X, seller, Seller)),
+  at(N, arg(X, goods, Goods)),
   0 = {
-    has_item(Seller, Goods)
-  }.
+    st(N, relation(has_item, Seller, Goods))
+  },
+  active_node(N).
 
-consequence(X, obtains(Buyer, Goods)) :-
-  action(X, trade),
-  outcome(X, deal),
-  arg(X, buyer, Buyer),
-  arg(X, goods, Goods).
+at(N, consequence(X, relation(has_item, Buyer, Goods))) :-
+  at(N, action(X, trade)),
+  at(N, outcome(X, deal)),
+  at(N, arg(X, buyer, Buyer)),
+  at(N, arg(X, goods, Goods)),
+  active_node(N).
 
-consequence(X, obtains(Seller, Price)) :-
-  action(X, trade),
-  outcome(X, deal),
-  arg(X, seller, Seller),
-  arg(X, price, Price).
-
-consequence(X, relinquishes(Buyer, Price)) :-
-  action(X, trade),
-  outcome(X, deal),
-  arg(X, buyer, Buyer),
-  arg(X, price, Price).
-
-consequence(X, relinquishes(Seller, Goods)) :-
-  action(X, trade),
-  outcome(X, deal),
-  arg(X, seller, Seller),
-  arg(X, goods, Goods).
+at(N, consequence(X, relation(has_item, Seller, Price))) :-
+  at(N, action(X, trade)),
+  at(N, outcome(X, deal)),
+  at(N, arg(X, seller, Seller)),
+  at(N, arg(X, price, Price)),
+  active_node(N).

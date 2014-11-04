@@ -1,5 +1,6 @@
 #!/bin/sh
 core="choice_structure.lp core.lp"
 content="content/*.lp"
-sources="test.lpt $core $content"
+grow="grow.lp"
+sources="../utils.lp $core $grow $content test.lpt"
 args="--seed=$seed --rand-freq=0.05"

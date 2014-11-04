@@ -10,59 +10,111 @@ outcome(attack, defeat).
 outcome(attack, parley).
 
 % you can't parley if one side of the conflict is unintelligent:
-:-
-  outcome(X, parley),
-  arg(X, target, Target),
-  unintelligent(Target).
+error(m("Parley with unintelligent target.", N, X)) :-
+  at(N, outcome(X, parley)),
+  at(N, arg(X, target, Target)),
+  st(N, state(unintelligent, Target)),
+  active_node(N).
 
-:-
-  outcome(X, parley),
-  arg(X, aggressor, Aggressor),
-  unintelligent(Aggressor).
+error(m("Parley with unintelligent agressor.", N, X)) :-
+  at(N, outcome(X, parley)),
+  at(N, arg(X, aggressor, Aggressor)),
+  st(N, state(unintelligent, Aggressor)),
+  active_node(N).
 
 % attacking is one way to deal with a threat
-deals_with(X, threatening(Target, Someone)) :-
-  action(X, attack),
+at(N, deals_with(X, threatening(Target, Someone))) :-
+  at(N, action(X, attack)),
   1= {
-    outcome(X, parley);
-    outcome(X, victory)
+    at(N, outcome(X, parley));
+    at(N, outcome(X, victory))
   },
-  arg(X, target, Target),
-  problem(threatening(Target, Someone)).
+  at(N, arg(X, target, Target)),
+  st(N, problem(threatening(Target, Someone))),
+  active_node(N).
 
 % fighting is dangerous:
 0 <= {
-  consequence(X, injured(Aggressor));
-  consequence(X, injured(Target))
+  at(N, consequence(X, state(injured, Aggressor)));
+  at(N, consequence(X, state(injured, Target)))
 } <= 2 :-
-  action(X, attack),
-  arg(X, aggressor, Aggressor),
-  arg(X, target, Target).
+  at(N, action(X, attack)),
+  at(N, arg(X, aggressor, Aggressor)),
+  at(N, arg(X, target, Target)),
+  active_node(N).
 
 1 = {
-  consequence(X, injured(Aggressor));
-  consequence(X, killed(Aggressor))
+  at(N, consequence(X, state(injured, Aggressor)));
+  at(N, consequence(X, state(killed, Aggressor)))
 } :-
-  action(X, attack),
-  arg(X, aggressor, Aggressor),
-  outcome(X, defeat).
+  at(N, action(X, attack)),
+  at(N, arg(X, aggressor, Aggressor)),
+  at(N, outcome(X, defeat)),
+  active_node(N).
 
 1 = {
-  consequence(X, injured(Target));
-  consequence(X, killed(Target))
+  at(N, consequence(X, state(injured, Target)));
+  at(N, consequence(X, state(killed, Target)))
 } :-
-  action(X, attack),
-  arg(X, target, Target),
-  outcome(X, victory).
+  at(N, action(X, attack)),
+  at(N, arg(X, target, Target)),
+  at(N, outcome(X, victory)),
+  active_node(N).
+
+% TODO: SOMETHING ABOUT THIS?!?
+%at(N, consequence(X, state(injured, Target))) :-
+%  at(N, action(X, attack)),
+%  at(N, arg(X, target, Target)),
+%  at(N, outcome(X, victory)),
+%  active_node(N).
+%
+%at(root, consequence(X, state(injured, Target))) :-
+%  at(root, action(X, attack)),
+%  at(root, arg(X, target, Target)).
+%
+%% Forcings:
+%at(N, consequence(X, state(injured, Target))) :-
+%  test_abcd(N, X, Target).
+%at(root,outcome(X, victory)) :-
+%  at(root, action(X, attack)).
+%
+%% Tests:
+%test_abcd(N, X, Target) :-
+%  at(N, action(X, attack)),
+%  at(N, arg(X, target, Target)),
+%  at(N, outcome(X, victory)),
+%  active_node(N).
+%
+%test_abc(N, X, Target) :-
+%  at(N, arg(X, target, Target)),
+%  at(N, outcome(X, victory)),
+%  active_node(N).
+%
+%test_ab(N, X) :-
+%  at(N, outcome(X, victory)),
+%  active_node(N).
+%
+%test_d(N, X) :-
+%  at(N, action(X, attack)).
+%
+%test_c(N, X, Target) :-
+%  at(N, arg(X, target, Target)).
+%
+%test_b(N, X) :-
+%  at(N, outcome(X, victory)).
+%
+%test_a(N) :-
+%  active_node(N).
 
 0 <= {
-  consequence(X, obtains(Aggressor, Item))
+  at(N, consequence(X, relation(has_item, Aggressor, Item))) :
+    st(N, relation(has_item, Target, Item))
 } <= 1 :-
-  action(X, attack),
-  arg(X, aggressor, Aggressor),
-  arg(X, target, Target),
-  trophy(Target, Item),
+  at(N, action(X, attack)),
+  at(N, arg(X, aggressor, Aggressor)),
+  at(N, arg(X, target, Target)),
   1 = {
-    outcome(X, victory);
-    outcome(X, parley)
-  }.
+    at(N, outcome(X, victory));
+    at(N, outcome(X, parley))
+  },
+  active_node(N).
