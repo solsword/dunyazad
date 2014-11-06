@@ -1,0 +1,30 @@
+#!/bin/sh
+seed=`head -c 2 /dev/urandom | hexdump -e '"%u"'`
+mkdir -p out
+. ./sources
+echo $seed > out/seed
+echo "% vim"": syn=lua" > out/stats
+echo "Running: \"clingo --stats --time-limit=2 $args $sources\""
+time --format="%E, %K KB" \
+  clingo --stats --time-limit=2 $args $sources |\
+  tail -n 29 | head -n -1 >> out/stats
+echo "% vim"": syn=gringo" > out/events
+echo "Sources:"
+echo $sources
+echo "Running: \"clingo --verbose=0 --quiet=1,1 $args $sources\""
+time --format="%E, %K KB" \
+  clingo --verbose=0 --quiet=1,1 $args $sources |\
+    cat | head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\
+    sed "s/^\([a-zA-Z0-9_]\+\)$/\1./" | sort >> out/events
+
+
+echo "% vim"": syn=gringo" > out/core
+grep "action(option" < out/events >> out/core
+echo "" >> out/core
+grep "arg(option" < out/events >> out/core
+echo "" >> out/core
+grep "outcome(option" < out/events >> out/core
+echo "" >> out/core
+grep "consequence(option" < out/events >> out/core
+echo "" >> out/core
+grep "deals_with(option" < out/events >> out/core

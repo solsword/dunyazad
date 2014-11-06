@@ -1,0 +1,74 @@
+% vim: syn=gringo
+% setup:
+% ------
+
+story_node(root).
+active_node(root).
+branch_node(root).
+active_node("root:2").
+
+st(root, inst(actor, the_party)).
+st(root, property(name, inst(actor, the_party), "party")).
+st(root, property(number, inst(actor, the_party), plural)).
+st(root, property(gender, inst(actor, the_party), neuter)).
+
+st(root, inst(item, supplies)).
+st(root, property(name, inst(item, supplies), "supplies")).
+st(root, property(number, inst(item, supplies), plural)).
+st(root, property(gender, inst(item, supplies), neuter)).
+st(root, relation(has_item, inst(actor, the_party), inst(item, supplies))).
+
+st(root, inst(party_member, "Arel")).
+st(root, property(name, inst(party_member, "Arel"), "Arel")).
+st(root, property(number, inst(party_member, "Arel"), singular)).
+st(root, property(gender, inst(party_member, "Arel"), feminine)).
+st(root, inst(party_member, "Jain")).
+st(root, property(name, inst(party_member, "Jain"), "Jain")).
+st(root, property(number, inst(party_member, "Jain"), singular)).
+st(root, property(gender, inst(party_member, "Jain"), masculine)).
+
+st(root, property(travel_mode, inst(actor, the_party), walking)).
+st(root, property(environment, inst(actor, the_party), hills)).
+
+%1 = {
+%  setup(being_robbed);
+%  setup(roc_attack)
+%}.
+setup(being_robbed).
+
+% roc attack
+st(root, inst(actor, roc)) :- setup(roc_attack).
+st(root, property(name, inst(actor, roc), "roc")).
+st(root, property(number, inst(actor, roc), singular)).
+st(root, property(gender, inst(actor, roc), neuter)).
+st(root, state(unintelligent, inst(actor, roc))) :- setup(roc_attack).
+
+st(root, inst(item, roc_feather)) :- setup(roc_attack).
+st(root, property(name, inst(item, roc_feather), "roc feather")).
+st(root, property(number, inst(item, roc_feather), singular)).
+st(root, property(gender, inst(item, roc_feather), neuter)).
+st(root, relation(has_item, inst(actor, roc), inst(item, roc_feather))) :-
+  setup(roc_attack).
+
+st(root, problem(threatening(inst(actor, roc), inst(actor, the_party)))) :-
+  setup(roc_attack).
+
+% merchants being robbed
+st(root, inst(item, treasure)).
+st(root, property(name, inst(item, treasure), "treasure")).
+st(root, property(number, inst(item, treasure), singular)).
+st(root, property(gender, inst(item, treasure), neuter)).
+st(root, relation(has_item, inst(actor, the_party), inst(item, treasure))).
+
+st(root, inst(actor, bandits)) :- setup(being_robbed).
+st(root, property(name, inst(actor, bandits), "bandits")).
+st(root, property(number, inst(actor, bandits), plural)).
+st(root, property(gender, inst(actor, bandits), neuter)).
+
+st(root, inst(actor, merchants)) :- setup(being_robbed).
+st(root, property(name, inst(actor, merchants), "merchants")).
+st(root, property(number, inst(actor, merchants), plural)).
+st(root, property(gender, inst(actor, merchants), neuter)).
+
+st(root, problem(threatening(inst(actor, bandits), inst(actor, merchants)))) :-
+  setup(being_robbed).
