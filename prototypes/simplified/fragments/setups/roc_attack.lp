@@ -2,6 +2,8 @@
 
 tn(N) :- target_node(N).
 
+setup(N, roc_attack) :- tn(N).
+
 st(N, inst(actor, roc)) :- tn(N).
 st(N, property(name, inst(actor, roc), "roc")) :- tn(N).
 st(N, property(number, inst(actor, roc), singular)) :- tn(N).

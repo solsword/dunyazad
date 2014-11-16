@@ -2,6 +2,8 @@
 
 tn(N) :- target_node(N).
 
+setup(N, being_robbed) :- tn(N).
+
 st(N, inst(item, treasure)) :- tn(N).
 st(N, property(name, inst(item, treasure), "treasure")) :- tn(N).
 st(N, property(number, inst(item, treasure), singular)) :- tn(N).

@@ -182,19 +182,6 @@ class Predicate:
     and
       all(self.args[i] == other.args[i] for i in range(len(self.args)))
     )
-    #r1 = (type(self) == type(other))
-    #if not r1:
-    #  print("Failed: r1")
-    #  return False
-    #r2 = (self.name == other.name)
-    #if not r2:
-    #  print("Failed: r2")
-    #  return False
-    #r3 = (self.args == other.args)
-    #if not r3:
-    #  print("Failed: r3\n{}\n{}".format(self.args, other.args))
-    #  return False
-    #return True
 
   def __ne__(self, other):
     return not self == other
