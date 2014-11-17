@@ -12,8 +12,6 @@ from utils import *
 def main():
   story = tasks.setup_story("")
   while len(list(tasks.all_nodes(story))) < 5:
-    while len(list(tasks.all_uninitialized_nodes(story))):
-      story = tasks.initialize_random(story)
     story = tasks.instantiate_random(story)
     story = tasks.branch_random(story)
   for pr in story:

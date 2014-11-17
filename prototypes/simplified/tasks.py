@@ -46,10 +46,6 @@ BASE_SRC += "% Base source code end." + SEP
 
 FRAGMENTS_DIR = "fragments"
 
-SETUPS_DIR = opj(FRAGMENTS_DIR, "setups")
-
-ALL_SETUPS = [ f[:-3] for f in os.listdir(SETUPS_DIR) if f.endswith(".lp") ]
-
 FR_CACHE = {}
 def fr(name):
   if name in FR_CACHE:
@@ -113,7 +109,7 @@ def all_initialized_nodes(story):
       yield b["setup.Node"]
 
 def all_uninitialized_nodes(story):
-  ai = all_initialized_nodes(story)
+  ai = list(all_initialized_nodes(story))
   for n in all_nodes(story):
     if n not in ai:
       yield n
@@ -164,35 +160,20 @@ def all_unfinished_options(story):
 def setup_story(story):
   return filter_keep(runfr(story, "setup"))
 
-def initialize_node(story, n):
-  return filter_keep(
-    runfr(
-      story,
-      "setups." + random.choice(ALL_SETUPS),
-      "target_node({}).".format(n)
-    )
-  )
-
 def instantiate_node(story, n):
   return filter_keep(runfr(story, "instantiate", "target_node({}).".format(n)))
 
 def branch_node(story, n):
   return filter_keep(runfr(story, "branch", "target_node({}).".format(n)))
 
-def initialize_random(story):
-  l = list(all_uninitialized_nodes(story))
-  print("ini rand")
-  if l:
-    return initialize_node(story, random.choice(l))
-  else:
-    print("Initialize random: no node to instantiate!")
-
 def instantiate_random(story):
-  l = list(all_uninstantiated_initialized_nodes(story))
+  l = list(all_uninstantiated_nodes(story))
   if l:
     return instantiate_node(story, random.choice(l))
   else:
     print("Instantiate random: no node to instantiate!")
+    for pr in story:
+      print(str(pr) + ".")
 
 def branch_random(story):
   l = list(all_unfinished_options(story))
@@ -200,3 +181,5 @@ def branch_random(story):
     return branch_node(story, random.choice(l)[0])
   else:
     print("Branch random: no node to instantiate!")
+    for pr in story:
+      print(str(pr) + ".")
