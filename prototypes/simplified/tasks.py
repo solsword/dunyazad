@@ -22,6 +22,7 @@ BASE_SOURCES = [
   opj("story", "choice_structure.lp"),
   opj("story", "core.lp"),
   opj("story", "grow.lp"),
+  opj("story", "vignettes.lp"),
 ]
 
 CONTENT_DIR = opj("story", "content")

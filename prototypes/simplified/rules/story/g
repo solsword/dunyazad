@@ -11,6 +11,8 @@ time --format="%E, %K KB" \
 echo "% vim"": syn=gringo" > out/events
 echo "Sources:"
 echo $sources
+echo "% vim"": syn=gringo" > out/source
+cat $sources >> out/source
 echo "Running: \"clingo --verbose=0 --quiet=1,1 $args $sources\""
 time --format="%E, %K KB" \
   clingo --verbose=0 --quiet=1,1 $args $sources |\
