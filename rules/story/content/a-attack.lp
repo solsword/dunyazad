@@ -14,24 +14,32 @@ error(m("Parley with unintelligent target.", N, X)) :-
   at(N, outcome(X, parley)),
   at(N, arg(X, target, Target)),
   st(N, state(unintelligent, Target)),
-  active_node(N).
+  story_op(N, build_options).
 
 error(m("Parley with unintelligent agressor.", N, X)) :-
   at(N, outcome(X, parley)),
   at(N, arg(X, aggressor, Aggressor)),
   st(N, state(unintelligent, Aggressor)),
-  active_node(N).
+  story_op(N, build_options).
 
 % attacking is one way to deal with a threat
-at(N, deals_with(X, threatening(Target, Someone))) :-
+at(N, deals_with(X, potential(problem, threatening(Target, Someone)))) :-
   at(N, action(X, attack)),
   1= {
     at(N, outcome(X, parley));
     at(N, outcome(X, victory))
   },
   at(N, arg(X, target, Target)),
-  st(N, problem(threatening(Target, Someone))),
-  active_node(N).
+  st(N, potential(problem, threatening(Target, Someone))),
+  story_op(N, build_options).
+
+% if things go badly it only makes things worse though:
+at(N, emphasizes(X, potential(problem, threatening(Target, Someone)))) :-
+  at(N, action(X, attack)),
+  at(N, outcome(X, defeat)),
+  at(N, arg(X, target, Target)),
+  st(N, potential(problem, threatening(Target, Someone))),
+  story_op(N, build_options).
 
 % fighting is dangerous:
 0 <= {
@@ -41,7 +49,7 @@ at(N, deals_with(X, threatening(Target, Someone))) :-
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, Aggressor)),
   at(N, arg(X, target, Target)),
-  active_node(N).
+  story_op(N, build_options).
 
 1 = {
   at(N, consequence(X, state(injured, Aggressor)));
@@ -50,7 +58,7 @@ at(N, deals_with(X, threatening(Target, Someone))) :-
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, Aggressor)),
   at(N, outcome(X, defeat)),
-  active_node(N).
+  story_op(N, build_options).
 
 1 = {
   at(N, consequence(X, state(injured, Target)));
@@ -59,52 +67,7 @@ at(N, deals_with(X, threatening(Target, Someone))) :-
   at(N, action(X, attack)),
   at(N, arg(X, target, Target)),
   at(N, outcome(X, victory)),
-  active_node(N).
-
-% TODO: SOMETHING ABOUT THIS?!?
-%at(N, consequence(X, state(injured, Target))) :-
-%  at(N, action(X, attack)),
-%  at(N, arg(X, target, Target)),
-%  at(N, outcome(X, victory)),
-%  active_node(N).
-%
-%at(root, consequence(X, state(injured, Target))) :-
-%  at(root, action(X, attack)),
-%  at(root, arg(X, target, Target)).
-%
-%% Forcings:
-%at(N, consequence(X, state(injured, Target))) :-
-%  test_abcd(N, X, Target).
-%at(root,outcome(X, victory)) :-
-%  at(root, action(X, attack)).
-%
-%% Tests:
-%test_abcd(N, X, Target) :-
-%  at(N, action(X, attack)),
-%  at(N, arg(X, target, Target)),
-%  at(N, outcome(X, victory)),
-%  active_node(N).
-%
-%test_abc(N, X, Target) :-
-%  at(N, arg(X, target, Target)),
-%  at(N, outcome(X, victory)),
-%  active_node(N).
-%
-%test_ab(N, X) :-
-%  at(N, outcome(X, victory)),
-%  active_node(N).
-%
-%test_d(N, X) :-
-%  at(N, action(X, attack)).
-%
-%test_c(N, X, Target) :-
-%  at(N, arg(X, target, Target)).
-%
-%test_b(N, X) :-
-%  at(N, outcome(X, victory)).
-%
-%test_a(N) :-
-%  active_node(N).
+  story_op(N, build_options).
 
 0 <= {
   at(N, consequence(X, relation(has_item, Aggressor, Item))) :
@@ -117,4 +80,4 @@ at(N, deals_with(X, threatening(Target, Someone))) :-
     at(N, outcome(X, victory));
     at(N, outcome(X, parley))
   },
-  active_node(N).
+  story_op(N, build_options).

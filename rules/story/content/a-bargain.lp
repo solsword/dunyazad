@@ -1,49 +1,60 @@
-% bargain
-action(bargain).
+% pay_off
+action(pay_off).
 
-argument(bargain, asking, actor).
-argument(bargain, listening, actor).
-argument(bargain, price, item).
-initiator(bargain, asking).
+argument(pay_off, asking, actor).
+argument(pay_off, listening, actor).
+argument(pay_off, price, item).
+initiator(pay_off, asking).
 
-outcome(bargain, deal).
-outcome(bargain, no_deal).
+outcome(pay_off, deal).
+outcome(pay_off, no_deal).
 
 error(m("Bargain without price.", N, X, Asking, Price)) :-
-  at(N, action(X, bargain)),
+  at(N, action(X, pay_off)),
   at(N, arg(X, asking, Asking)),
   at(N, arg(X, price, Price)),
   0 = {
     st(N, relation(has_item, Asking, Price))
   },
-  active_node(N).
+  story_op(N, build_options).
 
 error(m("Unintelligent bargainer.", N, X, Asking)) :-
-  at(N, action(X, bargain)),
+  at(N, action(X, pay_off)),
   at(N, arg(X, asking, Asking)),
   st(N, state(unintelligent, Asking)),
-  active_node(N).
+  story_op(N, build_options).
 
 error(m("Unintelligent listener.", N, X, Listening)) :-
-  at(N, action(X, bargain)),
+  at(N, action(X, pay_off)),
   at(N, arg(X, listening, Listening)),
   st(N, state(unintelligent, Listening)),
-  active_node(N).
+  story_op(N, build_options).
 
 1 = {
-  at(N, deals_with(X, threatening(Listening, Someone)))
-    : st(N, problem(threatening(Listening, Someone)))
-  % TODO: other problems that can be solved by bargaining?
+  at(N, deals_with(X, potential(problem, threatening(Listening, Someone))))
+    : st(N, potential(problem, threatening(Listening, Someone)))
+  % TODO: other problems that can be solved by paying someone off?
 } :-
-  at(N, action(X, bargain)),
+  at(N, action(X, pay_off)),
   at(N, outcome(X, deal)),
   at(N, arg(X, asking, Asking)),
   at(N, arg(X, listening, Listening)),
-  active_node(N).
+  story_op(N, build_options).
+
+1 = {
+  at(N, emphasizes(X, potential(problem, threatening(Listening, Someone))))
+    : st(N, potential(problem, threatening(Listening, Someone)))
+  % TODO: other problems here as well
+} :-
+  at(N, action(X, pay_off)),
+  at(N, outcome(X, no_deal)),
+  at(N, arg(X, asking, Asking)),
+  at(N, arg(X, listening, Listening)),
+  story_op(N, build_options).
 
 at(N, consequence(X, relation(has_item, Listening, Item))) :-
-  at(N, action(X, bargain)),
+  at(N, action(X, pay_off)),
   at(N, outcome(X, deal)),
   at(N, arg(X, listening, Listening)),
   at(N, arg(X, price, Item)),
-  active_node(N).
+  story_op(N, build_options).

@@ -29,13 +29,13 @@ unfinished_node(N) :- optcount(N, 0).
     not before(Succ, Br);
   successor(Br, option(Opt), @join(Br, ":", Opt))
 } :-
-  branch_node(Br),
+  story_op(Br, add_branch_nodes),
   at(Br, option(Opt)).
 
 % New nodes need to be marked as such and filled in:
 new_node(@join(Br, ":", Opt)) :-
   successor(Br, option(Opt), @join(Br, ":", Opt)),
-  branch_node(Br).
+  story_op(Br, add_branch_nodes).
 
 story_node(N) :- new_node(N).
 
@@ -72,7 +72,7 @@ error(m("New node lost a state", New, State)) :-
 
 % The concept of a "state match":
 state_match(Prev, option(Opt), New) :-
-  branch_node(Prev),
+  story_op(Prev, add_branch_nodes),
   story_node(New),
   New != Prev,
   at(Prev, option(Opt)),
@@ -80,7 +80,7 @@ state_match(Prev, option(Opt), New) :-
 
 % mismatch due to ignored consequence:
 state_mismatch(Prev, option(Opt), New) :-
-  branch_node(Prev),
+  story_op(Prev, add_branch_nodes),
   story_node(New),
   New != Prev,
   at(Prev, consequence(option(Opt), State)),
@@ -88,7 +88,7 @@ state_mismatch(Prev, option(Opt), New) :-
 
 % mismatch due to invalidated _not consequence:
 state_mismatch(Prev, option(Opt), New) :-
-  branch_node(Prev),
+  story_op(Prev, add_branch_nodes),
   at(Prev, option(Opt)),
   story_node(New),
   New != Prev,
@@ -100,7 +100,7 @@ state_mismatch(Prev, option(Opt), New) :-
 
 % mismatch due to uncaused state addition:
 state_mismatch(Prev, option(Opt), New) :-
-  branch_node(Prev),
+  story_op(Prev, add_branch_nodes),
   at(Prev, option(Opt)),
   story_node(New),
   New != Prev,
@@ -112,7 +112,7 @@ state_mismatch(Prev, option(Opt), New) :-
 
 % mismatch due to uncaused state dissapearance:
 state_mismatch(Prev, option(Opt), New) :-
-  branch_node(Prev),
+  story_op(Prev, add_branch_nodes),
   at(Prev, option(Opt)),
   story_node(New),
   New != Prev,
