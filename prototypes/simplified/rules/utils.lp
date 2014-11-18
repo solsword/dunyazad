@@ -20,6 +20,9 @@ def an(arg):
 def join(*args):
   return ''.join(str(a) for a in args)
 
+def fmt(tmplt, *args):
+  return str(tmplt).format(*(str(a) for a in args))
+
 def join_lines(*args):
   return '\n'.join(str(a) for a in args)
 

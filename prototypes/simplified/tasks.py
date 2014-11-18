@@ -23,6 +23,7 @@ BASE_SOURCES = [
   opj("story", "core.lp"),
   opj("story", "grow.lp"),
   opj("story", "vignettes.lp"),
+  opj("story", "surface.lp"),
 ]
 
 CONTENT_DIR = opj("story", "content")
@@ -69,6 +70,7 @@ SC = {
 KEEP = {
   "at": PVr("at", "at", Vr("Node"), SbT("Fluent")),
   "st": PVr("st", "st", Vr("Node"), SbT("Fluent")),
+
   "story_node": PVr("story_node", "story_node", Vr("Node")),
   "successor":
     PVr(
@@ -76,7 +78,27 @@ KEEP = {
       "successor",
       Vr("From"), Pr("option", Vr("Opt")), Vr("To")
     ),
+
   "setup": PVr("setup", "setup", Vr("Node"), Vr("Which")),
+
+  "intro_text":
+    ans.PVr("intro_text", "intro_text", ans.Vr("Node"), ans.Vr("Text")),
+  "potential_text":
+    ans.PVr("potential_text", "potential_text", ans.Vr("Node"), ans.Vr("Text")),
+  "option_text":
+    ans.PVr(
+      "option_text", "option_text",
+      ans.Vr("Node"),
+      ans.Pr("option", ans.Vr("Opt")),
+      ans.Vr("Text")
+    ),
+  "action_text":
+    ans.PVr(
+      "action_text", "action_text",
+      ans.Vr("Node"),
+      ans.Pr("option", ans.Vr("Opt")),
+      ans.Vr("Text")
+    ),
 }
 
 def runfr(story, name, extra = ""):

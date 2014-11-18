@@ -32,3 +32,41 @@ at(N, emphasizes(X, potential(problem, threatening(From, Fearful)))) :-
   at(N, outcome(X, failure)),
   story_op(N, build_options).
 % TODO: something about the attacker's intent
+
+option_text(
+  N,
+  X,
+  @fmt(
+    "N#{}/they V#flee/prs/{} from N#{}/them.",
+    Fearful, Fearful, From
+  )
+) :-
+  at(N, action(X, flee)),
+  at(N, arg(X, from, inst(T1, From))),
+  at(N, arg(X, fearful, inst(T2, Fearful))).
+
+action_text(
+  N,
+  X,
+  @fmt(
+    "N#{}/they V#flee/prs/{} from N#{}/them and escape.",
+    Fearful, Fearful, From
+  )
+) :-
+  at(N, action(X, flee)),
+  at(N, arg(X, from, inst(T1, From))),
+  at(N, arg(X, fearful, inst(T2, Fearful))),
+  at(N, outcome(X, escape)).
+
+action_text(
+  N,
+  X,
+  @fmt(
+    "N#{}/they V#flee/prs/{} from N#{}/them but cannot escape.",
+    Fearful, Fearful, From
+  )
+) :-
+  at(N, action(X, flee)),
+  at(N, arg(X, from, inst(T1, From))),
+  at(N, arg(X, fearful, inst(T2, Fearful))),
+  at(N, outcome(X, failure)).

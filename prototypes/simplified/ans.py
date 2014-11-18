@@ -159,6 +159,15 @@ class Predicate:
     else:
       return str(self.name)
 
+  def unquoted(self):
+    if self.args:
+      return "{}({})".format(
+        dequote(self.name),
+        ', '.join(a.unquoted_string() for a in self.args)
+      )
+    else:
+      return dequote(str(self.name))
+
   def __repr__(self):
     return "Predicate({}{})".format(
       repr(self.name),

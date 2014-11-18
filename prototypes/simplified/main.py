@@ -28,8 +28,12 @@ def main():
       with open("crash.lp", 'w') as fout:
         fout.write(e.message)
       exit(1)
-  for pr in story:
-    print(str(pr) + '.')
+#  for pr in story:
+#    print(str(pr) + '.')
+#  nouns = english.glean_nouns(story)
+#  for k in nouns:
+#    print(nouns[k])
+  print(english.build_story_text(story))
 
 if __name__ == "__main__":
   main()
