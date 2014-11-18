@@ -12,7 +12,7 @@ from utils import *
 
 def main():
   story = tasks.setup_story("")
-  while len(list(tasks.all_nodes(story))) < 5:
+  while len(list(tasks.all_nodes(story))) < 10:
     try:
       story = tasks.instantiate_random(story)
     except asp.ASPError as e:

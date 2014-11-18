@@ -4,10 +4,13 @@ Tools for NLG. Uses various sub-modules like nouns and verbs.
 """
 
 import re
+import copy
 
 from utils import *
 
 import ans
+
+from ans import Pr, Vr, PVr, SbT
 
 import nouns
 import verbs
@@ -38,77 +41,69 @@ TSABR = {
 
 NOUN_SCHEMAS = {
   "name":
-    ans.Pr(
+    Pr(
       "st",
-      ans.Vr("Node"),
-      ans.Pr("property",
-        ans.Pr("name"),
-        ans.Pr("inst", ans.Vr("Type"), ans.Vr("Key")),
-        ans.Vr("Name")
+      Vr("Node"),
+      Pr("property",
+        Pr("name"),
+        Pr("inst", Vr("Type"), Vr("Key")),
+        Vr("Name")
       )
     ),
   "number":
-    ans.Pr(
+    Pr(
       "st",
-      ans.Vr("Node"),
-      ans.Pr("property",
-        ans.Pr("number"),
-        ans.Pr("inst", ans.Vr("Type"), ans.Vr("Key")),
-        ans.Vr("Number")
+      Vr("Node"),
+      Pr("property",
+        Pr("number"),
+        Pr("inst", Vr("Type"), Vr("Key")),
+        Vr("Number")
       )
     ),
   "gender":
-    ans.Pr(
+    Pr(
       "st",
-      ans.Vr("Node"),
-      ans.Pr("property",
-        ans.Pr("gender"),
-        ans.Pr("inst", ans.Vr("Type"), ans.Vr("Key")),
-        ans.Vr("Gender")
+      Vr("Node"),
+      Pr("property",
+        Pr("gender"),
+        Pr("inst", Vr("Type"), Vr("Key")),
+        Vr("Gender")
       )
     ),
   "person":
-    ans.Pr(
+    Pr(
       "st",
-      ans.Vr("Node"),
-      ans.Pr("property",
-        ans.Pr("person"),
-        ans.Pr("inst", ans.Vr("Type"), ans.Vr("Key")),
-        ans.Vr("Person")
+      Vr("Node"),
+      Pr("property",
+        Pr("person"),
+        Pr("inst", Vr("Type"), Vr("Key")),
+        Vr("Person")
       )
     ),
   "determined":
-    ans.Pr(
+    Pr(
       "st",
-      ans.Vr("Node"),
-      ans.Pr("property",
-        ans.Pr("determined"),
-        ans.Pr("inst", ans.Vr("Type"), ans.Vr("Key")),
-        ans.Vr("Determination")
+      Vr("Node"),
+      Pr("property",
+        Pr("determined"),
+        Pr("inst", Vr("Type"), Vr("Key")),
+        Vr("Determination")
       )
     ),
 }
 
 TEXT_SCHEMAS = {
   "intro_text":
-    ans.PVr("txt", "intro_text", ans.Vr("Node"), ans.Vr("Text")),
+    PVr("txt", "intro_text", Vr("Node"), Vr("Text")),
   "potential_text":
-    ans.PVr("txt", "potential_text", ans.Vr("Node"), ans.Vr("Text")),
+    PVr("txt", "potential_text", Vr("Node"), Vr("Text")),
   "option_text":
-    ans.PVr(
-      "txt", "option_text",
-      ans.Vr("Node"),
-      ans.Pr("option", ans.Vr("Opt")),
-      ans.Vr("Text")
-    ),
+    PVr("txt", "option_text", Vr("Node"), Pr("option", Vr("Opt")), Vr("Text")),
   "action_text":
-    ans.PVr(
-      "txt", "action_text",
-      ans.Vr("Node"),
-      ans.Pr("option", ans.Vr("Opt")),
-      ans.Vr("Text")
-    ),
+    PVr("txt", "action_text", Vr("Node"), Pr("option", Vr("Opt")), Vr("Text")),
 }
+
+SUCCESSOR = Pr("successor", Vr("From"), Pr("option", Vr("Opt")), Vr("To"))
 
 def glean_nouns(story):
   result = {}
@@ -130,6 +125,34 @@ def glean_nouns(story):
       result[n].determined = d == "true"
   return result
 
+def merge_pnslots(pns1, pns2):
+  """
+  Takes two sets of pronoun slots and merges them such that the result is valid
+  for text that might follow text which resulted in either of the merged slot
+  sets.
+  """
+  result = {}
+  for pn in pns1:
+    if pns1[pn][1] == pns2[pn][1]:
+      result[pn] = [max(pns1[pn][0], pns2[pn][0]), set(pns1[pn][1])]
+    else:
+      # Any kind of ambiguity results in an empty slot:
+      result[pn] = [0, set()]
+  return result
+
+def merge_txt_states(pilist):
+  """
+  Takes a list of pnslots, introduced pairs and returns a single pnslots,
+  introduced pair that's valid no matter which of the input text states you're
+  coming from.
+  """
+  result_pnslots = pilist[0][0]
+  result_introduced = pilist[0][1]
+  for pnslots, introduced in pilist[1:]:
+    result_pnslots = merge_pnslots(result_pnslots, pnslots)
+    result_introduced &= introduced
+  return result_pnslots, result_introduced
+
 def build_text(template, ndict, pnslots=None, introduced=None):
   """
   Takes a text template and builds a filled-in string using the given nouns
@@ -146,8 +169,12 @@ def build_text(template, ndict, pnslots=None, introduced=None):
       "it": [0, set()],
       "they": [0, set()],
     }
+  else:
+    pnslots = copy.deepcopy(pnslots)
   if introduced == None:
     introduced = set()
+  else:
+    introduced = set(introduced)
   bits = re.split(ANYTAG, template)
   result = ""
   for b in bits:
@@ -201,64 +228,123 @@ def build_text(template, ndict, pnslots=None, introduced=None):
   return result, pnslots, introduced
 
 def find_node_structure(story):
-  # TODO: HERE!!
-  return {
-    "root": {}
-  }
+  """
+  Takes a story and looks at successor/3 predicates to determine the structure
+  of nodes in the story, returning a dictionary that maps node names to both
+  successor and predecessor entries: successor entries being option->node
+  mappings and predecessor entries being a list of nodes that have this node as
+  a successor.
+  """
+  result = {}
+  for pr in story:
+    scc = ans.bind(SUCCESSOR, pr)
+    if scc:
+      frm = scc["successor.From"].unquoted()
+      opt = scc["successor.option.Opt"].unquoted()
+      to = scc["successor.To"].unquoted()
+      if frm not in result:
+        result[frm] = {"successors":{}, "predecessors":[]}
+      if to not in result:
+        result[to] = {"successors":{}, "predecessors":[]}
+      result[frm]["successors"][opt] = to
+      result[to]["predecessors"].append(frm)
+  return result
 
-def build_node_text(node, nouns, pnslots, introduced):
+def build_node_text(node, node_structure, nouns, pnslots, introduced):
+  """
+  Builds text for the given node (should be a dictionary from the
+  node_templates map). Returns the resulting text and a dictionary mapping
+  options to their outgoing (pnslots, introduced) tuples.
+  """
+  outgoing = {}
   # TODO: A more rigorous capitalization approach.
-  intro, pnslots, introduced = build_text(
+  intro, _pnslots, _introduced = build_text(
     node["intro"],
     nouns,
     pnslots,
     introduced
   )
   intro = intro.capitalize()
-  situation, pnslots, introduced = build_text(
+  situation, _pnslots, _introduced = build_text(
     node["situation"],
     nouns,
-    pnslots,
-    introduced
+    _pnslots,
+    _introduced
   )
   situation += "."
   situation = situation.capitalize()
   options = ""
   for opt in node["options"]:
-    # TODO: Thread pnslots & introduced out per-option!
-    txt, _dc, _dc = build_text(
+    txt, pnout, intout = build_text(
       node["options"][opt],
       nouns,
-      pnslots,
-      introduced
+      _pnslots,
+      _introduced
     )
     options += "  #{}\n".format(txt.capitalize())
-    txt, _dc, _dc = build_text(
+    txt, pnout, intout = build_text(
       node["outcomes"][opt],
       nouns,
-      pnslots,
-      introduced
+      pnout,
+      intout
     )
     options += "    {}\n".format(txt.capitalize())
-    # TODO: an appropriate GOTO here!
-    options += "    *finish\n"
-  return """
-{label}
+    successors = node_structure[node["name"]]["successors"]
+    if opt in successors:
+      scc = successors[opt]
+      outgoing[scc] = (pnout, intout)
+      options += "    *goto {}\n".format(scc.replace(":", "_"))
+    else:
+      options += "    *finish\n"
+  result = """
+*label {label}
 {intro}
 {situation}
 *choice
 {options}
 """.format(
-  label=node["label"],
+  label=node["name"].replace(":", "_"),
   intro=intro,
   situation=situation,
   options=options
 )
+  return result, outgoing
 
-def build_story_text(story):
-  nodes = {}
+def build_story_text(story, root=None):
+  node_templates = {}
+
+  # First, build all of the templates for the entire story:
+  for sc, bnd in ans.bindings(TEXT_SCHEMAS, story):
+    node = bnd["txt.Node"].unquoted()
+    print("Building templates for node '{}'.".format(node))
+    if node not in node_templates:
+      node_templates[node] = {
+        "name": node,
+        "intro": "",
+        "situation": "",
+        "options": {},
+        "outcomes": {},
+        # TODO: state-change text
+      }
+    txt = bnd["txt.Text"].unquoted()
+    if sc == "intro_text":
+      node_templates[node]["intro"] = txt
+    elif sc == "potential_text":
+      if node_templates[node]["situation"]:
+        node_templates[node]["situation"] += " and "
+      node_templates[node]["situation"] += txt
+    elif sc == "option_text":
+      opt = bnd["txt.option.Opt"].unquoted()
+      node_templates[node]["options"][opt] = txt
+    elif sc == "action_text":
+      opt = bnd["txt.option.Opt"].unquoted()
+      node_templates[node]["outcomes"][opt] = txt
+
+  # Next, use the node structure to recursively render the story text in
+  # ChoiceScript:
   nouns = glean_nouns(story)
-  pnslots = {
+  node_structure = find_node_structure(story)
+  base_pnslots = {
     "I": [0, set()],
     "we": [0, set()],
     "you": [0, { "the_party" }],
@@ -267,28 +353,46 @@ def build_story_text(story):
     "it": [0, set()],
     "they": [0, set()],
   }
-  introduced = { "the_party" }
-  node_structure = find_node_structure(story)
-  for sc, bnd in ans.bindings(TEXT_SCHEMAS, story):
-    node = bnd["txt.Node"].unquoted()
-    if node not in nodes:
-      nodes[node] = {
-        "label": "*label {}".format(str(node).replace(":", "_")),
-        "intro": "",
-        "situation": "",
-        "options": {},
-        "outcomes": {},
-        # TODO: state-change text
-      }
-    if sc == "intro_text":
-      nodes[node]["intro"] = bnd["txt.Text"].unquoted()
-    elif sc == "potential_text":
-      if nodes[node]["situation"]:
-        nodes[node]["situation"] += " and "
-      nodes[node]["situation"] += bnd["txt.Text"].unquoted()
-    elif sc == "option_text":
-      nodes[node]["options"][bnd["txt.option.Opt"]] = bnd["txt.Text"].unquoted()
-    elif sc == "action_text":
-      nodes[node]["outcomes"][bnd["txt.option.Opt"]] =bnd["txt.Text"].unquoted()
-  # TODO: HERE!
-  return build_node_text(nodes["root"], nouns, pnslots, introduced)
+  base_introduced = { "the_party" }
+  # Start with all root nodes on our open list:
+  olist = [
+    (n, base_pnslots, base_introduced) for n in node_templates.keys()
+      if len(node_structure[n]["predecessors"]) == 0
+  ]
+  print("root nodes: {}".format([n for (n, bp, bi) in olist]))
+  # The ready dictionary keeps track of introduction and pronoun information
+  # propagating between non-root nodes and has enough information to know when
+  # a node is ready to be rendered:
+  ready = {
+    n: { pr: None for pr in node_structure[n]["predecessors"]}
+      for n in node_templates.keys()
+        if len(node_structure[n]["predecessors"]) > 0
+  }
+  results = []
+  while olist:
+    target, pnslots, introduced = olist.pop(0)
+    print("processing node: '{}'.".format(target))
+    # build node text:
+    txt, outgoing = build_node_text(
+      node_templates[target],
+      node_structure,
+      nouns,
+      pnslots,
+      introduced
+    )
+    results.append(txt)
+    # update our readiness information and propagate nodes to the open list as
+    # they're fully ready:
+    for n in [x for x in outgoing if x in ready]:
+      # DEBUG:
+      if None not in ready[n].values():
+        raise RuntimeError("""
+Updating readiness of already-ready node '{}' from node '{}'.
+Readiness is: {}\
+""".format(n, target, ready[n])
+        )
+      ready[n][target] = outgoing[n]
+      if None not in ready[n].values():
+        pns, intr = merge_txt_states(list(ready[n].values()))
+        olist.append((n, pns, intr))
+  return ("\n\n*comment " + '-'*72 + "\n\n").join(results)
