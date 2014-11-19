@@ -1,1 +1,1 @@
-../prototypes/choice/out/scene.txt
+../prototypes/simplified/out/story.txt

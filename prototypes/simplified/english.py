@@ -394,5 +394,7 @@ Readiness is: {}\
       ready[n][target] = outgoing[n]
       if None not in ready[n].values():
         pns, intr = merge_txt_states(list(ready[n].values()))
-        olist.append((n, pns, intr))
+        # TODO: Get rid of pnslots merging altogether?
+        #olist.append((n, pns, intr))
+        olist.append((n, base_pnslots, intr))
   return ("\n\n*comment " + '-'*72 + "\n\n").join(results)

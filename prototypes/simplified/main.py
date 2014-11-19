@@ -4,6 +4,9 @@ main.py
 The main file for story generation.
 """
 
+import os
+import os.path
+
 import asp
 import tasks
 import english
@@ -33,7 +36,13 @@ def main():
 #  nouns = english.glean_nouns(story)
 #  for k in nouns:
 #    print(nouns[k])
-  print(english.build_story_text(story))
+  if not os.path.isdir("out"):
+    os.mkdir("out")
+  with open(os.path.join("out", "story.txt"), 'w') as fout:
+    fout.write(english.build_story_text(story))
+  with open(os.path.join("out", "facts.lp"), 'w') as fout:
+    for pr in story:
+      fout.write(str(pr) + '.\n')
 
 if __name__ == "__main__":
   main()
