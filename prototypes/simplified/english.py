@@ -274,33 +274,36 @@ def build_node_text(node, node_structure, nouns, pnslots, introduced):
   situation += "."
   situation = situation.capitalize()
   options = ""
-  for opt in node["options"]:
-    txt, pnout, intout = build_text(
-      node["options"][opt],
-      nouns,
-      _pnslots,
-      _introduced
-    )
-    options += "  #{}\n".format(txt.capitalize())
-    txt, pnout, intout = build_text(
-      node["outcomes"][opt],
-      nouns,
-      pnout,
-      intout
-    )
-    options += "    {}\n".format(txt.capitalize())
-    successors = node_structure[node["name"]]["successors"]
-    if opt in successors:
-      scc = successors[opt]
-      outgoing[scc] = (pnout, intout)
-      options += "    *goto {}\n".format(scc.replace(":", "_"))
-    else:
-      options += "    *finish\n"
+  if node["options"]:
+    options = "*choice\n"
+    for opt in node["options"]:
+      txt, pnout, intout = build_text(
+        node["options"][opt],
+        nouns,
+        _pnslots,
+        _introduced
+      )
+      options += "  #{}\n".format(txt.capitalize())
+      txt, pnout, intout = build_text(
+        node["outcomes"][opt],
+        nouns,
+        pnout,
+        intout
+      )
+      options += "    {}\n".format(txt.capitalize())
+      successors = node_structure[node["name"]]["successors"]
+      if opt in successors:
+        scc = successors[opt]
+        outgoing[scc] = (pnout, intout)
+        options += "    *goto {}\n".format(scc.replace(":", "_"))
+      else:
+        options += "    *finish\n"
+  else:
+    options = "*finish"
   result = """
 *label {label}
 {intro}
 {situation}
-*choice
 {options}
 """.format(
   label=node["name"].replace(":", "_"),
@@ -316,7 +319,7 @@ def build_story_text(story, root=None):
   # First, build all of the templates for the entire story:
   for sc, bnd in ans.bindings(TEXT_SCHEMAS, story):
     node = bnd["txt.Node"].unquoted()
-    print("Building templates for node '{}'.".format(node))
+    print("Adding {} template for node '{}'.".format(sc, node))
     if node not in node_templates:
       node_templates[node] = {
         "name": node,
@@ -359,7 +362,7 @@ def build_story_text(story, root=None):
     (n, base_pnslots, base_introduced) for n in node_templates.keys()
       if len(node_structure[n]["predecessors"]) == 0
   ]
-  print("root nodes: {}".format([n for (n, bp, bi) in olist]))
+  print("Root nodes: {}".format([n for (n, bp, bi) in olist]))
   # The ready dictionary keeps track of introduction and pronoun information
   # propagating between non-root nodes and has enough information to know when
   # a node is ready to be rendered:
@@ -371,7 +374,7 @@ def build_story_text(story, root=None):
   results = []
   while olist:
     target, pnslots, introduced = olist.pop(0)
-    print("processing node: '{}'.".format(target))
+    print("Processing node: '{}'.".format(target))
     # build node text:
     txt, outgoing = build_node_text(
       node_templates[target],

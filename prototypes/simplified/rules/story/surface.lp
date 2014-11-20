@@ -4,39 +4,39 @@
 % Default values for name, person, number, gender, and determination:
 
 1 = {
-  st(Node, property(name, inst(Type, ID), Name))
-    : st(Node, property(name, inst(Type, ID), Name));
-  st(Node, property(name, inst(Type, ID), "nameless"))
+  s_st(Setup, property(name, inst(Type, ID), Name))
+    : s_st(Setup, property(name, inst(Type, ID), Name));
+  s_st(Setup, property(name, inst(Type, ID), "nameless"))
 } :-
-  st(Node, inst(Type, ID)).
+  s_st(Setup, inst(Type, ID)).
 
 1 = {
-  st(Node, property(person, inst(Type, ID), Name))
-    : st(Node, property(person, inst(Type, ID), Name));
-  st(Node, property(person, inst(Type, ID), third))
+  s_st(Setup, property(person, inst(Type, ID), Name))
+    : s_st(Setup, property(person, inst(Type, ID), Name));
+  s_st(Setup, property(person, inst(Type, ID), third))
 } :-
-  st(Node, inst(Type, ID)).
+  s_st(Setup, inst(Type, ID)).
 
 1 = {
-  st(Node, property(number, inst(Type, ID), Name))
-    : st(Node, property(number, inst(Type, ID), Name));
-  st(Node, property(number, inst(Type, ID), singular))
+  s_st(Setup, property(number, inst(Type, ID), Name))
+    : s_st(Setup, property(number, inst(Type, ID), Name));
+  s_st(Setup, property(number, inst(Type, ID), singular))
 } :-
-  st(Node, inst(Type, ID)).
+  s_st(Setup, inst(Type, ID)).
 
 1 = {
-  st(Node, property(gender, inst(Type, ID), Name))
-    : st(Node, property(gender, inst(Type, ID), Name));
-  st(Node, property(gender, inst(Type, ID), neuter))
+  s_st(Setup, property(gender, inst(Type, ID), Name))
+    : s_st(Setup, property(gender, inst(Type, ID), Name));
+  s_st(Setup, property(gender, inst(Type, ID), neuter))
 } :-
-  st(Node, inst(Type, ID)).
+  s_st(Setup, inst(Type, ID)).
 
 1 = {
-  st(Node, property(proper, inst(Type, ID), Det)) :
-    st(Node, property(proper, inst(Type, ID), Det));
-  st(Node, property(proper, inst(Type, ID), true))
+  s_st(Setup, property(proper, inst(Type, ID), Det)) :
+    s_st(Setup, property(proper, inst(Type, ID), Det));
+  s_st(Setup, property(proper, inst(Type, ID), true))
 } :-
-  st(Node, inst(Type, ID)).
+  s_st(Setup, inst(Type, ID)).
 
 % Problem/opportunity description:
 % TODO: content files for problems/opportunities?

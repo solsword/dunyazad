@@ -2,6 +2,7 @@
 % -----------
 
 :- error(Message).
+%#minimize { 1@0, error(Message) : error(Message) }.
 
 #const max_options=5.
 

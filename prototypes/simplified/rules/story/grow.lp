@@ -58,7 +58,8 @@ error(m("New node picked up extra state", New, State)) :-
   st(New, State),
   0 = {
     st(Old, State);
-    at(Old, consequence(Opt, State))
+    at(Old, consequence(Opt, State));
+    spontaneous(st(New, State))
   }.
 
 error(m("New node lost a state", New, State)) :-
@@ -107,7 +108,8 @@ state_mismatch(Prev, option(Opt), New) :-
   st(New, State),
   0 = {
     st(Prev, State);
-    at(Prev, consequence(option(Opt), State))
+    at(Prev, consequence(option(Opt), State));
+    spontaneous(st(New, State))
   }.
 
 % mismatch due to uncaused state dissapearance:
@@ -122,4 +124,4 @@ state_mismatch(Prev, option(Opt), New) :-
     at(Prev, consequence(option(Opt), _not, State))
   }.
 
-% TODO: problem/opportunity carryover
+% TODO: setup state dissapearance

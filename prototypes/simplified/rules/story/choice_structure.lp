@@ -25,8 +25,15 @@ error(m("Redundant option", N, option(X))) :-
   story_op(N, build_options).
 
 % first-person perspective
-
 error(m("Non-first-person option", N, option(X))) :-
   at(N, initiator(option(X), Init)),
   Init != inst(actor, the_party),
   story_op(N, build_options).
+
+% vignette-level boredom
+error(m("Repeated vignette setup", N, R)) :-
+  story_op(N, build_options),
+  setup(N, Boring),
+  successor(Prev, Opt, N),
+  vignette(Prev, R),
+  setup(R, Boring).

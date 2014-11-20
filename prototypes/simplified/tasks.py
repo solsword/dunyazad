@@ -79,6 +79,8 @@ KEEP = {
       Vr("From"), Pr("option", Vr("Opt")), Vr("To")
     ),
 
+  "vignette": PVr("vignette", "vignette", Vr("Node"), Vr("Root")),
+
   "setup": PVr("setup", "setup", Vr("Node"), Vr("Which")),
 
   "intro_text":

@@ -118,7 +118,7 @@ action_text(
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, inst(T1, Aggr))),
   at(N, arg(X, target, inst(T2, Trgt))),
-  at(N, outcome(X, parely)).
+  at(N, outcome(X, parley)).
 
 action_text(
   N,

@@ -67,7 +67,7 @@ option_text(
     Ask, Ask, Lstn, Price
   )
 ) :-
-  at(N, action(X, bargain)),
+  at(N, action(X, pay_off)),
   at(N, arg(X, asking, inst(T1, Ask))),
   at(N, arg(X, listening, inst(T2, Lstn))),
   at(N, arg(X, price, inst(T3, Price))).
@@ -80,7 +80,7 @@ action_text(
     Ask, Ask, Lstn, Ask
   )
 ) :-
-  at(N, action(X, bargain)),
+  at(N, action(X, pay_off)),
   at(N, arg(X, asking, inst(T1, Ask))),
   at(N, arg(X, listening, inst(T2, Lstn))),
   at(N, outcome(X, deal)).
@@ -93,7 +93,7 @@ action_text(
     Ask, Ask, Lstn, Ask
   )
 ) :-
-  at(N, action(X, bargain)),
+  at(N, action(X, pay_off)),
   at(N, arg(X, asking, inst(T1, Ask))),
   at(N, arg(X, listening, inst(T2, Lstn))),
   at(N, outcome(X, no_deal)).

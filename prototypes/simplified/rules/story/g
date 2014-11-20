@@ -23,6 +23,8 @@ time --format="%E, %K KB" \
 echo "% vim"": syn=gringo" > out/core
 grep "story_node(" < out/events >> out/core
 echo "" >> out/core
+grep "^setup(" < out/events >> out/core
+echo "" >> out/core
 grep "action(option" < out/events >> out/core
 echo "" >> out/core
 grep "arg(option" < out/events >> out/core

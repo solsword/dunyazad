@@ -15,9 +15,21 @@ from utils import *
 
 def main():
   story = tasks.setup_story("")
-  while len(list(tasks.all_nodes(story))) < 10:
+  n = -1
+  if not os.path.isdir("out"):
+    os.mkdir("out")
+  if not os.path.isdir(os.path.join("out", "snapshots")):
+    os.mkdir(os.path.join("out", "snapshots"))
+  while len(list(tasks.all_nodes(story))) < 6:
+    n += 1
     try:
       story = tasks.instantiate_random(story)
+      with open(
+        os.path.join("out", "snapshots", "story-{}.lp".format(n)),
+        'w'
+      ) as fout:
+        for pr in story:
+          fout.write(str(pr) + '.\n')
     except asp.ASPError as e:
       print("Error during instantiation. Dumping source to 'crash.lp'")
       with open("crash.lp", 'w') as fout:
@@ -36,8 +48,6 @@ def main():
 #  nouns = english.glean_nouns(story)
 #  for k in nouns:
 #    print(nouns[k])
-  if not os.path.isdir("out"):
-    os.mkdir("out")
   with open(os.path.join("out", "story.txt"), 'w') as fout:
     fout.write(english.build_story_text(story))
   with open(os.path.join("out", "facts.lp"), 'w') as fout:

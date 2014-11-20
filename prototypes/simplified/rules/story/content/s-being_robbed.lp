@@ -2,38 +2,30 @@
 
 possible_setup(being_robbed).
 
-st(N, inst(item, treasure)) :-
-  setup(N, being_robbed).
-st(N, property(name, inst(item, treasure), "treasure")) :-
-  setup(N, being_robbed).
+s_st(being_robbed, inst(item, treasure)).
+s_st(being_robbed, property(name, inst(item, treasure), "treasure")).
 % default number/person/gender
-st(N, property(has_item, inst(actor, the_party), inst(item, treasure))) :-
-  setup(N, being_robbed).
+s_st(
+  being_robbed,
+  property(has_item, inst(actor, the_party), inst(item, treasure))
+).
 
-st(N, inst(actor, bandits)) :-
-  setup(N, being_robbed).
-st(N, property(name, inst(actor, bandits), "bandits")) :-
-  setup(N, being_robbed).
-st(N, property(number, inst(actor, bandits), plural)) :-
-  setup(N, being_robbed).
+s_st(being_robbed, inst(actor, bandits)).
+s_st(being_robbed, property(name, inst(actor, bandits), "bandits")).
+s_st(being_robbed, property(number, inst(actor, bandits), plural)).
 % default person/gender
 
-st(N, inst(actor, merchants)) :-
-  setup(N, being_robbed).
-st(N, property(name, inst(actor, merchants), "merchants")) :-
-  setup(N, being_robbed).
-st(N, property(number, inst(actor, merchants), plural)) :-
-  setup(N, being_robbed).
+s_st(being_robbed, inst(actor, merchants)).
+s_st(being_robbed, property(name, inst(actor, merchants), "merchants")).
+s_st(being_robbed, property(number, inst(actor, merchants), plural)).
 % default person/gender
 
-st(
-  N,
+s_st(
+  being_robbed,
   potential(problem, threatening(inst(actor, bandits), inst(actor,merchants)))
-) :-
-    setup(N, being_robbed).
+).
 
-intro_text(
-  N,
+s_intro_text(
+  being_robbed,
   "N#the_party/they V#continue/prs/the_party on N#the_party/their journey, when N#the_party/they V#come/prs/the_party across N#bandits/them V#attack/prp/bandits N#merchants/them."
-) :-
-  setup(N, being_robbed).
+).
