@@ -1,1 +1,1 @@
-../prototypes/simplified/out/story.txt
+../current/out/story.txt
