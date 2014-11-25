@@ -1,10 +1,9 @@
 % Nodes statuses
 % --------------
 
-% Choice nodes which have no options yet are unfinished:
+% Nodes which have no options yet are unfinished:
 optcount(N, X) :-
   story_node(N),
-  node_type(N, choice),
   X = {
     at(N, option(O)) : opt_num(O)
   }.
@@ -21,7 +20,6 @@ inherited_potential(N) :-
 
 node_status(N, uninitialized) :-
   story_node(N),
-  node_type(N, choice),
   0 = {
     setup(N, Setup) : possible_setup(Setup);
     inherited_potential(N)
@@ -34,25 +32,24 @@ node_status(N, uninitialized) :-
   setup(N, Setup) : possible_setup(Setup)
 } :-
   not inherited_potential(N),
-  node_type(N, choice),
   story_op(N, initialize_node).
 
 st(N, State) :-
-  story_op(N, initialize_node),
   s_st(Setup, State),
-  setup(N, Setup).
+  setup(N, Setup),
+  story_op(N, initialize_node).
 
 spontaneous(st(N, State)) :-
-  story_op(N, X),
   s_st(Setup, State),
-  setup(N, Setup).
+  setup(N, Setup),
+  story_op(N, initialize_node).
 
 1 = {
   intro_text(N, Txt) :
     s_intro_text(Setup, Txt)
 } :-
-  story_op(N, initialize_node),
-  setup(N, Setup).
+  setup(N, Setup),
+  story_op(N, initialize_node).
 
 
 % Node ordering

@@ -84,7 +84,7 @@ KEEP = {
 
   "setup": PVr("setup", "setup", Vr("Node"), Vr("Which")),
   "spontaneous":
-    PVr("spontaneous", "spontaneous", Pr("st", Vr("Node"), Vr("State")),
+    PVr("spontaneous", "spontaneous", Pr("st", Vr("Node"), Vr("State"))),
 
   "intro_text":
     PVr("intro_text", "intro_text", Vr("Node"), Vr("Text")),
