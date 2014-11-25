@@ -6,10 +6,11 @@ story_node(root).
 story_op(root, initialize_node).
 story_op(root, build_options).
 story_op(root, add_branch_nodes).
-:- not successor(root, option(1), "root:1").
-story_op("root:1", initialize_node).
-story_op("root:1", build_options).
-story_op("root:1", add_branch_nodes).
+%:- not successor(root, option(1), "root:1").
+%story_op("root:1", initialize_node).
+%story_op("root:1", build_options).
+%story_op("root:1", add_branch_nodes).
+
 %:- not needs_activity("root:1").
 %:- not setup(root, being_robbed).
 %:- not setup("root:1", roc_attack).

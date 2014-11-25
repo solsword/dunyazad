@@ -53,4 +53,5 @@ potential_text(
       problem,
       threatening(inst(T1, Threatening), inst(T2, Threatened))
     )
-  ).
+  ),
+  story_op(N, add_surface).

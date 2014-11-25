@@ -7,18 +7,22 @@ at(N, relevant(option(X))) :-
     at(N, deals_with(option(X), Something))
       : at(N, deals_with(option(X), Something));
     at(N, emphasizes(option(X), Something))
-      : at(N, emphasizes(option(X), Something))
+      : at(N, emphasizes(option(X), Something));
+    at(N, nullifies(option(X), Something))
+      : at(N, nullifies(option(X), Something))
   },
   at(N, option(X)),
   story_op(N, build_options).
 
 error(m("Irrelevant option", N, option(X))) :-
+  node_type(N, choice),
   at(N, option(X)),
   not at(N, relevant(option(X))),
   story_op(N, build_options).
 
 % redundancy
 error(m("Redundant option", N, option(X))) :-
+  node_type(N, choice),
   at(N, action(option(X), Act)),
   at(N, action(option(Y), Act)),
   X != Y,
@@ -26,6 +30,7 @@ error(m("Redundant option", N, option(X))) :-
 
 % first-person perspective
 error(m("Non-first-person option", N, option(X))) :-
+  node_type(N, choice),
   at(N, initiator(option(X), Init)),
   Init != inst(actor, the_party),
   story_op(N, build_options).
@@ -52,6 +57,11 @@ node_type(N, event) :-
   at(N, action(option(1), travel_onwards));
   at(N, action(option(1), reach_destination))
 } :-
+  resolves_vignette(End, Opt),
+  successor(End, Opt, N),
+  story_op(N, build_options).
+
+at(N, arg(option(1), subject, inst(actor, the_party))) :-
   resolves_vignette(End, Opt),
   successor(End, Opt, N),
   story_op(N, build_options).

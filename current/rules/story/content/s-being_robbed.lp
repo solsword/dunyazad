@@ -2,12 +2,13 @@
 
 possible_setup(being_robbed).
 
-s_st(being_robbed, inst(item, treasure)).
-s_st(being_robbed, property(name, inst(item, treasure), "treasure")).
+s_st(being_robbed, inst(item, goods)).
+s_st(being_robbed, property(name, inst(item, goods), "goods")).
 % default number/person/gender
+% TODO: give the goods to the merchants!
 s_st(
   being_robbed,
-  property(has_item, inst(actor, the_party), inst(item, treasure))
+  relation(has_item, inst(actor, the_party), inst(item, goods))
 ).
 
 s_st(being_robbed, inst(actor, bandits)).

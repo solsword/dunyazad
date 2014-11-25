@@ -54,6 +54,10 @@ at(N, consequence(X, relation(has_item, Seller, Price))) :-
   at(N, arg(X, price, Price)),
   story_op(N, build_options).
 
+
+% Surface details
+% ---------------
+
 option_text(
   N,
   X,
@@ -66,7 +70,8 @@ option_text(
   at(N, arg(X, buyer, inst(T1, Buyer))),
   at(N, arg(X, seller, inst(T3, Seller))),
   at(N, arg(X, price, inst(T2, Price))),
-  at(N, arg(X, goods, inst(T4, Goods))).
+  at(N, arg(X, goods, inst(T4, Goods))),
+  story_op(N, add_surface).
 
 action_text(
   N,
@@ -81,7 +86,8 @@ action_text(
   at(N, arg(X, seller, inst(T3, Seller))),
   at(N, arg(X, price, inst(T2, Price))),
   at(N, arg(X, goods, inst(T4, Goods))),
-  at(N, outcome(X, deal)).
+  at(N, outcome(X, deal)),
+  story_op(N, add_surface).
 
 action_text(
   N,
@@ -96,4 +102,5 @@ action_text(
   at(N, arg(X, seller, inst(T3, Seller))),
   at(N, arg(X, price, inst(T2, Price))),
   at(N, arg(X, goods, inst(T4, Goods))),
-  at(N, outcome(X, no_deal)).
+  at(N, outcome(X, no_deal)),
+  story_op(N, add_surface).

@@ -33,6 +33,10 @@ at(N, emphasizes(X, potential(problem, threatening(From, Fearful)))) :-
   story_op(N, build_options).
 % TODO: something about the attacker's intent
 
+
+% Surface details
+% ---------------
+
 option_text(
   N,
   X,
@@ -43,7 +47,8 @@ option_text(
 ) :-
   at(N, action(X, flee)),
   at(N, arg(X, from, inst(T1, From))),
-  at(N, arg(X, fearful, inst(T2, Fearful))).
+  at(N, arg(X, fearful, inst(T2, Fearful))),
+  story_op(N, add_surface).
 
 action_text(
   N,
@@ -56,7 +61,8 @@ action_text(
   at(N, action(X, flee)),
   at(N, arg(X, from, inst(T1, From))),
   at(N, arg(X, fearful, inst(T2, Fearful))),
-  at(N, outcome(X, escape)).
+  at(N, outcome(X, escape)),
+  story_op(N, add_surface).
 
 action_text(
   N,
@@ -69,4 +75,5 @@ action_text(
   at(N, action(X, flee)),
   at(N, arg(X, from, inst(T1, From))),
   at(N, arg(X, fearful, inst(T2, Fearful))),
-  at(N, outcome(X, failure)).
+  at(N, outcome(X, failure)),
+  story_op(N, add_surface).

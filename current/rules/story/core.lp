@@ -52,7 +52,11 @@ at(N, consequence(X, _not, relation(Rel, Old, Obj))) :-
   Old != New,
   story_op(N, build_options).
 
-% Dealing with a problem gets rid of it:
+% Dealing or nullifying a problem/opportunity gets rid of it:
 at(N, consequence(X, _not, Pt)) :-
   at(N, deals_with(X, Pt)),
+  story_op(N, build_options).
+
+at(N, consequence(X, _not, Pt)) :-
+  at(N, nullifies(X, Pt)),
   story_op(N, build_options).

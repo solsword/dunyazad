@@ -69,6 +69,7 @@ at(N, emphasizes(X, potential(problem, threatening(Target, Someone)))) :-
   at(N, outcome(X, victory)),
   story_op(N, build_options).
 
+% Looting is a possibility:
 0 <= {
   at(N, consequence(X, relation(has_item, Aggressor, Item))) :
     st(N, relation(has_item, Target, Item))
@@ -82,6 +83,10 @@ at(N, emphasizes(X, potential(problem, threatening(Target, Someone)))) :-
   },
   story_op(N, build_options).
 
+
+% Surface details
+% ---------------
+
 option_text(
   N,
   X,
@@ -92,7 +97,8 @@ option_text(
 ) :-
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, inst(T1, Aggr))),
-  at(N, arg(X, target, inst(T2, Trgt))).
+  at(N, arg(X, target, inst(T2, Trgt))),
+  story_op(N, add_surface).
 
 action_text(
   N,
@@ -105,7 +111,8 @@ action_text(
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, inst(T1, Aggr))),
   at(N, arg(X, target, inst(T2, Trgt))),
-  at(N, outcome(X, victory)).
+  at(N, outcome(X, victory)),
+  story_op(N, add_surface).
 
 action_text(
   N,
@@ -118,7 +125,8 @@ action_text(
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, inst(T1, Aggr))),
   at(N, arg(X, target, inst(T2, Trgt))),
-  at(N, outcome(X, parley)).
+  at(N, outcome(X, parley)),
+  story_op(N, add_surface).
 
 action_text(
   N,
@@ -131,4 +139,5 @@ action_text(
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, inst(T1, Aggr))),
   at(N, arg(X, target, inst(T2, Trgt))),
-  at(N, outcome(X, defeat)).
+  at(N, outcome(X, defeat)),
+  story_op(N, add_surface).

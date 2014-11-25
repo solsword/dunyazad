@@ -8,9 +8,10 @@ vignette(N, PrV) :-
   successor(Prev, Opt, N),
   vignette(Prev, PrV).
 
-unresolved_potential(N, Opt, potential(X, Pt)) :-
+unresolved_potential(N, option(O), potential(X, Pt)) :-
   st(N, potential(X, Pt)),
-  0 = { at(N, consequence(Opt, _not, potential(X, Pt))) }.
+  at(N, option(O)),
+  0 = { at(N, consequence(option(O), _not, potential(X, Pt))) }.
 
 unresolved_potential(N, Opt, potential(X, Pt)) :-
   at(N, consequence(Opt, potential(X, Pt))).
