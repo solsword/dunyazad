@@ -83,24 +83,26 @@ KEEP = {
   "vignette": PVr("vignette", "vignette", Vr("Node"), Vr("Root")),
 
   "setup": PVr("setup", "setup", Vr("Node"), Vr("Which")),
+  "spontaneous":
+    PVr("spontaneous", "spontaneous", Pr("st", Vr("Node"), Vr("State")),
 
   "intro_text":
-    ans.PVr("intro_text", "intro_text", ans.Vr("Node"), ans.Vr("Text")),
+    PVr("intro_text", "intro_text", Vr("Node"), Vr("Text")),
   "potential_text":
-    ans.PVr("potential_text", "potential_text", ans.Vr("Node"), ans.Vr("Text")),
+    PVr("potential_text", "potential_text", Vr("Node"), Vr("Text")),
   "option_text":
-    ans.PVr(
+    PVr(
       "option_text", "option_text",
-      ans.Vr("Node"),
-      ans.Pr("option", ans.Vr("Opt")),
-      ans.Vr("Text")
+      Vr("Node"),
+      Pr("option", Vr("Opt")),
+      Vr("Text")
     ),
   "action_text":
-    ans.PVr(
+    PVr(
       "action_text", "action_text",
-      ans.Vr("Node"),
-      ans.Pr("option", ans.Vr("Opt")),
-      ans.Vr("Text")
+      Vr("Node"),
+      Pr("option", Vr("Opt")),
+      Vr("Text")
     ),
 }
 

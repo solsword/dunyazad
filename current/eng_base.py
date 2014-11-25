@@ -8,6 +8,22 @@ from utils import *
 vowels = "aieou"
 consonants = "bcdfghjklmnpqrstvwxyz"
 
+GR_CASES = {
+  "tense": (
+    "present",
+    "past",
+    "infinitive",
+    "imperative",
+    "present participle",
+    "past participle"
+  ),
+  "number": ("singular", "plural"),
+  "person": ("first", "second", "third"),
+  "gender": ("masculine", "feminine", "neuter"),
+  "case": ("subjective", "objective", "possessive"),
+  "position": ("modifier", "object"),
+}
+
 def table_match(table, search):
   for entry in table:
     if all(

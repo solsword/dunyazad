@@ -69,13 +69,22 @@ IRREGULAR = {
     ("past", "singular", "second", "were"),
     ("past", "singular", "third", "was"),
 
-    ("past", "plural", "third", "were"),
+    ("past", "plural", "any", "were"),
 
     ("past participle", "any", "any", "been"),
+  ],
+  "do": [
+    ("past", "any", "any", "did"),
+    ("past participle", "any", "any", "done"),
+  ],
+  "have": [
+    ("present", "singular", "third", "has"),
+    ("past", "any", "any", "had"),
+    ("past participle", "any", "any", "had"),
   ]
 }
 
-def conjugation(verb, tns, nmbr, per):
+def conjugation(verb, tns="present", nmbr="any", per="any"):
   """
   Figures out the conjugation of the given verb and returns it.
   """

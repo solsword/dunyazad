@@ -12,6 +12,8 @@ import ans
 
 from ans import Pr, Vr, PVr, SbT
 
+from eng_base import *
+
 import nouns
 import verbs
 
@@ -104,6 +106,34 @@ TEXT_SCHEMAS = {
 }
 
 SUCCESSOR = Pr("successor", Vr("From"), Pr("option", Vr("Opt")), Vr("To"))
+
+def conjugation_table(verb):
+  result = {
+    tense : [
+      fmt.format(
+        pronoun=table_match(
+          nouns.PRONOUNS,
+          (person, number, "neuter", "subjective", "any")
+        ),
+        verb=verbs.conjugation(verb, tense, number, person),
+        be_p=verbs.conjugation("be", "present", number, person),
+        have_p=verbs.conjugation("have", "present", number, person),
+      )
+        for person in GR_CASES["person"]
+        for number in GR_CASES["number"]
+    ]
+      for tense, fmt in (
+        ("present", "{pronoun} {verb}"),
+        ("past", "{pronoun} {verb}"),
+        ("present participle", "{pronoun} {be_p} {verb}"),
+        ("past participle", "{pronoun} {have_p} {verb}"),
+      )
+  }
+  result.update({
+    "infinitive": "to {verb}".format(verb=verbs.conjugation(verb,"infinitive")),
+    "imperative": "{verb} it".format(verb=verbs.conjugation(verb,"imperative")),
+  })
+  return result
 
 def glean_nouns(story):
   result = {}
@@ -401,3 +431,81 @@ Readiness is: {}\
         #olist.append((n, pns, intr))
         olist.append((n, base_pnslots, intr))
   return ("\n\n*comment " + '-'*72 + "\n\n").join(results)
+
+# Testing:
+
+_test_cases = [
+  (
+    conjugation_table,
+    "be",
+    {
+      'present': ['I am', 'we are', 'you are', 'you are', 'it is', 'they are'],
+      'past':
+        ['I was', 'we were', 'you were', 'you were', 'it was', 'they were'],
+      'present participle':
+        ['I am being', 'we are being', 'you are being', 'you are being',
+         'it is being', 'they are being'],
+      'past participle':
+        ['I have been', 'we have been', 'you have been', 'you have been',
+         'it has been', 'they have been'],
+      'infinitive': 'to be',
+      'imperative': 'be it',
+    }
+  ),
+  (
+    conjugation_table,
+    "do",
+    {
+      'present': ['I do', 'we do', 'you do', 'you do', 'it does', 'they do'],
+      'past':
+        ['I did', 'we did', 'you did', 'you did', 'it did', 'they did'],
+      'present participle':
+        ['I am doing', 'we are doing', 'you are doing', 'you are doing',
+         'it is doing', 'they are doing'],
+      'past participle':
+        ['I have done', 'we have done', 'you have done', 'you have done',
+         'it has done', 'they have done'],
+      'infinitive': 'to do',
+      'imperative': 'do it',
+    }
+  ),
+  (
+    conjugation_table,
+    "have",
+    {
+      'present':
+        ['I have', 'we have', 'you have', 'you have', 'it has', 'they have'],
+      'past': ['I had', 'we had', 'you had', 'you had', 'it had', 'they had'],
+      'present participle':
+        ['I am having', 'we are having', 'you are having', 'you are having',
+         'it is having', 'they are having'],
+      'past participle':
+        ['I have had', 'we have had', 'you have had', 'you have had',
+         'it has had', 'they have had'],
+      'infinitive': 'to have',
+      'imperative': 'have it',
+    }
+
+  ),
+  (
+    conjugation_table,
+    "travel",
+    {
+      'present':
+        ['I travel', 'we travel', 'you travel', 'you travel', 'it travels',
+         'they travel'],
+      'past':
+        ['I traveled', 'we traveled', 'you traveled', 'you traveled',
+         'it traveled', 'they traveled'],
+      'present participle':
+        ['I am traveling', 'we are traveling', 'you are traveling',
+         'you are traveling', 'it is traveling', 'they are traveling'],
+      'past participle':
+        ['I have traveled', 'we have traveled', 'you have traveled',
+         'you have traveled', 'it has traveled', 'they have traveled'],
+      'infinitive': 'to travel',
+      'imperative': 'travel it',
+    }
+
+  ),
+]
