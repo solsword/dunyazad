@@ -73,18 +73,35 @@ KEEP = {
 
   "story_node": PVr("story_node", "story_node", Vr("Node")),
   "node_type": PVr("node_type", "node_type", Vr("Node"), Vr("Type")),
+  "node_status_reached":
+    PVr("node_status_reached", "node_status_reached", Vr("Node"), Vr("Status")),
   "successor":
     PVr(
-      "successor",
-      "successor",
-      Vr("From"), Pr("option", Vr("Opt")), Vr("To")
+      "successor", "successor",
+      Vr("From"),
+      Pr("option", Vr("Opt")),
+      Vr("To"),
     ),
+  "path_length": PVr("path_length", "path_length", Vr("Node"), Vr("Count")),
 
   "vignette": PVr("vignette", "vignette", Vr("Node"), Vr("Root")),
 
   "setup": PVr("setup", "setup", Vr("Node"), Vr("Which")),
   "spontaneous":
     PVr("spontaneous", "spontaneous", Pr("st", Vr("Node"), Vr("State"))),
+  "unresolved_potential":
+    PVr(
+      "unresolved_potential", "unresolved_potential",
+      Vr("Node"),
+      Pr("option", Vr("Opt")),
+      SbT("Potential"),
+    ),
+  "resolves_vignette":
+    PVr(
+      "resolves_vignette", "resolves_vignette", 
+      Vr("Node"),
+      Pr("option", Vr("Opt")),
+    ),
 
   "intro_text":
     PVr("intro_text", "intro_text", Vr("Node"), Vr("Text")),
@@ -95,14 +112,14 @@ KEEP = {
       "option_text", "option_text",
       Vr("Node"),
       Pr("option", Vr("Opt")),
-      Vr("Text")
+      Vr("Text"),
     ),
   "action_text":
     PVr(
       "action_text", "action_text",
       Vr("Node"),
       Pr("option", Vr("Opt")),
-      Vr("Text")
+      Vr("Text"),
     ),
 }
 

@@ -35,6 +35,44 @@ error(m("Non-first-person option", N, option(X))) :-
   Init != inst(actor, the_party),
   story_op(N, build_options).
 
+% choices should be frequent
+error(m("Not enough choices", A, B, C)) :-
+  successor(A, AOpt, B),
+  successor(B, BOpt, C),
+  0 = {
+    node_type(A, choice);
+    node_type(B, choice);
+    node_type(C, choice)
+  }.
+
+% events shouldn't re-hash the choice you just made or a prevoius event
+arg_mismatch(N, option(NO), O, option(OO)) :-
+  at(N, arg(option(NO), Arg, Val)),
+  at(O, option(OO)),
+  0 = {
+    at(O, arg(option(OO), Arg, Val)) : at(O, arg(option(OO), Arg, Val))
+  },
+  story_op(N, build_options).
+
+arg_mismatch(O, OOpt, N, NOpt) :-
+  arg_mismatch(N, NOpt, O, OOpt).
+
+error(m("Event duplicates previous action", N, Prev, Action)) :-
+  successor(Prev, Opt, N),
+  node_type(N, event),
+  at(Prev, action(Opt, Action)),
+  at(N, action(AnyOpt, Action)),
+  not arg_mismatch(Prev, Opt, N, AnyOpt),
+  story_op(N, build_options).
+
+% emphasizing something once is enough
+error(m("Repeated emphasis of a problem", N, option(X))) :-
+  story_node(N),
+  at(N, emphasizes(option(X), Something)),
+  successor(N, option(X), Next),
+  at(Next, emphasizes(option(Y), Something)),
+  story_op(N, build_options).
+
 % within-vignette boredom
 
 % TODO: within-vignette boredom!
@@ -49,19 +87,29 @@ error(m("Repeated vignette setup", N, R)) :-
 
 % every vignette ends with one of the special actions "travel onwards" or
 % "reach destination:"
-node_type(N, event) :-
-  resolves_vignette(End, Opt),
-  successor(End, Opt, N).
-
 1 = {
-  at(N, action(option(1), travel_onwards));
-  at(N, action(option(1), reach_destination))
+  node_type(N, event);
+  node_type(N, ending)
 } :-
   resolves_vignette(End, Opt),
   successor(End, Opt, N),
-  story_op(N, build_options).
+  story_op(End, build_options).
 
-at(N, arg(option(1), subject, inst(actor, the_party))) :-
+at(N, action(option(1), travel_onwards)) :-
+  node_type(N, event),
   resolves_vignette(End, Opt),
   successor(End, Opt, N),
   story_op(N, build_options).
+
+at(N, action(option(1), reach_destination)) :-
+  node_type(N, ending),
+  resolves_vignette(End, Opt),
+  successor(End, Opt, N),
+  story_op(N, build_options).
+
+% the story shouldn't end too soon:
+
+error(m("Story too short", N, L)) :-
+  node_type(N, ending),
+  shortest_path(N, L),
+  L < min_story_length.

@@ -3,8 +3,10 @@
 
 :- error(Message).
 %#minimize { 1@0, error(Message) : error(Message) }.
+%:- error(m("Story too short", N, X)).
 
 #const max_options=5.
+#const min_story_length=7. % TODO: increase this
 
 opt_num(1..max_options).
 
@@ -12,6 +14,10 @@ opt_num(1..max_options).
   at(N, option(X)) : opt_num(X)
 } <= max_options :-
   node_type(N, choice),
+  story_op(N, build_options).
+
+at(N, option(1)) :-
+  node_type(N, ending),
   story_op(N, build_options).
 
 at(N, option(1)) :-

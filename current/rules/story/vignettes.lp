@@ -11,15 +11,18 @@ vignette(N, PrV) :-
 unresolved_potential(N, option(O), potential(X, Pt)) :-
   st(N, potential(X, Pt)),
   at(N, option(O)),
-  0 = { at(N, consequence(option(O), _not, potential(X, Pt))) }.
+  0 = { at(N, consequence(option(O), _not, potential(X, Pt))) },
+  story_op(N, build_options).
 
 unresolved_potential(N, Opt, potential(X, Pt)) :-
-  at(N, consequence(Opt, potential(X, Pt))).
+  at(N, consequence(Opt, potential(X, Pt))),
+  story_op(N, build_options).
 
 % An option which resolves the all remaining potentials at a given node
-% resolves that node's vignette, since a new vignette will need to start to
-% reintroduce potential.
+% resolves that node's vignette, since a new vignette will be needed to start
+% to reintroduce potential.
 resolves_vignette(N, option(O)) :-
   story_node(N),
   at(N, option(O)),
-  0 = { unresolved_potential(N, option(O), Pt) }.
+  0 = { unresolved_potential(N, option(O), Pt) },
+  story_op(N, build_options).

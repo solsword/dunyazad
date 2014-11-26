@@ -5,8 +5,13 @@ argument(travel_onwards, subject, actor).
 
 outcome(travel_onwards, onwards).
 
-% travel_onwards as a choice nullifies all existing opportunities (but can't be
-% an option if there are problems):
+% The argument of travel_onwards is fixed:
+
+at(N, arg(Opt, subject, inst(actor, the_party))) :-
+  at(N, action(Opt, travel_onwards)).
+
+% travel_onwards as an option nullifies all existing opportunities (but it
+% can't be an option if there are problems):
 
 error(m("Left a problem behind.", N, Prb)) :-
   at(N, action(X, travel_onwards)),
