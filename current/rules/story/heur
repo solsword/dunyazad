@@ -1,0 +1,3 @@
+#!/bin/sh
+echo "%" "vim: syn=gringo" > out/cut
+tail -n +2 out/grounded | cut -b1-16 | sort | uniq -c | sort -r >> out/cut

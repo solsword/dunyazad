@@ -52,6 +52,7 @@ arg_mismatch(N, option(NO), O, option(OO)) :-
   0 = {
     at(O, arg(option(OO), Arg, Val)) : at(O, arg(option(OO), Arg, Val))
   },
+  N < O,
   story_op(N, build_options).
 
 arg_mismatch(O, OOpt, N, NOpt) :-

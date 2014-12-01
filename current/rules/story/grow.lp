@@ -316,5 +316,3 @@ state_mismatch(Prev, option(Opt), New) :-
     st(New, State);
     at(Prev, consequence(option(Opt), _not, State))
   }.
-
-% TODO: setup state dissapearance
