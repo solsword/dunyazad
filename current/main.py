@@ -13,8 +13,17 @@ import english
 
 from utils import *
 
+CRASHFILE = os.path.join("out", "crash.lp")
+
 def main():
-  story = tasks.setup_story("")
+  try:
+    story = tasks.setup_story("")
+  except asp.ASPError as e:
+    print("Error during setup. Dumping source to '{}'".format(CRASHFILE))
+    with open(CRASHFILE, 'w') as fout:
+      fout.write(e.message)
+    exit(1)
+
   n = -1
   if not os.path.isdir("out"):
     os.mkdir("out")
@@ -31,16 +40,18 @@ def main():
         for pr in story:
           fout.write(str(pr) + '.\n')
     except asp.ASPError as e:
-      print("Error during instantiation. Dumping source to 'crash.lp'")
-      with open("crash.lp", 'w') as fout:
+      print(
+        "Error during instantiation. Dumping source to '{}'".format(CRASHFILE)
+      )
+      with open(CRASHFILE, 'w') as fout:
         fout.write(e.message)
       exit(1)
 
     try:
       story = tasks.branch_random(story)
     except asp.ASPError as e:
-      print("Error during branching. Dumping source to 'crash.lp'")
-      with open("crash.lp", 'w') as fout:
+      print("Error during branching. Dumping source to '{}'".format(CRASHFILE))
+      with open(CRASHFILE, 'w') as fout:
         fout.write(e.message)
       exit(1)
 #  for pr in story:

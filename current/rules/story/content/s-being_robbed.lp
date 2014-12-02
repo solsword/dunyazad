@@ -2,28 +2,28 @@
 
 possible_setup(being_robbed).
 
-s_st(being_robbed, inst(item, goods)).
-s_st(being_robbed, property(name, inst(item, goods), "goods")).
+s_st(being_robbed, linst(item, goods)).
+s_st(being_robbed, property(name, linst(item, goods), "goods")).
 % default number/person/gender
 % TODO: give the goods to the merchants!
 s_st(
   being_robbed,
-  relation(has_item, inst(actor, the_party), inst(item, goods))
+  relation(has_item, inst(actor, the_party), linst(item, goods))
 ).
 
-s_st(being_robbed, inst(actor, bandits)).
-s_st(being_robbed, property(name, inst(actor, bandits), "bandits")).
-s_st(being_robbed, property(number, inst(actor, bandits), plural)).
+s_st(being_robbed, linst(actor, bandits)).
+s_st(being_robbed, property(name, linst(actor, bandits), "bandits")).
+s_st(being_robbed, property(number, linst(actor, bandits), plural)).
 % default person/gender
 
-s_st(being_robbed, inst(actor, merchants)).
-s_st(being_robbed, property(name, inst(actor, merchants), "merchants")).
-s_st(being_robbed, property(number, inst(actor, merchants), plural)).
+s_st(being_robbed, linst(actor, merchants)).
+s_st(being_robbed, property(name, linst(actor, merchants), "merchants")).
+s_st(being_robbed, property(number, linst(actor, merchants), plural)).
 % default person/gender
 
 s_st(
   being_robbed,
-  potential(problem, threatening(inst(actor, bandits), inst(actor,merchants)))
+  potential(problem, threatening(linst(actor, bandits), linst(actor,merchants)))
 ).
 
 s_intro_text(

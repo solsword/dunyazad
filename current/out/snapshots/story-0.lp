@@ -17,6 +17,13 @@ st(root, property(gender, inst(party_member, "Jain"), masculine)).
 st(root, property(proper, inst(party_member, "Jain"), false)).
 st(root, property(travel_mode, inst(actor, the_party), walking)).
 st(root, property(environment, inst(actor, the_party), hills)).
+node_status_reached(root, uninitialized).
+node_type(root, event).
 story_op(root, build_options).
 story_op(root, initialize_node).
-story_op(root, add_surface).
+at(root, option(1)).
+at(root, arg(option(1), subject, inst(actor, the_party))).
+at(root, action(option(1), travel_onwards)).
+node_status_reached(root, initialized).
+node_status_reached(root, built).
+at(root, outcome(option(1), onwards)).

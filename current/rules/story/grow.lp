@@ -149,12 +149,12 @@ error(m("Branched node's option is missing a successor.", N, option(O))) :-
   at(Prev, action(Opt, travel_onwards)),
   story_op(N, initialize_node).
 
-st(N, State) :-
+st(N, @instify(State, N)) :-
   s_st(Setup, State),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-spontaneous(st(N, State)) :-
+spontaneous(st(N, @instify(State, N))) :-
   s_st(Setup, State),
   setup(N, Setup),
   story_op(N, initialize_node).
