@@ -8,20 +8,20 @@ initiator(flee, fearful).
 outcome(flee, escape).
 outcome(flee, failure).
 
-at(N, deals_with(X, potential(problem, threatening(From, Fearful)))) :-
+at(N, consequence(X, _not, relation(threatening, From, Fearful))) :-
   at(N, action(X, flee)),
   at(N, outcome(X, escape)),
   at(N, arg(X, fearful, Fearful)),
   at(N, arg(X, from, From)),
-  st(N, potential(problem, threatening(From, Fearful))),
+  st(N, relation(threatening, From, Fearful)),
   story_op(N, build_options).
 
-at(N, emphasizes(X, potential(problem, threatening(From, Fearful)))) :-
+at(N, emphasizes(X, relation(threatening, From, Fearful))) :-
   at(N, action(X, flee)),
   at(N, outcome(X, failure)),
   at(N, arg(X, fearful, Fearful)),
   at(N, arg(X, from, From)),
-  st(N, potential(problem, threatening(From, Fearful))),
+  st(N, relation(threatening, From, Fearful)),
   story_op(N, build_options).
 
 0 <= {

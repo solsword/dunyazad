@@ -4,12 +4,10 @@
 % relevance
 at(N, relevant(option(X))) :-
   1 = {
-    at(N, deals_with(option(X), Something))
-      : at(N, deals_with(option(X), Something));
+    at(N, consequence(option(X), _not, Something))
+      : at(N, potential(PTyp, Something));
     at(N, emphasizes(option(X), Something))
-      : at(N, emphasizes(option(X), Something));
-    at(N, nullifies(option(X), Something))
-      : at(N, nullifies(option(X), Something))
+      : at(N, potential(PTyp, Something))
   },
   at(N, option(X)),
   story_op(N, build_options).
@@ -67,7 +65,7 @@ error(m("Event duplicates previous action", N, Prev, Action)) :-
   story_op(N, build_options).
 
 % emphasizing something once is enough
-error(m("Repeated emphasis of a problem", N, option(X))) :-
+error(m("Repeated emphasis", N, option(X))) :-
   story_node(N),
   at(N, emphasizes(option(X), Something)),
   successor(N, option(X), Next),

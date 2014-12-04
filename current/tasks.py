@@ -19,10 +19,12 @@ opj = os.path.join
 # Base source files:
 BASE_SOURCES = [
   "utils.lp",
-  opj("story", "choice_structure.lp"),
   opj("story", "core.lp"),
-  opj("story", "grow.lp"),
+  opj("story", "choice_structure.lp"),
+  opj("story", "potential.lp"),
   opj("story", "vignettes.lp"),
+  opj("story", "grow.lp"),
+  opj("story", "eval.lp"),
   opj("story", "surface.lp"),
 ]
 

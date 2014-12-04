@@ -37,21 +37,3 @@
   s_st(Setup, property(proper, inst(Type, ID), true))
 } :-
   s_st(Setup, inst(Type, ID)).
-
-% Problem/opportunity description:
-% TODO: content files for problems/opportunities?
-potential_text(
-  N,
-  @fmt(
-    "N#{}/they V#be/prs/{} V#threaten/prp/{} N#{}/them",
-    Threatening, Threatening, Threatening, Threatened
-  )
-) :-
-  st(
-    N,
-    potential(
-      problem,
-      threatening(inst(T1, Threatening), inst(T2, Threatened))
-    )
-  ),
-  story_op(N, add_surface).

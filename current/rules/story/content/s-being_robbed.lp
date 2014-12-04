@@ -23,7 +23,7 @@ s_st(being_robbed, property(number, linst(actor, merchants), plural)).
 
 s_st(
   being_robbed,
-  potential(problem, threatening(linst(actor, bandits), linst(actor,merchants)))
+  relation(threatening, linst(actor, bandits), linst(actor,merchants))
 ).
 
 s_intro_text(

@@ -14,7 +14,7 @@ s_st(roc_attack, relation(has_item, linst(actor,roc), linst(item,roc_feather))).
 
 s_st(
   roc_attack,
-  potential(problem, threatening(linst(actor, roc), inst(actor, the_party)))
+  relation(threatening, linst(actor, roc), inst(actor, the_party))
 ).
 
 s_intro_text(

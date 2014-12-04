@@ -16,11 +16,11 @@ error(m("Reached destination before end of story", N, X)) :-
   at(N, action(X, reach_destination)),
   not node_type(N, ending).
 
-% reach_destination nullifies all existing potentials:
+% reach_destination removes all existing potentials:
 
-at(N, nullifies(X, potential(Any, Pt))) :-
+at(N, consequence(X, _not, Pt)) :-
   at(N, action(X, reach_destination)),
-  st(N, potential(Any, Pt)),
+  at(N, potential(Any, Pt)),
   story_op(N, build_options).
 
 % reach_destination doesn't need to have any consequences as it can only happen

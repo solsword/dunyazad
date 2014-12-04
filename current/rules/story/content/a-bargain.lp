@@ -31,8 +31,8 @@ error(m("Unintelligent listener.", N, X, Listening)) :-
   story_op(N, build_options).
 
 1 = {
-  at(N, deals_with(X, potential(problem, threatening(Listening, Someone))))
-    : st(N, potential(problem, threatening(Listening, Someone)))
+  at(N, consequence(X, _not, relation(threatening, Listening, Someone)))
+    : st(N, relation(threatening, Listening, Someone))
   % TODO: other problems that can be solved by paying someone off?
 } :-
   at(N, action(X, pay_off)),
@@ -42,8 +42,8 @@ error(m("Unintelligent listener.", N, X, Listening)) :-
   story_op(N, build_options).
 
 1 = {
-  at(N, emphasizes(X, potential(problem, threatening(Listening, Someone))))
-    : st(N, potential(problem, threatening(Listening, Someone)))
+  at(N, emphasizes(X, relation(threatening, Listening, Someone)))
+    : st(N, relation(threatening, Listening, Someone))
   % TODO: other problems here as well
 } :-
   at(N, action(X, pay_off)),

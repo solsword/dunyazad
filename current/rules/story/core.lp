@@ -1,8 +1,8 @@
 % core rules:
 % -----------
 
-:- error(Message).
-%#minimize { 1@0, error(Message) : error(Message) }.
+%:- error(Message).
+#minimize { 1@0, error(Message) : error(Message) }.
 %:- error(m("Story too short", N, X)).
 
 #const max_options=5.
@@ -62,16 +62,6 @@ at(N, initiator(X, Initiator)) :-
   at(N, arg(X, InitArg, Initiator)),
   initiator(Action, InitArg),
   story_op(N, build_options).
-
-% Dealing with or nullifying a problem/opportunity gets rid of it:
-at(N, consequence(X, _not, Pt)) :-
-  at(N, deals_with(X, Pt)),
-  story_op(N, build_options).
-
-at(N, consequence(X, _not, Pt)) :-
-  at(N, nullifies(X, Pt)),
-  story_op(N, build_options).
-
 
 % State and action rules:
 % -----------------------

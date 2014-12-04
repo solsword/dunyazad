@@ -10,17 +10,17 @@ outcome(travel_onwards, onwards).
 at(N, arg(Opt, subject, inst(actor, the_party))) :-
   at(N, action(Opt, travel_onwards)).
 
-% travel_onwards as an option nullifies all existing opportunities (but it
+% travel_onwards as an option removes all existing opportunities (but it
 % can't be an option if there are problems):
 
 error(m("Left a problem behind.", N, Prb)) :-
   at(N, action(X, travel_onwards)),
-  st(N, potential(problem, Prb)),
+  at(N, potential(problem, Prb)),
   story_op(N, build_options).
 
-at(N, nullifies(X, potential(opportunity, Opp))) :-
+at(N, consequence(X, _not, Opp)) :-
   at(N, action(X, travel_onwards)),
-  st(N, potential(opportunity, Opp)),
+  at(N, potential(opportunity, Opp)),
   node_type(N, choice),
   story_op(N, build_options).
 

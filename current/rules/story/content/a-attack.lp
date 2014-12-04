@@ -23,22 +23,22 @@ error(m("Parley with unintelligent agressor.", N, X)) :-
   story_op(N, build_options).
 
 % attacking is one way to deal with a threat
-at(N, deals_with(X, potential(problem, threatening(Target, Someone)))) :-
+at(N, consequence(X, _not, relation(threatening, Target, Someone))) :-
   at(N, action(X, attack)),
   1= {
     at(N, outcome(X, parley));
     at(N, outcome(X, victory))
   },
   at(N, arg(X, target, Target)),
-  st(N, potential(problem, threatening(Target, Someone))),
+  st(N, relation(threatening, Target, Someone)),
   story_op(N, build_options).
 
-% if things go badly it only makes things worse though:
-at(N, emphasizes(X, potential(problem, threatening(Target, Someone)))) :-
+% if things go badly it serves to emphasize the problem
+at(N, emphasizes(X, relation(threatening, Target, Someone))) :-
   at(N, action(X, attack)),
   at(N, outcome(X, defeat)),
   at(N, arg(X, target, Target)),
-  st(N, potential(problem, threatening(Target, Someone))),
+  st(N, relation(threatening, Target, Someone)),
   story_op(N, build_options).
 
 % fighting is dangerous:
