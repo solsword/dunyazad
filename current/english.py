@@ -227,7 +227,6 @@ def build_text(template, ndict, pnslots=None, introduced=None):
             print("ERROR!")
             print(template, noun, ndict)
             exit(1)
-          print("Processing noun:", m)
           pro = m.group(2)
           case, position = nouns.casepos(pro)
           slot = pnslots[nouns.pnslot(ndict[noun])]
@@ -302,7 +301,8 @@ def build_node_text(node, node_structure, nouns, pnslots, introduced):
     _pnslots,
     _introduced
   )
-  situation += "."
+  if situation:
+    situation += "."
   situation = situation.capitalize()
   options = ""
   if node["options"]:
@@ -405,7 +405,6 @@ def build_story_text(story, root=None):
   results = []
   while olist:
     target, pnslots, introduced = olist.pop(0)
-    print("Processing node: '{}'.".format(target))
     # build node text:
     txt, outgoing = build_node_text(
       node_templates[target],
