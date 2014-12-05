@@ -17,7 +17,15 @@ s_st(
   relation(threatening, linst(actor, roc), inst(actor, the_party))
 ).
 
-s_intro_text(
+intro_text(
+  N,
   roc_attack,
-  "N#the_party/they V#continue/prs/the_party on N#the_party/their journey, when suddenly N#roc/they V#swoop/prs/roc down from the skies, clearly intent on V#attack/prp/roc N#the_party/them."
-).
+  @fmt(
+    "N#the_party/they V#continue/prs/the_party on N#the_party/their journey, when suddenly N#{}/they V#swoop/prs/{} down from the skies, clearly intent on V#attack/prp/{} N#the_party/them.",
+    LRoc, LRoc, LRoc
+  )
+) :-
+  st(N, inst(actor, LRoc)),
+  st(N, property(name, inst(actor, LRoc), "roc")),
+  setup(N, roc_attack),
+  story_op(N, initialize_node).

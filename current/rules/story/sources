@@ -1,5 +1,13 @@
 #!/bin/sh
-core="core.lp choice_structure.lp potential.lp vignettes.lp grow.lp eval.lp"
+core="
+core.lp
+setup.lp
+potential.lp
+grow.lp
+eval.lp
+vignettes.lp
+choice_structure.lp
+"
 content="content/*.lp"
 surface="surface.lp"
 sources="../utils.lp $core $surface $content test.lpt"

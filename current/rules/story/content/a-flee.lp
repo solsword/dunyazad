@@ -8,7 +8,7 @@ initiator(flee, fearful).
 outcome(flee, escape).
 outcome(flee, failure).
 
-at(N, consequence(X, _not, relation(threatening, From, Fearful))) :-
+at(N, deals_with(X, relation(threatening, From, Fearful))) :-
   at(N, action(X, flee)),
   at(N, outcome(X, escape)),
   at(N, arg(X, fearful, Fearful)),

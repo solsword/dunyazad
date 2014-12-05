@@ -16,9 +16,9 @@ error(m("Reached destination before end of story", N, X)) :-
   at(N, action(X, reach_destination)),
   not node_type(N, ending).
 
-% reach_destination removes all existing potentials:
+% reach_destination nullifies all existing potentials:
 
-at(N, consequence(X, _not, Pt)) :-
+at(N, nullifies(X, Pt)) :-
   at(N, action(X, reach_destination)),
   at(N, potential(Any, Pt)),
   story_op(N, build_options).
@@ -35,7 +35,7 @@ option_text(
   X,
   @fmt(
     "N#{}/they V#reach/prs/{} N#{}/their destination.",
-    Subj, Subj
+    Subj, Subj, Subj
   )
 ) :-
   at(N, action(X, travel_onwards)),
@@ -47,7 +47,7 @@ action_text(
   X,
   @fmt(
     "N#{}/they finally V#reach/prs/{} N#{}/their destination. All is well.",
-    Subj, Subj
+    Subj, Subj, Subj
   )
 ) :-
   at(N, action(X, travel_onwards)),

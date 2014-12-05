@@ -1,5 +1,7 @@
 story_node(root).
-new_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
 
 st(root, inst(actor, the_party)).
 st(root, property(name, inst(actor, the_party), "party")).

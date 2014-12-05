@@ -10,6 +10,7 @@ node_type(root, choice).
 story_op(root, initialize_node).
 story_op(root, build_options).
 story_op(root, add_branch_nodes).
+story_op(root, add_surface).
 
 :- not successor(root, option(1), root_1).
 story_op(root_1, initialize_node).
@@ -26,9 +27,9 @@ story_op(root_1_1, build_options).
 
 %:- not setup(root, being_robbed).
 %:- not setup("root_1", roc_attack).
-:- not resolves_vignette(root, option(1)).
-:- not node_type(root_1_1, choice).
-:- error(m("Reached destination before end of story", N, X)).
+%:- not resolves_vignette(root, option(1)).
+%:- not node_type(root_1_1, choice).
+%:- error(m("Reached destination before end of story", N, X)).
 %:- 0 = { resolves_vignette(N, option(O)) : at(N, option(O)) }.
 
 st(root, inst(actor, the_party)).

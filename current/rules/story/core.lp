@@ -1,9 +1,9 @@
 % core rules:
 % -----------
 
-%:- error(Message).
-#minimize { 1@0, error(Message) : error(Message) }.
-%:- error(m("Story too short", N, X)).
+:- error(Message).
+%#minimize { 1@0, error(Message) : error(Message) }.
+:- error(m("Story too short", N, X)).
 
 #const max_options=5.
 #const min_story_length=7. % TODO: increase this

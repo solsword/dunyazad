@@ -31,7 +31,7 @@ error(m("Unintelligent listener.", N, X, Listening)) :-
   story_op(N, build_options).
 
 1 = {
-  at(N, consequence(X, _not, relation(threatening, Listening, Someone)))
+  at(N, deals_with(X, relation(threatening, Listening, Someone)))
     : st(N, relation(threatening, Listening, Someone))
   % TODO: other problems that can be solved by paying someone off?
 } :-

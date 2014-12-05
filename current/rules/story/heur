@@ -1,3 +1,3 @@
 #!/bin/sh
-echo "%" "vim: syn=gringo" > out/cut
-tail -n +2 out/grounded | cut -b1-16 | sort | uniq -c | sort -r >> out/cut
+echo "%" "vim: syn=gringo nowrap" > out/freq
+tail -n +2 out/grounded | sort | uniq -w16 -c | sort -r >> out/freq

@@ -23,7 +23,7 @@ error(m("Parley with unintelligent agressor.", N, X)) :-
   story_op(N, build_options).
 
 % attacking is one way to deal with a threat
-at(N, consequence(X, _not, relation(threatening, Target, Someone))) :-
+at(N, deals_with(X, relation(threatening, Target, Someone))) :-
   at(N, action(X, attack)),
   1= {
     at(N, outcome(X, parley));

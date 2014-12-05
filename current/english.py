@@ -17,11 +17,11 @@ from eng_base import *
 import nouns
 import verbs
 
-ANYTAG = re.compile(r"(\b[A-Z]#[a-z_/]+\b)")
+ANYTAG = re.compile(r"(\b[A-Z]#[a-z_0-9/]+\b)")
 
 TAGS = {
-  "noun": re.compile(r"\bN#([a-z_]+)/([a-z_]+)\b"),
-  "verb": re.compile(r"\bV#([a-z]+)/([a-z]+)/([a-z_]+)\b"),
+  "noun": re.compile(r"\bN#([a-z_][a-z_0-9]*)/([a-z_]+)\b"),
+  "verb": re.compile(r"\bV#([a-z]+)/([a-z]+)/([a-z_][a-z_0-9]*)\b"),
   #"pronoun": re.compile(r"\bP#[a-z]+/[a-z]+\b"),
   #"determined": re.compile(r"\bT#[a-z]+\b"),
 }
@@ -227,6 +227,7 @@ def build_text(template, ndict, pnslots=None, introduced=None):
             print("ERROR!")
             print(template, noun, ndict)
             exit(1)
+          print("Processing noun:", m)
           pro = m.group(2)
           case, position = nouns.casepos(pro)
           slot = pnslots[nouns.pnslot(ndict[noun])]

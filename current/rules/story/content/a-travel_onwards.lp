@@ -18,7 +18,7 @@ error(m("Left a problem behind.", N, Prb)) :-
   at(N, potential(problem, Prb)),
   story_op(N, build_options).
 
-at(N, consequence(X, _not, Opp)) :-
+at(N, nullifies(X, Opp)) :-
   at(N, action(X, travel_onwards)),
   at(N, potential(opportunity, Opp)),
   node_type(N, choice),
@@ -56,7 +56,7 @@ at(N, consequence(X, _not, relation(Rel, Inst, Other))) :-
 % Surface details
 % ---------------
 
-option_text(N, X, @fmt("N#{}/they V#travel/prs/{} onwards.", Subj)) :-
+option_text(N, X, @fmt("N#{}/they V#travel/prs/{} onwards.", Subj, Subj)) :-
   at(N, action(X, travel_onwards)),
   at(N, arg(X, subject, inst(T1, Subj))),
   story_op(N, add_surface).
@@ -66,7 +66,7 @@ action_text(
   X,
   @fmt(
     "N#{}/they V#continue/prs/{} N#{}/their journey.",
-    Subj, Subj
+    Subj, Subj, Subj
   )
 ) :-
   at(N, action(X, travel_onwards)),
