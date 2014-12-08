@@ -276,7 +276,7 @@ class Variable(Predicate):
 class PatternVariable(Variable):
   """
   A PatternVariable is like a normal variable but to match a predicate it must
-  also satisfy a regular expression match.
+  also satisfy a regular expression match (it must match fully).
   """
   def __init__(self, name, pattern, *args):
     super().__init__(name, *args)
@@ -305,7 +305,7 @@ class PatternVariable(Variable):
 
   def matches(self, other):
     return len(self.args) == len(other.args) \
-        and self.re.match(other.name)
+        and self.re.fullmatch(other.name)
 
 class Subtree(Variable):
   """

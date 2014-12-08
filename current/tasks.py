@@ -91,7 +91,7 @@ KEEP = {
 
   "setup": PVr("setup", "setup", Vr("Node"), Vr("Which")),
   "spontaneous":
-    PVr("spontaneous", "spontaneous", Pr("st", Vr("Node"), Vr("State"))),
+    PVr("spontaneous", "spontaneous", Pr("st", Vr("Node"), SbT("State"))),
   "unresolved_potential":
     PVr(
       "unresolved_potential", "unresolved_potential",

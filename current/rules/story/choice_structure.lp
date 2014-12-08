@@ -41,7 +41,8 @@ error(m("Not enough choices", A, B, C)) :-
     node_type(A, choice);
     node_type(B, choice);
     node_type(C, choice)
-  }.
+  },
+  story_op(B, add_branch_nodes).
 
 % events shouldn't re-hash the choice you just made or a prevoius event
 arg_mismatch(N, option(NO), O, option(OO)) :-
@@ -54,7 +55,8 @@ arg_mismatch(N, option(NO), O, option(OO)) :-
   story_op(N, build_options).
 
 arg_mismatch(O, OOpt, N, NOpt) :-
-  arg_mismatch(N, NOpt, O, OOpt).
+  arg_mismatch(N, NOpt, O, OOpt),
+  story_op(N, build_options).
 
 error(m("Event duplicates previous action", N, Prev, Action)) :-
   successor(Prev, Opt, N),
@@ -92,7 +94,7 @@ error(m("Repeated vignette setup", N, R)) :-
 } :-
   resolves_vignette(End, Opt),
   successor(End, Opt, N),
-  story_op(End, build_options).
+  new_node(N).
 
 at(N, action(option(1), travel_onwards)) :-
   node_type(N, event),
@@ -108,7 +110,7 @@ at(N, action(option(1), reach_destination)) :-
 
 % the story shouldn't end too soon:
 
-error(m("Story too short", N, L)) :-
+error(m("Story too short", N)) :-
   node_type(N, ending),
   shortest_path(N, L),
   L < min_story_length.

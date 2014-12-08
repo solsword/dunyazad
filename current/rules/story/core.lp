@@ -3,7 +3,7 @@
 
 :- error(Message).
 %#minimize { 1@0, error(Message) : error(Message) }.
-:- error(m("Story too short", N, X)).
+%:- error(m("Story too short", N)).
 
 #const max_options=5.
 #const min_story_length=7. % TODO: increase this

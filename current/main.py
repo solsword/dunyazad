@@ -15,6 +15,8 @@ from utils import *
 
 CRASHFILE = os.path.join("out", "crash.lp")
 
+NODES_TO_GENERATE = 12
+
 def main():
   try:
     story = tasks.setup_story("")
@@ -29,7 +31,7 @@ def main():
     os.mkdir("out")
   if not os.path.isdir(os.path.join("out", "snapshots")):
     os.mkdir(os.path.join("out", "snapshots"))
-  while len(list(tasks.all_nodes(story))) < 6:
+  while len(list(tasks.all_nodes(story))) < 12:
     n += 1
     try:
       story = tasks.instantiate_random(story)
