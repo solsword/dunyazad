@@ -54,6 +54,15 @@ at(N, consequence(X, relation(has_item, Seller, Price))) :-
   at(N, arg(X, price, Price)),
   story_op(N, build_options).
 
+% trading is how you buy stuff:
+at(N, deals_with(X, relation(selling, Merchant, Goods))) :-
+  at(N, action(X, trade)),
+  at(N, outcome(X, deal));
+  at(N, arg(X, seller, Merchant)),
+  at(N, arg(X, goods, Goods)),
+  st(N, relation(selling, Merchant, Goods)),
+  story_op(N, build_options).
+
 
 % Surface details
 % ---------------

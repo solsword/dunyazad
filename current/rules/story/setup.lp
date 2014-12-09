@@ -2,89 +2,193 @@
 % Rules concerning vignette setup.
 
 % Local instance counting:
-licount(linst(Typ, I), N, X) :-
+licount(inst(Typ, I), N, X) :-
   setup(N, Setup),
-  s_st(Setup, linst(Typ, I)),
+  setup_argument_c(Setup, AnyArg, inst(Typ, I)),
   X = {
-    setup(Prev, OSet) : s_st(OSet, linst(Typ, I)), before(Prev, N)
+    setup(Prev, OSet)
+      : setup_argument_c(OSet, SomeArg, inst(Typ, I)),
+      before(Prev, N)
   }.
 
-% Rules for unpacking setups:
-% ---------------------------
+% Rules for unpacking and labelling spontaneous states:
+% -----------------------------------------------------
 
 st(N, State) :-
-  ls_st(N, State),
+  sp_st(N, State),
   story_op(N, initialize_node).
 
 spontaneous(st(N, State)) :-
-  ls_st(N, State),
+  sp_st(N, State),
   story_op(N, initialize_node).
 
-% Instances
-ls_st(N, inst(Typ, @inst(I, LIC+1))) :-
-  licount(linst(Typ, I), N, LIC),
-  s_st(Setup, linst(Typ, I)),
+% Rules for setup arguments:
+% --------------------------
+
+1 = {
+  at(N, setup_arg(Arg, inst(Type, Inst))) : st(N, inst(Type, Inst))
+} :-
   setup(N, Setup),
+  setup_argument(Setup, Arg, Type),
   story_op(N, initialize_node).
 
-ls_st(N, state(local_instance, inst(Typ, @inst(I, LIC+1)))) :-
-  licount(linst(Typ, I), N, LIC),
-  s_st(Setup, linst(Typ, I)),
+1 = {
+  at(N, setup_arg(Arg, Symbol)) : symbol(SymType, Symbol)
+} :-
   setup(N, Setup),
+  setup_argument_s(Setup, Arg, SymType),
   story_op(N, initialize_node).
+
+at(N, setup_arg(Arg, inst(Typ, @inst(I, LIC+1)))) :-
+  setup(N, Setup),
+  licount(inst(Typ, I), N, LIC),
+  setup_argument_c(Setup, Arg, inst(Type, I)),
+  story_op(N, initialize_node).
+
+sp_st(N, inst(Typ, @inst(I, LIC+1))) :-
+  setup(N, Setup),
+  licount(inst(Typ, I), N, LIC),
+  setup_argument_c(Setup, Arg, inst(Type, I)),
+  story_op(N, initialize_node).
+
+% TODO: Do we need this?
+%sp_st(N, state(local_instance, inst(Typ, @inst(I, LIC+1)))) :-
+%  licount(inst(Typ, I), N, LIC),
+%  setup_argument_c(Setup, Arg, inst(Type, I)),
+%  setup(N, Setup),
+%  story_op(N, initialize_node).
+
+
+% Rules for argument substitution:
+% --------------------------------
 
 % States
-ls_st(N, state(State, inst(Typ, I))) :-
-  s_st(Setup, state(State, inst(Typ, I))),
+sp_st(N, state(State, Const)) :-
+  s_st(Setup, state(c(State), c(Const))),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-ls_st(N, state(State, inst(Typ, @inst(I, LIC+1)))) :-
-  licount(linst(Typ, I), N, LIC),
-  s_st(Setup, state(State, linst(Typ, I))),
+sp_st(N, state(State, Val)) :-
+  s_st(Setup, state(c(State), v(Arg))),
+  at(N, setup_arg(Arg, Val)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, state(SVal, Const)) :-
+  s_st(Setup, state(v(SArg), c(Const))),
+  at(N, setup_arg(SArg, SVal)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, state(SVal, Val)) :-
+  s_st(Setup, state(v(SArg), v(Arg))),
+  at(N, setup_arg(Arg, Val)),
+  at(N, setup_arg(SArg, SVal)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
 % Properties
-ls_st(N, property(Prop, inst(Typ, I), Value)) :-
-  s_st(Setup, property(Prop, inst(Typ, I), Value)),
+sp_st(N, property(Prop, C1, C2)) :-
+  s_st(Setup, property(c(Prop), c(C1), c(C2))),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-ls_st(N, property(Prop, inst(Typ, @inst(I, LIC+1)), Value)) :-
-  licount(linst(Typ, I), N, LIC),
-  s_st(Setup, property(Prop, linst(Typ, I), Value)),
+sp_st(N, property(Prop, Val, Const)) :-
+  s_st(Setup, property(c(Prop), v(Arg), c(Const))),
+  at(N, setup_arg(Arg, Val)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, property(Prop, Const, Val)) :-
+  s_st(Setup, property(c(Prop), c(Const), v(Arg))),
+  at(N, setup_arg(Arg, Val)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, property(Prop, V1, V2)) :-
+  s_st(Setup, property(c(Prop), v(A1), v(A2))),
+  at(N, setup_arg(A1, V1)),
+  at(N, setup_arg(A2, V2)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, property(PVal, C1, C2)) :-
+  s_st(Setup, property(v(PArg), c(C1), c(C2))),
+  at(N, setup_arg(PArg, PVal)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, property(PVal, Val, Const)) :-
+  s_st(Setup, property(v(PArg), v(Arg), c(Const))),
+  at(N, setup_arg(PArg, PVal)),
+  at(N, setup_arg(Arg, Val)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, property(PVal, Const, Val)) :-
+  s_st(Setup, property(v(PArg), c(Const), v(Arg))),
+  at(N, setup_arg(PArg, PVal)),
+  at(N, setup_arg(Arg, Val)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, property(PVal, V1, V2)) :-
+  s_st(Setup, property(v(PArg), v(A1), v(A2))),
+  at(N, setup_arg(PArg, PVal)),
+  at(N, setup_arg(A1, V1)),
+  at(N, setup_arg(A2, V2)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
 % Relations
-ls_st(N, relation(Rel, inst(T1, I1), inst(T2, I2))) :-
-  s_st(Setup, relation(Rel, inst(T1, I1), inst(T2, I2))),
+sp_st(N, relation(Rel, C1, C2)) :-
+  s_st(Setup, relation(c(Rel), c(C1), c(C2))),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-ls_st(N, relation(Rel, inst(LT, @inst(LI, LIC+1)), inst(T, I))) :-
-  licount(linst(LT, LI), N, LIC),
-  s_st(Setup, relation(Rel, linst(LT, LI), inst(T, I))),
+sp_st(N, relation(Rel, Val, Const)) :-
+  s_st(Setup, relation(c(Rel), v(Arg), c(Const))),
+  at(N, setup_arg(Arg, Val)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-ls_st(N, relation(Rel, inst(T, I), inst(LT, @inst(LI, LIC+1)))) :-
-  licount(linst(LT, LI), N, LIC),
-  s_st(Setup, relation(Rel, inst(T, I), linst(LT, LI))),
+sp_st(N, relation(Rel, Const, Val)) :-
+  s_st(Setup, relation(c(Rel), c(Const), v(Arg))),
+  at(N, setup_arg(Arg, Val)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-ls_st(
-  N,
-  relation(
-    Rel,
-    inst(LT1, @inst(LI1, LIC1+1)),
-    inst(LT2, @inst(LI2, LIC2+1))
-  )
-) :-
-  licount(linst(LT1, LI1), N, LIC1),
-  licount(linst(LT2, LI2), N, LIC2),
-  s_st(Setup, relation(Rel, linst(LT1, LI1), linst(LT2, LI2))),
+sp_st(N, relation(Rel, V1, V2)) :-
+  s_st(Setup, relation(c(Rel), v(A1), v(A2))),
+  at(N, setup_arg(A1, V1)),
+  at(N, setup_arg(A2, V2)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, relation(RVal, C1, C2)) :-
+  s_st(Setup, relation(v(RArg), c(C1), c(C2))),
+  at(N, setup_arg(RArg, RVal)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, relation(RVal, Val, Const)) :-
+  s_st(Setup, relation(v(RArg), v(Arg), c(Const))),
+  at(N, setup_arg(RArg, RVal)),
+  at(N, setup_arg(Arg, Val)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, relation(RVal, Const, Val)) :-
+  s_st(Setup, relation(v(RArg), c(Const), v(Arg))),
+  at(N, setup_arg(RArg, RVal)),
+  at(N, setup_arg(Arg, Val)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, relation(RVal, V1, V2)) :-
+  s_st(Setup, relation(v(RArg), v(A1), v(A2))),
+  at(N, setup_arg(RArg, RVal)),
+  at(N, setup_arg(A1, V1)),
+  at(N, setup_arg(A2, V2)),
   setup(N, Setup),
   story_op(N, initialize_node).

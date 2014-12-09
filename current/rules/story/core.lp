@@ -52,6 +52,13 @@ at(N, option(1)) :-
   argument(Action, Arg, Type),
   story_op(N, build_options).
 
+1 = {
+  at(N, arg(X, Arg, Symbol)) : symbol(SymType, Symbol)
+} :-
+  at(N, action(X, Action)),
+  argument_s(Action, Arg, SymType),
+  story_op(N, build_options).
+
 
 % Misc rules:
 % -----------

@@ -4,36 +4,36 @@
 % Default values for name, person, number, gender, and determination:
 
 1 = {
-  s_st(Setup, property(name, linst(Type, ID), Name))
-    : s_st(Setup, property(name, linst(Type, ID), Name));
-  s_st(Setup, property(name, linst(Type, ID), "nameless"))
+  sp_st(Setup, property(name, inst(Type, ID), Name))
+    : sp_st(Setup, property(name, inst(Type, ID), Name));
+  sp_st(Setup, property(name, inst(Type, ID), "nameless"))
 } :-
-  s_st(Setup, linst(Type, ID)).
+  sp_st(Setup, inst(Type, ID)).
 
 1 = {
-  s_st(Setup, property(person, linst(Type, ID), Name))
-    : s_st(Setup, property(person, linst(Type, ID), Name));
-  s_st(Setup, property(person, linst(Type, ID), third))
+  sp_st(Setup, property(person, inst(Type, ID), Name))
+    : sp_st(Setup, property(person, inst(Type, ID), Name));
+  sp_st(Setup, property(person, inst(Type, ID), third))
 } :-
-  s_st(Setup, linst(Type, ID)).
+  sp_st(Setup, inst(Type, ID)).
 
 1 = {
-  s_st(Setup, property(number, linst(Type, ID), Name))
-    : s_st(Setup, property(number, linst(Type, ID), Name));
-  s_st(Setup, property(number, linst(Type, ID), singular))
+  sp_st(Setup, property(number, inst(Type, ID), Name))
+    : sp_st(Setup, property(number, inst(Type, ID), Name));
+  sp_st(Setup, property(number, inst(Type, ID), singular))
 } :-
-  s_st(Setup, linst(Type, ID)).
+  sp_st(Setup, inst(Type, ID)).
 
 1 = {
-  s_st(Setup, property(gender, linst(Type, ID), Name))
-    : s_st(Setup, property(gender, linst(Type, ID), Name));
-  s_st(Setup, property(gender, linst(Type, ID), neuter))
+  sp_st(Setup, property(gender, inst(Type, ID), Name))
+    : sp_st(Setup, property(gender, inst(Type, ID), Name));
+  sp_st(Setup, property(gender, inst(Type, ID), neuter))
 } :-
-  s_st(Setup, linst(Type, ID)).
+  sp_st(Setup, inst(Type, ID)).
 
 1 = {
-  s_st(Setup, property(proper, linst(Type, ID), Det)) :
-    s_st(Setup, property(proper, linst(Type, ID), Det));
-  s_st(Setup, property(proper, linst(Type, ID), true))
+  sp_st(Setup, property(proper, inst(Type, ID), Det)) :
+    sp_st(Setup, property(proper, inst(Type, ID), Det));
+  sp_st(Setup, property(proper, inst(Type, ID), false))
 } :-
-  s_st(Setup, linst(Type, ID)).
+  sp_st(Setup, inst(Type, ID)).

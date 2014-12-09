@@ -1,32 +1,39 @@
-% merchants being robbed
+% innocents being threatened
 
-possible_setup(being_robbed).
+possible_setup(threatened_innocents).
 
-s_st(being_robbed, linst(item, goods)).
-s_st(being_robbed, property(name, linst(item, goods), "goods")).
+setup_argument_c(threatened_innocents, attacker, inst(actor, attacker)).
+setup_argument_c(threatened_innocents, victim, inst(actor, victim)).
+setup_argument_c(threatened_innocents, goods, inst(item, goods)).
+
+% The attacker:
+s_st(threatened_innocents, property(c(name), v(attacker), c("bandits"))).
+s_st(threatened_innocents, property(c(number), v(attacker), c(plural))).
+% default person/gender
+
+% The victim:
+s_st(threatened_innocents, property(c(name), v(victim), c("merchants"))).
+s_st(threatened_innocents, property(c(number), v(victim), c(plural))).
+% default person/gender
+
+% The victim owns some goods:
+s_st(threatened_innocents, property(c(name), v(goods), c("goods"))).
+s_st(threatened_innocents, property(c(number), v(goods), c(plural))).
 % default number/person/gender
-% TODO: give the goods to the merchants!
-s_st(
-  being_robbed,
-  relation(has_item, inst(actor, the_party), linst(item, goods))
-).
+s_st(threatened_innocents, relation(c(has_item), v(victim), v(goods))).
 
-s_st(being_robbed, linst(actor, bandits)).
-s_st(being_robbed, property(name, linst(actor, bandits), "bandits")).
-s_st(being_robbed, property(number, linst(actor, bandits), plural)).
-% default person/gender
+% The attacker is threatening the victim:
+s_st(threatened_innocents, relation(c(threatening), v(attacker), v(victim))).
 
-s_st(being_robbed, linst(actor, merchants)).
-s_st(being_robbed, property(name, linst(actor, merchants), "merchants")).
-s_st(being_robbed, property(number, linst(actor, merchants), plural)).
-% default person/gender
-
-s_st(
-  being_robbed,
-  relation(threatening, linst(actor, bandits), linst(actor,merchants))
-).
-
-s_intro_text(
-  being_robbed,
-  "N#the_party/they V#continue/prs/the_party on N#the_party/their journey, when N#the_party/they V#come/prs/the_party across N#bandits/them V#attack/prp/bandits N#merchants/them."
-).
+intro_text(
+  N,
+  threatened_innocents,
+  @fmt(
+    "N#the_party/they V#come/prs/the_party across N#{}/them V#attack/prp/{} N#{}/them.",
+    LAttk, LAttk, LVict
+  )
+) :-
+  at(N, setup_arg(attacker, inst(actor, LAttk))),
+  at(N, setup_arg(victim, inst(actor, LVict))),
+  setup(N, threatened_innocents),
+  story_op(N, initialize_node).
