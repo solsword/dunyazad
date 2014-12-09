@@ -22,11 +22,11 @@ intro_text(
   N,
   on_sale,
   @fmt(
-    "N#{}/they V#show/prs/{} up and V#offer/prs/{} V#trade/inf/{} N#{}/them.",
+    "N#{}/they V#show/prs/{} up and V#offer/prs/{} to V#trade/inf/{} N#{}/them.",
     LMcht, LMcht, LMcht, LMcht, LGds
   )
 ) :-
   at(N, setup_arg(merchant, inst(actor, LMcht))),
-  at(N, setup_arg(goods, inst(actor, LGds))),
+  at(N, setup_arg(goods, inst(item, LGds))),
   setup(N, on_sale),
   story_op(N, initialize_node).

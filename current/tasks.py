@@ -21,6 +21,7 @@ BASE_SOURCES = [
   "utils.lp",
   opj("story", "core.lp"),
   opj("story", "setup.lp"),
+  opj("story", "symbols.lp"),
   opj("story", "potential.lp"),
   opj("story", "grow.lp"),
   opj("story", "eval.lp"),
@@ -107,7 +108,7 @@ KEEP = {
     ),
 
   "intro_text":
-    PVr("intro_text", "intro_text", Vr("Node"), Vr("Text")),
+    PVr("intro_text", "intro_text", Vr("Node"), Vr("Setup"), Vr("Text")),
   "potential_text":
     PVr("potential_text", "potential_text", Vr("Node"), Vr("Text")),
   "option_text":

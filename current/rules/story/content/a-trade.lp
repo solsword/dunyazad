@@ -71,7 +71,7 @@ option_text(
   N,
   X,
   @fmt(
-    "N#{}/they offer N#{}/them to V#trade/inf/{} to trade N#{}/them for N#{}/them.",
+    "N#{}/they offer N#{}/them to V#trade/inf/{} N#{}/them for N#{}/them.",
     Buyer, Seller, Buyer, Price, Goods
   )
 ) :-
@@ -86,7 +86,7 @@ action_text(
   N,
   X,
   @fmt(
-    "N#{}/they and N#{}/them V#agree/prs/_plural to trade N#{}/them for N#{}/them.",
+    "N#{}/they and N#{}/them V#agree/prs/_plural to V#trade/inf/_plural N#{}/them for N#{}/them.",
     Buyer, Seller, Price, Goods
   )
 ) :-

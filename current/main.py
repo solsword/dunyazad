@@ -31,6 +31,7 @@ def main():
     os.mkdir("out")
   if not os.path.isdir(os.path.join("out", "snapshots")):
     os.mkdir(os.path.join("out", "snapshots"))
+  sofar = story
   while len(list(tasks.all_nodes(story))) < 12:
     n += 1
     try:
@@ -47,7 +48,7 @@ def main():
       )
       with open(CRASHFILE, 'w') as fout:
         fout.write(e.message)
-      exit(1)
+      break
 
     try:
       story = tasks.branch_random(story)
@@ -55,16 +56,18 @@ def main():
       print("Error during branching. Dumping source to '{}'".format(CRASHFILE))
       with open(CRASHFILE, 'w') as fout:
         fout.write(e.message)
-      exit(1)
+      break
+    sofar = story
+
 #  for pr in story:
 #    print(str(pr) + '.')
 #  nouns = english.glean_nouns(story)
 #  for k in nouns:
 #    print(nouns[k])
   with open(os.path.join("out", "story.txt"), 'w') as fout:
-    fout.write(english.build_story_text(story))
+    fout.write(english.build_story_text(sofar))
   with open(os.path.join("out", "facts.lp"), 'w') as fout:
-    for pr in story:
+    for pr in sofar:
       fout.write(str(pr) + '.\n')
 
 if __name__ == "__main__":

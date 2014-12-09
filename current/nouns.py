@@ -92,7 +92,16 @@ def pnslot(thing):
   Returns the pronouns slot that the given thing occupies.
   """
   lookup = (thing.person, thing.number, thing.gender, "any", "any")
-  return table_match(PRONOUNS, lookup)
+  result = table_match(PRONOUNS, lookup)
+  if result:
+    return result
+  else:
+    raise KeyError(
+      "Pronoun lookup failed for '{}'. No match for conditions: {}".format(
+        str(thing),
+        lookup
+      )
+    )
 
 def pronoun(thing, case = "subjective", position = "object"):
   """

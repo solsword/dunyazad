@@ -96,7 +96,7 @@ NOUN_SCHEMAS = {
 
 TEXT_SCHEMAS = {
   "intro_text":
-    PVr("txt", "intro_text", Vr("Node"), Vr("Text")),
+    PVr("txt", "intro_text", Vr("Node"), Vr("Setup"), Vr("Text")),
   "potential_text":
     PVr("txt", "potential_text", Vr("Node"), Vr("Text")),
   "option_text":
@@ -249,7 +249,7 @@ def build_text(template, ndict, pnslots=None, introduced=None):
           tense = TSABR[m.group(2)]
           agree = m.group(3)
           if agree == "_plural":
-            verbs.conjugation(verb, tense, "plural", "third")
+            add = verbs.conjugation(verb, tense, "plural", "third")
           else:
             add = verbs.conj_ref(ndict[agree], verb, tense)
         # if we matched a tag, don't bother checking the other tags:
@@ -362,7 +362,9 @@ def build_story_text(story, root=None):
       }
     txt = bnd["txt.Text"].unquoted()
     if sc == "intro_text":
-      node_templates[node]["intro"] = txt
+      if node_templates[node]["intro"]:
+        node_templates[node]["intro"] += " "
+      node_templates[node]["intro"] += txt
     elif sc == "potential_text":
       if node_templates[node]["situation"]:
         node_templates[node]["situation"] += " and "
