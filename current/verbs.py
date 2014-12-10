@@ -39,12 +39,10 @@ def add_ing(verb):
   else:
     return verb + "ing"
 
-CONJ_DEFAULTS = [
+FORM_DEFAULTS = [
   ("present", "singular", "first", base),
   ("present", "singular", "second", base),
   ("present", "singular", "third", add_s),
-
-  ("present", "plural", "any", base),
 
   ("past", "any", "any", add_ed),
 
@@ -81,12 +79,102 @@ IRREGULAR = {
     ("present", "singular", "third", "has"),
     ("past", "any", "any", "had"),
     ("past participle", "any", "any", "had"),
+  ],
+  "will": [
+    ("present", "any", "any", "will"),
+    ("past", "any", "any", "would"),
+    ("infinitive", "any", "any", None),
+    ("imperative", "any", "any", None),
+    ("present participle", "any", "any", None),
+    ("past participle", "any", "any", None),
   ]
 }
 
-def conjugation(verb, tns="present", nmbr="any", per="any"):
+TIMESHIFT = {
+  "present": {
+    "future": "future",
+    "past": "past",
+  },
+  "present continuous": {
+    "future": "future continuous",
+    "past": "past continuous",
+  },
+  "past": {
+    "future": "future perfect",
+    "past": "past perfect",
+  },
+  "past continuous": {
+    "future": "future perfect continuous",
+    "past": "past perfect continuous",
+  },
+  "future": {
+    "future": "future", # does this work?
+    "past": "past future", # TODO: I GIVE UP!
+  },
+  "future continuous": {
+    "future": "future continuous",
+    "past": "past future continuous",
+  },
+  "infinitive": {
+    "future": "infinitive",
+    "past": "infinitive",
+  },
+  "imperative": {
+    "future": "imperative",
+    "past": "imperative",
+  },
+  "imperative": {
+    "future": "imperative",
+    "past": "imperative",
+  },
+  "present perfect": {
+    "future": "future perfect",
+    "past": "past perfect",
+  },
+  "present perfect continuous": {
+    "future": "future perfect continuous",
+    "past": "past perfect continuous",
+  },
+  "past perfect": {
+    "future": "future perfect", # TODO: is this right? (and below)
+    "past": "past perfect",
+  },
+  "past perfect continuous": {
+    "future": "future perfect continuous",
+    "past": "past perfect continuous",
+  },
+  "future perfect": {
+    "future": "future perfect",
+    "past": "past future perfect",
+  },
+  "future perfect continuous": {
+    "future": "future perfect continuous",
+    "past": "past future perfect continuous",
+  },
+  # Made-up tenses:
+  "past future": {
+    "future": "ERROR: future past future",
+    "past": "ERROR: past past future",
+  },
+  "past future continuous": {
+    "future": "ERROR: future past future continuous",
+    "past": "ERROR: past past future continuous",
+  },
+  "past future perfect": {
+    "future": "ERROR: future past future perfect",
+    "past": "ERROR: past past future perfect",
+  },
+  "past future perfect continuous": {
+    "future": "ERROR: future past future perfect continuous",
+    "past": "ERROR: past past future perfect continuous",
+  },
+}
+
+CONJUGATION = {} # redefined later
+
+def verb_form(verb, tns="present", nmbr="any", per="any"):
   """
-  Figures out the conjugation of the given verb and returns it.
+  Figures out the form of the given verb and returns it.
   """
   lookup = (tns, nmbr, per)
   if verb in IRREGULAR:
@@ -94,11 +182,90 @@ def conjugation(verb, tns="present", nmbr="any", per="any"):
     if irr:
       return irr
     # else fall out:
-  return table_match(CONJ_DEFAULTS, lookup)(verb)
+  return table_match(FORM_DEFAULTS, lookup)(verb)
 
-def conj_ref(thing, verb, tns):
+def conjugation(verb, tns="present", nmbr="any", per="any", timeshift=None):
+  """
+  If "timeshift" is given it throws the verb into the appropriate relative
+  "future" or "past" tense.
+  """
+  if timeshift:
+    tns = TIMESHIFT[tns][timeshift]
+  return CONJUGATION[tns](verb, nmbr, per)
+
+def conj_ref(thing, verb, tns, timeshift=None):
   """
   Uses the given noun to help conjugate the given verb (but still needs a tense
   of course).
   """
-  return conjugation(verb, tns, thing.number, thing.person)
+  return conjugation(verb, tns, thing.number, thing.person, timeshift)
+
+CONJUGATION = {
+  "present":
+    lambda v, n, p: verb_form(v, "present", n, p),
+  "present continuous":
+    lambda v, n, p:
+      verb_form("be", "present", n, p) + " " +
+      verb_form(v, "present participle", n, p),
+  "past":
+    lambda v, n, p: verb_form(v, "past", n, p),
+  "past continuous":
+    lambda v, n, p:
+      verb_form("be", "past", n, p) + " " +
+      verb_form(v, "present participle", n, p),
+  "future":
+    lambda v, n, p:
+      verb_form("will", "present", n, p) + " " +
+      verb_form(v, "infinitive", n, p),
+  "future continuous":
+    lambda v, n, p:
+      conjugation("be", "future", n, p) + " " +
+      verb_form(v, "present participle", n, p),
+  "infinitive":
+    lambda v, n, p:
+      "to " + verb_form(v, "infinitive", n, p),
+  "imperative":
+    lambda v, n, p:
+      verb_form(v, "imperative", n, p),
+  "present perfect":
+    lambda v, n, p:
+      verb_form("have", "present", n, p) + " " +
+      verb_form(v, "past participle", n, p),
+  "present perfect continuous":
+    lambda v, n, p:
+      conjugation("be", "present perfect", n, p) + " " +
+      verb_form(v, "present participle", n, p),
+  "past perfect":
+    lambda v, n, p:
+      verb_form("have", "past", n, p) + " " +
+      verb_form(v, "past participle", n, p),
+  "past perfect continuous":
+    lambda v, n, p:
+      conjugation("be", "past perfect", n, p) + " " +
+      verb_form(v, "present participle", n, p),
+  "future perfect":
+    lambda v, n, p:
+      conjugation("have", "future", n, p) + " " +
+      verb_form(v, "past participle", n, p),
+  "future perfect continuous":
+    lambda v, n, p:
+      conjugation("be", "future perfect", n, p) + " " +
+      verb_form(v, "present participle", n, p),
+  # Some made-up tenses:
+  "past future":
+    lambda v, n, p:
+      verb_form("will", "past", n, p) + " " +
+      verb_form(v, "infinitive", n, p),
+  "past future continuous":
+    lambda v, n, p:
+      conjugation("be", "past future", n, p) + " " +
+      verb_form(v, "present participle", n, p),
+  "past future perfect":
+    lambda v, n, p:
+      conjugation("have", "past future", n, p) + " " +
+      verb_form(v, "past participle", n, p),
+  "past future perfect continuous":
+    lambda v, n, p:
+      conjugation("have", "past future perfect", n, p) + " " +
+      verb_form(v, "present participle", n, p),
+}

@@ -90,54 +90,34 @@ at(N, emphasizes(X, relation(threatening, Target, Someone))) :-
 option_text(
   N,
   X,
-  @fmt(
-    "N#{}/they V#attack/prs/{} N#{}/them.",
-    Aggr, Aggr, Trgt
-  )
+  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them.",
 ) :-
   at(N, action(X, attack)),
-  at(N, arg(X, aggressor, inst(T1, Aggr))),
-  at(N, arg(X, target, inst(T2, Trgt))),
   story_op(N, add_surface).
 
 action_text(
   N,
   X,
-  @fmt(
-    "N#{}/they V#attack/prs/{} and V#defeat/prs/{} N#{}/them.",
-    Aggr, Aggr, Aggr, Trgt
-  )
+  "N#:aggressor/they V#attack/prs/:aggressor and V#defeat/prs/:aggressor N#:target/them.",
 ) :-
   at(N, action(X, attack)),
-  at(N, arg(X, aggressor, inst(T1, Aggr))),
-  at(N, arg(X, target, inst(T2, Trgt))),
   at(N, outcome(X, victory)),
   story_op(N, add_surface).
 
 action_text(
   N,
   X,
-  @fmt(
-    "N#{}/they V#attack/prs/{} N#{}/them and V#fight/prs/{} to a standstill.",
-    Aggr, Aggr, Trgt, Aggr
-  )
+  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them and V#fight/prs/:aggressor to a standstill.",
 ) :-
   at(N, action(X, attack)),
-  at(N, arg(X, aggressor, inst(T1, Aggr))),
-  at(N, arg(X, target, inst(T2, Trgt))),
   at(N, outcome(X, parley)),
   story_op(N, add_surface).
 
 action_text(
   N,
   X,
-  @fmt(
-    "N#{}/they V#attack/prs/{} N#{}/them but V#be/prs/{} defeated.",
-    Aggr, Aggr, Trgt, Aggr
-  )
+  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them but V#be/prs/:aggressor defeated.",
 ) :-
   at(N, action(X, attack)),
-  at(N, arg(X, aggressor, inst(T1, Aggr))),
-  at(N, arg(X, target, inst(T2, Trgt))),
   at(N, outcome(X, defeat)),
   story_op(N, add_surface).

@@ -65,7 +65,7 @@ def main():
 #  for k in nouns:
 #    print(nouns[k])
   with open(os.path.join("out", "story.txt"), 'w') as fout:
-    fout.write(english.build_story_text(sofar))
+    fout.write(english.build_story_text(sofar, timeshift="past"))
   with open(os.path.join("out", "facts.lp"), 'w') as fout:
     for pr in sofar:
       fout.write(str(pr) + '.\n')

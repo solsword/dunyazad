@@ -5,6 +5,7 @@ Tools for NLG. Uses various sub-modules like nouns and verbs.
 
 import re
 import copy
+import random
 
 from utils import *
 
@@ -19,11 +20,13 @@ import verbs
 
 ANYTAG = re.compile(r"(\b[A-Z]#[a-z_0-9/]+\b)")
 
+SUBST_SPLIT = re.compile(r"(\b\[\[(?:[A-Z]*\|)?[a-z_/:?]+\]\]\b)")
+
+SUBST = re.compile(r"\b\[\[([A-Z]*|)?([a-z_/:?*]+)\]\]\b")
+
 TAGS = {
-  "noun": re.compile(r"\bN#([a-z_][a-z_0-9]*)/([a-z_]+)\b"),
-  "verb": re.compile(r"\bV#([a-z]+)/([a-z]+)/([a-z_][a-z_0-9]*)\b"),
-  #"pronoun": re.compile(r"\bP#[a-z]+/[a-z]+\b"),
-  #"determined": re.compile(r"\bT#[a-z]+\b"),
+  "noun": re.compile(r"\bN#(:?)([a-z_][a-z_0-9]*)/([a-z_]+)\b"),
+  "verb": re.compile(r"\bV#([a-z]+)/([a-z]+)/(:?)([a-z_][a-z_0-9]*)\b"),
 }
 
 TR_TYPE = {
@@ -183,11 +186,48 @@ def merge_txt_states(pilist):
     result_introduced &= introduced
   return result_pnslots, result_introduced
 
-def build_text(template, ndict, pnslots=None, introduced=None):
+def keymatch(test, key):
   """
-  Takes a text template and builds a filled-in string using the given nouns
-  along with pronoun and noun usage information. Returns a tuple of the
-  constructed string and the resulting pronoun slots and noun introduction.
+  Tests whether the given concrete key matches the given possibly variadic key.
+  """
+  tp = test.split('/')
+  kp = key.split('/')
+  if len(kp) > len(tp):
+    return False
+  for i, k in enumerate(kp):
+    if tp[i] != k and k != '?':
+      if i == len(kp) - 1 and k == '*':
+        continue
+      return False
+  if len(kp) < len(tp) and kp[-1] != '*':
+    return False
+  return True
+
+def subst_result(rules, key, flags):
+  """
+  Given a set of substitution rules, returns the substitution result for the
+  given key using the given flags.
+  """
+  matching_keys = [k for k in rules if keymatch(k, key)]
+  # TODO: better/controllable randomness?
+  result = rules[random.choice(matching_keys)]
+  if 'S' in flags:
+    result = sentence(result)
+
+def build_text(
+  template,
+  rules,
+  ndict,
+  pnslots=None,
+  introduced=None,
+  timeshift=None
+):
+  """
+  Takes a text template and builds a filled-in string using the given rules and
+  nouns along with pronoun and noun usage information. If a timeshift is given
+  it should be either "past" or "future" and it will be applied to all the
+  verbs in the text. Returns a tuple of the constructed string and the
+  resulting rules, pronoun slots, and noun introduction.
   """
   if pnslots == None:
     pnslots = {
@@ -205,6 +245,21 @@ def build_text(template, ndict, pnslots=None, introduced=None):
     introduced = set()
   else:
     introduced = set(introduced)
+  # First, recursively perform substitutions until we've reached a base text:
+  bits = re.split(SUBST_SPLIT, template)
+  while len(bits) > 1:
+    template = ""
+    for b in bits:
+      add = b
+      m = SUBST.fullmatch(b)
+      if m:
+        flags = m.group(1)[:-1] # take off the '|'
+        key = m.group(2)
+        add = subst_result(rules, key, flags)
+      template += add
+    # gather a new set of bits for substitution:
+    bits = re.split(SUBST, template)
+  # Next, fill in any tags:
   bits = re.split(ANYTAG, template)
   result = ""
   for b in bits:
@@ -249,9 +304,9 @@ def build_text(template, ndict, pnslots=None, introduced=None):
           tense = TSABR[m.group(2)]
           agree = m.group(3)
           if agree == "_plural":
-            add = verbs.conjugation(verb, tense, "plural", "third")
+            add = verbs.conjugation(verb, tense, "plural", "third", timeshift)
           else:
-            add = verbs.conj_ref(ndict[agree], verb, tense)
+            add = verbs.conj_ref(ndict[agree], verb, tense, timeshift)
         # if we matched a tag, don't bother checking the other tags:
         break
     result += add
@@ -280,11 +335,20 @@ def find_node_structure(story):
       result[to]["predecessors"].append(frm)
   return result
 
-def build_node_text(node, node_structure, nouns, pnslots, introduced):
+def build_node_text(
+  node,
+  node_structure,
+  nouns,
+  pnslots,
+  introduced,
+  timeshift=None
+):
   """
   Builds text for the given node (should be a dictionary from the
   node_templates map). Returns the resulting text and a dictionary mapping
-  options to their outgoing (pnslots, introduced) tuples.
+  options to their outgoing (pnslots, introduced) tuples. If a timeshift is
+  given, it should be either "past" or "future" and will be applied to all
+  verbs in the text generated.
   """
   outgoing = {}
   # TODO: A more rigorous capitalization approach.
@@ -292,14 +356,16 @@ def build_node_text(node, node_structure, nouns, pnslots, introduced):
     node["intro"],
     nouns,
     pnslots,
-    introduced
+    introduced,
+    timeshift
   )
   intro = intro.capitalize()
   situation, _pnslots, _introduced = build_text(
     node["situation"],
     nouns,
     _pnslots,
-    _introduced
+    _introduced,
+    timeshift
   )
   if situation:
     situation += "."
@@ -312,14 +378,16 @@ def build_node_text(node, node_structure, nouns, pnslots, introduced):
         node["options"][opt],
         nouns,
         _pnslots,
-        _introduced
+        _introduced,
+        timeshift
       )
       options += "  #{}\n".format(txt.capitalize())
       txt, pnout, intout = build_text(
         node["outcomes"][opt],
         nouns,
         pnout,
-        intout
+        intout,
+        timeshift
       )
       options += "    {}\n".format(txt.capitalize())
       successors = node_structure[node["name"]]["successors"]
@@ -344,7 +412,7 @@ def build_node_text(node, node_structure, nouns, pnslots, introduced):
 )
   return result, outgoing
 
-def build_story_text(story, root=None):
+def build_story_text(story, timeshift=None):
   node_templates = {}
 
   # First, build all of the templates for the entire story:
@@ -382,8 +450,8 @@ def build_story_text(story, root=None):
   node_structure = find_node_structure(story)
   base_pnslots = {
     "I": [0, set()],
-    "we": [0, set()],
-    "you": [0, { "the_party" }],
+    "we": [0, { "the_party" }],
+    "you": [0, set()],
     "he": [0, set()],
     "she": [0, set()],
     "it": [0, set()],
@@ -413,7 +481,8 @@ def build_story_text(story, root=None):
       node_structure,
       nouns,
       pnslots,
-      introduced
+      introduced,
+      timeshift
     )
     results.append(txt)
     # update our readiness information and propagate nodes to the open list as

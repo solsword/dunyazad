@@ -1,44 +1,58 @@
 % a thief steals an item
 
 %possible_setup(thief).
+
+%setup_argument_c(thief, perp, inst(actor, thief)).
+%setup_argument(thief, stolen, item).
+
+% TODO: This setup!
+
+%error("Thief stole wrong item.", N) :-
+%  at(N, setup_arg(stolen, Item)),
+%  X = {
+%    successor(Prev, Opt, N)
+%  },
+%  X > {
+%    st(Prev, relation(has_item, inst(actor, the_party), Item))
+%      : successor(Prev, Opt, N),
+%        not at(
+%          Prev,
+%          consequence(
+%            Opt,
+%            _not,
+%            relation(has_item, inst(actor, the_party), Item)
+%          )
+%        );
+%    at(Prev, consequence(Opt, relation(has_item, inst(actor, the_party), Item)))
+%      : successor(Prev, Opt, N);
+%  }.
 %
-%1 = {
-%  stolen(N, inst(item, Stolen))
-%    : st(N, inst(item Stolen)),
-%      st(N, relation(has_item, inst(actor, the_party), inst(item, Stolen)))
-%} :-
-%  setup(N, thief).
+%spontaneous(
+%  at(N, setup_arg(stolen, Item)),
+%  story_op(N, initialize_node).
 %
-%% TODO: This setup!!
-%
-%s_st(thief, relation(has_item, linst(actor, thief), Stolen)) :-
-%  setup(N, thief),
-%  stolen(N, Stolen).
-%
-%s_st(thief, linst(actor, bandits)).
-%s_st(thief, property(name, linst(actor, bandits), "bandits")).
-%s_st(thief, property(number, linst(actor, bandits), plural)).
-%% default person/gender
-%
-%s_st(thief, linst(actor, merchants)).
-%s_st(thief, property(name, linst(actor,merchants), "merchants")).
-%s_st(thief, property(number, linst(actor, merchants), plural)).
-%% default person/gender
-%
-%s_st(thief, linst(item, goods)).
-%s_st(thief, property(name, linst(item, goods), "goods")).
+%s_st(thief, property(c(name), v(monster), c("dragon"))).
 %% default number/person/gender
-%s_st(
-%  thief,
-%  relation(has_item, linst(actor, merchants), linst(item, goods))
-%).
+%s_st(monster_attack, state(c(unintelligent), v(monster))).
+%
+%s_st(monster_attack, property(c(name), v(trophy), c("dragon scale"))).
+%% default number/person/gender
+%s_st(monster_attack, relation(c(has_item), v(monster), v(trophy))).
 %
 %s_st(
-%  thief,
-%  relation(threatening, linst(actor, bandits), linst(actor,merchants))
+%  monster_attack,
+%  relation(c(threatening), v(monster), c(inst(actor, the_party)))
 %).
 %
-%s_intro_text(
-%  thief,
-%  "N#the_party/they V#continue/prs/the_party on N#the_party/their journey, when N#the_party/they V#come/prs/the_party across N#bandits/them V#attack/prp/bandits N#merchants/them."
-%).
+%intro_text(
+%  N,
+%  monster_attack,
+%  @fmt(
+%    "Suddenly N#{}/they V#swoop/prs/{} down from the skies, clearly intent on V#attack/prp/{} N#the_party/them.",
+%    LMonst, LMonst, LMonst
+%  )
+%) :-
+%  at(N, setup_arg(monster, inst(actor, LMonst))),
+%  st(N, property(name, inst(actor, LMonst), "dragon")),
+%  setup(N, monster_attack),
+%  story_op(N, initialize_node).

@@ -9,22 +9,27 @@ initiator(pay_off, asking).
 outcome(pay_off, deal).
 outcome(pay_off, no_deal).
 
-error(m("Bargain without price.", N, X, Asking, Price)) :-
+error(m("Pay off without price.", N, X)) :-
   at(N, action(X, pay_off)),
   at(N, arg(X, asking, Asking)),
   at(N, arg(X, price, Price)),
-  0 = {
-    st(N, relation(has_item, Asking, Price))
-  },
+  not st(N, relation(has_item, Asking, Price)),
   story_op(N, build_options).
 
-error(m("Unintelligent bargainer.", N, X, Asking)) :-
+error(m("Price is not a treasure.", N, X)) :-
+  at(N, action(X, pay_off)),
+  at(N, arg(X, asking, Asking)),
+  at(N, arg(X, price, Price)),
+  not st(N, property(type, Price, treasure)),
+  story_op(N, build_options).
+
+error(m("Unintelligent bargainer.", N, X)) :-
   at(N, action(X, pay_off)),
   at(N, arg(X, asking, Asking)),
   st(N, state(unintelligent, Asking)),
   story_op(N, build_options).
 
-error(m("Unintelligent listener.", N, X, Listening)) :-
+error(m("Unintelligent listener.", N, X)) :-
   at(N, action(X, pay_off)),
   at(N, arg(X, listening, Listening)),
   st(N, state(unintelligent, Listening)),

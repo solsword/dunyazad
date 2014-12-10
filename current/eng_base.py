@@ -32,3 +32,10 @@ def table_match(table, search):
     ):
       return entry[-1]
   return None
+
+def sentence(result):
+  if result[0].islower():
+    result = result[0].capitalize() + result[1:]
+  if result[-1] != '.':
+    result = result + '.'
+

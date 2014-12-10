@@ -3,6 +3,8 @@ core="
 core.lp
 setup.lp
 symbols.lp
+the_party.lp
+skills.lp
 potential.lp
 grow.lp
 eval.lp

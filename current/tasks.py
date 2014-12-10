@@ -22,6 +22,8 @@ BASE_SOURCES = [
   opj("story", "core.lp"),
   opj("story", "setup.lp"),
   opj("story", "symbols.lp"),
+  opj("story", "the_party.lp"),
+  opj("story", "skills.lp"),
   opj("story", "potential.lp"),
   opj("story", "grow.lp"),
   opj("story", "eval.lp"),
@@ -76,6 +78,7 @@ KEEP = {
   "st": PVr("st", "st", Vr("Node"), SbT("Fluent")),
 
   "story_node": PVr("story_node", "story_node", Vr("Node")),
+  "story_root": PVr("story_root", "story_root", Vr("Node")),
   "node_type": PVr("node_type", "node_type", Vr("Node"), Vr("Type")),
   "node_status_reached":
     PVr("node_status_reached", "node_status_reached", Vr("Node"), Vr("Status")),

@@ -240,7 +240,8 @@ error(m("New node lost a state", New, State)) :-
   st(Old, State),
   0 = {
     st(New, State);
-    at(Old, consequence(Opt, _not, State))
+    at(Old, consequence(Opt, _not, State));
+    spontaneous(_not, st(New, State))
   }.
 
 
@@ -297,5 +298,6 @@ state_mismatch(Prev, option(Opt), New) :-
   st(Prev, State),
   0 = {
     st(New, State);
-    at(Prev, consequence(option(Opt), _not, State))
+    at(Prev, consequence(option(Opt), _not, State));
+    spontaneous(_not, st(New, State))
   }.
