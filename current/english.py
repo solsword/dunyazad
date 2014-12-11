@@ -6,6 +6,7 @@ Tools for NLG. Uses various sub-modules like nouns and verbs.
 import re
 import copy
 import random
+import os
 
 from utils import *
 
@@ -18,15 +19,23 @@ from eng_base import *
 import nouns
 import verbs
 
-ANYTAG = re.compile(r"(\b[A-Z]#[a-z_0-9/]+\b)")
+STATIC_RULES_DIR = "surface"
 
-SUBST_SPLIT = re.compile(r"(\b\[\[(?:[A-Z]*\|)?[a-z_/:?]+\]\]\b)")
+STATIC_RULES_SOURCES = list(
+  walk_files(STATIC_RULES_DIR, lambda f: f.endswith(".rls"))
+)
 
-SUBST = re.compile(r"\b\[\[([A-Z]*|)?([a-z_/:?*]+)\]\]\b")
+VAR = re.compile(r"\b(?[a-z_]+)\b")
+
+SUBST_SPLIT = re.compile(r"(\b\[\[(?:[A-Z]*\|)?[a-z_?*/]+\]\]\b)")
+
+SUBST = re.compile(r"\b\[\[([A-Z]*|)?([a-z_?*/]+)\]\]\b")
+
+ANYTAG = re.compile(r"(\b[A-Z]#[a-z_0-9/?]+\b)")
 
 TAGS = {
-  "noun": re.compile(r"\bN#(:?)([a-z_][a-z_0-9]*)/([a-z_]+)\b"),
-  "verb": re.compile(r"\bV#([a-z]+)/([a-z]+)/(:?)([a-z_][a-z_0-9]*)\b"),
+  "noun": re.compile(r"\bN#(\??)([a-z_][a-z_0-9]*)/([a-z_]+)\b"),
+  "verb": re.compile(r"\bV#([a-z]+)/([a-z]+)/(\??)([a-z_][a-z_0-9]*)\b"),
 }
 
 TR_TYPE = {
@@ -97,6 +106,36 @@ NOUN_SCHEMAS = {
     ),
 }
 
+STRUCTURE_SCHEMAS = {
+  "action":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr("action", Pr("option", Vr("Option")), Vr("Action"))
+    ),
+  "initiator":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr("initiator", Pr("option", Vr("Option")), Vr("Initiator")))
+    ),
+  "arg":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr("arg", Pr("option", Vr("Option")), Vr("Arg"), Vr("Value"))
+    ),
+  "setup": Pr("setup", Vr("Node"), Vr("Setup")),
+  "setup_arg":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr("setup_arg", Vr("Arg"), Vr("Value"))
+    ),
+}
+
+INSTANCE_SCHEMA = Pr("inst", Vr("Type"), Vr("Key"))
+
 TEXT_SCHEMAS = {
   "intro_text":
     PVr("txt", "intro_text", Vr("Node"), Vr("Setup"), Vr("Text")),
@@ -139,6 +178,9 @@ def conjugation_table(verb):
   return result
 
 def glean_nouns(story):
+  """
+  Takes a story and builds a nouns dictionary from the nouns it finds therein.
+  """
   result = {}
   for sc, binding in ans.bindings(NOUN_SCHEMAS, story):
     n = binding["st.property.inst.Key"].unquoted()
@@ -156,6 +198,138 @@ def glean_nouns(story):
     elif sc == "determined":
       d = binding["st.property.Determination"].unquoted()
       result[n].determined = d == "true"
+  return result
+
+def glean_context_variables(story):
+  """
+  Takes a story and builds a variables dictionary that maps node/option pairs
+  to variable mappings at that point in the story. Variables include:
+
+    '_action' - the name of the action
+    '_initiator' -  the initiator of the action
+    - all action arguments by name
+
+  Setups also get their own entries under node/'setup' for nodes that have a
+  setup. These include:
+
+    '_setup' - the name of the setup
+    - all setup arguments by name
+  """
+  result = {}
+  for sc, binding in ans.bindings(STRUCTURE_SCHEMAS, story):
+    if sc == "action":
+      n = str(binding["at.Node"])
+      o = str(binding["at.action.option.Option"])
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+
+      a = str(binding["at.action.Action"])
+      result[n][o]["_action"] = a
+
+    elif sc == "initiator":
+      n = str(binding["at.Node"])
+      o = str(binding["at.initiator.option.Option"])
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+
+      ipr = binding["at.initiator.Initiator"]
+      sb = ans.bind(INSTANCE_SCHEMA, ipr)
+      if sb:
+        i = str(sb["inst.Key"])
+      i = "unknown"
+      result[n][o]["_initiator"] = i
+
+    elif sc == "arg":
+      n = str(binding["at.Node"])
+      o = str(binding["at.arg.option.Option"])
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+
+      a = str(binding["at.arg.Arg"])
+      vpr = binding["at.arg.Value"]
+      sb = ans.bind(INSTANCE_SCHEMA, vpr)
+      if sb:
+        v = str(sb["inst.Key"])
+      else:
+        v = str(vpr)
+      result[n][o][a] = v
+
+    elif sc == "setup":
+      n = str(binding["setup.Node"])
+      if n not in result:
+        result[n] = {}
+      if "setup" not in result[n]:
+        result[n]["setup"] = {}
+
+      s = str(binding["setup.Setup"])
+      result[n]["setup"]["_setup"] = s
+
+    elif sc == "setup_arg":
+      n = str(binding["at.Node"])
+      if n not in result:
+        result[n] = {}
+      if "setup" not in result[n]:
+        result[n]["setup"] = {}
+
+      a = str(binding["at.setup_arg.Arg"])
+      vpr = binding["at.setup_arg.Value"]
+      sb = ans.bind(INSTANCE_SCHEMA, vpr)
+      if sb:
+        v = str(sb["inst.Key"])
+      else:
+        v = str(vpr)
+      result[n]["setup"][a] = v
+  return result
+  # TODO: HERE! Thread this info through and use it!
+
+def collate_rules(story):
+  """
+  Takes a complete story and collates a full set of grammar rules for use in
+  build_text.
+  """
+  result = {}
+  for f in STATIC_RULES_SOURCES:
+    with open(f, 'r') as fin:
+      key = None
+      mode = "lines"
+      para = ""
+      for ln, line in enumerate(fin.readlines()):
+        if mode == "lines":
+          if line.strip()[0] == "%":
+            continue
+          if line[0] == ":":
+            key = line[1:]
+            if key not in rules:
+              rules[key] = []
+            mode = "lines"
+          elif line[0] == ">"
+            key = line[1:]
+            mode = "paragraph"
+            para = ""
+          elif key and line.strip():
+            rules[key].append(line[:-1]) # get rid of the newline
+          elif key == None and line.strip():
+            raise ValueError(
+              "{}:{} - Rule product has no key.".format(f,ln)
+            )
+        elif mode == "paragraph":
+          if line == "<":
+            rules[key].append(para)
+            key = None
+            mode = "lines"
+          else:
+            para += line
+      if mode == "paragraph" and key != None:
+        raise ValueError(
+          "{} - Unterminated paragraph entry for key '{}'.".format(f, key)
+        )
+  # TODO: dynamic rules like aspects!
   return result
 
 def merge_pnslots(pns1, pns2):
@@ -214,20 +388,54 @@ def subst_result(rules, key, flags):
   if 'S' in flags:
     result = sentence(result)
 
+def subst_vars(text, args):
+  """
+  Given a text with some variable substitutions to be made returns the result
+  text after all argument substitutions.
+  """
+  result = ""
+  bits = re.split(VAR, text)
+  for b in bits:
+    add = b
+    m = VAR.fullmatch(b)
+    if m:
+      var = m.group(1)[1:] # take off the initial '?'
+      add = subst_result(rules, key, flags)
+    result += add
+  return result
+
+def subst_rules(text, rules):
+  """
+  Works like subst_args but does (one round of) rules substitutions instead of
+  doing variable substitutions.
+  """
+  result = ""
+  bits = re.split(SUBST, text)
+  for b in bits:
+    add = b
+    m = SUBST.fullmatch(b)
+    if m:
+      flags = m.group(1)[:-1] # take off the '|'
+      key = m.group(2)
+      add = subst_result(rules, key, flags)
+    result += add
+  return result
+
 def build_text(
   template,
   rules,
+  vars,
   ndict,
   pnslots=None,
   introduced=None,
   timeshift=None
 ):
   """
-  Takes a text template and builds a filled-in string using the given rules and
-  nouns along with pronoun and noun usage information. If a timeshift is given
-  it should be either "past" or "future" and it will be applied to all the
-  verbs in the text. Returns a tuple of the constructed string and the
-  resulting rules, pronoun slots, and noun introduction.
+  Takes a text template and builds a filled-in string using the given rules,
+  variables, and nouns along with pronoun and noun usage information. If a
+  timeshift is given it should be either "past" or "future" and it will be
+  applied to all the verbs in the text. Returns a tuple of the constructed
+  string and the resulting rules, pronoun slots, and noun introduction.
   """
   if pnslots == None:
     pnslots = {
@@ -245,20 +453,13 @@ def build_text(
     introduced = set()
   else:
     introduced = set(introduced)
-  # First, recursively perform substitutions until we've reached a base text:
+  # First, repeatedly perform variable and rule substitutions until we've
+  # reached a base text:
   bits = re.split(SUBST_SPLIT, template)
-  while len(bits) > 1:
-    template = ""
-    for b in bits:
-      add = b
-      m = SUBST.fullmatch(b)
-      if m:
-        flags = m.group(1)[:-1] # take off the '|'
-        key = m.group(2)
-        add = subst_result(rules, key, flags)
-      template += add
-    # gather a new set of bits for substitution:
-    bits = re.split(SUBST, template)
+  template = subst_vars(template, vars)
+  while re.find(SUBST, template):
+    template = subst_rules(template, rules)
+    template = subst_vars(template, vars)
   # Next, fill in any tags:
   bits = re.split(ANYTAG, template)
   result = ""
@@ -394,7 +595,7 @@ def build_node_text(
       if opt in successors:
         scc = successors[opt]
         outgoing[scc] = (pnout, intout)
-        options += "    *goto {}\n".format(scc.replace(":", "_"))
+        options += "    *goto {}\n".format(scc)
       else:
         options += "    *finish\n"
   else:
@@ -405,7 +606,7 @@ def build_node_text(
 {situation}
 {options}
 """.format(
-  label=node["name"].replace(":", "_"),
+  label=node["name"],
   intro=intro,
   situation=situation,
   options=options
