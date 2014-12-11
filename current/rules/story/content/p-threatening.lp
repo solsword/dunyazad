@@ -7,7 +7,7 @@ potential(problem, relation, threatening).
 potential_text(
   N,
   @fmt(
-    "N#{}/they V#be/prs/{} V#threaten/prp/{} N#{}/them",
+    "N#{}/they V#threaten/prsc/{} N#{}/them",
     Threatening, Threatening, Threatening, Threatened
   )
 ) :-

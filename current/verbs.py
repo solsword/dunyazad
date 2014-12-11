@@ -99,6 +99,10 @@ TIMESHIFT = {
     "future": "future continuous",
     "past": "past continuous",
   },
+  "present participle": {
+    "future": "present participle", # TODO: is this correct?
+    "past": "present participle",
+  },
   "past": {
     "future": "future perfect",
     "past": "past perfect",
@@ -107,6 +111,10 @@ TIMESHIFT = {
     "future": "future perfect continuous",
     "past": "past perfect continuous",
   },
+  "past participle": {
+    "future": "past participle", # TODO: is this correct?
+    "past": "past participle",
+  },
   "future": {
     "future": "future", # does this work?
     "past": "past future", # TODO: I GIVE UP!
@@ -114,6 +122,10 @@ TIMESHIFT = {
   "future continuous": {
     "future": "future continuous",
     "past": "past future continuous",
+  },
+  "raw infinitive": {
+    "future": "raw infinitive",
+    "past": "raw infinitive",
   },
   "infinitive": {
     "future": "infinitive",
@@ -207,12 +219,18 @@ CONJUGATION = {
     lambda v, n, p:
       verb_form("be", "present", n, p) + " " +
       verb_form(v, "present participle", n, p),
+  "present participle":
+    lambda v, n, p:
+      verb_form(v, "present participle", n, p),
   "past":
     lambda v, n, p: verb_form(v, "past", n, p),
   "past continuous":
     lambda v, n, p:
       verb_form("be", "past", n, p) + " " +
       verb_form(v, "present participle", n, p),
+  "past participle":
+    lambda v, n, p:
+      verb_form(v, "past participle", n, p),
   "future":
     lambda v, n, p:
       verb_form("will", "present", n, p) + " " +
@@ -221,6 +239,9 @@ CONJUGATION = {
     lambda v, n, p:
       conjugation("be", "future", n, p) + " " +
       verb_form(v, "present participle", n, p),
+  "raw infinitive":
+    lambda v, n, p:
+      verb_form(v, "infinitive", n, p),
   "infinitive":
     lambda v, n, p:
       "to " + verb_form(v, "infinitive", n, p),

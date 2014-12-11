@@ -56,19 +56,19 @@ at(N, consequence(X, _not, relation(Rel, Inst, Other))) :-
 % Surface details
 % ---------------
 
-option_text(N, X, @fmt("N#{}/they V#travel/prs/{} onwards.", Subj, Subj)) :-
-  at(N, action(X, travel_onwards)),
-  at(N, arg(X, subject, inst(T1, Subj))),
-  story_op(N, add_surface).
-
-action_text(
-  N,
-  X,
-  @fmt(
-    "N#{}/they V#continue/prs/{} N#{}/their journey.",
-    Subj, Subj, Subj
-  )
-) :-
-  at(N, action(X, travel_onwards)),
-  at(N, arg(X, subject, inst(T1, Subj))),
-  story_op(N, add_surface).
+%option_text(N, X, @fmt("N#{}/they V#travel/prs/{} onwards.", Subj, Subj)) :-
+%  at(N, action(X, travel_onwards)),
+%  at(N, arg(X, subject, inst(T1, Subj))),
+%  story_op(N, add_surface).
+%
+%action_text(
+%  N,
+%  X,
+%  @fmt(
+%    "N#{}/they V#continue/prs/{} N#{}/their journey.",
+%    Subj, Subj, Subj
+%  )
+%) :-
+%  at(N, action(X, travel_onwards)),
+%  at(N, arg(X, subject, inst(T1, Subj))),
+%  story_op(N, add_surface).

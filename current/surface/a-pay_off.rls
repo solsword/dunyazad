@@ -1,0 +1,12 @@
+% Action - pay_off
+
+:action/pay_off/option
+N#?asking/they V#offer/prs/?asking N#?listening/them N#?price/them
+
+:action/pay_off/outcome/deal
+N#?asking/they V#bargain/prs/?asking with N#?listening/them and V#reach/prs/?asking a deal
+
+:action/pay_off/outcome/no_deal
+N#?asking/they V#bargain/prs/?asking with N#?listening/them, but V#can/prs/?asking not seem to V#reach/rinf/?asking a deal
+
+% TODO: More here!

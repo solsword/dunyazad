@@ -22,7 +22,7 @@ intro_text(
   N,
   on_sale,
   @fmt(
-    "N#{}/they V#show/prs/{} up and V#offer/prs/{} to V#trade/inf/{} N#{}/them.",
+    "N#{}/they V#show/prs/{} up and V#offer/prs/{} V#trade/inf/{} N#{}/them.",
     LMcht, LMcht, LMcht, LMcht, LGds
   )
 ) :-

@@ -7,7 +7,7 @@ potential(opportunity, relation, selling).
 potential_text(
   N,
   @fmt(
-    "N#{}/they V#be/prs/{} V#sell/prp/{} N#{}/them",
+    "N#{}/they V#sell/prsc/{} N#{}/them",
     Merchant, Merchant, Merchant, Goods
   )
 ) :-

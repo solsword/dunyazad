@@ -1,0 +1,12 @@
+% Action - flee
+
+:action/flee/option
+N#?fearful/they V#flee/prs/?fearful from N#?from/them
+
+:action/flee/outcome/escape
+N#?fearful/they V#flee/prs/?fearful from N#?from/them and V#escape/prs/?fearful
+
+:action/flee/outcome/failure
+N#?fearful/they V#flee/prs/?fearful from N#?from/them but V#can/prs/?fearful not V#escape/rinf/?fearful
+
+% TODO: More here!

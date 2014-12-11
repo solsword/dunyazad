@@ -67,49 +67,49 @@ at(N, deals_with(X, relation(selling, Merchant, Goods))) :-
 % Surface details
 % ---------------
 
-option_text(
-  N,
-  X,
-  @fmt(
-    "N#{}/they offer N#{}/them to V#trade/inf/{} N#{}/them for N#{}/them.",
-    Buyer, Seller, Buyer, Price, Goods
-  )
-) :-
-  at(N, action(X, trade)),
-  at(N, arg(X, buyer, inst(T1, Buyer))),
-  at(N, arg(X, seller, inst(T3, Seller))),
-  at(N, arg(X, price, inst(T2, Price))),
-  at(N, arg(X, goods, inst(T4, Goods))),
-  story_op(N, add_surface).
-
-action_text(
-  N,
-  X,
-  @fmt(
-    "N#{}/they and N#{}/them V#agree/prs/_plural to V#trade/inf/_plural N#{}/them for N#{}/them.",
-    Buyer, Seller, Price, Goods
-  )
-) :-
-  at(N, action(X, trade)),
-  at(N, arg(X, buyer, inst(T1, Buyer))),
-  at(N, arg(X, seller, inst(T3, Seller))),
-  at(N, arg(X, price, inst(T2, Price))),
-  at(N, arg(X, goods, inst(T4, Goods))),
-  at(N, outcome(X, deal)),
-  story_op(N, add_surface).
-
-action_text(
-  N,
-  X,
-  @fmt(
-    "N#{}/they and N#{}/them V#haggle/prs/_plural over N#{}/them and N#{}/them, but cannot V#agree/prs/_plural to the trade.",
-    Buyer, Seller, Price, Goods
-  )
-) :-
-  at(N, action(X, trade)),
-  at(N, arg(X, buyer, inst(T1, Buyer))),
-  at(N, arg(X, seller, inst(T3, Seller))),
-  at(N, arg(X, price, inst(T2, Price))),
-  at(N, arg(X, goods, inst(T4, Goods))),
-  at(N, outcome(X, no_deal)),
-  story_op(N, add_surface).
+%option_text(
+%  N,
+%  X,
+%  @fmt(
+%    "N#{}/they offer N#{}/them to V#trade/inf/{} N#{}/them for N#{}/them.",
+%    Buyer, Seller, Buyer, Price, Goods
+%  )
+%) :-
+%  at(N, action(X, trade)),
+%  at(N, arg(X, buyer, inst(T1, Buyer))),
+%  at(N, arg(X, seller, inst(T3, Seller))),
+%  at(N, arg(X, price, inst(T2, Price))),
+%  at(N, arg(X, goods, inst(T4, Goods))),
+%  story_op(N, add_surface).
+%
+%action_text(
+%  N,
+%  X,
+%  @fmt(
+%    "N#{}/they and N#{}/them V#agree/prs/_plural to V#trade/inf/_plural N#{}/them for N#{}/them.",
+%    Buyer, Seller, Price, Goods
+%  )
+%) :-
+%  at(N, action(X, trade)),
+%  at(N, arg(X, buyer, inst(T1, Buyer))),
+%  at(N, arg(X, seller, inst(T3, Seller))),
+%  at(N, arg(X, price, inst(T2, Price))),
+%  at(N, arg(X, goods, inst(T4, Goods))),
+%  at(N, outcome(X, deal)),
+%  story_op(N, add_surface).
+%
+%action_text(
+%  N,
+%  X,
+%  @fmt(
+%    "N#{}/they and N#{}/them V#haggle/prs/_plural over N#{}/them and N#{}/them, but cannot V#agree/prs/_plural to the trade.",
+%    Buyer, Seller, Price, Goods
+%  )
+%) :-
+%  at(N, action(X, trade)),
+%  at(N, arg(X, buyer, inst(T1, Buyer))),
+%  at(N, arg(X, seller, inst(T3, Seller))),
+%  at(N, arg(X, price, inst(T2, Price))),
+%  at(N, arg(X, goods, inst(T4, Goods))),
+%  at(N, outcome(X, no_deal)),
+%  story_op(N, add_surface).

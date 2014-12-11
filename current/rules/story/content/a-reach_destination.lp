@@ -3,7 +3,7 @@ action(reach_destination).
 
 argument(reach_destination, subject, actor).
 
-outcome(reach_destination, onwards).
+outcome(reach_destination, journey_over).
 
 % The argument of reach_destination is fixed:
 
@@ -30,26 +30,26 @@ at(N, nullifies(X, Pt)) :-
 % Surface details
 % ---------------
 
-option_text(
-  N,
-  X,
-  @fmt(
-    "N#{}/they V#reach/prs/{} N#{}/their destination.",
-    Subj, Subj, Subj
-  )
-) :-
-  at(N, action(X, travel_onwards)),
-  at(N, arg(X, subject, inst(T1, Subj))),
-  story_op(N, add_surface).
-
-action_text(
-  N,
-  X,
-  @fmt(
-    "N#{}/they finally V#reach/prs/{} N#{}/their destination. All is well.",
-    Subj, Subj, Subj
-  )
-) :-
-  at(N, action(X, travel_onwards)),
-  at(N, arg(X, subject, inst(T1, Subj))),
-  story_op(N, add_surface).
+%option_text(
+%  N,
+%  X,
+%  @fmt(
+%    "N#{}/they V#reach/prs/{} N#{}/their destination.",
+%    Subj, Subj, Subj
+%  )
+%) :-
+%  at(N, action(X, reach_destination)),
+%  at(N, arg(X, subject, inst(T1, Subj))),
+%  story_op(N, add_surface).
+%
+%action_text(
+%  N,
+%  X,
+%  @fmt(
+%    "N#{}/they finally V#reach/prs/{} N#{}/their destination. All is well.",
+%    Subj, Subj, Subj
+%  )
+%) :-
+%  at(N, action(X, reach_destination)),
+%  at(N, arg(X, subject, inst(T1, Subj))),
+%  story_op(N, add_surface).

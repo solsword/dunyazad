@@ -54,43 +54,43 @@ at(N, consequence(X, relation(threatening, Aggressive, Pacifier))) :-
 % Surface details
 % ---------------
 
-option_text(
-  N,
-  X,
-  @fmt(
-    "N#{}/they V#pacify/prs/{} N#{}/them.",
-    Pac, Pac, Aggr
-  )
-) :-
-  at(N, action(X, pacify)),
-  at(N, arg(X, pacifier, inst(T1, Pac))),
-  at(N, arg(X, aggressive, inst(T2, Aggr))),
-  story_op(N, add_surface).
-
-action_text(
-  N,
-  X,
-  @fmt(
-    "N#{}/they V#pacify/prs/{} N#{}/them, and N#{}/they V#become/prs/{} calm.",
-    Pac, Pac, Aggr, Aggr, Aggr
-  )
-) :-
-  at(N, action(X, pacify)),
-  at(N, arg(X, pacifier, inst(T1, Pac))),
-  at(N, arg(X, aggressive, inst(T2, Aggr))),
-  at(N, outcome(X, pacified)),
-  story_op(N, add_surface).
-
-action_text(
-  N,
-  X,
-  @fmt(
-    "N#{}/they V#pacify/prs/{} N#{}/them, but N#{}/they V#become/prs/{} enraged.",
-    Pac, Pac, Aggr, Aggr, Aggr
-  )
-) :-
-  at(N, action(X, pacify)),
-  at(N, arg(X, pacifier, inst(T1, Pac))),
-  at(N, arg(X, aggressive, inst(T2, Aggr))),
-  at(N, outcome(X, enraged)),
-  story_op(N, add_surface).
+%option_text(
+%  N,
+%  X,
+%  @fmt(
+%    "N#{}/they V#pacify/prs/{} N#{}/them.",
+%    Pac, Pac, Aggr
+%  )
+%) :-
+%  at(N, action(X, pacify)),
+%  at(N, arg(X, pacifier, inst(T1, Pac))),
+%  at(N, arg(X, aggressive, inst(T2, Aggr))),
+%  story_op(N, add_surface).
+%
+%action_text(
+%  N,
+%  X,
+%  @fmt(
+%    "N#{}/they V#pacify/prs/{} N#{}/them, and N#{}/they V#become/prs/{} calm.",
+%    Pac, Pac, Aggr, Aggr, Aggr
+%  )
+%) :-
+%  at(N, action(X, pacify)),
+%  at(N, arg(X, pacifier, inst(T1, Pac))),
+%  at(N, arg(X, aggressive, inst(T2, Aggr))),
+%  at(N, outcome(X, pacified)),
+%  story_op(N, add_surface).
+%
+%action_text(
+%  N,
+%  X,
+%  @fmt(
+%    "N#{}/they V#pacify/prs/{} N#{}/them, but N#{}/they V#become/prs/{} enraged.",
+%    Pac, Pac, Aggr, Aggr, Aggr
+%  )
+%) :-
+%  at(N, action(X, pacify)),
+%  at(N, arg(X, pacifier, inst(T1, Pac))),
+%  at(N, arg(X, aggressive, inst(T2, Aggr))),
+%  at(N, outcome(X, enraged)),
+%  story_op(N, add_surface).

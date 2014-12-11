@@ -25,7 +25,7 @@ STATIC_RULES_SOURCES = list(
   walk_files(STATIC_RULES_DIR, lambda f: f.endswith(".rls"))
 )
 
-VAR = re.compile(r"\b(?[a-z_]+)\b")
+VAR = re.compile(r"\b(\?[a-z_]+)\b")
 
 SUBST_SPLIT = re.compile(r"(\b\[\[(?:[A-Z]*\|)?[a-z_?*/]+\]\]\b)")
 
@@ -34,8 +34,8 @@ SUBST = re.compile(r"\b\[\[([A-Z]*|)?([a-z_?*/]+)\]\]\b")
 ANYTAG = re.compile(r"(\b[A-Z]#[a-z_0-9/?]+\b)")
 
 TAGS = {
-  "noun": re.compile(r"\bN#(\??)([a-z_][a-z_0-9]*)/([a-z_]+)\b"),
-  "verb": re.compile(r"\bV#([a-z]+)/([a-z]+)/(\??)([a-z_][a-z_0-9]*)\b"),
+  "noun": re.compile(r"\bN#(\??[a-z_][a-z_0-9]*)/([a-z_]+)\b"),
+  "verb": re.compile(r"\bV#([a-z]+)/([a-z]+)/(\??[a-z_][a-z_0-9]*)\b"),
 }
 
 TR_TYPE = {
@@ -46,11 +46,22 @@ TR_TYPE = {
 
 TSABR = {
   "prs": "present",
+  "prsc": "present continuous",
   "pst": "past",
+  "pstc": "past continuous",
+  "ftr": "future",
+  "ftrc": "future continuous",
+  "rinf": "raw infinitive",
   "inf": "infinitive",
   "imp": "imperative",
+  "prsp": "present perfect",
+  "prspc": "present perfect continuous",
+  "pstp": "past perfect",
+  "pstpc": "past perfect continuous",
+  "ftrp": "future perfect",
+  "ftrpc": "future perfect continuous",
   "prp": "present participle",
-  "psp": "past participle",
+  "psp": "present participle",
 }
 
 NOUN_SCHEMAS = {
@@ -113,11 +124,17 @@ STRUCTURE_SCHEMAS = {
       Vr("Node"),
       Pr("action", Pr("option", Vr("Option")), Vr("Action"))
     ),
+  "outcome":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr("outcome", Pr("option", Vr("Option")), Vr("Outcome"))
+    ),
   "initiator":
     Pr(
       "at",
       Vr("Node"),
-      Pr("initiator", Pr("option", Vr("Option")), Vr("Initiator")))
+      Pr("initiator", Pr("option", Vr("Option")), Vr("Initiator"))
     ),
   "arg":
     Pr(
@@ -206,6 +223,7 @@ def glean_context_variables(story):
   to variable mappings at that point in the story. Variables include:
 
     '_action' - the name of the action
+    '_outcome' - the outcome of the action
     '_initiator' -  the initiator of the action
     - all action arguments by name
 
@@ -218,19 +236,32 @@ def glean_context_variables(story):
   result = {}
   for sc, binding in ans.bindings(STRUCTURE_SCHEMAS, story):
     if sc == "action":
-      n = str(binding["at.Node"])
-      o = str(binding["at.action.option.Option"])
+      n = binding["at.Node"].unquoted()
+      o = binding["at.action.option.Option"].unquoted()
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+      if "setup" not in result[n]:
+        result[n]["setup"] = {}
+
+      a = binding["at.action.Action"].unquoted()
+      result[n][o]["_action"] = a
+
+    if sc == "outcome":
+      n = binding["at.Node"].unquoted()
+      o = binding["at.outcome.option.Option"].unquoted()
       if n not in result:
         result[n] = {}
       if o not in result[n]:
         result[n][o] = {}
 
-      a = str(binding["at.action.Action"])
-      result[n][o]["_action"] = a
+      out = binding["at.outcome.Outcome"].unquoted()
+      result[n][o]["_outcome"] = out
 
     elif sc == "initiator":
-      n = str(binding["at.Node"])
-      o = str(binding["at.initiator.option.Option"])
+      n = binding["at.Node"].unquoted()
+      o = binding["at.initiator.option.Option"].unquoted()
       if n not in result:
         result[n] = {}
       if o not in result[n]:
@@ -239,51 +270,52 @@ def glean_context_variables(story):
       ipr = binding["at.initiator.Initiator"]
       sb = ans.bind(INSTANCE_SCHEMA, ipr)
       if sb:
-        i = str(sb["inst.Key"])
-      i = "unknown"
+        i = sb["inst.Key"].unquoted()
+      else:
+        i = ipr.unquoted()
       result[n][o]["_initiator"] = i
 
     elif sc == "arg":
-      n = str(binding["at.Node"])
-      o = str(binding["at.arg.option.Option"])
+      n = binding["at.Node"].unquoted()
+      o = binding["at.arg.option.Option"].unquoted()
       if n not in result:
         result[n] = {}
       if o not in result[n]:
         result[n][o] = {}
 
-      a = str(binding["at.arg.Arg"])
+      a = binding["at.arg.Arg"].unquoted()
       vpr = binding["at.arg.Value"]
       sb = ans.bind(INSTANCE_SCHEMA, vpr)
       if sb:
-        v = str(sb["inst.Key"])
+        v = sb["inst.Key"].unquoted()
       else:
-        v = str(vpr)
+        v = vpr.unquoted()
       result[n][o][a] = v
 
     elif sc == "setup":
-      n = str(binding["setup.Node"])
+      n = binding["setup.Node"].unquoted()
       if n not in result:
         result[n] = {}
       if "setup" not in result[n]:
         result[n]["setup"] = {}
 
-      s = str(binding["setup.Setup"])
+      s = binding["setup.Setup"].unquoted()
       result[n]["setup"]["_setup"] = s
 
     elif sc == "setup_arg":
-      n = str(binding["at.Node"])
+      n = binding["at.Node"].unquoted()
       if n not in result:
         result[n] = {}
       if "setup" not in result[n]:
         result[n]["setup"] = {}
 
-      a = str(binding["at.setup_arg.Arg"])
+      a = binding["at.setup_arg.Arg"].unquoted()
       vpr = binding["at.setup_arg.Value"]
       sb = ans.bind(INSTANCE_SCHEMA, vpr)
       if sb:
-        v = str(sb["inst.Key"])
+        v = sb["inst.Key"].unquoted()
       else:
-        v = str(vpr)
+        v = vpr.unquoted()
       result[n]["setup"][a] = v
   return result
   # TODO: HERE! Thread this info through and use it!
@@ -301,26 +333,26 @@ def collate_rules(story):
       para = ""
       for ln, line in enumerate(fin.readlines()):
         if mode == "lines":
-          if line.strip()[0] == "%":
+          if not line.strip() or line.strip()[0] == "%":
             continue
           if line[0] == ":":
             key = line[1:]
-            if key not in rules:
-              rules[key] = []
+            if key not in result:
+              result[key] = []
             mode = "lines"
-          elif line[0] == ">"
+          elif line[0] == ">":
             key = line[1:]
             mode = "paragraph"
             para = ""
           elif key and line.strip():
-            rules[key].append(line[:-1]) # get rid of the newline
+            result[key].append(line[:-1]) # get rid of the newline
           elif key == None and line.strip():
             raise ValueError(
               "{}:{} - Rule product has no key.".format(f,ln)
             )
         elif mode == "paragraph":
           if line == "<":
-            rules[key].append(para)
+            result[key].append(para)
             key = None
             mode = "lines"
           else:
@@ -424,7 +456,7 @@ def subst_rules(text, rules):
 def build_text(
   template,
   rules,
-  vars,
+  cvars,
   ndict,
   pnslots=None,
   introduced=None,
@@ -456,10 +488,10 @@ def build_text(
   # First, repeatedly perform variable and rule substitutions until we've
   # reached a base text:
   bits = re.split(SUBST_SPLIT, template)
-  template = subst_vars(template, vars)
-  while re.find(SUBST, template):
+  template = subst_vars(template, cvars)
+  while re.search(SUBST, template):
     template = subst_rules(template, rules)
-    template = subst_vars(template, vars)
+    template = subst_vars(template, cvars)
   # Next, fill in any tags:
   bits = re.split(ANYTAG, template)
   result = ""
@@ -480,8 +512,11 @@ def build_text(
           noun = m.group(1)
           if noun not in ndict:
             # TODO: Something about this
-            print("ERROR!")
-            print(template, noun, ndict)
+            print("ERROR! Noun '{}' not in ndict.".format(noun))
+            print("Match is: '{}'".format(str(m)))
+            print(template)
+            print(noun)
+            print(ndict)
             exit(1)
           pro = m.group(2)
           case, position = nouns.casepos(pro)
@@ -539,6 +574,8 @@ def find_node_structure(story):
 def build_node_text(
   node,
   node_structure,
+  grammar_rules,
+  context_variables,
   nouns,
   pnslots,
   introduced,
@@ -555,28 +592,32 @@ def build_node_text(
   # TODO: A more rigorous capitalization approach.
   intro, _pnslots, _introduced = build_text(
     node["intro"],
+    grammar_rules,
+    context_variables["setup"],
     nouns,
     pnslots,
     introduced,
     timeshift
   )
-  intro = intro.capitalize()
+  intro = sentence(intro)
   situation, _pnslots, _introduced = build_text(
     node["situation"],
+    grammar_rules,
+    context_variables["setup"],
     nouns,
     _pnslots,
     _introduced,
     timeshift
   )
-  if situation:
-    situation += "."
-  situation = situation.capitalize()
+  situation = sentence(situation)
   options = ""
   if node["options"]:
     options = "*choice\n"
     for opt in node["options"]:
       txt, pnout, intout = build_text(
         node["options"][opt],
+        grammar_rules,
+        context_variables[opt],
         nouns,
         _pnslots,
         _introduced,
@@ -585,6 +626,8 @@ def build_node_text(
       options += "  #{}\n".format(txt.capitalize())
       txt, pnout, intout = build_text(
         node["outcomes"][opt],
+        grammar_rules,
+        context_variables[opt],
         nouns,
         pnout,
         intout,
@@ -615,8 +658,9 @@ def build_node_text(
 
 def build_story_text(story, timeshift=None):
   node_templates = {}
+  gr_rules = collate_rules(story)
 
-  # First, build all of the templates for the entire story:
+  # First, build the intro and potential templates for the story:
   for sc, bnd in ans.bindings(TEXT_SCHEMAS, story):
     node = bnd["txt.Node"].unquoted()
     print("Adding {} template for node '{}'.".format(sc, node))
@@ -638,12 +682,24 @@ def build_story_text(story, timeshift=None):
       if node_templates[node]["situation"]:
         node_templates[node]["situation"] += " and "
       node_templates[node]["situation"] += txt
-    elif sc == "option_text":
-      opt = bnd["txt.option.Opt"].unquoted()
-      node_templates[node]["options"][opt] = txt
-    elif sc == "action_text":
-      opt = bnd["txt.option.Opt"].unquoted()
-      node_templates[node]["outcomes"][opt] = txt
+
+    #elif sc == "option_text":
+    #  opt = bnd["txt.option.Opt"].unquoted()
+    #  node_templates[node]["options"][opt] = txt
+    #elif sc == "action_text":
+    #  opt = bnd["txt.option.Opt"].unquoted()
+    #  node_templates[node]["outcomes"][opt] = txt
+
+  # Next find context variables which also gives us an idea of the story
+  # structure:
+  cvrs = glean_context_variables(story)
+
+  # Iterate over our nodes and options adding static option/outcome templates:
+  for node in cvrs:
+    for option in cvrs[node]:
+      nts = node_templates[node]
+      nts["options"][option] = "[[S|action/?_action/option]]"
+      nts["outcomes"][option] = "[[S|action/?_action/outcome/?_outcome]]"
 
   # Next, use the node structure to recursively render the story text in
   # ChoiceScript:
@@ -680,6 +736,8 @@ def build_story_text(story, timeshift=None):
     txt, outgoing = build_node_text(
       node_templates[target],
       node_structure,
+      gr_rules,
+      cvrs[target],
       nouns,
       pnslots,
       introduced,

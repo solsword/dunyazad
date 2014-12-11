@@ -87,37 +87,37 @@ at(N, emphasizes(X, relation(threatening, Target, Someone))) :-
 % Surface details
 % ---------------
 
-option_text(
-  N,
-  X,
-  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them.",
-) :-
-  at(N, action(X, attack)),
-  story_op(N, add_surface).
-
-action_text(
-  N,
-  X,
-  "N#:aggressor/they V#attack/prs/:aggressor and V#defeat/prs/:aggressor N#:target/them.",
-) :-
-  at(N, action(X, attack)),
-  at(N, outcome(X, victory)),
-  story_op(N, add_surface).
-
-action_text(
-  N,
-  X,
-  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them and V#fight/prs/:aggressor to a standstill.",
-) :-
-  at(N, action(X, attack)),
-  at(N, outcome(X, parley)),
-  story_op(N, add_surface).
-
-action_text(
-  N,
-  X,
-  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them but V#be/prs/:aggressor defeated.",
-) :-
-  at(N, action(X, attack)),
-  at(N, outcome(X, defeat)),
-  story_op(N, add_surface).
+%option_text(
+%  N,
+%  X,
+%  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them."
+%) :-
+%  at(N, action(X, attack)),
+%  story_op(N, add_surface).
+%
+%action_text(
+%  N,
+%  X,
+%  "N#:aggressor/they V#attack/prs/:aggressor and V#defeat/prs/:aggressor N#:target/them."
+%) :-
+%  at(N, action(X, attack)),
+%  at(N, outcome(X, victory)),
+%  story_op(N, add_surface).
+%
+%action_text(
+%  N,
+%  X,
+%  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them and V#fight/prs/:aggressor to a standstill."
+%) :-
+%  at(N, action(X, attack)),
+%  at(N, outcome(X, parley)),
+%  story_op(N, add_surface).
+%
+%action_text(
+%  N,
+%  X,
+%  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them but V#be/prs/:aggressor defeated."
+%) :-
+%  at(N, action(X, attack)),
+%  at(N, outcome(X, defeat)),
+%  story_op(N, add_surface).

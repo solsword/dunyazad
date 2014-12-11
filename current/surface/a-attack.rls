@@ -1,4 +1,4 @@
-% Action - Attack
+% Action - attack
 
 :action/attack/option
 N#?aggressor/they V#attack/prs/?aggressor N#?target/them
@@ -18,6 +18,6 @@ N#?aggressor/they V#strike/prs/?aggressor at N#?target/them
 :combat/losing
 N#?target/they V#fight/prs/?target back
 
-:combat/neutral
-[[aspects/?aggressor/active]]
-[[aspects/?target/active]]
+%:combat/neutral
+%[[aspects/?aggressor/active]]
+%[[aspects/?target/active]]

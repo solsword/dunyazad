@@ -1,0 +1,9 @@
+% Action - reach_destination
+
+:action/reach_destination/option
+N#?subject/they V#reach/prs/?subject N#?subject/their destination
+
+:action/reach_destination/outcome/journey_over
+N#?subject/they finally V#reach/prs/?subject N#?subject/their destination. All V#is/prs/_plural well.
+
+% TODO: More here!

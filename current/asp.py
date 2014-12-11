@@ -60,6 +60,17 @@ ClingoOptOutput = parser.Hook(
   )
 )
 
+ClingoOutput = parser.Hook(
+  clean_clingo_parse,
+  parser.Seq(
+    parser.Rep(
+      ans.Predicate
+    ),
+    "SATISFIABLE",
+  )
+)
+
+
 def solve(code, is_opt=False):
   """
   Takes a string containing some answer set code and runs clingo on it,
