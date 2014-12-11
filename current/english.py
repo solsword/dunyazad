@@ -25,11 +25,11 @@ STATIC_RULES_SOURCES = list(
   walk_files(STATIC_RULES_DIR, lambda f: f.endswith(".rls"))
 )
 
-VAR = re.compile(r"\b(\?[a-z_]+)\b")
+VAR = re.compile(r"(\?[a-z_]+)")
 
-SUBST_SPLIT = re.compile(r"(\b\[\[(?:[A-Z]*\|)?[a-z_?*/]+\]\]\b)")
+SUBST_SPLIT = re.compile(r"(\[\[(?:[A-Z]*\|)?[a-z_?*/]+\]\])")
 
-SUBST = re.compile(r"\b\[\[([A-Z]*|)?([a-z_?*/]+)\]\]\b")
+SUBST = re.compile(r"\[\[([A-Z]*\|)?([a-z_?*/]+)\]\]")
 
 ANYTAG = re.compile(r"(\b[A-Z]#[a-z_0-9/?]+\b)")
 
@@ -134,20 +134,20 @@ STRUCTURE_SCHEMAS = {
     Pr(
       "at",
       Vr("Node"),
-      Pr("initiator", Pr("option", Vr("Option")), Vr("Initiator"))
+      Pr("initiator", Pr("option", Vr("Option")), SbT("Initiator"))
     ),
   "arg":
     Pr(
       "at",
       Vr("Node"),
-      Pr("arg", Pr("option", Vr("Option")), Vr("Arg"), Vr("Value"))
+      Pr("arg", Pr("option", Vr("Option")), Vr("Arg"), SbT("Value"))
     ),
   "setup": Pr("setup", Vr("Node"), Vr("Setup")),
   "setup_arg":
     Pr(
       "at",
       Vr("Node"),
-      Pr("setup_arg", Vr("Arg"), Vr("Value"))
+      Pr("setup_arg", Vr("Arg"), SbT("Value"))
     ),
 }
 
@@ -336,12 +336,12 @@ def collate_rules(story):
           if not line.strip() or line.strip()[0] == "%":
             continue
           if line[0] == ":":
-            key = line[1:]
+            key = line[1:-1]
             if key not in result:
               result[key] = []
             mode = "lines"
           elif line[0] == ">":
-            key = line[1:]
+            key = line[1:-1]
             mode = "paragraph"
             para = ""
           elif key and line.strip():
@@ -414,25 +414,45 @@ def subst_result(rules, key, flags):
   Given a set of substitution rules, returns the substitution result for the
   given key using the given flags.
   """
+  print("SUBST_RESULT")
   matching_keys = [k for k in rules if keymatch(k, key)]
+  print("key:", key)
+  print("matching:", matching_keys)
+  all_possibilities = []
+  for ps in [rules[k] for k in matching_keys]:
+    all_possibilities.extend(ps)
   # TODO: better/controllable randomness?
-  result = rules[random.choice(matching_keys)]
+  print("possibilities:")
+  print(all_possibilities)
+  result = random.choice(all_possibilities)
+  print("result:")
+  print(result)
   if 'S' in flags:
     result = sentence(result)
+  return result
 
-def subst_vars(text, args):
+def subst_vars(text, vs):
   """
   Given a text with some variable substitutions to be made returns the result
   text after all argument substitutions.
   """
   result = ""
   bits = re.split(VAR, text)
+  print("*"*80)
+  print("subst_vars text:")
+  print(text)
+  print("subst_vars variables:")
+  print(vs)
+  print("*"*80)
   for b in bits:
     add = b
     m = VAR.fullmatch(b)
     if m:
       var = m.group(1)[1:] # take off the initial '?'
-      add = subst_result(rules, key, flags)
+      if var in vs:
+        add = vs[var]
+      else:
+        add = "ERROR: unknown variable '{}'".format(var)
     result += add
   return result
 
@@ -442,14 +462,19 @@ def subst_rules(text, rules):
   doing variable substitutions.
   """
   result = ""
-  bits = re.split(SUBST, text)
+  bits = re.split(SUBST_SPLIT, text)
+  print("SUBST_RULES")
+  print(bits)
   for b in bits:
     add = b
     m = SUBST.fullmatch(b)
     if m:
       flags = m.group(1)[:-1] # take off the '|'
       key = m.group(2)
+      print("subst")
       add = subst_result(rules, key, flags)
+    else:
+      print("nosubst")
     result += add
   return result
 
@@ -469,6 +494,7 @@ def build_text(
   applied to all the verbs in the text. Returns a tuple of the constructed
   string and the resulting rules, pronoun slots, and noun introduction.
   """
+  print('-'*80 + "\nBegin build_text!")
   if pnslots == None:
     pnslots = {
       "I": [0, set()],
@@ -487,11 +513,19 @@ def build_text(
     introduced = set(introduced)
   # First, repeatedly perform variable and rule substitutions until we've
   # reached a base text:
+  print("build_text input template:")
+  print(template)
   bits = re.split(SUBST_SPLIT, template)
   template = subst_vars(template, cvars)
+  print("build_text vars-sub'd template:")
+  print(template)
+  if not re.search(SUBST, template):
+    print("no templates found")
   while re.search(SUBST, template):
     template = subst_rules(template, rules)
     template = subst_vars(template, cvars)
+  print("build_text expanded template:")
+  print(template)
   # Next, fill in any tags:
   bits = re.split(ANYTAG, template)
   result = ""
@@ -546,6 +580,9 @@ def build_text(
         # if we matched a tag, don't bother checking the other tags:
         break
     result += add
+  print("build_text result:")
+  print(result)
+  print("build_text done.\n" + '-'*80 + "\n")
   return result, pnslots, introduced
 
 def find_node_structure(story):
@@ -614,6 +651,9 @@ def build_node_text(
   if node["options"]:
     options = "*choice\n"
     for opt in node["options"]:
+      print("BT INPUT:")
+      print(opt)
+      print(context_variables)
       txt, pnout, intout = build_text(
         node["options"][opt],
         grammar_rules,
@@ -660,6 +700,9 @@ def build_story_text(story, timeshift=None):
   node_templates = {}
   gr_rules = collate_rules(story)
 
+  print("Build story text rules:")
+  print(gr_rules)
+
   # First, build the intro and potential templates for the story:
   for sc, bnd in ans.bindings(TEXT_SCHEMAS, story):
     node = bnd["txt.Node"].unquoted()
@@ -696,7 +739,7 @@ def build_story_text(story, timeshift=None):
 
   # Iterate over our nodes and options adding static option/outcome templates:
   for node in cvrs:
-    for option in cvrs[node]:
+    for option in [o for o in cvrs[node] if o != "setup"]:
       nts = node_templates[node]
       nts["options"][option] = "[[S|action/?_action/option]]"
       nts["outcomes"][option] = "[[S|action/?_action/outcome/?_outcome]]"

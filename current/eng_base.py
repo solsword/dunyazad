@@ -40,4 +40,5 @@ def sentence(result):
     result = result[0].capitalize() + result[1:]
   if result[-1] != '.':
     result = result + '.'
+  return result
 
