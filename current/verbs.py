@@ -87,7 +87,31 @@ IRREGULAR = {
     ("imperative", "any", "any", None),
     ("present participle", "any", "any", None),
     ("past participle", "any", "any", None),
-  ]
+  ],
+  "can": [
+    ("present", "any", "any", "can"),
+
+    ("past", "any", "any", "could"),
+
+    ("imperative", "any", "any", None),
+
+    ("present participle", "any", "any", None),
+
+    ("past participle", "any", "any", None),
+  ],
+  "come": [
+    ("present", "singular", "first", "come"),
+    ("present", "singular", "second", "come"),
+    ("present", "singular", "third", "comes"),
+
+    ("present", "plural", "any", "come"),
+
+    ("past", "any", "any", "came"),
+
+    ("present participle", "any", "any", "coming"),
+
+    ("past participle", "any", "any", "come"),
+  ],
 }
 
 TIMESHIFT = {
