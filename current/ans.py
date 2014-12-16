@@ -1135,6 +1135,31 @@ def parse_ans(text):
     devour=devour_asp
   )
 
+def parse_ans_fast(text):
+  """
+  Parses the given ext as an answer set quickly, assuming normal clingo output
+  constraints.
+  """
+  qsplit = re.compile(r'("(?:[^\\"]|(?:\\.))*")')
+  # First, split up the output into a list of predicate strings, being
+  # careful of quotes:
+  prstrings = [""]
+  qregions = re.split(qsplit, text)
+  for r in qregions:
+    if re.fullmatch(qsplit, r):
+      prstrings[-1] += r
+    else:
+      prparts = r.split(" ")
+      for part in prparts[:-1]:
+        prstrings[-1] += part
+        prstrings.append("")
+      prstrings[-1] += prparts[-1]
+  # Now parse each predicate string individually:
+  predicates = []
+  for p in prstrings:
+    predicates.append(parser.parse_completely(p, Predicate, devour=devour_asp))
+  return predicates
+
 def parse_asp(text):
   """
   Parses the given text as an answer set program, i.e., a Program (see above).

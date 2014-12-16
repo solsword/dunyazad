@@ -9,6 +9,7 @@ import os
 import sys
 import itertools
 import traceback
+import time
 
 # Sorting by str(x):
 def strsorted(x):
@@ -289,6 +290,15 @@ def prevent_recursion(
         return result
     return recursion_guard
   return decorate
+
+# Timer functions:
+
+def stopwatch(key, reset=False, cache={}):
+  if reset or key not in cache:
+    cache[key] = time.time()
+    return -1
+  else:
+    return time.time() - cache[key]
 
 # Filesystem functions:
 

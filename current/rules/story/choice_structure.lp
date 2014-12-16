@@ -3,12 +3,14 @@
 
 % relevance
 at(N, relevant(option(X))) :-
-  1 = {
-    at(N, consequence(option(X), _not, Something))
-      : at(N, potential(PTyp, Something));
-    at(N, emphasizes(option(X), Something))
-      : at(N, potential(PTyp, Something))
-  },
+  at(N, consequence(option(X), _not, Something)),
+  at(N, potential(PTyp, Something)),
+  at(N, option(X)),
+  story_op(N, build_options).
+
+at(N, relevant(option(X))) :-
+  at(N, emphasizes(option(X), Something)),
+  at(N, potential(PTyp, Something)),
   at(N, option(X)),
   story_op(N, build_options).
 
@@ -37,11 +39,9 @@ error(m("Non-first-person option", N, option(X))) :-
 error(m("Not enough choices", A, B, C)) :-
   successor(A, AOpt, B),
   successor(B, BOpt, C),
-  0 = {
-    node_type(A, choice);
-    node_type(B, choice);
-    node_type(C, choice)
-  },
+  not node_type(A, choice),
+  not node_type(B, choice),
+  not node_type(C, choice),
   story_op(B, add_branch_nodes).
 
 % events shouldn't re-hash the choice you just made or a prevoius event

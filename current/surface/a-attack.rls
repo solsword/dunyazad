@@ -10,7 +10,7 @@ N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/?]] [[S|com
 N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/winning]] [[S|combat/losing]] [[S|combat/neutral]] [[S|combat/neutral]] Finally N#?aggressor/they and N#?target/they V#agree/prs/_plural to a truce
 
 :action/attack/outcome/defeat
-N#?aggressor/they V#attack/prs/?aggressor N#?target/them but V#be/prs/?aggressor defeated
+N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/?]] [[S|combat/?]] [[S|combat/winning]] Suddenly N#?target/they V#rally/prs/?target and fiercely V#strike/prs/?target back at N#?aggressor/them, and N#?aggressor/them V#be/prs/?aggressor defeated
 
 :combat/winning
 N#?aggressor/they V#strike/prs/?aggressor at N#?target/them

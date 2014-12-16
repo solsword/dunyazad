@@ -414,19 +414,12 @@ def subst_result(rules, key, flags):
   Given a set of substitution rules, returns the substitution result for the
   given key using the given flags.
   """
-  print("SUBST_RESULT")
   matching_keys = [k for k in rules if keymatch(k, key)]
-  print("key:", key)
-  print("matching:", matching_keys)
   all_possibilities = []
   for ps in [rules[k] for k in matching_keys]:
     all_possibilities.extend(ps)
   # TODO: better/controllable randomness?
-  print("possibilities:")
-  print(all_possibilities)
   result = random.choice(all_possibilities)
-  print("result:")
-  print(result)
   if 'S' in flags:
     result = sentence(result)
   return result
@@ -438,12 +431,6 @@ def subst_vars(text, vs):
   """
   result = ""
   bits = re.split(VAR, text)
-  print("*"*80)
-  print("subst_vars text:")
-  print(text)
-  print("subst_vars variables:")
-  print(vs)
-  print("*"*80)
   for b in bits:
     add = b
     m = VAR.fullmatch(b)
@@ -463,18 +450,13 @@ def subst_rules(text, rules):
   """
   result = ""
   bits = re.split(SUBST_SPLIT, text)
-  print("SUBST_RULES")
-  print(bits)
   for b in bits:
     add = b
     m = SUBST.fullmatch(b)
     if m:
       flags = m.group(1)[:-1] # take off the '|'
       key = m.group(2)
-      print("subst")
       add = subst_result(rules, key, flags)
-    else:
-      print("nosubst")
     result += add
   return result
 
@@ -494,7 +476,6 @@ def build_text(
   applied to all the verbs in the text. Returns a tuple of the constructed
   string and the resulting rules, pronoun slots, and noun introduction.
   """
-  print('-'*80 + "\nBegin build_text!")
   if pnslots == None:
     pnslots = {
       "I": [0, set()],
@@ -513,19 +494,11 @@ def build_text(
     introduced = set(introduced)
   # First, repeatedly perform variable and rule substitutions until we've
   # reached a base text:
-  print("build_text input template:")
-  print(template)
   bits = re.split(SUBST_SPLIT, template)
   template = subst_vars(template, cvars)
-  print("build_text vars-sub'd template:")
-  print(template)
-  if not re.search(SUBST, template):
-    print("no templates found")
   while re.search(SUBST, template):
     template = subst_rules(template, rules)
     template = subst_vars(template, cvars)
-  print("build_text expanded template:")
-  print(template)
   # Next, fill in any tags:
   bits = re.split(ANYTAG, template)
   result = ""
@@ -580,9 +553,6 @@ def build_text(
         # if we matched a tag, don't bother checking the other tags:
         break
     result += add
-  print("build_text result:")
-  print(result)
-  print("build_text done.\n" + '-'*80 + "\n")
   return result, pnslots, introduced
 
 def find_node_structure(story):
@@ -651,9 +621,6 @@ def build_node_text(
   if node["options"]:
     options = "*choice\n"
     for opt in node["options"]:
-      print("BT INPUT:")
-      print(opt)
-      print(context_variables)
       txt, pnout, intout = build_text(
         node["options"][opt],
         grammar_rules,

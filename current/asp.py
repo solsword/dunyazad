@@ -12,6 +12,8 @@ import parser
 
 #TODO: Seed clingo!
 
+FASTPARSE = True
+
 class ASPError(Exception):
   def __init__(self, code="unknown", message=''):
     self.message = message
@@ -60,24 +62,11 @@ ClingoOptOutput = parser.Hook(
   )
 )
 
-ClingoOutput = parser.Hook(
-  clean_clingo_parse,
-  parser.Seq(
-    parser.Rep(
-      ans.Predicate
-    ),
-    "SATISFIABLE",
-  )
-)
-
-
-def solve(code, is_opt=False):
+def solve(code):
   """
   Takes a string containing some answer set code and runs clingo on it,
   returning a set of Predicate objects parsed from clingo's output. Raises an
-  ASPError if clingo returns an error code. If is_opt is given and not False,
-  then the output will be assumed to be the result of an optimization problem
-  rather than a simple satisfiability problem.
+  ASPError if clingo returns an error code.
   """
   clingo = subprocess.Popen(
     ["clingo", "--verbose=0", "--quiet=1,1", "--seed=0"],
@@ -107,15 +96,5 @@ Clingo returned error code {}
 {}
 """.format(ret, code, stdout.decode(), stderr.decode())
     )
-  if is_opt:
-    return parser.parse_completely(
-      stdout.decode(),
-      ClingoOptOutput,
-      devour=ans.devour_asp
-    )
-  else:
-    return parser.parse_completely(
-      stdout.decode(),
-      ClingoOutput,
-      devour=ans.devour_asp
-    )
+  lines = stdout.decode().split('\n')
+  return ans.parse_ans_fast(lines[0])
