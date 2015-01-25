@@ -41,7 +41,7 @@ def main(storyfile = None):
     if not os.path.isdir(os.path.join("out", "snapshots")):
       os.mkdir(os.path.join("out", "snapshots"))
     sofar = story
-    while len(list(tasks.all_nodes(story))) < 12:
+    while len(list(tasks.all_nodes(story))) < NODES_TO_GENERATE:
       n += 1
       try:
         story = tasks.instantiate_random(story)
