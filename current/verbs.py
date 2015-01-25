@@ -112,6 +112,14 @@ IRREGULAR = {
 
     ("past participle", "any", "any", "come"),
   ],
+  "strike": [
+    ("past", "any", "any", "struck"),
+    ("past participle", "any", "any", "struck"),
+  ],
+  "fight": [
+    ("past", "any", "any", "fought"),
+    ("past participle", "any", "any", "fought"),
+  ],
 }
 
 TIMESHIFT = {

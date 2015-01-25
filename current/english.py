@@ -33,6 +33,8 @@ SUBST = re.compile(r"\[\[([A-Z]*\|)?([a-z_?*/]+)\]\]")
 
 ANYTAG = re.compile(r"(\b[A-Z]#[a-z_0-9/?]+\b)")
 
+CAP = re.compile(r"@CAP@(.)")
+
 TAGS = {
   "noun": re.compile(r"\bN#(\??[a-z_][a-z_0-9]*)/([a-z_]+)\b"),
   "verb": re.compile(r"\bV#([a-z]+)/([a-z]+)/(\??[a-z_][a-z_0-9]*)\b"),
@@ -421,7 +423,7 @@ def subst_result(rules, key, flags):
   # TODO: better/controllable randomness?
   result = random.choice(all_possibilities)
   if 'S' in flags:
-    result = sentence(result)
+    result = "@CAP@" + sentence(result)
   return result
 
 def subst_vars(text, vs):
@@ -553,6 +555,8 @@ def build_text(
         # if we matched a tag, don't bother checking the other tags:
         break
     result += add
+  # Finally process capitalization directives:
+  result = re.sub(CAP, lambda m: m.group(1).upper(), result)
   return result, pnslots, introduced
 
 def find_node_structure(story):
@@ -630,7 +634,7 @@ def build_node_text(
         _introduced,
         timeshift
       )
-      options += "  #{}\n".format(txt.capitalize())
+      options += "  #{}\n".format(sentence(txt))
       txt, pnout, intout = build_text(
         node["outcomes"][opt],
         grammar_rules,
@@ -640,7 +644,7 @@ def build_node_text(
         intout,
         timeshift
       )
-      options += "    {}\n".format(txt.capitalize())
+      options += "    {}\n".format(sentence(txt))
       successors = node_structure[node["name"]]["successors"]
       if opt in successors:
         scc = successors[opt]
