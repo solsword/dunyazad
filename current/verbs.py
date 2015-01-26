@@ -44,6 +44,8 @@ FORM_DEFAULTS = [
   ("present", "singular", "second", base),
   ("present", "singular", "third", add_s),
 
+  ("present", "plural", "any", base),
+
   ("past", "any", "any", add_ed),
 
   ("infinitive", "any", "any", base),

@@ -13,6 +13,7 @@ import asp
 import ans
 import parser
 import tasks
+import viz
 import english
 
 from utils import *
@@ -73,8 +74,17 @@ def main(storyfile = None):
 #  nouns = english.glean_nouns(story)
 #  for k in nouns:
 #    print(nouns[k])
+  print("Story nodes:")
+  for pr in story:
+    if (pr.name == "story_node"):
+      print("  " + pr.args[0].name)
+
+  print("Drawing story graph...")
+  viz.viz(story)
+
+  print("Building story text...")
   with open(os.path.join("out", "story.txt"), 'w') as fout:
-    fout.write(english.build_story_text(sofar, timeshift="past"))
+    fout.write(english.build_story_text(sofar, timeshift=None))
   with open(os.path.join("out", "facts.lp"), 'w') as fout:
     for pr in sofar:
       fout.write(str(pr) + '.\n')

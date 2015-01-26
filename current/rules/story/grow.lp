@@ -97,8 +97,8 @@ inherited_potential(N) :-
   successor(Prev, Opt, N),
   0 < { unresolved_potential(Prev, Opt, Pt) }.
 
-error(m("Initialized choice has no potential!", N)) :-
-  node_status_reached(N, initialized),
+error(m("Built choice has no potential!", N)) :-
+  node_status_reached(N, built),
   story_node(N),
   node_type(N, choice),
   0 = {
@@ -195,7 +195,8 @@ story_node(N) :- new_node(N).
   node_type(N, event);
   node_type(N, ending)
 } :-
-  new_node(N).
+  story_node(N),
+  story_op(N, build_options).
 
 path_length(Next, Shortest+1) :-
   successor(Prev, Opt, Next),

@@ -14,7 +14,7 @@ _sr(R) :- story_root(R), story_op(R, initialize_node).
 
 st(R, inst(actor, the_party)) :- _sr(R).
 st(R, property(name, inst(actor, the_party), "party")) :- _sr(R).
-st(R, property(person, inst(actor, the_party), first)) :- _sr(R).
+st(R, property(person, inst(actor, the_party), second)) :- _sr(R).
 st(R, property(number, inst(actor, the_party), plural)) :- _sr(R).
 % default gender
 

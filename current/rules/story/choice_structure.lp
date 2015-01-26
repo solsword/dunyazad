@@ -15,7 +15,6 @@ at(N, relevant(option(X))) :-
   story_op(N, build_options).
 
 error(m("Irrelevant option", N, option(X))) :-
-  node_type(N, choice),
   at(N, option(X)),
   not at(N, relevant(option(X))),
   story_op(N, build_options).
@@ -42,7 +41,7 @@ error(m("Not enough choices", A, B, C)) :-
   not node_type(A, choice),
   not node_type(B, choice),
   not node_type(C, choice),
-  story_op(B, add_branch_nodes).
+  story_op(C, build_options).
 
 % events shouldn't re-hash the choice you just made or a prevoius event
 arg_mismatch(N, option(NO), O, option(OO)) :-
@@ -69,9 +68,9 @@ error(m("Event duplicates previous action", N, Prev, Action)) :-
 % emphasizing something once is enough
 error(m("Repeated emphasis", N, option(X))) :-
   story_node(N),
-  at(N, emphasizes(option(X), Something)),
-  successor(N, option(X), Next),
-  at(Next, emphasizes(option(Y), Something)),
+  at(Prev, emphasizes(option(X), Something)),
+  successor(Prev, option(X), N),
+  at(N, emphasizes(option(Y), Something)),
   story_op(N, build_options).
 
 % within-vignette boredom
@@ -94,7 +93,7 @@ error(m("Repeated vignette setup", N, R)) :-
 } :-
   resolves_vignette(End, Opt),
   successor(End, Opt, N),
-  new_node(N).
+  story_op(N, build_options).
 
 at(N, action(option(1), travel_onwards)) :-
   node_type(N, event),

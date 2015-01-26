@@ -160,10 +160,10 @@ TEXT_SCHEMAS = {
     PVr("txt", "intro_text", Vr("Node"), Vr("Setup"), Vr("Text")),
   "potential_text":
     PVr("txt", "potential_text", Vr("Node"), Vr("Text")),
-  "option_text":
-    PVr("txt", "option_text", Vr("Node"), Pr("option", Vr("Opt")), Vr("Text")),
-  "action_text":
-    PVr("txt", "action_text", Vr("Node"), Pr("option", Vr("Opt")), Vr("Text")),
+#  "option_text":
+#    PVr("txt", "option_text", Vr("Node"), Pr("option", Vr("Opt")), Vr("Text")),
+#  "action_text":
+#    PVr("txt", "action_text", Vr("Node"), Pr("option", Vr("Opt")), Vr("Text")),
 }
 
 SUCCESSOR = Pr("successor", Vr("From"), Pr("option", Vr("Opt")), Vr("To"))
@@ -421,6 +421,8 @@ def subst_result(rules, key, flags):
   for ps in [rules[k] for k in matching_keys]:
     all_possibilities.extend(ps)
   # TODO: better/controllable randomness?
+  if (len(all_possibilities) == 0):
+    print("ERROR: No possible substitutions for key '{}'.".format(key))
   result = random.choice(all_possibilities)
   if 'S' in flags:
     result = "@CAP@" + sentence(result)
@@ -456,7 +458,10 @@ def subst_rules(text, rules):
     add = b
     m = SUBST.fullmatch(b)
     if m:
-      flags = m.group(1)[:-1] # take off the '|'
+      if (m.group(1)):
+        flags = m.group(1)[:-1] # take off the '|'
+      else:
+        flags = ''
       key = m.group(2)
       add = subst_result(rules, key, flags)
     result += add
@@ -671,22 +676,28 @@ def build_story_text(story, timeshift=None):
   node_templates = {}
   gr_rules = collate_rules(story)
 
-  print("Build story text rules:")
-  print(gr_rules)
+  #print("Build story text rules:")
+  #print(gr_rules)
 
-  # First, build the intro and potential templates for the story:
+  # First, build the dictionary of templates for all polished nodes:
+  for sc, bnd in ans.bindings(
+    { "_": Pr("node_status_reached", Vr("Node"), Pr("polished")) },
+    story
+  ):
+    node = bnd["node_status_reached.Node"].unquoted()
+    node_templates[node] = {
+      "name": node,
+      "intro": "",
+      "situation": "",
+      "options": {},
+      "outcomes": {},
+      # TODO: state-change text
+    }
+
+  # Next, build the intro and potential templates for the story:
   for sc, bnd in ans.bindings(TEXT_SCHEMAS, story):
     node = bnd["txt.Node"].unquoted()
-    print("Adding {} template for node '{}'.".format(sc, node))
-    if node not in node_templates:
-      node_templates[node] = {
-        "name": node,
-        "intro": "",
-        "situation": "",
-        "options": {},
-        "outcomes": {},
-        # TODO: state-change text
-      }
+    print("Adding {} template for node '{}'...".format(sc, node))
     txt = bnd["txt.Text"].unquoted()
     if sc == "intro_text":
       if node_templates[node]["intro"]:
@@ -708,6 +719,12 @@ def build_story_text(story, timeshift=None):
   # structure:
   cvrs = glean_context_variables(story)
 
+  # Error check:
+  for k in [key for key in cvrs if key not in node_templates]:
+    print("WARNING: Node '{}' has context but isn't polished.".format(k))
+  for k in [key for key in node_templates if key not in cvrs]:
+    print("WARNING: Node '{}' is polished, but has no context.".format(k))
+
   # Iterate over our nodes and options adding static option/outcome templates:
   for node in cvrs:
     for option in [o for o in cvrs[node] if o != "setup"]:
@@ -721,8 +738,8 @@ def build_story_text(story, timeshift=None):
   node_structure = find_node_structure(story)
   base_pnslots = {
     "I": [0, set()],
-    "we": [0, { "the_party" }],
-    "you": [0, set()],
+    "we": [0, set()],
+    "you": [0, { "the_party" }],
     "he": [0, set()],
     "she": [0, set()],
     "it": [0, set()],
@@ -745,6 +762,7 @@ def build_story_text(story, timeshift=None):
   }
   results = []
   while olist:
+    #print("open:", [ole[0] for ole in olist])
     target, pnslots, introduced = olist.pop(0)
     # build node text:
     txt, outgoing = build_node_text(

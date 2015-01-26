@@ -114,20 +114,20 @@ KEEP = {
     PVr("intro_text", "intro_text", Vr("Node"), Vr("Setup"), Vr("Text")),
   "potential_text":
     PVr("potential_text", "potential_text", Vr("Node"), Vr("Text")),
-  "option_text":
-    PVr(
-      "option_text", "option_text",
-      Vr("Node"),
-      Pr("option", Vr("Opt")),
-      Vr("Text"),
-    ),
-  "action_text":
-    PVr(
-      "action_text", "action_text",
-      Vr("Node"),
-      Pr("option", Vr("Opt")),
-      Vr("Text"),
-    ),
+#  "option_text":
+#    PVr(
+#      "option_text", "option_text",
+#      Vr("Node"),
+#      Pr("option", Vr("Opt")),
+#      Vr("Text"),
+#    ),
+#  "action_text":
+#    PVr(
+#      "action_text", "action_text",
+#      Vr("Node"),
+#      Pr("option", Vr("Opt")),
+#      Vr("Text"),
+#    ),
 }
 
 def runfr(story, name, extra = ""):
@@ -214,6 +214,7 @@ def setup_story(story):
   return filter_keep(runfr(story, "setup"))
 
 def instantiate_node(story, n):
+  print("Instantiating node '{}'...".format(n))
   return filter_keep(runfr(story, "instantiate", "target_node({}).".format(n)))
 
 def branch_node(story, n):

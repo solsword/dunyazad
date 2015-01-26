@@ -1,6 +1,20 @@
 % surface.lp
 % Rules about surface text realization
 
+error(m("Missing intro text.", N, Setup)) :-
+  setup(N, Setup),
+  story_op(N, add_surface),
+  0 = {
+    intro_text(N, Setup, Text)
+  }.
+
+error(m("Missing potential text.", N, Type, Fact)) :-
+  at(N, potential(Type, Fact)),
+  story_op(N, add_surface),
+  0 = {
+    potential_text(N, Text)
+  }.
+
 % Default values for name, person, number, gender, and determination:
 
 1 = {
