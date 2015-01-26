@@ -8,7 +8,7 @@ potential_text(
   N,
   @fmt(
     "N#{}/they V#sell/prsc/{} N#{}/them",
-    Merchant, Merchant, Merchant, Goods
+    Merchant, Merchant, Goods
   )
 ) :-
   at(

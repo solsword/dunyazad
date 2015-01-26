@@ -17,6 +17,8 @@ at(N, relevant(option(X))) :-
 error(m("Irrelevant option", N, option(X))) :-
   at(N, option(X)),
   not at(N, relevant(option(X))),
+  not at(N, action(option(X), travel_onwards)),
+  not at(N, action(option(X), reach_destination)),
   story_op(N, build_options).
 
 % redundancy

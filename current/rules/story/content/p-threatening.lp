@@ -8,7 +8,7 @@ potential_text(
   N,
   @fmt(
     "N#{}/they V#threaten/prsc/{} N#{}/them",
-    Threatening, Threatening, Threatening, Threatened
+    Threatening, Threatening, Threatened
   )
 ) :-
   at(

@@ -15,12 +15,22 @@ import parser
 FASTPARSE = True
 
 class ASPError(Exception):
-  def __init__(self, code="unknown", message=''):
+  def __init__(
+    self,
+    message='',
+    retcode="unknown",
+    program='',
+    stdout='',
+    stderr=''
+  ):
     self.message = message
-    self.code = code
+    self.retcode = retcode
+    self.program = program
+    self.stdout = stdout
+    self.stderr = stderr
 
   def __str__(self):
-    return "[error code {}] {}".format(self.code, self.message)
+    return "[error code {}] {}".format(self.retcode, self.message)
 
 # A grammar for clingo output:
 
@@ -79,22 +89,11 @@ def solve(code):
   # clingo returns either 10 or 30 on success (not sure what the difference is)
   if ret not in [10, 30]:
     raise ASPError(
-      code=ret,
-      message="""
-Clingo returned error code {}
---------
--stdin:-
---------
-{}
----------
--stdout:-
----------
-{}
----------
--stderr:-
----------
-{}
-""".format(ret, code, stdout.decode(), stderr.decode())
+      message="Clingo returned error code {}".format(ret),
+      retcode=ret,
+      program=code,
+      stdout = stdout.decode(),
+      stderr = stderr.decode()
     )
   lines = stdout.decode().split('\n')
   return ans.parse_ans_fast(lines[0])

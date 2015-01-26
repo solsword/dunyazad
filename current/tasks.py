@@ -210,29 +210,33 @@ def all_unfinished_options(story):
 
 # Tasks:
 
-def setup_story(story):
-  return filter_keep(runfr(story, "setup"))
+def setup_story(story, extra=""):
+  return filter_keep(runfr(story, "setup", extra))
 
-def instantiate_node(story, n):
+def instantiate_node(story, n, extra=""):
   print("Instantiating node '{}'...".format(n))
-  return filter_keep(runfr(story, "instantiate", "target_node({}).".format(n)))
+  return filter_keep(
+    runfr(story, "instantiate", extra + "\ntarget_node({}).".format(n))
+  )
 
-def branch_node(story, n):
-  return filter_keep(runfr(story, "branch", "target_node({}).".format(n)))
+def branch_node(story, n, extra=""):
+  return filter_keep(
+    runfr(story, "branch", extra + "\ntarget_node({}).".format(n))
+  )
 
-def instantiate_random(story):
+def instantiate_random(story, extra=""):
   l = list(all_uninstantiated_nodes(story))
   if l:
-    return instantiate_node(story, random.choice(l))
+    return instantiate_node(story, random.choice(l), extra)
   else:
     print("Instantiate random: no node to instantiate!")
     for pr in story:
       print(str(pr) + ".")
 
-def branch_random(story):
+def branch_random(story, extra=""):
   l = list(all_unfinished_options(story))
   if l:
-    return branch_node(story, random.choice(l)[0])
+    return branch_node(story, random.choice(l)[0], extra)
   else:
     print("Branch random: no node to instantiate!")
     for pr in story:

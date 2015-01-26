@@ -11,17 +11,18 @@ import sys
 import types
 
 default_tests = [
-  "utils",
-  "parser",
-  "tasknet",
-  "obj",
   "ans",
-  "storytasks"
+  "english",
+  "parser",
+  "utils",
+  "wholeunit",
 ]
 
 stop_on_failure = False
 
 def test(module):
+  if module.endswith(".py"):
+    module = module[:-3]
   print("Starting tests for module '{}'...".format(module))
   m = __import__(module)
   passed = 0
