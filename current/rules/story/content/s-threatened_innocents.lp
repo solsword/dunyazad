@@ -2,9 +2,9 @@
 
 possible_setup(threatened_innocents).
 
-setup_argument_c(threatened_innocents, attacker, inst(actor, attacker)).
-setup_argument_c(threatened_innocents, victim, inst(actor, victim)).
-setup_argument_c(threatened_innocents, goods, inst(item, goods)).
+setup_argument_create(threatened_innocents, attacker, inst(actor, attacker)).
+setup_argument_create(threatened_innocents, victim, inst(actor, victim)).
+setup_argument_create(threatened_innocents, goods, inst(item, goods)).
 
 % The attacker:
 s_st(threatened_innocents, property(c(name), v(attacker), c("bandits"))).

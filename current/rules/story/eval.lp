@@ -20,3 +20,9 @@ at(N, score(X, -3)) :-
   at(N, nullifies(X, Opp)),
   at(N, potential(opportunity, Opp)),
   story_op(N, build_options).
+
+at(N, total_score(option(Opt), TS)) :-
+  story_node(N),
+  at(N, option(Opt)),
+  TS = #sum{ S : at(N, score(option(Opt), S)) },
+  story_op(N, build_options).

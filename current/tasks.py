@@ -24,6 +24,8 @@ BASE_SOURCES = [
   opj("story", "symbols.lp"),
   opj("story", "the_party.lp"),
   opj("story", "skills.lp"),
+  opj("story", "items.lp"),
+  opj("story", "settings.lp"),
   opj("story", "potential.lp"),
   opj("story", "grow.lp"),
   opj("story", "eval.lp"),
@@ -68,6 +70,7 @@ def fr(name):
 
 SC = {
   "story_node": Pr("story_node", Vr("Node")),
+  "node_type": Pr("node_type", Vr("Node"), Vr("Type")),
   "option": Pr("at", Vr("Node"), Pr("option", Vr("Opt"))),
   "successor": Pr("successor", Vr("From"), Pr("option", Vr("Opt")), Vr("To")),
   "setup": PVr("setup", "setup", Vr("Node"), Vr("Which")),
@@ -92,6 +95,7 @@ KEEP = {
   "path_length": PVr("path_length", "path_length", Vr("Node"), Vr("Count")),
 
   "vignette": PVr("vignette", "vignette", Vr("Node"), Vr("Root")),
+  "setting": PVr("setting", "setting", Vr("Node"), Vr("Setting")),
 
   "setup": PVr("setup", "setup", Vr("Node"), Vr("Which")),
   "spontaneous":
@@ -154,18 +158,24 @@ def all_nodes(story):
     if b:
       yield b["story_node.Node"]
 
+def all_polished_nodes(story):
+  for pr in story:
+    b = ans.bind(SC["status_polished"], pr)
+    if b:
+      yield b["status_polished.Node"]
+
+def all_endings(story):
+  for pr in story:
+    b = ans.bind(SC["node_type"], pr)
+    if b and str(b["node_type.Type"]) == "ending":
+      yield b["node_type.Node"]
+
 def all_vignette_beginnings(story):
   # TODO: Fix me!
   for pr in story:
     b = ans.bind(SC["setup"], pr)
     if b:
       yield b["setup.Node"]
-
-def all_uninitialized_nodes(story):
-  ai = list(all_initialized_nodes(story))
-  for n in all_nodes(story):
-    if n not in ai:
-      yield n
 
 def all_options(story):
   for pr in story:
@@ -191,15 +201,14 @@ def all_uninstantiated_nodes(story):
     if not hit:
       yield n
 
-def all_uninstantiated_initialized_nodes(story):
-  uin = list(all_uninstantiated_nodes(story))
-  return [n for n in all_initialized_nodes(story) if n in uin]
-
 def all_unfinished_options(story):
   ao = all_options(story)
+  ae = list(all_endings(story))
   an = list(all_nodes(story))
   asc = list(all_successors(story))
   for n, opt in ao:
+    if n in ae:
+      continue
     hit = False
     for node, option, nxt in asc:
       if n == node and opt == option:
@@ -214,7 +223,6 @@ def setup_story(story, extra=""):
   return filter_keep(runfr(story, "setup", extra))
 
 def instantiate_node(story, n, extra=""):
-  print("Instantiating node '{}'...".format(n))
   return filter_keep(
     runfr(story, "instantiate", extra + "\ntarget_node({}).".format(n))
   )
@@ -224,20 +232,39 @@ def branch_node(story, n, extra=""):
     runfr(story, "branch", extra + "\ntarget_node({}).".format(n))
   )
 
-def instantiate_random(story, extra=""):
+def polish_ending(story, n, extra=""):
+  return filter_keep(
+    runfr(story, "branch", extra + "\ntarget_node({}).".format(n))
+  )
+
+def random_uninstantiated(story):
   l = list(all_uninstantiated_nodes(story))
   if l:
-    return instantiate_node(story, random.choice(l), extra)
+    return random.choice(l)
   else:
-    print("Instantiate random: no node to instantiate!")
-    for pr in story:
-      print(str(pr) + ".")
+    print("Random uninstantiated: none left!")
+    return None
 
-def branch_random(story, extra=""):
+def random_unbranched(story):
   l = list(all_unfinished_options(story))
   if l:
-    return branch_node(story, random.choice(l)[0], extra)
+    return random.choice(l)[0]
   else:
-    print("Branch random: no node to instantiate!")
-    for pr in story:
-      print(str(pr) + ".")
+    print("Random unbranched: none left!")
+    return None
+
+def random_ending(story):
+  l = list(all_endings(story))
+  if l:
+    return random.choice(l)
+  else:
+    print("Random ending: none left!")
+    return None
+
+def random_unpolished_ending(story):
+  l = list(all_endings(story))
+  if l:
+    return random.choice(l)
+  else:
+    print("Random ending: none left!")
+    return None

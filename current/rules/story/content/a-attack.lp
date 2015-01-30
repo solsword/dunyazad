@@ -9,6 +9,9 @@ outcome(attack, victory).
 outcome(attack, defeat).
 outcome(attack, parley).
 
+skill_link(attack, fighting).
+requires_tool(attack).
+
 % you can't parley if one side of the conflict is unintelligent:
 error(m("Parley with unintelligent target.", N, X)) :-
   at(N, outcome(X, parley)),

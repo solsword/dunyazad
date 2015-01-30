@@ -20,6 +20,12 @@ from utils import *
 
 CRASHFILE = os.path.join("out", "crash.lp")
 
+def write_crashfile(e):
+  with open(CRASHFILE, 'w') as fout:
+    fout.write('% stdout:\n%' + '\n%'.join(e.stdout.split('\n')))
+    fout.write('% stderr:\n%' + '\n%'.join(e.stderr.split('\n')))
+    fout.write(e.program)
+
 def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
   story = []
   sofar = []
@@ -42,10 +48,7 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
           CRASHFILE
         )
       )
-      with open(CRASHFILE, 'w') as fout:
-        fout.write('% stdout:\n%' + '\n%'.join(e.stdout.split('\n')))
-        fout.write('% stderr:\n%' + '\n%'.join(e.stderr.split('\n')))
-        fout.write(e.program)
+      write_crashfile(e)
       return False
  
     n = -1
@@ -54,45 +57,74 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
     if not os.path.isdir(os.path.join("out", "snapshots")):
       os.mkdir(os.path.join("out", "snapshots"))
     sofar = story
-    while len(list(tasks.all_nodes(story))) < nodelimit:
+    keepgoing = True
+    target = "unknown"
+    while len(list(tasks.all_nodes(story))) < nodelimit and keepgoing:
+      keepgoing = False
       n += 1
-      try:
-        story = tasks.instantiate_random(story, scaffolding)
-        with open(
-          os.path.join("out", "snapshots", "story-{}.lp".format(n)),
-          'w'
-        ) as fout:
-          for pr in story:
-            fout.write(str(pr) + '.\n')
-      except asp.ASPError as e:
-        print(
-          "Error during instantiation: {}. Dumping source to '{}'".format(
-            e.message,
-            CRASHFILE
+      target = tasks.random_uninstantiated(story)
+      if not target:
+        print("No nodes to instantiate this cycle.")
+      else:
+        keepgoing = True
+        print("Instantiating node '{}'...".format(target))
+        try:
+          story = tasks.instantiate_node(story, target, scaffolding)
+          with open(
+            os.path.join("out", "snapshots", "story-{}.lp".format(n)),
+            'w'
+          ) as fout:
+            for pr in story:
+              fout.write(str(pr) + '.\n')
+        except asp.ASPError as e:
+          print(
+            "Error during instantiation: {}. Dumping source to '{}'".format(
+              e.message,
+              CRASHFILE
+            )
           )
-        )
-        with open(CRASHFILE, 'w') as fout:
-          fout.write('% stdout:\n%' + '\n%'.join(e.stdout.split('\n')))
-          fout.write('% stderr:\n%' + '\n%'.join(e.stderr.split('\n')))
-          fout.write(e.program)
-        error = True
-        break
+          write_crashfile(e)
+          error = True
+          break
  
-      try:
-        story = tasks.branch_random(story, scaffolding)
-      except asp.ASPError as e:
-        print(
-          "Error during branching: {}. Dumping source to '{}'".format(
-            e.message,
-            CRASHFILE
+      target = tasks.random_unbranched(story)
+      if not target:
+        print("No nodes to branch this cycle.")
+      else:
+        keepgoing = True
+        print("Branching node '{}'...".format(target))
+        try:
+          story = tasks.branch_node(story, target, scaffolding)
+        except asp.ASPError as e:
+          print(
+            "Error during branching: {}. Dumping source to '{}'".format(
+              e.message,
+              CRASHFILE
+            )
           )
-        )
-        with open(CRASHFILE, 'w') as fout:
-          fout.write('% stdout:\n%' + '\n%'.join(e.stdout.split('\n')))
-          fout.write('% stderr:\n%' + '\n%'.join(e.stderr.split('\n')))
-          fout.write(e.program)
-        error = True
-        break
+          write_crashfile(e)
+          error = True
+          break
+
+      target = tasks.random_ending(story)
+      if not target:
+        print("No endings to polish this cycle.")
+      else:
+        keepgoing = True
+        print("Polishing ending node '{}'...".format(target))
+        try:
+          story = tasks.polish_ending(story, target, scaffolding)
+        except asp.ASPError as e:
+          print(
+            "Error while polishing ending: {}. Dumping source to '{}'".format(
+              e.message,
+              CRASHFILE
+            )
+          )
+          write_crashfile(e)
+          error = True
+          break
+
       sofar = story
 
 #  for pr in sofar:
@@ -106,14 +138,16 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
       print("  " + pr.args[0].name)
 
   print("Drawing story graph...")
-  viz.viz(sofar)
+  viz.viz(sofar, error, str(target))
+
+  print("Writing out story facts...")
+  with open(os.path.join("out", "facts.lp"), 'w') as fout:
+    for pr in sofar:
+      fout.write(str(pr) + '.\n')
 
   print("Building story text...")
   with open(os.path.join("out", "story.txt"), 'w') as fout:
     fout.write(english.build_story_text(sofar, timeshift=None))
-  with open(os.path.join("out", "facts.lp"), 'w') as fout:
-    for pr in sofar:
-      fout.write(str(pr) + '.\n')
   return not error
 
 if __name__ == "__main__":

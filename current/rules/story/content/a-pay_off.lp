@@ -9,6 +9,8 @@ initiator(pay_off, asking).
 outcome(pay_off, deal).
 outcome(pay_off, no_deal).
 
+skill_link(pay_off, negotiation).
+
 error(m("Pay off without price.", N, X)) :-
   at(N, action(X, pay_off)),
   at(N, arg(X, asking, Asking)),

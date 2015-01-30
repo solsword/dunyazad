@@ -1,7 +1,7 @@
 % nodelimit(2)
 :-
-  node_status_reached(root, branched),
-  SC = {
-    successor(root, Opt, Child)
+  node_status_reached(root, built),
+  OPT = {
+    at(root, option(Opt))
   },
-  SC < 3.
+  OPT < 3.

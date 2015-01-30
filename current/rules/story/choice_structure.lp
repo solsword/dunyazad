@@ -29,11 +29,11 @@ error(m("Redundant option", N, option(X))) :-
   X != Y,
   story_op(N, build_options).
 
-% first-person perspective
-error(m("Non-first-person option", N, option(X))) :-
+% your party as the active agent:
+error(m("Non-party-initiated option", N, option(X))) :-
   node_type(N, choice),
   at(N, initiator(option(X), Init)),
-  Init != inst(actor, the_party),
+  not st(N, state(party_member, Init)),
   story_op(N, build_options).
 
 % choices should be frequent

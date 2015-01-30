@@ -43,7 +43,7 @@ NODE_STATUSES = [
   "polished",
 ]
 
-def viz(story):
+def viz(story, error=False, lasttarget=None):
   """
   Visualize the given set of predicates (writes out to a file).
   """
@@ -108,68 +108,70 @@ def viz(story):
         node_properties[node] = {}
       node_properties[node]["setup"] = setup
 
-    # Write out the graphviz graph:
-    gv = """\
+  # Write out the graphviz graph:
+  gv = """\
 digraph "story" {
   graph [
     fontname = "TeXGyre-Pagella",
     fontsize = 12
   ];
 """
-    for node in nodes:
+  for node in nodes:
 
-      if "status" not in node_properties[node]:
-        color = "gray"
-      elif node_properties[node]["status"] == "uninitialized":
-        color = "red"
-      elif node_properties[node]["status"] == "polished":
-        color = "green"
-      else:
-        color = "yellow"
+    if "status" not in node_properties[node]:
+      color = "gray"
+    elif node_properties[node]["status"] == "uninitialized":
+      color = "red"
+    elif node_properties[node]["status"] == "polished":
+      color = "green"
+    else:
+      color = "yellow"
 
-      gvattrs = ['color = {}'.format(color),]
+    gvattrs = ['color = {}'.format(color),]
 
-      if "type" not in node_properties[node]:
-        shape = "polygon"
-      elif node_properties[node]["type"] == "event":
-        shape = "box"
-      elif node_properties[node]["type"] == "choice":
-        shape = "oval"
-      elif node_properties[node]["type"] == "ending":
-        shape = "invtriangle"
-      gvattrs.append('shape = {}'.format(shape))
+    if error and node == lasttarget:
+      shape = "diamond"
+    elif "type" not in node_properties[node]:
+      shape = "polygon"
+    elif node_properties[node]["type"] == "event":
+      shape = "box"
+    elif node_properties[node]["type"] == "choice":
+      shape = "oval"
+    elif node_properties[node]["type"] == "ending":
+      shape = "invtriangle"
+    gvattrs.append('shape = {}'.format(shape))
 
-      if "setup" in node_properties[node]:
-        gvattrs.append(
-          'label = "s:{}"'.format(node_properties[node]["setup"])
-        )
-      gv += '  "{}" [{}];\n'.format(node, ', '.join(gvattrs))
+    if "setup" in node_properties[node]:
+      gvattrs.append(
+        'label = "s:{}"'.format(node_properties[node]["setup"])
+      )
+    gv += '  "{}" [{}];\n'.format(node, ', '.join(gvattrs))
 
-    for src in links:
-      if src not in nodes:
+  for src in links:
+    if src not in nodes:
+      continue
+    for opt in [o for o in links[src] if o != "actions"]:
+      dst = links[src][opt]
+      if dst not in nodes:
         continue
-      for opt in [o for o in links[src] if o != "actions"]:
-        dst = links[src][opt]
-        if dst not in nodes:
-          continue
-        if "actions" in links[src] and opt in links[src]["actions"]:
-          act = links[src]["actions"][opt]
-        else:
-          act = "unknown"
-        linkattrs = ['label = "{}"'.format(act)]
-        if (
+      if "actions" in links[src] and opt in links[src]["actions"]:
+        act = links[src]["actions"][opt]
+      else:
+        act = "unknown"
+      linkattrs = ['label = "{}"'.format(act)]
+      if (
+        node_properties[src].get("vignette")
+      and (
           node_properties[src].get("vignette")
-        and (
-            node_properties[src].get("vignette")
-          ==
-            node_properties[dst].get("vignette")
-          )
-        ):
-          linkattrs.append('style = bold')
-        gvattrs = ''
-        if linkattrs:
-          gvattrs = ' [{}]'.format(', '.join(linkattrs))
-        gv += '  "{}" -> "{}"{};\n'.format(src, dst, gvattrs)
+        ==
+          node_properties[dst].get("vignette")
+        )
+      ):
+        linkattrs.append('style = bold')
+      gvattrs = ''
+      if linkattrs:
+        gvattrs = ' [{}]'.format(', '.join(linkattrs))
+      gv += '  "{}" -> "{}"{};\n'.format(src, dst, gvattrs)
   gv += "}"
   with open(VIZ_GV, 'w') as fout:
     fout.write(gv)

@@ -1,16 +1,6 @@
 % setup.lp
 % Rules concerning vignette setup.
 
-% Local instance counting:
-licount(inst(Typ, I), N, X) :-
-  setup(N, Setup),
-  setup_argument_c(Setup, AnyArg, inst(Typ, I)),
-  X = {
-    setup(Prev, OSet)
-      : setup_argument_c(OSet, SomeArg, inst(Typ, I)),
-      before(Prev, N)
-  }.
-
 % Rules for unpacking and labelling spontaneous states:
 % -----------------------------------------------------
 
@@ -36,28 +26,19 @@ spontaneous(st(N, State)) :-
   at(N, setup_arg(Arg, Symbol)) : symbol(SymType, Symbol)
 } :-
   setup(N, Setup),
-  setup_argument_s(Setup, Arg, SymType),
+  setup_argument_symbol(Setup, Arg, SymType),
   story_op(N, initialize_node).
 
-at(N, setup_arg(Arg, inst(Typ, @inst(I, LIC+1)))) :-
+at(N, setup_arg(Arg, inst(Type, @inst(I, @unique())))) :-
   setup(N, Setup),
-  licount(inst(Typ, I), N, LIC),
-  setup_argument_c(Setup, Arg, inst(Type, I)),
+  setup_argument_create(Setup, Arg, inst(Type, I)),
   story_op(N, initialize_node).
 
-sp_st(N, inst(Typ, @inst(I, LIC+1))) :-
+sp_st(N, Inst) :-
   setup(N, Setup),
-  licount(inst(Typ, I), N, LIC),
-  setup_argument_c(Setup, Arg, inst(Type, I)),
+  at(N, setup_arg(Arg, Inst)),
+  setup_argument_create(Setup, Arg, inst(Type, I)),
   story_op(N, initialize_node).
-
-% TODO: Do we need this?
-%sp_st(N, state(local_instance, inst(Typ, @inst(I, LIC+1)))) :-
-%  licount(inst(Typ, I), N, LIC),
-%  setup_argument_c(Setup, Arg, inst(Type, I)),
-%  setup(N, Setup),
-%  story_op(N, initialize_node).
-
 
 % Rules for argument substitution:
 % --------------------------------

@@ -739,13 +739,13 @@ def build_story_text(story, timeshift=None):
   base_pnslots = {
     "I": [0, set()],
     "we": [0, set()],
-    "you": [0, { "the_party" }],
+    "you": [0, { "you" }],
     "he": [0, set()],
     "she": [0, set()],
     "it": [0, set()],
     "they": [0, set()],
   }
-  base_introduced = { "the_party" }
+  base_introduced = { "you" }
   # Start with all root nodes on our open list:
   olist = [
     (n, base_pnslots, base_introduced) for n in node_templates.keys()

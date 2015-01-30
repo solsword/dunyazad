@@ -2,8 +2,8 @@
 
 possible_setup(monster_attack).
 
-setup_argument_c(monster_attack, monster, inst(actor, monster)).
-setup_argument_c(monster_attack, trophy, inst(item, trophy)).
+setup_argument_create(monster_attack, monster, inst(actor, monster)).
+setup_argument_create(monster_attack, trophy, inst(item, trophy)).
 
 s_st(monster_attack, property(c(name), v(monster), c("dragon"))).
 % default number/person/gender
@@ -13,16 +13,13 @@ s_st(monster_attack, property(c(name), v(trophy), c("dragon scale"))).
 % default number/person/gender
 s_st(monster_attack, relation(c(has_item), v(monster), v(trophy))).
 
-s_st(
-  monster_attack,
-  relation(c(threatening), v(monster), c(inst(actor, the_party)))
-).
+s_st(monster_attack, relation(c(threatening), v(monster), c(inst(actor, you)))).
 
 intro_text(
   N,
   monster_attack,
   @fmt(
-    "Suddenly N#{}/they V#swoop/prs/{} down from the skies, clearly intent on V#attack/prp/{} N#the_party/them.",
+    "Suddenly N#{}/they V#swoop/prs/{} down from the skies, clearly intent on V#attack/prp/{} N#you/them.",
     LMonst, LMonst, LMonst
   )
 ) :-

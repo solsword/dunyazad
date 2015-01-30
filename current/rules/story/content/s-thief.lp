@@ -2,7 +2,7 @@
 
 %possible_setup(thief).
 
-%setup_argument_c(thief, perp, inst(actor, thief)).
+%setup_argument_create(thief, perp, inst(actor, thief)).
 %setup_argument(thief, stolen, item).
 
 % TODO: This setup!

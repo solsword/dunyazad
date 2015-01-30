@@ -168,11 +168,15 @@ before(Prev, New) :-
 
 % Succession involves either an existing node that matches the outcome state of
 % the branching node, or a new node.
+matching_successor(Br, option(Opt), Succ) :-
+  story_node(Succ),
+  state_match(Br, option(Opt), Succ),
+  not before(Succ, Br),
+  story_op(Br, add_branch_nodes).
+
 1 = {
   successor(Br, option(Opt), Succ) :
-    story_node(Succ),
-    state_match(Br, option(Opt), Succ),
-    not before(Succ, Br);
+    matching_successor(Br, option(Opt), Succ);
   successor(Br, option(Opt), @pred(@join_(Br, Opt)))
 } :-
   story_op(Br, add_branch_nodes),

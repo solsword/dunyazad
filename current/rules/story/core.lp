@@ -56,7 +56,7 @@ at(N, option(1)) :-
   at(N, arg(X, Arg, Symbol)) : symbol(SymType, Symbol)
 } :-
   at(N, action(X, Action)),
-  argument_s(Action, Arg, SymType),
+  argument_symbol(Action, Arg, SymType),
   story_op(N, build_options).
 
 

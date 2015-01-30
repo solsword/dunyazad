@@ -38,6 +38,10 @@ def join_lines(*args):
 def mkmem(*args):
   return '.'.join(str(a) for a in args)
 
+def unique(state=[0]):
+  state[0] += 1
+  return state[0]
+
 def inst(base, number):
   return gringo.Fun(str(base) + "_" + str(number))
 
