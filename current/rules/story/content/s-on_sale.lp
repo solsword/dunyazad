@@ -5,6 +5,7 @@ possible_setup(on_sale).
 setup_argument_create(on_sale, merchant, inst(actor, merchant)).
 setup_argument_symbol(on_sale, gender, person_gender).
 setup_argument_create(on_sale, goods, inst(item, goods)).
+% TODO: item type for these goods
 
 % There is a merchant
 s_st(on_sale, property(c(name), v(merchant), c("merchant"))).
