@@ -1,0 +1,12 @@
+% Action - tell_story
+
+:action/tell_story/option
+N#?teller/they V#tell/prs/?teller N#?audience/them a story
+
+:action/tell_story/outcome/entertaining
+N#?audience/they V#listen/prs/?audience closely, V#laugh/prp/?audience and V#gasp/prp/?audience as the story unfolds
+
+:action/tell_story/outcome/boring
+N#?audience/they V#do/prs/?audience not V#seem/prs/?audience interested
+
+% TODO: More here!

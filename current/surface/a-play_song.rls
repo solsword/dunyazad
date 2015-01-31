@@ -1,0 +1,12 @@
+% Action - play_song
+
+:action/play_song/option
+N#?musician/they V#play/prs/?musician a song for N#?audience/them
+
+:action/play_song/outcome/harmonious
+N#?musician/their song V#sound/prs/_singular lovely, and N#?audience/they V#be/prs/?audience enraptured
+
+:action/play_song/outcome/discordant
+N#?musician/their song V#sound/prs/_singular awful, and N#?audience/they V#shudder/prs/?audience
+
+% TODO: More here!

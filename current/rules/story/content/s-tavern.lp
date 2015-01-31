@@ -44,11 +44,11 @@ intro_text(
   N,
   tavern,
   @fmt(
-    "N#{}/they V#enter/prs/{} a bustling tavern. @CAP@N#{}/they V#/tend/prsc/{} the bar, where N#{}/they and N#{}/they V#relax/prsc/_plural. @CAP@N#{}/they V#look/prs/{} like N#{}/they might V#have/prs/{} something to sell, while N#{}/they just V#look/prs/{} bored.",
+    "N#{}/they V#enter/prs/{} a bustling tavern. @CAP@N#{}/they V#tend/prsc/{} the bar, where N#{}/they and N#{}/they V#relax/prsc/_plural. @CAP@N#{}/they V#look/prs/{} like N#{}/they V#might/prs/{} V#have/rinf/{} something to sell, while N#{}/they just V#look/prs/{} bored.",
     you, you,
     Innkeeper, Innkeeper,
     Tinker, Noble,
-    Tinker, Tinker, Tinker, Tinker,
+    Tinker, Tinker, Tinker, Tinker, Tinker,
     Noble, Noble
   )
 ) :-

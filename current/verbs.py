@@ -57,6 +57,7 @@ FORM_DEFAULTS = [
   ("past participle", "any", "any", add_ed),
 ]
 
+# TODO: Modal verbs!
 IRREGULAR = {
   "be": [
     ("present", "singular", "first", "am"),
@@ -99,6 +100,14 @@ IRREGULAR = {
 
     ("present participle", "any", "any", None),
 
+    ("past participle", "any", "any", None),
+  ],
+  "might": [
+    ("present", "any", "any", "might"),
+    ("past", "any", "any", "might"),
+    ("infinitive", "any", "any", None),
+    ("imperative", "any", "any", None),
+    ("present participle", "any", "any", None),
     ("past participle", "any", "any", None),
   ],
   "come": [

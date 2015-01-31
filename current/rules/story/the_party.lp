@@ -19,8 +19,9 @@ starting_skill(acrobatics).
 st(R, inst(actor, you)) :- _sr(R).
 st(R, state(party_member, inst(actor, you))) :- _sr(R).
 st(R, property(name, inst(actor, you), "Dunyazad")) :- _sr(R).
-st(R, property(person, inst(actor, you), first)) :- _sr(R).
+st(R, property(person, inst(actor, you), second)) :- _sr(R).
 st(R, property(gender, inst(actor, you), feminine)) :- _sr(R).
+st(R, property(proper, inst(actor, you), true)) :- _sr(R).
 % You start with literacy, storytelling, and one other random skill (from the
 % list of "starting" skills):
 1 = {

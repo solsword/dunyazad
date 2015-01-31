@@ -63,7 +63,7 @@ TSABR = {
   "ftrp": "future perfect",
   "ftrpc": "future perfect continuous",
   "prp": "present participle",
-  "psp": "present participle",
+  "psp": "past participle",
 }
 
 NOUN_SCHEMAS = {
@@ -191,7 +191,7 @@ def conjugation_table(verb):
       )
   }
   result.update({
-    "infinitive": "to {verb}".format(verb=verbs.conjugation(verb,"infinitive")),
+    "infinitive": "{verb}".format(verb=verbs.conjugation(verb,"infinitive")),
     "imperative": "{verb} it".format(verb=verbs.conjugation(verb,"imperative")),
   })
   return result
@@ -555,6 +555,8 @@ def build_text(
           agree = m.group(3)
           if agree == "_plural":
             add = verbs.conjugation(verb, tense, "plural", "third", timeshift)
+          elif agree == "_singular":
+            add = verbs.conjugation(verb, tense, "singular", "third", timeshift)
           else:
             add = verbs.conj_ref(ndict[agree], verb, tense, timeshift)
         # if we matched a tag, don't bother checking the other tags:
