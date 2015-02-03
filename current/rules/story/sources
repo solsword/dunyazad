@@ -1,19 +1,20 @@
 #!/bin/sh
 core="
-core.lp
-setup.lp
-symbols.lp
-items.lp
-the_party.lp
-skills.lp
-settings.lp
-potential.lp
-grow.lp
-eval.lp
-vignettes.lp
 choice_structure.lp
+core.lp
+eval.lp
+grow.lp
+items.lp
+potential.lp
+settings.lp
+setup.lp
+skills.lp
+symbols.lp
+the_party.lp
+vignettes.lp
 "
 content="content/*.lp"
 surface="surface.lp"
-sources="../utils.lp $core $surface $content test.lpt"
+constraints="test.lpt"
+sources="../utils.lp $core $surface $content"
 args="--seed=$seed --rand-freq=0.05"

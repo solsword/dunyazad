@@ -91,7 +91,8 @@ error(m("Repeated vignette setup", N, R)) :-
 % "reach destination:"
 1 = {
   node_type(N, event);
-  node_type(N, ending)
+  node_type(N, ending);
+  error(m("Vignette resolution has wrong node type.", End, Opt, N))
 } :-
   resolves_vignette(End, Opt),
   successor(End, Opt, N),

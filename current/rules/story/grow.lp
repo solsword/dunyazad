@@ -137,13 +137,15 @@ error(m("Branched node's option is missing a successor.", N, option(O))) :-
 % A setup is needed at the beginning of the story and after every
 % travel_onwards event:
 1 = {
-  setup(N, Setup) : possible_setup(Setup)
+  setup(R, Setup) : possible_setup(Setup);
+  error(m("Root without setup.", R))
 } :-
-  path_length(N, 0),
-  story_op(N, initialize_node).
+  story_root(R),
+  story_op(R, initialize_node).
 
 1 = {
-  setup(N, Setup) : possible_setup(Setup)
+  setup(N, Setup) : possible_setup(Setup);
+  error(m("Post-travel node without setup.", Prev, Opt, N))
 } :-
   successor(Prev, Opt, N),
   at(Prev, action(Opt, travel_onwards)),
@@ -177,7 +179,8 @@ matching_successor(Br, option(Opt), Succ) :-
 1 = {
   successor(Br, option(Opt), Succ) :
     matching_successor(Br, option(Opt), Succ);
-  successor(Br, option(Opt), @pred(@join_(Br, Opt)))
+  successor(Br, option(Opt), @pred(@join_(Br, Opt)));
+  error(m("Node without successor.", Br, option(Opt)))
 } :-
   story_op(Br, add_branch_nodes),
   at(Br, option(Opt)),
@@ -197,7 +200,8 @@ story_node(N) :- new_node(N).
 1 = {
   node_type(N, choice);
   node_type(N, event);
-  node_type(N, ending)
+  node_type(N, ending);
+  error(m("Invalid/missing node type.", N))
 } :-
   story_node(N),
   story_op(N, build_options).
@@ -220,9 +224,7 @@ st(New, PSt) :-
   new_node(New),
   successor(Old, Opt, New),
   st(Old, PSt),
-  0 = {
-    at(Old, consequence(Opt, _not, PSt))
-  }.
+  not at(Old, consequence(Opt, _not, PSt)).
 
 st(New, NSt) :-
   new_node(New),
@@ -248,6 +250,12 @@ error(m("New node lost a state", New, State)) :-
     at(Old, consequence(Opt, _not, State));
     spontaneous(_not, st(New, State))
   }.
+
+error(m("New node violated negative consequence", New, State)) :-
+  new_node(New),
+  successor(Old, Opt, New),
+  at(Old, consequence(Opt, _not, State)),
+  st(New, State).
 
 
 % State matching
@@ -275,11 +283,8 @@ state_mismatch(Prev, option(Opt), New) :-
   at(Prev, option(Opt)),
   story_node(New),
   New != Prev,
-  st(Prev, State),
-  0 = {
-    st(New, State);
-    at(Prev, consequence(option(Opt), _not, State))
-  }.
+  at(Prev, consequence(option(Opt), _not, State)),
+  st(New, State).
 
 % mismatch due to uncaused state addition:
 state_mismatch(Prev, option(Opt), New) :-
@@ -306,3 +311,8 @@ state_mismatch(Prev, option(Opt), New) :-
     at(Prev, consequence(option(Opt), _not, State));
     spontaneous(_not, st(New, State))
   }.
+
+% insurance:
+error(m("Option has state mismatch with successor.", Old, Opt)) :-
+  state_mismatch(Old, Opt, New),
+  successor(Old, Opt, New).

@@ -21,11 +21,12 @@ st(R, state(party_member, inst(actor, you))) :- _sr(R).
 st(R, property(name, inst(actor, you), "Dunyazad")) :- _sr(R).
 st(R, property(person, inst(actor, you), second)) :- _sr(R).
 st(R, property(gender, inst(actor, you), feminine)) :- _sr(R).
-st(R, property(proper, inst(actor, you), true)) :- _sr(R).
+st(R, property(determined, inst(actor, you), false)) :- _sr(R).
 % You start with literacy, storytelling, and one other random skill (from the
 % list of "starting" skills):
 1 = {
-  st(R, property(has_skill, inst(actor, you), Skill)) : starting_skill(Skill)
+  st(R, property(has_skill, inst(actor, you), Skill)) : starting_skill(Skill);
+  error(m("Missing starting skill."))
 } :- _sr(R).
 st(R, property(has_skill, inst(actor, you), literacy)) :- _sr(R).
 st(R, property(has_skill, inst(actor, you), storytelling)) :- _sr(R).
@@ -50,10 +51,12 @@ party_member_rel("beloved").
 % Party member selection:
 
 1 = {
-  party_member(member_1, Relation) : party_member_rel(Relation)
+  party_member(member_1, Relation) : party_member_rel(Relation);
+  error(m("Party member of no relation.", member_1))
 } :- _sr(R).
 1 >= {
-  party_member(member_2, Relation) : party_member_rel(Relation)
+  party_member(member_2, Relation) : party_member_rel(Relation);
+  error(m("Party member of no relation.", member_2))
 } :- _sr(R).
 error(m("Polyamory is too complciated to handle.")) :-
   2 <= { party_member(M, "beloved") : party_member(M, R) }.
@@ -67,20 +70,24 @@ st(R, inst(actor, Member)) :- party_member(Member, Relation), _sr(R).
 st(R, state(party_member, inst(actor, Member))) :- party_member(Member, Relation), _sr(R).
 1 = {
   st(R, property(name, inst(actor, Member), Name))
-    : party_member_name(Name)
+    : party_member_name(Name);
+  error(m("Party member without name.", Member))
 } :- party_member(Member, Relation), _sr(R).
 1 = {
   st(R, property(gender, inst(actor, Member), Gender))
-    : symbol(person_gender, Gender)
+    : symbol(person_gender, Gender);
+  error(m("Party member without gender.", Member))
 } :- party_member(Member, Relation), _sr(R).
 st(R, property(relationship, inst(actor, Member), Relation)) :-
   party_member(Member, Relation), _sr(R).
-st(R, property(proper, inst(actor, Member), true)) :-
+st(R, property(determined, inst(actor, Member), false)) :-
   party_member(Member, Relation),
   _sr(R).
 % Each party member starts with 2 skills:
 2 = {
-  st(R, property(has_skill, inst(actor, Member), Skill)) : skill(Skill)
+  st(R, property(has_skill, inst(actor, Member), Skill)) : skill(Skill);
+  error(m("Party member missing starting skill 1.", Member));
+  error(m("Party member missing starting skill 2.", Member))
 } :- party_member(Member, Relation), _sr(R).
 
 error(m("Party member initial skill overlap.", Skill)) :-
@@ -122,14 +129,16 @@ st(R, relation(has_item, inst(actor, Owner), Inst)) :-
 
 1 = {
   supplies(you, Book) :
-    item(Book, book, Name, Number)
+    item(Book, book, Name, Number);
+  error(m("No starting book."))
 } :- _sr(R).
 
 % Your party members start with non-book tools for their skills:
 1 = {
   supplies(Member, Tool) :
     nonbook_tool(Tool, Skill),
-    item(Tool, Type, Name, Number)
+    item(Tool, Type, Name, Number);
+  error(m("Member didn't start with tool for skill.", Member, Skill))
 } :-
   1 <= { nonbook_tool(Tool, Skill) },
   party_member(Member, Relation),

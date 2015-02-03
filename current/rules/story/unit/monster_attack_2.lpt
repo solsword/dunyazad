@@ -1,0 +1,26 @@
+% vim: syn=gringo
+
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+:- not setup(root, monster_attack).
+:- not at(root, action(option(1), attack)).
+:- not at(root, outcome(option(1), victory)).
+:- not at(root, action(option(2), flee)).
+:- not at(root, outcome(option(2), failure)).
+:- not at(root, action(option(3), pacify)).
+:- not at(root, outcome(option(3), enraged)).
+
+:- not successor(root, option(2), root_2).
+:- not successor(root, option(3), root_2).
+%story_op(root_2, initialize_node).
+%story_op(root_2, build_options).
+%story_op(root_1, add_branch_nodes).

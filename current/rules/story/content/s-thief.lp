@@ -24,7 +24,7 @@
 %          )
 %        );
 %    at(Prev, consequence(Opt, relation(has_item, inst(actor, the_party), Item)))
-%      : successor(Prev, Opt, N);
+%      : successor(Prev, Opt, N)
 %  }.
 %
 %spontaneous(

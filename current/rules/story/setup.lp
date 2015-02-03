@@ -16,14 +16,16 @@ spontaneous(st(N, State)) :-
 % --------------------------
 
 1 = {
-  at(N, setup_arg(Arg, inst(Type, Inst))) : st(N, inst(Type, Inst))
+  at(N, setup_arg(Arg, inst(Type, Inst))) : st(N, inst(Type, Inst));
+  error(m("Unbound setup argument.", N, Setup, Arg, Type))
 } :-
   setup(N, Setup),
   setup_argument(Setup, Arg, Type),
   story_op(N, initialize_node).
 
 1 = {
-  at(N, setup_arg(Arg, Symbol)) : symbol(SymType, Symbol)
+  at(N, setup_arg(Arg, Symbol)) : symbol(SymType, Symbol);
+  error(m("Unbound setup argument (symbol).", N, Setup, Arg, SymType))
 } :-
   setup(N, Setup),
   setup_argument_symbol(Setup, Arg, SymType),

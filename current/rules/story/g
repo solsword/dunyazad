@@ -4,8 +4,12 @@ timelimit="--time-limit=10"
 #timelimit=""
 mkdir -p out
 . ./sources
+if [ $# -gt 0 ]
+then
+  constraints="$*"
+fi
+sources="$sources $constraints"
 echo $seed > out/seed
-
 echo "Sources:"
 echo $sources
 echo "% vim"": syn=gringo" > out/source

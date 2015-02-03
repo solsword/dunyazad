@@ -29,3 +29,7 @@ error(m("Wrong outcome 1")) :-
 error(m("Wrong outcome 2")) :-
   node_status_reached(root, built),
   not at(root, outcome(option(2), failure)).
+
+error(m("Wrong outcome 3")) :-
+  node_status_reached(root, built),
+  not at(root, outcome(option(3), pacified)).

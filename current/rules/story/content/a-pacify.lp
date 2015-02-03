@@ -21,7 +21,7 @@ error(m("Pacification of intelligent target.", N, X)) :-
 % pacifying is one way to deal with a threat
 at(N, deals_with(X, relation(threatening, Aggressive, Someone))) :-
   at(N, action(X, pacify)),
-  at(N, outcome(X, pacified));
+  at(N, outcome(X, pacified)),
   at(N, arg(X, aggressive, Aggressive)),
   st(N, relation(threatening, Aggressive, Someone)),
   story_op(N, build_options).
@@ -54,47 +54,3 @@ at(N, consequence(X, relation(threatening, Aggressive, Pacifier))) :-
   st(N, relation(threatening, Aggressive, Someone)),
   Pacifier != Someone,
   story_op(N, build_options).
-
-% Surface details
-% ---------------
-
-%option_text(
-%  N,
-%  X,
-%  @fmt(
-%    "N#{}/they V#pacify/prs/{} N#{}/them.",
-%    Pac, Pac, Aggr
-%  )
-%) :-
-%  at(N, action(X, pacify)),
-%  at(N, arg(X, pacifier, inst(T1, Pac))),
-%  at(N, arg(X, aggressive, inst(T2, Aggr))),
-%  story_op(N, add_surface).
-%
-%action_text(
-%  N,
-%  X,
-%  @fmt(
-%    "N#{}/they V#pacify/prs/{} N#{}/them, and N#{}/they V#become/prs/{} calm.",
-%    Pac, Pac, Aggr, Aggr, Aggr
-%  )
-%) :-
-%  at(N, action(X, pacify)),
-%  at(N, arg(X, pacifier, inst(T1, Pac))),
-%  at(N, arg(X, aggressive, inst(T2, Aggr))),
-%  at(N, outcome(X, pacified)),
-%  story_op(N, add_surface).
-%
-%action_text(
-%  N,
-%  X,
-%  @fmt(
-%    "N#{}/they V#pacify/prs/{} N#{}/them, but N#{}/they V#become/prs/{} enraged.",
-%    Pac, Pac, Aggr, Aggr, Aggr
-%  )
-%) :-
-%  at(N, action(X, pacify)),
-%  at(N, arg(X, pacifier, inst(T1, Pac))),
-%  at(N, arg(X, aggressive, inst(T2, Aggr))),
-%  at(N, outcome(X, enraged)),
-%  story_op(N, add_surface).

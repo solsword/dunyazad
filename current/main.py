@@ -31,6 +31,11 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
   sofar = []
   scaffolding = ""
   error = False
+  if not os.path.isdir("out"):
+    os.mkdir("out")
+  if not os.path.isdir(os.path.join("out", "snapshots")):
+    os.mkdir(os.path.join("out", "snapshots"))
+
   if scaffoldfile:
     with open(scaffoldfile, 'r') as fin:
       scaffolding = fin.read()
@@ -40,7 +45,10 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
       sofar = list(ans.parse_ans(fin.read()))
   else:
     try:
-      story.extend(tasks.setup_story([], scaffolding))
+      program, setup = tasks.setup_story([], scaffolding)
+      story.extend(setup)
+      with open(os.path.join("out", "snapshots", "prog-setup.lp"), 'w') as fout:
+        fout.write(program)
     except asp.ASPError as e:
       print(
         "Error during setup: {}. Dumping source to '{}'".format(
@@ -52,10 +60,6 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
       return False
  
     n = -1
-    if not os.path.isdir("out"):
-      os.mkdir("out")
-    if not os.path.isdir(os.path.join("out", "snapshots")):
-      os.mkdir(os.path.join("out", "snapshots"))
     sofar = story
     keepgoing = True
     target = "unknown"
@@ -69,7 +73,12 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
         keepgoing = True
         print("Instantiating node '{}'...".format(target))
         try:
-          story = tasks.instantiate_node(story, target, scaffolding)
+          program, story = tasks.instantiate_node(story, target, scaffolding)
+          with open(
+            os.path.join("out", "snapshots", "prog-inst-{}.lp".format(n)),
+            'w'
+          ) as fout:
+            fout.write(program)
           with open(
             os.path.join("out", "snapshots", "story-{}.lp".format(n)),
             'w'
@@ -94,7 +103,12 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
         keepgoing = True
         print("Branching node '{}'...".format(target))
         try:
-          story = tasks.branch_node(story, target, scaffolding)
+          program, story = tasks.branch_node(story, target, scaffolding)
+          with open(
+            os.path.join("out", "snapshots", "prog-branch-{}.lp".format(n)),
+            'w'
+          ) as fout:
+            fout.write(program)
         except asp.ASPError as e:
           print(
             "Error during branching: {}. Dumping source to '{}'".format(
@@ -113,7 +127,12 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
         keepgoing = True
         print("Polishing ending node '{}'...".format(target))
         try:
-          story = tasks.polish_ending(story, target, scaffolding)
+          program, story = tasks.polish_ending(story, target, scaffolding)
+          with open(
+            os.path.join("out", "snapshots", "prog-polish-{}.lp".format(n)),
+            'w'
+          ) as fout:
+            fout.write(program)
         except asp.ASPError as e:
           print(
             "Error while polishing ending: {}. Dumping source to '{}'".format(

@@ -135,16 +135,15 @@ KEEP = {
 }
 
 def runfr(story, name, extra = ""):
-  return asp.solve(
-    SEP.join(
-      [
-        BASE_SRC,
-        '\n'.join(str(pr) + '.' for pr in story),
-        fr(name),
-        extra
-      ]
-    )
+  program = SEP.join(
+    [
+      BASE_SRC,
+      '\n'.join(str(pr) + '.' for pr in story),
+      fr(name),
+      extra
+    ]
   )
+  return program, asp.solve(program)
 
 def filter_keep(story):
   result = []
@@ -220,22 +219,32 @@ def all_unfinished_options(story):
 # Tasks:
 
 def setup_story(story, extra=""):
-  return filter_keep(runfr(story, "setup", extra))
+  program, solution = runfr(story, "setup", extra)
+  return program, filter_keep(solution)
 
 def instantiate_node(story, n, extra=""):
-  return filter_keep(
-    runfr(story, "instantiate", extra + "\ntarget_node({}).".format(n))
+  program, solution = runfr(
+    story,
+    "instantiate",
+    extra + "\ntarget_node({}).".format(n)
   )
+  return program, filter_keep(solution)
 
 def branch_node(story, n, extra=""):
-  return filter_keep(
-    runfr(story, "branch", extra + "\ntarget_node({}).".format(n))
+  program, solution = runfr(
+    story,
+    "branch",
+    extra + "\ntarget_node({}).".format(n)
   )
+  return program, filter_keep(solution)
 
 def polish_ending(story, n, extra=""):
-  return filter_keep(
-    runfr(story, "branch", extra + "\ntarget_node({}).".format(n))
+  program, solution = runfr(
+    story,
+    "branch",
+    extra + "\ntarget_node({}).".format(n)
   )
+  return program, filter_keep(solution)
 
 def random_uninstantiated(story):
   l = list(all_uninstantiated_nodes(story))

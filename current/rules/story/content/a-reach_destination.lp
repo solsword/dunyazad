@@ -25,31 +25,3 @@ at(N, nullifies(X, Pt)) :-
 
 % reach_destination doesn't need to have any consequences as it can only happen
 % at the end of a story.
-
-
-% Surface details
-% ---------------
-
-%option_text(
-%  N,
-%  X,
-%  @fmt(
-%    "N#{}/they V#reach/prs/{} N#{}/their destination.",
-%    Subj, Subj, Subj
-%  )
-%) :-
-%  at(N, action(X, reach_destination)),
-%  at(N, arg(X, subject, inst(T1, Subj))),
-%  story_op(N, add_surface).
-%
-%action_text(
-%  N,
-%  X,
-%  @fmt(
-%    "N#{}/they finally V#reach/prs/{} N#{}/their destination. All is well.",
-%    Subj, Subj, Subj
-%  )
-%) :-
-%  at(N, action(X, reach_destination)),
-%  at(N, arg(X, subject, inst(T1, Subj))),
-%  story_op(N, add_surface).

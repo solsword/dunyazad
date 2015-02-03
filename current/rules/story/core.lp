@@ -4,6 +4,7 @@
 :- error(Message).
 %#minimize { 1@0, error(Message) : error(Message) }.
 %:- error(m("Story too short", N)).
+%:- error(m("Irrelevant option", Node, Option)).
 
 #const max_options=5.
 #const min_story_length=7. % TODO: increase this
@@ -16,7 +17,9 @@ opt_num(1..max_options).
 
 % Choice nodes have at least two options:
 2 <= {
-  at(N, option(X)) : opt_num(X)
+  at(N, option(X)) : opt_num(X);
+  error(m("Choice node missing option 1.", N));
+  error(m("Choice node missing option 2.", N))
 } <= max_options :-
   node_type(N, choice),
   story_op(N, build_options).
@@ -32,28 +35,32 @@ at(N, option(1)) :-
 
 % Every option has an action:
 1 = {
-  at(N, action(option(X), Act)) : action(Act)
+  at(N, action(option(X), Act)) : action(Act);
+  error(m("Option without action.", N, option(X)))
 } :-
   at(N, option(X)),
   story_op(N, build_options).
 
 % And every action has an outcome:
 1 = {
-  at(N, outcome(X, Outcome)) : outcome(Action, Outcome)
+  at(N, outcome(X, Outcome)) : outcome(Action, Outcome);
+  error(m("Action without outcome.", N, X, Action))
 } :-
   at(N, action(X, Action)),
   story_op(N, build_options).
 
 % And all action arguments are filled in:
 1 = {
-  at(N, arg(X, Arg, inst(Type, Inst))) : st(N, inst(Type, Inst))
+  at(N, arg(X, Arg, inst(Type, Inst))) : st(N, inst(Type, Inst));
+  error(m("Unbound action argument.", N, Action, Arg, Type))
 } :-
   at(N, action(X, Action)),
   argument(Action, Arg, Type),
   story_op(N, build_options).
 
 1 = {
-  at(N, arg(X, Arg, Symbol)) : symbol(SymType, Symbol)
+  at(N, arg(X, Arg, Symbol)) : symbol(SymType, Symbol);
+  error(m("Unbound action argument (symbol).", N, Action, Arg, SymType))
 } :-
   at(N, action(X, Action)),
   argument_symbol(Action, Arg, SymType),

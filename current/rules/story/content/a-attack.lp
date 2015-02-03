@@ -55,21 +55,23 @@ at(N, emphasizes(X, relation(threatening, Target, Someone))) :-
   story_op(N, build_options).
 
 1 = {
-  at(N, consequence(X, state(injured, Aggressor)));
-  at(N, consequence(X, state(killed, Aggressor)))
-} :-
-  at(N, action(X, attack)),
-  at(N, arg(X, aggressor, Aggressor)),
-  at(N, outcome(X, defeat)),
-  story_op(N, build_options).
-
-1 = {
   at(N, consequence(X, state(injured, Target)));
-  at(N, consequence(X, state(killed, Target)))
+  at(N, consequence(X, state(killed, Target)));
+  error(m("Victory without consequences.", N, X))
 } :-
   at(N, action(X, attack)),
   at(N, arg(X, target, Target)),
   at(N, outcome(X, victory)),
+  story_op(N, build_options).
+
+1 = {
+  at(N, consequence(X, state(injured, Aggressor)));
+  at(N, consequence(X, state(killed, Aggressor)));
+  error(m("Defeat without consequences.", N, X))
+} :-
+  at(N, action(X, attack)),
+  at(N, arg(X, aggressor, Aggressor)),
+  at(N, outcome(X, defeat)),
   story_op(N, build_options).
 
 % Looting is a possibility:
@@ -85,42 +87,3 @@ at(N, emphasizes(X, relation(threatening, Target, Someone))) :-
     at(N, outcome(X, parley))
   },
   story_op(N, build_options).
-
-
-% Surface details
-% ---------------
-
-%option_text(
-%  N,
-%  X,
-%  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them."
-%) :-
-%  at(N, action(X, attack)),
-%  story_op(N, add_surface).
-%
-%action_text(
-%  N,
-%  X,
-%  "N#:aggressor/they V#attack/prs/:aggressor and V#defeat/prs/:aggressor N#:target/them."
-%) :-
-%  at(N, action(X, attack)),
-%  at(N, outcome(X, victory)),
-%  story_op(N, add_surface).
-%
-%action_text(
-%  N,
-%  X,
-%  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them and V#fight/prs/:aggressor to a standstill."
-%) :-
-%  at(N, action(X, attack)),
-%  at(N, outcome(X, parley)),
-%  story_op(N, add_surface).
-%
-%action_text(
-%  N,
-%  X,
-%  "N#:aggressor/they V#attack/prs/:aggressor N#:target/them but V#be/prs/:aggressor defeated."
-%) :-
-%  at(N, action(X, attack)),
-%  at(N, outcome(X, defeat)),
-%  story_op(N, add_surface).

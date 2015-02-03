@@ -57,7 +57,7 @@ class Noun:
     person="third",
     number="singular",
     gender="neuter",
-    proper=False
+    determined=False
   ):
     self.tag = tag
     self.typ = typ
@@ -65,7 +65,7 @@ class Noun:
     self.person = person
     self.number = number
     self.gender = gender
-    self.proper = proper
+    self.determined = determined
 
   def __str__(self):
     return "Noun[{}:{}/{}][{}/{}]".format(
@@ -84,7 +84,7 @@ class Noun:
       self.person,
       self.number,
       self.gender,
-      self.proper
+      self.determined
     )
 
 def pnslot(thing):
@@ -146,13 +146,13 @@ def definite(thing):
   """
   Returns a definite reference to the given noun, e.g. "the monster" or "Sam"
   """
-  if thing.proper:
-    return thing.name
-  else:
+  if thing.determined:
     return "the {}".format(thing.name)
+  else:
+    return thing.name
 
 def indefinite(thing):
-  if thing.proper:
+  if not thing.determined:
     return "a {} named {}".format(thing.typ, thing.name)
   else:
     if thing.number == "singular":

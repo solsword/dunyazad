@@ -43,7 +43,7 @@ TAGS = {
 TR_TYPE = {
   "party_member": "person",
   "item": "item",
-  "actor": "entity",
+  "actor": "person",
 }
 
 TSABR = {
@@ -115,6 +115,15 @@ NOUN_SCHEMAS = {
         Pr("determined"),
         Pr("inst", Vr("Type"), Vr("Key")),
         Vr("Determination")
+      )
+    ),
+  "party_member":
+    Pr(
+      "st",
+      Vr("Node"),
+      Pr("state",
+        Pr("party_member"),
+        Pr("inst", Vr("Type"), Vr("Key")),
       )
     ),
 }
@@ -217,6 +226,8 @@ def glean_nouns(story):
     elif sc == "determined":
       d = binding["st.property.Determination"].unquoted()
       result[n].determined = d == "true"
+    elif sc == "party_member":
+      result[n].is_party_member = True
   return result
 
 def glean_context_variables(story):

@@ -24,3 +24,5 @@ at(N, emphasizes(X, state(bored, Audience))) :-
   st(N, state(bored, Audience)),
   story_op(N, build_options).
 % TODO: angering the audience?
+
+% TODO: Other effects?
