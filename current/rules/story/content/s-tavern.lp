@@ -38,7 +38,7 @@ s_st(tavern, property(c(gender), v(innkeeper), v(innkeeper_gender))).
 % Potentials:
 s_st(tavern, relation(c(selling), v(tinker), v(goods))).
 s_st(tavern, state(c(bored), v(noble))).
-s_st(tavern, state(c(gossip), v(innkeeper))).
+s_st(tavern, state(c(knows_gossip), v(innkeeper))).
 
 intro_text(
   N,

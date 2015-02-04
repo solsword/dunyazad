@@ -10,7 +10,7 @@ outcome(pacify, enraged).
 
 skill_link(pacify, music).
 requires_tool(pacify).
-%skill_link(pacify, negotiation).
+%skill_link(pacify, elocution).
 
 % you can only pacify unintelligent beings: TODO: Change this?
 error(m("Pacification of intelligent target.", N, X)) :-

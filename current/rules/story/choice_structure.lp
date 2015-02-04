@@ -87,6 +87,27 @@ error(m("Repeated vignette setup", N, R)) :-
   vignette(Prev, R),
   setup(R, Boring).
 
+times_setup_used_before(N, Setup, Count) :-
+  story_op(N, build_options),
+  possible_setup(Setup),
+  Count = {
+    setup(Prev, Setup) : before(Prev, N)
+  }.
+
+unique_setups_used_before(N, Count) :-
+  story_op(N, build_options),
+  Count = {
+    possible_setup(Setup) : setup(Prev, Setup), before(Prev, N)
+  }.
+
+error(m("Boring vignette setup", N)) :-
+  story_op(N, build_options),
+  setup(N, Boring),
+  times_setup_used_before(N, Boring, Boredom),
+  unique_setups_used_before(N, Unique),
+  Boredom > 0,
+  Boredom + 1 >= Unique.
+
 % every vignette ends with one of the special actions "travel onwards" or
 % "reach destination:"
 1 = {

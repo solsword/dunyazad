@@ -7,6 +7,7 @@ initiator(tell_story, teller).
 outcome(tell_story, entertaining).
 outcome(tell_story, boring).
 
+skill_link(tell_story, elocution).
 skill_link(tell_story, storytelling).
 
 at(N, deals_with(X, state(bored, Audience))) :-

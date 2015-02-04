@@ -11,7 +11,7 @@ _sr(R) :- story_root(R), story_op(R, initialize_node).
 starting_skill(tinkering).
 starting_skill(wilderness_lore).
 starting_skill(music).
-starting_skill(negotiation).
+starting_skill(elocution).
 starting_skill(healing).
 starting_skill(prayer).
 starting_skill(acrobatics).

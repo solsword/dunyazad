@@ -1,0 +1,13 @@
+% Action - gossip
+
+:action/tell_story/option
+N#?interested/they V#gossip/prs/?teller with N#?knowledgeable/them
+
+% TODO: This!!
+:action/tell_story/outcome/useful
+N#?interested/they V#chat/prs/?interested with N#?knowledgeable/them, and V#learn/prs/?interested something interesting
+
+:action/tell_story/outcome/useless
+N#?interested/they V#chat/prs/?interested with N#?knowledgeable/them, but N#?knowledgeable/they V#don't/prs/?knowledgeable seem to know anything useful
+
+% TODO: More here!

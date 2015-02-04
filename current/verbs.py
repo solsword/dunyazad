@@ -123,6 +123,19 @@ IRREGULAR = {
 
     ("past participle", "any", "any", "come"),
   ],
+  "don't": [
+    ("present", "singular", "first", "don't"),
+    ("present", "singular", "second", "don't"),
+    ("present", "singular", "third", "doesn't"),
+
+    ("present", "plural", "any", "don't"),
+
+    ("past", "any", "any", "didn't"),
+
+    ("present participle", "any", "any", None),
+
+    ("past participle", "any", "any", None),
+  ],
   "strike": [
     ("past", "any", "any", "struck"),
     ("past participle", "any", "any", "struck"),

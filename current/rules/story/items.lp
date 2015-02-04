@@ -46,7 +46,7 @@ item(comb, charm, "comb", singular).
 item(holy_book, book, "holy book", singular).
 item(plants_book, book, "book of herbal lore", singular).
 item(animals_book, book, "guide to wild beasts", singular).
-item(trade_book, book, "book about trading principles", singular).
+item(speech_book, book, "book of speeches", singular).
 item(music_book, book, "music book", singular).
 item(medicine_book, book, "book of medicine", singular).
 item(legends_book, book, "book of legends", singular).
@@ -62,7 +62,7 @@ tool_for(plants_book, healing).
 teaches_skill(animals_book, wilderness_lore).
 tool_for(animals_book, wilderness_lore).
 
-teaches_skill(trade_book, negotiation).
+teaches_skill(speech_book, elocution).
 
 teaches_skill(music_book, music).
 tool_for(music_book, music).

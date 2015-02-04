@@ -10,7 +10,7 @@ initiator(trade, buyer).
 outcome(trade, deal).
 outcome(trade, no_deal).
 
-skill_link(trade, negotiation).
+skill_link(trade, elocution).
 
 error(m("Unintelligent buyer.", N, X, Buyer)) :-
   at(N, action(X, trade)),
