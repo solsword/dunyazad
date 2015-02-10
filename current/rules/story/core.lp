@@ -7,7 +7,8 @@
 %:- error(m("Irrelevant option", Node, Option)).
 
 #const max_options=5.
-#const min_story_length=7. % TODO: increase this
+#const min_story_length=25.
+#const min_story_choices=15.
 
 opt_num(1..max_options).
 

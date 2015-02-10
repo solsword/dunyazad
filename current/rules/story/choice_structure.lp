@@ -36,6 +36,15 @@ error(m("Non-party-initiated option", N, option(X))) :-
   not st(N, state(party_member, Init)),
   story_op(N, build_options).
 
+% overall structure constraints:
+% ------------------------------
+
+% the story shouldn't end too soon:
+error(m("Story too short", N)) :-
+  node_type(N, ending),
+  shortest_path(N, L),
+  L < min_story_length.
+
 % choices should be frequent
 error(m("Not enough choices", A, B, C)) :-
   successor(A, AOpt, B),
@@ -75,9 +84,9 @@ error(m("Repeated emphasis", N, option(X))) :-
   at(N, emphasizes(option(Y), Something)),
   story_op(N, build_options).
 
-% within-vignette boredom
 
-% TODO: within-vignette boredom!
+% vignette structure constraints:
+% -------------------------------
 
 % vignette-level boredom
 error(m("Repeated vignette setup", N, R)) :-
@@ -131,9 +140,35 @@ at(N, action(option(1), reach_destination)) :-
   successor(End, Opt, N),
   story_op(N, build_options).
 
-% the story shouldn't end too soon:
 
-error(m("Story too short", N)) :-
+% choice poetics constraints:
+% ---------------------------
+
+choices_before(N, X) :-
+  X = {
+    node_type(B, choice) : before(B, N)
+  },
+  story_op(N, build_options).
+
+
+% the story must contain at least a minimum number of choices:
+error(m("Too few choices before ending", N)) :-
   node_type(N, ending),
-  shortest_path(N, L),
-  L < min_story_length.
+  choices_before(N, L),
+  L < min_story_choices.
+
+
+% The first few choices have a set structure:
+choice_structure_plan(0, relaxed).
+choice_structure_plan(1, relaxed).
+choice_structure_plan(2, straightforward).
+choice_structure_plan(3, mysterious).
+
+error(m("Deviated from initial choices plan", N)) :-
+  node_type(N, choice),
+  story_op(N, build_options),
+  choices_before(N, L),
+  choice_structure_plan(L, CS),
+  not at(N, choice_structure(CS)).
+
+% The midgame is less constrained:

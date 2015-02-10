@@ -7,6 +7,8 @@ initiator(flee, fearful).
 outcome(flee, escape).
 outcome(flee, failure).
 
+
+dangerous(flee).
 at(N, skill_link(flee, acrobatics)) :-
   1 <= {
     setting(N, city);
@@ -19,6 +21,7 @@ at(N, skill_link(flee, wilderness_lore)) :-
     setting(N, wilderness)
   },
   story_node(N).
+
 
 at(N, deals_with(X, relation(threatening, From, Fearful))) :-
   at(N, action(X, flee)),

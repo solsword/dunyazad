@@ -27,7 +27,16 @@ skill_name(prayer, "prayer").
 skill_name(acrobatics, "acrobatics").
 
 % Universal skill links:
-
 at(N, skill_link(Action, Skill)) :-
   story_node(N),
   skill_link(Action, Skill).
+
+% Universal danger:
+at(N, dangerous(Action)) :-
+  story_node(N),
+  dangerous(Action).
+
+% Option danger:
+at(N, dangerous(Option)) :-
+  at(N, dangerous(Action)),
+  at(N, action(Option, Action)).

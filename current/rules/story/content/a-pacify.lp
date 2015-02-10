@@ -8,9 +8,12 @@ initiator(pacify, pacifier).
 outcome(pacify, pacified).
 outcome(pacify, enraged).
 
+
+dangerous(pacify).
 skill_link(pacify, music).
 requires_tool(pacify).
 %skill_link(pacify, elocution).
+
 
 % you can only pacify unintelligent beings: TODO: Change this?
 error(m("Pacification of intelligent target.", N, X)) :-
@@ -53,4 +56,13 @@ at(N, consequence(X, relation(threatening, Aggressive, Pacifier))) :-
   at(N, arg(X, pacifier, Pacifier)),
   st(N, relation(threatening, Aggressive, Someone)),
   Pacifier != Someone,
+  story_op(N, build_options).
+
+% You can also get injured if things go badly.
+0 <= {
+  at(N, consequence(X, state(injured, Pacifier)))
+} <= 1 :-
+  at(N, action(X, pacify)),
+  at(N, arg(X, pacifier, Pacifier)),
+  at(N, outcome(X, enraged)),
   story_op(N, build_options).
