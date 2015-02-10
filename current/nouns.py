@@ -57,7 +57,8 @@ class Noun:
     person="third",
     number="singular",
     gender="neuter",
-    determined=False
+    determined=False,
+    is_party_member=False,
   ):
     self.tag = tag
     self.typ = typ
@@ -66,6 +67,7 @@ class Noun:
     self.number = number
     self.gender = gender
     self.determined = determined
+    self.is_party_member = is_party_member
 
   def __str__(self):
     return "Noun[{}:{}/{}][{}/{}]".format(
@@ -77,14 +79,15 @@ class Noun:
     )
 
   def __repr__(self):
-    return "Noun({}, {}, {}, {}, {}, {}, {})".format(
+    return "Noun({}, {}, {}, {}, {}, {}, {}, {})".format(
       self.tag,
       self.typ,
       self.name,
       self.person,
       self.number,
       self.gender,
-      self.determined
+      self.determined,
+      self.is_party_member,
     )
 
 def pnslot(thing):

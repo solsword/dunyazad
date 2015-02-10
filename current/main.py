@@ -40,6 +40,7 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
     with open(scaffoldfile, 'r') as fin:
       scaffolding = fin.read()
 
+  target = "unknown"
   if storyfile:
     with open(storyfile, 'r') as fin:
       sofar = list(ans.parse_ans(fin.read()))
@@ -62,7 +63,6 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
     n = -1
     sofar = story
     keepgoing = True
-    target = "unknown"
     while len(list(tasks.all_nodes(story))) < nodelimit and keepgoing:
       keepgoing = False
       n += 1
@@ -120,7 +120,7 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
           error = True
           break
 
-      target = tasks.random_ending(story)
+      target = tasks.random_unpolished_ending(story)
       if not target:
         print("No endings to polish this cycle.")
       else:

@@ -74,6 +74,7 @@ SC = {
   "option": Pr("at", Vr("Node"), Pr("option", Vr("Opt"))),
   "successor": Pr("successor", Vr("From"), Pr("option", Vr("Opt")), Vr("To")),
   "setup": PVr("setup", "setup", Vr("Node"), Vr("Which")),
+  "polished": Pr("node_status", Vr("Node"), Pr("polished")),
 }
 
 KEEP = {
@@ -188,6 +189,12 @@ def all_successors(story):
     if b:
       yield (b["successor.From"], b["successor.option.Opt"], b["successor.To"])
 
+def all_polished_nodes(story):
+  for pr in story:
+    b = ans.bind(SC["polished"], pr)
+    if b:
+      yield b["node_status.Node"]
+
 def all_uninstantiated_nodes(story):
   an = all_nodes(story)
   ao = list(all_options(story))
@@ -272,8 +279,10 @@ def random_ending(story):
 
 def random_unpolished_ending(story):
   l = list(all_endings(story))
-  if l:
-    return random.choice(l)
+  p = set(all_polished_nodes(story))
+  upe = [ e for e in l if e not in p ]
+  if upe:
+    return random.choice(upe)
   else:
-    print("Random ending: none left!")
+    print("Random unpolished ending: none left!")
     return None

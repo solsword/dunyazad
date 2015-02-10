@@ -211,8 +211,16 @@ def glean_nouns(story):
   """
   result = {}
   for sc, binding in ans.bindings(NOUN_SCHEMAS, story):
-    n = binding["st.property.inst.Key"].unquoted()
-    t = binding["st.property.inst.Type"].unquoted()
+    if "st.property.inst.Key" in binding:
+      n = binding["st.property.inst.Key"].unquoted()
+      t = binding["st.property.inst.Type"].unquoted()
+    elif "st.state.inst.Key" in binding:
+      n = binding["st.state.inst.Key"].unquoted()
+      t = binding["st.state.inst.Type"].unquoted()
+    else:
+      raise ValueError(
+        "Unknown binding structure for noun schema:\n{}".format(binding)
+      )
     if n not in result:
       result[n] = nouns.Noun(n, TR_TYPE[t] if t in TR_TYPE else "thing")
     if sc == "name":
@@ -331,7 +339,6 @@ def glean_context_variables(story):
         v = vpr.unquoted()
       result[n]["setup"][a] = v
   return result
-  # TODO: HERE! Thread this info through and use it!
 
 def collate_rules(story):
   """
@@ -433,7 +440,7 @@ def subst_result(rules, key, flags):
     all_possibilities.extend(ps)
   # TODO: better/controllable randomness?
   if (len(all_possibilities) == 0):
-    print("ERROR: No possible substitutions for key '{}'.".format(key))
+    raise KeyError("ERROR: No possible substitutions for key '{}'.".format(key))
   result = random.choice(all_possibilities)
   if 'S' in flags:
     result = "@CAP@" + sentence(result)
@@ -577,13 +584,13 @@ def build_text(
   result = re.sub(CAP, lambda m: m.group(1).upper(), result)
   return result, pnslots, introduced
 
-def find_node_structure(story):
+def find_node_structure(story, nodelist):
   """
   Takes a story and looks at successor/3 predicates to determine the structure
-  of nodes in the story, returning a dictionary that maps node names to both
-  successor and predecessor entries: successor entries being option->node
-  mappings and predecessor entries being a list of nodes that have this node as
-  a successor.
+  of nodes in the story, ignoring nodes not on the given nodelist, and
+  returning a dictionary that maps node names to both successor and predecessor
+  entries: successor entries being option->node mappings and predecessor
+  entries being a list of nodes that have this node as a successor.
   """
   result = {}
   for pr in story:
@@ -592,6 +599,8 @@ def find_node_structure(story):
       frm = scc["successor.From"].unquoted()
       opt = scc["successor.option.Opt"].unquoted()
       to = scc["successor.To"].unquoted()
+      if frm not in nodelist or to not in nodelist:
+        continue
       if frm not in result:
         result[frm] = {"successors":{}, "predecessors":[]}
       if to not in result:
@@ -640,7 +649,37 @@ def build_node_text(
   )
   situation = sentence(situation)
   options = ""
-  if node["options"]:
+  if len(node["options"]) == 1:
+    options = ""
+    opt = list(node["options"].keys())[0]
+    txt, pnout, intout = build_text(
+      node["options"][opt],
+      grammar_rules,
+      context_variables[opt],
+      nouns,
+      _pnslots,
+      _introduced,
+      timeshift
+    )
+    options += '\n' + sentence(txt)
+    txt, pnout, intout = build_text(
+      node["outcomes"][opt],
+      grammar_rules,
+      context_variables[opt],
+      nouns,
+      pnout,
+      intout,
+      timeshift
+    )
+    options += '\n' + sentence(txt)
+    successors = node_structure[node["name"]]["successors"]
+    if opt in successors:
+      scc = successors[opt]
+      outgoing[scc] = (pnout, intout)
+      options += "\n*goto {}\n".format(scc)
+    else:
+      options += "*finish\n"
+  elif len(node["options"]) > 1:
     options = "*choice\n"
     for opt in node["options"]:
       txt, pnout, intout = build_text(
@@ -685,6 +724,10 @@ def build_node_text(
 )
   return result, outgoing
 
+def generate_intro(story, timeshift=None):
+  return ""
+  # TODO: HERE!
+
 def build_story_text(story, timeshift=None):
   node_templates = {}
   gr_rules = collate_rules(story)
@@ -721,13 +764,6 @@ def build_story_text(story, timeshift=None):
         node_templates[node]["situation"] += " and "
       node_templates[node]["situation"] += txt
 
-    #elif sc == "option_text":
-    #  opt = bnd["txt.option.Opt"].unquoted()
-    #  node_templates[node]["options"][opt] = txt
-    #elif sc == "action_text":
-    #  opt = bnd["txt.option.Opt"].unquoted()
-    #  node_templates[node]["outcomes"][opt] = txt
-
   # Next find context variables which also gives us an idea of the story
   # structure:
   cvrs = glean_context_variables(story)
@@ -739,7 +775,7 @@ def build_story_text(story, timeshift=None):
     print("WARNING: Node '{}' is polished, but has no context.".format(k))
 
   # Iterate over our nodes and options adding static option/outcome templates:
-  for node in cvrs:
+  for node in node_templates:
     for option in [o for o in cvrs[node] if o != "setup"]:
       nts = node_templates[node]
       nts["options"][option] = "[[S|action/?_action/option]]"
@@ -748,7 +784,7 @@ def build_story_text(story, timeshift=None):
   # Next, use the node structure to recursively render the story text in
   # ChoiceScript:
   nouns = glean_nouns(story)
-  node_structure = find_node_structure(story)
+  node_structure = find_node_structure(story, node_templates.keys())
   base_pnslots = {
     "I": [0, set()],
     "we": [0, set()],
@@ -758,7 +794,8 @@ def build_story_text(story, timeshift=None):
     "it": [0, set()],
     "they": [0, set()],
   }
-  base_introduced = { "you" }
+  # You and your party members start as 'introduced'
+  base_introduced = { "you" } | { n for n in nouns if nouns[n].is_party_member }
   # Start with all root nodes on our open list:
   olist = [
     (n, base_pnslots, base_introduced) for n in node_templates.keys()
@@ -774,6 +811,7 @@ def build_story_text(story, timeshift=None):
         if len(node_structure[n]["predecessors"]) > 0
   }
   results = []
+  results.append(generate_intro(story, timeshift))
   while olist:
     #print("open:", [ole[0] for ole in olist])
     target, pnslots, introduced = olist.pop(0)
