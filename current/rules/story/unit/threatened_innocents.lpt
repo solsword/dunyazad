@@ -15,6 +15,9 @@ story_op(root, add_surface).
 :- not at(root, action(option(1), attack)).
 :- not at(root, outcome(option(1), victory)).
 
+:- 0 = { at(root, arg(option(2), price, Price)) }.
+:- not at(root, action(option(2), pay_off)).
+
 :- not successor(root, option(1), root_1).
 story_op(root_1, initialize_node).
 story_op(root_1, build_options).

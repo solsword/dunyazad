@@ -10,10 +10,12 @@ setup_argument_create(on_sale, goods, inst(item, goods)).
 % There is a merchant
 s_st(on_sale, property(c(name), v(merchant), c("merchant"))).
 s_st(on_sale, property(c(gender), v(merchant), v(gender))).
+s_st(on_sale, property(c(type), v(merchant), c(merchant))).
 % default number/person
 
 s_st(on_sale, property(c(name), v(goods), c("goods"))).
 s_st(on_sale, property(c(number), v(goods), c(plural))).
+s_st(on_sale, property(c(type), v(goods), c(treasure))).
 % default person/gender
 s_st(on_sale, relation(c(has_item), v(merchant), v(goods))).
 

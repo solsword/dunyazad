@@ -17,22 +17,26 @@ setup_argument_symbol(tavern, innkeeper_gender, person_gender).
 % The tinker
 s_st(tavern, property(c(name), v(tinker), c("tinker"))).
 s_st(tavern, property(c(gender), v(tinker), v(tinker_gender))).
+s_st(tavern, property(c(type), v(tinker), c(merchant))).
 % default number/person
 
 % The tinker's goods
 s_st(tavern, property(c(name), v(goods), c("goods"))).
 s_st(tavern, property(c(number), v(goods), c(plural))).
+s_st(tavern, property(c(type), v(goods), c(treasure))).
 % default person/gender
 s_st(tavern, relation(c(has_item), v(tinker), v(goods))).
 
 % The noble
 s_st(tavern, property(c(name), v(noble), c("noble"))).
 s_st(tavern, property(c(gender), v(noble), v(noble_gender))).
+s_st(tavern, property(c(type), v(noble), c(noble))).
 % default number/person
 
 % The innkeeper
 s_st(tavern, property(c(name), v(innkeeper), c("innkeeper"))).
 s_st(tavern, property(c(gender), v(innkeeper), v(innkeeper_gender))).
+s_st(tavern, property(c(type), v(innkeeper), c(innkeeper))).
 % default number/person
 
 % Potentials:

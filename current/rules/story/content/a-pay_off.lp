@@ -22,7 +22,7 @@ error(m("Price is not a treasure.", N, X)) :-
   at(N, action(X, pay_off)),
   at(N, arg(X, asking, Asking)),
   at(N, arg(X, price, Price)),
-  not st(N, property(type, Price, treasure)),
+  not is_instance(N, Price, treasure),
   story_op(N, build_options).
 
 error(m("Unintelligent bargainer.", N, X)) :-

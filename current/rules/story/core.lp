@@ -5,6 +5,8 @@
 :- error(Message).
 %:- error(m("Story too short", N)).
 %:- error(m("Irrelevant option", Node, Option)).
+%:- error(m("Unbound action argument.", Node, Action, Arg, ArgType)).
+%:- error(m("Price is not a treasure.", Node, Option)).
 
 #const max_options=5.
 #const min_story_length=25.
@@ -78,6 +80,7 @@ at(N, initiator(X, Initiator)) :-
   initiator(Action, InitArg),
   story_op(N, build_options).
 
+
 % State and action rules:
 % -----------------------
 
@@ -98,3 +101,20 @@ error(m("Improperly reflexive action.", N, Opt)) :-
   at(N, arg(Opt, Arg2, inst(actor, ID))),
   Arg1 < Arg2,
   not reflexive(Action).
+
+
+% Typing rules:
+% -------------
+
+is_instance(N, Thing, Class) :-
+  st(N, property(type, Thing, Class)).
+
+is_instance(N, Thing, Class) :-
+  is_instance(N, Thing, Subclass),
+  subclass(Class, Subclass).
+
+subclass(General, Specific) :-
+  subclass(General, Intermediate),
+  subclass(Intermediate, Specific).
+
+% TODO: Class/subclass hierarchies for things other than items!

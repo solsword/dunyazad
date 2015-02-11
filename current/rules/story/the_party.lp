@@ -22,6 +22,7 @@ st(R, property(name, inst(actor, you), "Dunyazad")) :- _sr(R).
 st(R, property(person, inst(actor, you), second)) :- _sr(R).
 st(R, property(gender, inst(actor, you), feminine)) :- _sr(R).
 st(R, property(determined, inst(actor, you), false)) :- _sr(R).
+st(R, property(type, inst(actor, you), individual_human)) :- _sr(R).
 % You start with literacy, storytelling, and one other random skill (from the
 % list of "starting" skills):
 1 = {
@@ -83,6 +84,9 @@ st(R, property(relationship, inst(actor, Member), Relation)) :-
 st(R, property(determined, inst(actor, Member), false)) :-
   party_member(Member, Relation),
   _sr(R).
+st(R, property(type, inst(actor, member), individual_human)) :-
+  party_member(Member, Relation),
+  _sr(R).
 % Each party member starts with 2 skills:
 2 = {
   st(R, property(has_skill, inst(actor, Member), Skill)) : skill(Skill);
@@ -118,7 +122,7 @@ st(R, relation(has_item, inst(actor, Owner), Inst)) :-
 % Supply details
 
 % You start with some basic items:
-1 >= {
+1 = {
   supplies(you, Treasure) :
     item(Treasure, treasure, Name, Number)
 } :- _sr(R).

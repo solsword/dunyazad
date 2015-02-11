@@ -1,3 +1,14 @@
+
+subclass(item, weapon).
+subclass(item, treasure).
+subclass(item, tool).
+subclass(item, instrument).
+subclass(item, charm).
+subclass(item, book).
+
+subclass(Imm, Spec) :-
+  item(Spec, Imm, Name, Number).
+
 item(sword, weapon, "sword", singular).
 item(spear, weapon, "spear", singular).
 item(javelin, weapon, "javelin", singular).
@@ -85,6 +96,7 @@ at(N, requires_tool(Action)) :-
 
 % Tool requirement enforcement:
 
+% TODO: remove this?
 error(m("Action requires tool", Action)) :-
   at(N, action(Option, Action)),
   at(N, requires_tool(Action)),
@@ -95,14 +107,3 @@ error(m("Action requires tool", Action)) :-
       at(N, skill_link(Action, Skill)),
       tool_for(Type, Skill)
   }.
-
-
-%error(m("Action requires tool", pacify)) :-
-%  at(root,action(option(1),pacify)),
-%  at(root,requires_tool(pacify)),
-%  at(root,initiator(option(1),inst(actor,member_1))),
-%  0 = {
-%    st(root,relation(has_item,inst(actor,member_1),inst(item,trumpet_45))) :
-%      st(root,property(type,inst(item,trumpet_45),instrument)),
-%      tool_for(instrument,pacify)
-%  }.
