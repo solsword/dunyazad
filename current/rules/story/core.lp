@@ -1,8 +1,8 @@
 % core rules:
 % -----------
 
-:- error(Message).
 %#minimize { 1@0, error(Message) : error(Message) }.
+:- error(Message).
 %:- error(m("Story too short", N)).
 %:- error(m("Irrelevant option", Node, Option)).
 

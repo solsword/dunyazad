@@ -159,10 +159,10 @@ error(m("Too few choices before ending", N)) :-
 
 
 % The first few choices have a set structure:
-choice_structure_plan(0, relaxed).
-choice_structure_plan(1, relaxed).
-choice_structure_plan(2, straightforward).
-choice_structure_plan(3, mysterious).
+%choice_structure_plan(0, relaxed).
+%choice_structure_plan(1, relaxed).
+%choice_structure_plan(2, straightforward).
+%choice_structure_plan(3, mysterious).
 
 error(m("Deviated from initial choices plan", N)) :-
   node_type(N, choice),

@@ -148,23 +148,23 @@ at(N, expectation(X, success)) :-
   at(N, action(X, Action)),
   at(N, skill_link(Action, Skill)),
   at(N, initiator(X, Actor)),
-  at(N, property(has_skill, Actor, Skill)),
+  st(N, property(has_skill, Actor, Skill)),
   not requires_tool(Action).
 
 at(N, expectation(X, success)) :-
   at(N, action(X, Action)),
   at(N, skill_link(Action, Skill)),
   at(N, initiator(X, Actor)),
-  at(N, property(has_skill, Actor, Skill)),
+  st(N, property(has_skill, Actor, Skill)),
   requires_tool(Action),
-  at(N, property(has_item, Actor, Tool)),
+  st(N, property(has_item, Actor, Tool)),
   tool_for(Tool, Skill).
 
 at(N, expectation(X, failure)) :-
   at(N, action(X, Action)),
   at(N, initiator(X, Actor)),
   0 = {
-    at(N, property(has_skill, Actor, Skill)) : at(N, skill_link(Action, Skill))
+    st(N, property(has_skill, Actor, Skill)) : at(N, skill_link(Action, Skill))
   }.
 
 at(N, expectation(X, failure)) :-
@@ -172,9 +172,9 @@ at(N, expectation(X, failure)) :-
   at(N, initiator(X, Actor)),
   requires_tool(Action),
   0 = {
-    at(N, property(has_skill, Actor, Skill)) :
+    st(N, property(has_skill, Actor, Skill)) :
       at(N, skill_link(Action, Skill)),
-      at(N, property(has_item, Actor, Tool)),
+      st(N, property(has_item, Actor, Tool)),
       tool_for(Tool, Skill)
   }.
 
@@ -187,20 +187,22 @@ error(m("Expectation for both failure and success.", N, X)) :-
 % Overall choice structure evaluation:
 
 at(N, choice_structure(straightforward)) :-
+  node_status_reached(N, branched),
   at(N, expectation(X, success)),
   at(N, expectation(Y, failure)).
 
 at(N, choice_structure(spoiled)) :-
-  story_node(N),
+  node_status_reached(N, branched),
   All = { at(N, expectation(X, success)) },
   All = { at(N, option(O)) }.
 
 at(N, choice_structure(grim)) :-
-  story_node(N),
+  node_status_reached(N, branched),
   All = { at(N, expectation(X, failure)) },
   All = { at(N, option(O)) }.
 
 at(N, choice_structure(mysterious)) :-
+  node_status_reached(N, branched),
   story_node(N),
   0 = {
     at(N, expectation(X, success));
@@ -208,11 +210,13 @@ at(N, choice_structure(mysterious)) :-
   }.
 
 at(N, choice_structure(relaxed)) :-
+  node_status_reached(N, branched),
   at(N, expectation(X, success)),
   at(N, expectation(Z, unknown)),
   0 = { at(N, expectation(W, failure)) }.
 
 at(N, choice_structure(desperate)) :-
+  node_status_reached(N, branched),
   at(N, expectation(X, failure)),
   at(N, expectation(Z, unknown)),
   0 = { at(N, expectation(W, success)) }.
