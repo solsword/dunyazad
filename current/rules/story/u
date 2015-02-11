@@ -1,4 +1,5 @@
 #!/bin/sh
+set -o pipefail
 seed=`head -c 2 /dev/urandom | hexdump -e '"%u"'`
 timelimit="--time-limit=10"
 #timelimit=""
@@ -15,9 +16,11 @@ count=0
 passed=0
 failed=0
 crashed=0
+status_report=""
 for f in $test
 do
   echo "Testing \"$f\"..."
+  status_report=$status_report$'\n'`printf "%-36s" "$f"`
   count=`expr $count + 1`
   sources="$base_sources $f"
   echo $seed > out/seed
@@ -27,10 +30,11 @@ do
   echo "% vim"": syn=gringo" > out/events
   echo "---"
   echo "Running: \"clingo --verbose=0 --quiet=1,1 $args $sources\""
-  clingo --verbose=0 --quiet=1,1 $args $sources |\
+  clout=`clingo --verbose=0 --quiet=1,1 $args $sources`
+  ret=$?
+  echo "$clout" |\
     cat | head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\
     sed "s/^\([a-zA-Z0-9_]\+\)$/\1./" | sort >> out/events
-  ret=$?
   echo "  ...done."
   test "(" $ret -eq 10 ")" -o "(" $ret -eq 30 ")"
   success=$?
@@ -43,44 +47,54 @@ do
   else
     expect="success"
   fi
+  #echo "Expecting: $expect ($firstchar)"
+  #echo "Return Code: $ret"
+  #echo "Success: $success"
+  #echo "Failure: $failure"
   if [ $expect = "success" ]
   then
-    if [ $success -eq 1 ]
+    if [ $success -eq 0 ]
     then
       echo "------------"
       echo "Test passed."
       echo "------------"
       passed=`expr $passed + 1`
-    elif [ $failure -eq 1 ]
+      status_report=`echo "$status_report ...passed."`
+    elif [ $failure -eq 0 ]
     then
       echo "------------"
       echo "Test failed!"
       echo "------------"
       failed=`expr $failed + 1`
+      status_report=`echo "$status_report ...failed."`
     else
       echo "-------------"
       echo "Test crashed!"
       echo "-------------"
       crashed=`expr $crashed + 1`
+      status_report=`echo "$status_report ...crashed."`
     fi
   else
-    if [ $failure -eq 1 ]
+    if [ $failure -eq 0 ]
     then
       echo "------------"
       echo "Test passed."
       echo "------------"
       passed=`expr $passed + 1`
-    elif [ $success -eq 1 ]
+      status_report=`echo "$status_report ...passed."`
+    elif [ $success -eq 0 ]
     then
       echo "------------"
       echo "Test failed!"
       echo "------------"
       failed=`expr $failed + 1`
+      status_report=`echo "$status_report ...failed."`
     else
       echo "-------------"
       echo "Test crashed!"
       echo "-------------"
       crashed=`expr $crashed + 1`
+      status_report=`echo "$status_report ...crashed."`
     fi
   fi
 
@@ -115,4 +129,5 @@ then
   fi
 else
   echo "  Out of $count tests, $passed passed, $failed failed, and $crashed crashed."
+  echo "$status_report"
 fi
