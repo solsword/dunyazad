@@ -32,7 +32,8 @@ intro_text(
   N,
   threatened_innocents,
   @fmt(
-    "N#the_party/they V#come/prs/the_party across N#{}/them V#attack/prp/{} N#{}/them.",
+    "N#{}/they V#come/prs/{} across N#{}/them V#attack/prp/{} N#{}/them.",
+    you, you,
     LAttk, LAttk, LVict
   )
 ) :-
