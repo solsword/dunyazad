@@ -13,6 +13,7 @@ symbols.lp
 the_party.lp
 vignettes.lp
 "
+core=`echo $core | tr "\n" " "`
 content="content/*.lp"
 surface="surface.lp"
 constraints="test.lpt"

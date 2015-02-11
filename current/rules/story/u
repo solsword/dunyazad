@@ -1,0 +1,118 @@
+#!/bin/sh
+seed=`head -c 2 /dev/urandom | hexdump -e '"%u"'`
+timelimit="--time-limit=10"
+#timelimit=""
+mkdir -p out
+. ./sources
+if [ $# -gt 0 ]
+then
+  test="$*"
+else
+  test=`find unit/*.lpt`
+fi
+base_sources=$sources
+count=0
+passed=0
+failed=0
+crashed=0
+for f in $test
+do
+  echo "Testing \"$f\"..."
+  count=`expr $count + 1`
+  sources="$base_sources $f"
+  echo $seed > out/seed
+  echo "% vim"": syn=gringo" > out/source
+  cat $sources >> out/source
+
+  echo "% vim"": syn=gringo" > out/events
+  echo "---"
+  echo "Running: \"clingo --verbose=0 --quiet=1,1 $args $sources\""
+  clingo --verbose=0 --quiet=1,1 $args $sources |\
+    cat | head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\
+    sed "s/^\([a-zA-Z0-9_]\+\)$/\1./" | sort >> out/events
+  ret=$?
+  echo "  ...done."
+  test "(" $ret -eq 10 ")" -o "(" $ret -eq 30 ")"
+  success=$?
+  test $ret -eq 20
+  failure=$?
+  firstchar=`echo $f | cut -d'/' -f2 | cut -b1`
+  if [ $firstchar = "_" ]
+  then
+    expect="failure"
+  else
+    expect="success"
+  fi
+  if [ $expect = "success" ]
+  then
+    if [ $success -eq 1 ]
+    then
+      echo "------------"
+      echo "Test passed."
+      echo "------------"
+      passed=`expr $passed + 1`
+    elif [ $failure -eq 1 ]
+    then
+      echo "------------"
+      echo "Test failed!"
+      echo "------------"
+      failed=`expr $failed + 1`
+    else
+      echo "-------------"
+      echo "Test crashed!"
+      echo "-------------"
+      crashed=`expr $crashed + 1`
+    fi
+  else
+    if [ $failure -eq 1 ]
+    then
+      echo "------------"
+      echo "Test passed."
+      echo "------------"
+      passed=`expr $passed + 1`
+    elif [ $success -eq 1 ]
+    then
+      echo "------------"
+      echo "Test failed!"
+      echo "------------"
+      failed=`expr $failed + 1`
+    else
+      echo "-------------"
+      echo "Test crashed!"
+      echo "-------------"
+      crashed=`expr $crashed + 1`
+    fi
+  fi
+
+  echo "% vim"": syn=gringo" > out/core
+  grep "story_node(" < out/events >> out/core
+  echo "" >> out/core
+  grep "^setup(" < out/events >> out/core
+  echo "" >> out/core
+  grep "action(option" < out/events >> out/core
+  echo "" >> out/core
+  grep "arg(option" < out/events >> out/core
+  echo "" >> out/core
+  grep "outcome(option" < out/events >> out/core
+  echo "" >> out/core
+  grep "consequence(option" < out/events >> out/core
+  echo "" >> out/core
+  grep "emphasizes(option" < out/events >> out/core
+  echo "---"
+done
+
+echo "Overall report:"
+if [ $count -eq 1 ]
+then
+  if [ $passed -eq 1 ]
+  then
+    echo "  The test passed."
+  elif [ $failed -eq 1 ]
+  then
+    echo "  The test failed."
+  else
+    echo "  The test crashed."
+  fi
+else
+  echo "  Out of $count tests, $passed passed, $failed failed, and $crashed crashed."
+fi
