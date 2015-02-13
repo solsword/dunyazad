@@ -593,6 +593,8 @@ def find_node_structure(story, nodelist):
   entries being a list of nodes that have this node as a successor.
   """
   result = {}
+  for node in nodelist:
+    result[node] = {"successors":{}, "predecessors":[]}
   for pr in story:
     scc = ans.bind(SUCCESSOR, pr)
     if scc:
@@ -601,10 +603,6 @@ def find_node_structure(story, nodelist):
       to = scc["successor.To"].unquoted()
       if frm not in nodelist or to not in nodelist:
         continue
-      if frm not in result:
-        result[frm] = {"successors":{}, "predecessors":[]}
-      if to not in result:
-        result[to] = {"successors":{}, "predecessors":[]}
       result[frm]["successors"][opt] = to
       result[to]["predecessors"].append(frm)
   return result

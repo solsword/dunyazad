@@ -75,6 +75,8 @@ SC = {
   "successor": Pr("successor", Vr("From"), Pr("option", Vr("Opt")), Vr("To")),
   "setup": PVr("setup", "setup", Vr("Node"), Vr("Which")),
   "polished": Pr("node_status", Vr("Node"), Pr("polished")),
+  "unique_key_used": Pr("unique_key_used", Vr("Key")),
+  "max_unique": Pr("max_unique", Vr("Key")),
 }
 
 KEEP = {
@@ -119,20 +121,6 @@ KEEP = {
     PVr("intro_text", "intro_text", Vr("Node"), Vr("Setup"), Vr("Text")),
   "potential_text":
     PVr("potential_text", "potential_text", Vr("Node"), Vr("Text")),
-#  "option_text":
-#    PVr(
-#      "option_text", "option_text",
-#      Vr("Node"),
-#      Pr("option", Vr("Opt")),
-#      Vr("Text"),
-#    ),
-#  "action_text":
-#    PVr(
-#      "action_text", "action_text",
-#      Vr("Node"),
-#      Pr("option", Vr("Opt")),
-#      Vr("Text"),
-#    ),
 }
 
 def runfr(story, name, extra = ""):
@@ -150,6 +138,23 @@ def filter_keep(story):
   result = []
   for sch, bnd in ans.bindings(KEEP, story):
     result.append(bnd[sch])
+  # Unique key handling:
+  max_unique_key = None
+  for pr in story:
+    b = ans.bind(SC["unique_key_used"], pr)
+    if b:
+      k = int(str(b["unique_key_used.Key"]))
+      if max_unique_key == None or k > max_unique_key:
+        max_unique_key = k
+    b = ans.bind(SC["max_unique"], pr)
+    if b:
+      k = int(str(b["max_unique.Key"]))
+      if max_unique_key == None or k > max_unique_key:
+        max_unique_key = k
+  if max_unique_key == None:
+    result.append(Pr("max_unique", Pr(0)))
+  else:
+    result.append(Pr("max_unique", Pr(max_unique_key)))
   return result
 
 def all_nodes(story):

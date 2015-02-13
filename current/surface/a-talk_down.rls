@@ -1,0 +1,12 @@
+% Action - talk_down
+
+:action/talk_down/option
+N#?asking/they V#talk/prs/?asking N#?listening/them down
+
+:action/talk_down/outcome/convinced
+N#?asking/they V#calm/prs/?asking N#?listening/them down and N#?listening/they V#agree/prs/?listening to back off
+
+:action/talk_down/outcome/unconvinced
+N#?asking/they V#talk/prs/?asking with N#?listening/them, but N#?listening/they V#refuse/prs/?listening to back down
+
+% TODO: More here!

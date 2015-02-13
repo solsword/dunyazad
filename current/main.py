@@ -43,6 +43,7 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
   target = "unknown"
   if storyfile:
     with open(storyfile, 'r') as fin:
+      # TODO: parse faster here!
       sofar = list(ans.parse_ans(fin.read()))
   else:
     try:

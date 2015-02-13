@@ -104,8 +104,11 @@ error(m("Party member initial skill overlap.", Skill)) :-
 
 % Supply unpacking:
 
-supply_inst(R, Owner, inst(item, @inst(Item, @unique())), Item) :-
-  supplies(Owner, Item), _sr(R).
+get_unique_key(s(supplies(Owner, Item))) :- supplies(Owner, Item), _sr(R).
+supply_inst(R, Owner, inst(item, @inst(Item, K)), Item) :-
+  unique_key(s(supplies(Owner, Item)), K),
+  supplies(Owner, Item),
+  _sr(R).
 st(R, Inst) :-
   supply_inst(R, Owner, Inst, Type).
 st(R, property(type, Inst, Type)) :-

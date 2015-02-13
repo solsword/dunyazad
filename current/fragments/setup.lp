@@ -1,3 +1,4 @@
+max_unique(0).
 story_root(root).
 story_node(root).
 node_status_reached(root, uninitialized).

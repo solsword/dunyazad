@@ -163,6 +163,9 @@ at(N, expectation(X, success)) :-
 at(N, expectation(X, failure)) :-
   at(N, action(X, Action)),
   at(N, initiator(X, Actor)),
+  1 <= {
+    at(N, skill_link(Action, Skill))
+  },
   0 = {
     st(N, property(has_skill, Actor, Skill)) : at(N, skill_link(Action, Skill))
   }.
@@ -171,6 +174,9 @@ at(N, expectation(X, failure)) :-
   at(N, action(X, Action)),
   at(N, initiator(X, Actor)),
   requires_tool(Action),
+  1 <= {
+    at(N, skill_link(Action, Skill))
+  },
   0 = {
     st(N, property(has_skill, Actor, Skill)) :
       at(N, skill_link(Action, Skill)),
@@ -180,9 +186,10 @@ at(N, expectation(X, failure)) :-
 
 % Error check:
 
-error(m("Expectation for both failure and success.", N, X)) :-
-  at(N, expectation(X, failure)),
-  at(N, expectation(X, success)).
+error(m("Multiple expectations.", N, X)) :-
+  at(N, expectation(X, E1)),
+  at(N, expectation(X, E2)),
+  E1 != E2.
 
 % Overall choice structure evaluation:
 

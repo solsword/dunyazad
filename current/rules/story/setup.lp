@@ -31,7 +31,13 @@ spontaneous(st(N, State)) :-
   setup_argument_symbol(Setup, Arg, SymType),
   story_op(N, initialize_node).
 
-at(N, setup_arg(Arg, inst(Type, @inst(I, @unique())))) :-
+get_unique_key(s(N, setup_argument_create(Setup, Arg, inst(Type, I)))) :-
+  setup(N, Setup),
+  setup_argument_create(Setup, Arg, inst(Type, I)),
+  story_op(N, initialize_node).
+
+at(N, setup_arg(Arg, inst(Type, @inst(I, K)))) :-
+  unique_key(s(N, setup_argument_create(Setup, Arg, inst(Type, I))), K),
   setup(N, Setup),
   setup_argument_create(Setup, Arg, inst(Type, I)),
   story_op(N, initialize_node).

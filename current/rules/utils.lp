@@ -2,6 +2,13 @@
 % Various utilities, including script functions.
 % vim: syn=python
 
+unique_key(State, @unique(M)) :-
+  max_unique(M),
+  get_unique_key(State).
+
+unique_key_used(K) :-
+  unique_key(State, K).
+
 #script (python)
 import gringo
 
@@ -38,7 +45,10 @@ def join_lines(*args):
 def mkmem(*args):
   return '.'.join(str(a) for a in args)
 
-def unique(state=[0]):
+def unique(lastroundmax, state=[0]):
+  lastroundmax = int(lastroundmax)
+  if state[0] <= lastroundmax:
+    state[0] = lastroundmax + 1
   state[0] += 1
   return state[0]
 

@@ -52,6 +52,7 @@ error(m("Not enough choices", A, B, C)) :-
   not node_type(A, choice),
   not node_type(B, choice),
   not node_type(C, choice),
+  not resolves_vignette(B, BOpt),
   story_op(C, build_options).
 
 % events shouldn't re-hash the choice you just made or a prevoius event

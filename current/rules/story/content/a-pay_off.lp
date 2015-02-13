@@ -9,8 +9,6 @@ initiator(pay_off, asking).
 outcome(pay_off, deal).
 outcome(pay_off, no_deal).
 
-skill_link(pay_off, elocution).
-
 error(m("Pay off without price.", N, X)) :-
   at(N, action(X, pay_off)),
   at(N, arg(X, asking, Asking)),
@@ -25,7 +23,7 @@ error(m("Price is not a treasure.", N, X)) :-
   not is_instance(N, Price, treasure),
   story_op(N, build_options).
 
-error(m("Unintelligent bargainer.", N, X)) :-
+error(m("Unintelligent asker.", N, X)) :-
   at(N, action(X, pay_off)),
   at(N, arg(X, asking, Asking)),
   st(N, state(unintelligent, Asking)),
