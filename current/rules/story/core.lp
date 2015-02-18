@@ -80,6 +80,13 @@ at(N, initiator(X, Initiator)) :-
   initiator(Action, InitArg),
   story_op(N, build_options).
 
+% An action without an initiator is an error:
+error(m("Action without initiator.", N, X)) :-
+  at(N, option(X)),
+  0 = {
+    at(N, initiator(option(X), Anyone))
+  }.
+
 
 % State and action rules:
 % -----------------------

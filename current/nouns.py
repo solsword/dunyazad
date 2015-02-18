@@ -53,15 +53,17 @@ class Noun:
     self,
     tag,
     typ="thing",
+    cls="object",
     name="nameless",
     person="third",
     number="singular",
     gender="neuter",
-    determined=False,
+    determined=True,
     is_party_member=False,
   ):
     self.tag = tag
     self.typ = typ
+    self.cls = cls
     self.name = name
     self.person = person
     self.number = number
@@ -70,18 +72,20 @@ class Noun:
     self.is_party_member = is_party_member
 
   def __str__(self):
-    return "Noun[{}:{}/{}][{}/{}]".format(
+    return "Noun[{}:{}.{}/{}][{}/{}]".format(
       self.tag,
       self.typ,
+      self.cls,
       self.name,
       definite(self),
       pronoun(self)
     )
 
   def __repr__(self):
-    return "Noun({}, {}, {}, {}, {}, {}, {}, {})".format(
+    return "Noun({}, {}, {}, {}, {}, {}, {}, {}, {})".format(
       self.tag,
       self.typ,
+      self.cls,
       self.name,
       self.person,
       self.number,
@@ -156,7 +160,7 @@ def definite(thing):
 
 def indefinite(thing):
   if not thing.determined:
-    return "a {} named {}".format(thing.typ, thing.name)
+    return "a {} named {}".format(thing.cls, thing.name)
   else:
     if thing.number == "singular":
       if thing.name[0] in vowels: # TODO: better than this T_T

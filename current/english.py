@@ -27,23 +27,21 @@ STATIC_RULES_SOURCES = list(
 
 VAR = re.compile(r"(\?[a-z_]+)")
 
-SUBST_SPLIT = re.compile(r"(\[\[(?:[A-Z]*\|)?[a-z_?*/]+\]\])")
+SBST_FLAGS = re.compile(r"([A-Z]+)\|")
+SBST_KEY = re.compile(r"([A-Za-z_0-9]+)=")
 
-SUBST = re.compile(r"\[\[([A-Z]*\|)?([a-z_?*/]+)\]\]")
+KV_TOKENS = re.compile(r"(@)|(\\.)|(\[\[)|(\]\])")
 
 ANYTAG = re.compile(r"(\b[A-Z]#[a-z_0-9/?]+\b)")
 
 CAP = re.compile(r"@CAP@(.)")
 
+BREAK = re.compile(r"@@")
+
 TAGS = {
+  "directive": re.compile(r"\bD#([a-z_][a-z_0-9]*)/(\??[a-z_][a-z_0-9]*)\b"),
   "noun": re.compile(r"\bN#(\??[a-z_][a-z_0-9]*)/([a-z_]+)\b"),
   "verb": re.compile(r"\bV#([a-z]+)/([a-z]+)/(\??[a-z_][a-z_0-9]*)\b"),
-}
-
-TR_TYPE = {
-  "party_member": "person",
-  "item": "item",
-  "actor": "person",
 }
 
 TSABR = {
@@ -67,6 +65,16 @@ TSABR = {
 }
 
 NOUN_SCHEMAS = {
+  "class":
+    Pr(
+      "st",
+      Vr("Node"),
+      Pr("property",
+        Pr("type"),
+        Pr("inst", Vr("Type"), Vr("Key")),
+        Vr("Class")
+      )
+    ),
   "name":
     Pr(
       "st",
@@ -169,10 +177,6 @@ TEXT_SCHEMAS = {
     PVr("txt", "intro_text", Vr("Node"), Vr("Setup"), Vr("Text")),
   "potential_text":
     PVr("txt", "potential_text", Vr("Node"), Vr("Text")),
-#  "option_text":
-#    PVr("txt", "option_text", Vr("Node"), Pr("option", Vr("Opt")), Vr("Text")),
-#  "action_text":
-#    PVr("txt", "action_text", Vr("Node"), Pr("option", Vr("Opt")), Vr("Text")),
 }
 
 SUCCESSOR = Pr("successor", Vr("From"), Pr("option", Vr("Opt")), Vr("To"))
@@ -222,8 +226,10 @@ def glean_nouns(story):
         "Unknown binding structure for noun schema:\n{}".format(binding)
       )
     if n not in result:
-      result[n] = nouns.Noun(n, TR_TYPE[t] if t in TR_TYPE else "thing")
-    if sc == "name":
+      result[n] = nouns.Noun(n, t)
+    if sc == "class":
+      result[n].cls = binding["st.property.Class"].unquoted()
+    elif sc == "name":
       result[n].name = binding["st.property.Name"].unquoted()
     elif sc == "number":
       result[n].number = binding["st.property.Number"].unquoted()
@@ -429,27 +435,10 @@ def keymatch(test, key):
     return False
   return True
 
-def subst_result(rules, key, flags):
-  """
-  Given a set of substitution rules, returns the substitution result for the
-  given key using the given flags.
-  """
-  matching_keys = [k for k in rules if keymatch(k, key)]
-  all_possibilities = []
-  for ps in [rules[k] for k in matching_keys]:
-    all_possibilities.extend(ps)
-  # TODO: better/controllable randomness?
-  if (len(all_possibilities) == 0):
-    raise KeyError("ERROR: No possible substitutions for key '{}'.".format(key))
-  result = random.choice(all_possibilities)
-  if 'S' in flags:
-    result = "@CAP@" + sentence(result)
-  return result
-
 def subst_vars(text, vs):
   """
   Given a text with some variable substitutions to be made returns the result
-  text after all argument substitutions.
+  text after one round of argument substitutions.
   """
   result = ""
   bits = re.split(VAR, text)
@@ -465,24 +454,165 @@ def subst_vars(text, vs):
     result += add
   return result
 
-def subst_rules(text, rules):
+def subst_all_vars(text, vs):
   """
-  Works like subst_args but does (one round of) rules substitutions instead of
-  doing variable substitutions.
+  Recursively perform variable substitutions until no variables are left to
+  expand.
   """
-  result = ""
-  bits = re.split(SUBST_SPLIT, text)
-  for b in bits:
-    add = b
-    m = SUBST.fullmatch(b)
-    if m:
-      if (m.group(1)):
-        flags = m.group(1)[:-1] # take off the '|'
+  while VAR.search(text):
+    text = subst_vars(text, vs)
+  return text
+
+class Substitution:
+  def __init__(self, flags='', key='', vs=None):
+    self.flags = flags
+    self.key = key
+    self.vs = vs or {}
+
+  def expand(self, rules):
+    """
+    Given a set of substitution rules, returns the substitution result for this
+    Substitution object.
+    """
+    matching_keys = [k for k in rules if keymatch(k, self.key)]
+    all_possibilities = []
+    for ps in [rules[k] for k in matching_keys]:
+      all_possibilities.extend(ps)
+    # TODO: better/controllable randomness?
+    if (len(all_possibilities) == 0):
+      raise KeyError(
+        "ERROR: No possible substitutions for key '{}'.".format(self.key)
+      )
+    result = random.choice(all_possibilities)
+    if 'S' in self.flags:
+      result = "@CAP@" + sentence(result)
+    return result
+
+def parse_kv(text):
+  """
+  Parses a substitution key/value pair off of the front of the given text, and
+  returns the pair as a tuple followed by any leftover text (which will either
+  be empty or start with an '@').
+  """
+  km = SBST_KEY.match(text)
+  if not km:
+    return None
+  key = km.group(1)
+  leftovers = text[km.end():]
+  value = ""
+  depth = 0
+  while leftovers:
+    m = KV_TOKENS.match(leftovers)
+    cycle = 1
+    if not m:
+      pass
+    elif m.group(1) and depth == 0: # '@'
+      break
+    elif m.group(2): # '\.'
+      value += m.group(2)[1]
+      leftovers = leftovers[2:]
+      continue
+    elif m.group(3): # '[['
+      cycle = 2
+      depth += 1
+    elif m.group(4): # ']]'
+      cycle = 2
+      depth -= 1
+    value += leftovers[:cycle]
+    leftovers = leftovers[cycle:]
+  return ( key, value ), leftovers
+
+def parse_initial_substituion(text):
+  """
+  Tries to parse the start of "text" as a Substitution and return a tuple
+  (Substitution, text). Returns None if it can't do so.
+  """
+  if text[:2] != '[[':
+    return None
+  text = text[2:]
+  depth = 1
+  found = False
+  end = -1
+  while end < len(text) - 1:
+    end += 1
+    if text[end:end+2] == '[[':
+      end += 1
+      depth += 1
+    elif text[end:end+2] == ']]':
+      depth -= 1
+      if depth == 0:
+        found = True
+        break
       else:
-        flags = ''
-      key = m.group(2)
-      add = subst_result(rules, key, flags)
-    result += add
+        end += 1
+  if not found:
+    return None
+
+  sbst = text[:end]
+  leftovers = text[end + 2:]
+
+  m = SBST_FLAGS.match(sbst)
+  if m:
+    flags = m.group(1)
+    sbst = sbst[m.end():]
+  else:
+    flags = ''
+
+  if '@' in sbst:
+    keyend = sbst.index('@')
+  else:
+    keyend = len(sbst)
+
+  key = sbst[:keyend]
+  sbst = sbst[keyend + 1:]
+
+  vs = {}
+  while sbst:
+    pkvr = parse_kv(sbst)
+    if pkvr == None:
+      return None
+    kv, sbst = pkvr
+    vs[kv[0]] = kv[1]
+
+  return Substitution(flags, key, vs), leftovers
+
+def parse_substitutions(text):
+  """
+  Parses flat text into a list of string and Substitution objects.
+  """
+  result = ['']
+  while text:
+    if text[:2] == '[[':
+      attempt = parse_initial_substituion(text)
+      if attempt == None:
+        result[-1] += text[:2]
+        text = text[2:]
+      else:
+        sbst, text = attempt
+        result.append(sbst)
+        result.append('')
+    else:
+      result[-1] += text[0]
+      text = text[1:]
+  return result
+
+def run_grammar(text, rules, vs):
+  """
+  Runs the given grammar rules of the text, expanding it recursively as
+  necessary, using the given variable mappings.
+  """
+  # First exhaust variable substitutions:
+  text = subst_all_vars(text, vs)
+  # Next recursively substitute rule results:
+  result = ""
+  bits = parse_substitutions(text)
+  for b in bits:
+    if isinstance(b, Substitution):
+      newvars = dict(vs)
+      newvars.update(b.vs)
+      result += run_grammar(b.expand(rules), rules, newvars)
+    else:
+      result += b
   return result
 
 def build_text(
@@ -501,6 +631,7 @@ def build_text(
   applied to all the verbs in the text. Returns a tuple of the constructed
   string and the resulting rules, pronoun slots, and noun introduction.
   """
+  tsstack = [timeshift]
   if pnslots == None:
     pnslots = {
       "I": [0, set()],
@@ -517,13 +648,9 @@ def build_text(
     introduced = set()
   else:
     introduced = set(introduced)
-  # First, repeatedly perform variable and rule substitutions until we've
+  # First, recursively perform variable and rule substitutions until we've
   # reached a base text:
-  bits = re.split(SUBST_SPLIT, template)
-  template = subst_vars(template, cvars)
-  while re.search(SUBST, template):
-    template = subst_rules(template, rules)
-    template = subst_vars(template, cvars)
+  template = run_grammar(template, rules, cvars)
   # Next, fill in any tags:
   bits = re.split(ANYTAG, template)
   result = ""
@@ -540,7 +667,31 @@ def build_text(
     for t in TAGS:
       m = TAGS[t].fullmatch(b)
       if m:
-        if t == "noun":
+        if t == "directive":
+          directive = m.group(1)
+          argument = m.group(2)
+          if directive == "timeshift":
+            argument = argument.replace('_', ' ')
+            if argument in verbs.TIMESHIFTS:
+              tsstack.append(argument)
+            elif argument == "pop":
+              if len(tsstack) > 1:
+                tsstack = tsstack[:-1]
+              else:
+                print("ERROR! Popped last timeshift from timeshift stack.")
+                print(template)
+                exit(1)
+            else:
+              print("ERROR! Unknown timeshift '{}'.".format(argument))
+              print(template)
+              exit(1)
+          else:
+            print("ERROR! Unknown directive '{}'.".format(directive))
+            print("Tag is: '{}'.".format(b))
+            print(template)
+            exit(1)
+          add = ""
+        elif t == "noun":
           noun = m.group(1)
           if noun not in ndict:
             # TODO: Something about this
@@ -572,16 +723,17 @@ def build_text(
           tense = TSABR[m.group(2)]
           agree = m.group(3)
           if agree == "_plural":
-            add = verbs.conjugation(verb, tense, "plural", "third", timeshift)
+            add = verbs.conjugation(verb, tense, "plural", "third", tsstack[-1])
           elif agree == "_singular":
-            add = verbs.conjugation(verb, tense, "singular", "third", timeshift)
+            add = verbs.conjugation(verb, tense, "singular","third",tsstack[-1])
           else:
-            add = verbs.conj_ref(ndict[agree], verb, tense, timeshift)
+            add = verbs.conj_ref(ndict[agree], verb, tense, tsstack[-1])
         # if we matched a tag, don't bother checking the other tags:
         break
     result += add
   # Finally process capitalization directives:
   result = re.sub(CAP, lambda m: m.group(1).upper(), result)
+  result = re.sub(BREAK, '', result)
   return result, pnslots, introduced
 
 def find_node_structure(story, nodelist):
@@ -763,8 +915,9 @@ def build_story_text(story, timeshift=None):
       node_templates[node]["situation"] += txt
 
   # Next find context variables which also gives us an idea of the story
-  # structure:
+  # structure, as well as the nouns:
   cvrs = glean_context_variables(story)
+  nouns = glean_nouns(story)
 
   # Error check:
   for k in [key for key in cvrs if key not in node_templates]:
@@ -774,14 +927,25 @@ def build_story_text(story, timeshift=None):
 
   # Iterate over our nodes and options adding static option/outcome templates:
   for node in node_templates:
-    for option in [o for o in cvrs[node] if o != "setup"]:
+    options = [o for o in cvrs[node] if o != "setup"]
+    for option in options:
       nts = node_templates[node]
-      nts["options"][option] = "[[S|action/?_action/option]]"
+      # If a party member is the initiator of an option at a choice...
+      initiator = cvrs[node][option]["_initiator"]
+      if (
+        initiator != "unknown"
+       and nouns[initiator].is_party_member
+       and len(options) > 1
+       and initiator != "you"
+      ):
+        nts["options"][option] = \
+            "[[misc/you_ask_for@statement=[[action/?_action/option]]]]"
+      else:
+        nts["options"][option] = "[[action/?_action/option]]"
       nts["outcomes"][option] = "[[S|action/?_action/outcome/?_outcome]]"
 
   # Next, use the node structure to recursively render the story text in
   # ChoiceScript:
-  nouns = glean_nouns(story)
   node_structure = find_node_structure(story, node_templates.keys())
   base_pnslots = {
     "I": [0, set()],
@@ -917,6 +1081,37 @@ _test_cases = [
       'infinitive': 'to travel',
       'imperative': 'travel it',
     }
-
+  ),
+  (
+    run_grammar,
+    (
+      "template.. [[S|a/b]]",
+      { "a/b": [ "sentence substitution test" ] },
+      {},
+    ),
+    "template.. @CAP@Sentence substitution test."
+  ),
+  (
+    run_grammar,
+    (
+      "variable.. ?var",
+      {},
+      { "var": "val"},
+    ),
+    "variable.. val"
+  ),
+  (
+    run_grammar,
+    (
+      "nested.. ?var [[S|test@var=[[test3@var=[[test4@var=stop]]]]]][[test2]]",
+      {
+        "test": [ "subst1 ?var" ],
+        "test2": [ "subst2 ?var" ],
+        "test3": [ "subst3 ?var" ],
+        "test4": [ "subst4 ?var" ],
+      },
+      { "var": "initial"},
+    ),
+    "nested.. initial @CAP@Subst1 subst3 subst4 stop.subst2 initial"
   ),
 ]

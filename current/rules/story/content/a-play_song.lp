@@ -1,5 +1,6 @@
 % play_song
 action(play_song).
+
 argument(play_song, musician, actor).
 argument(play_song, audience, actor).
 initiator(play_song, musician).

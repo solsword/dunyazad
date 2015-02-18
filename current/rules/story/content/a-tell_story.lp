@@ -1,5 +1,6 @@
 % tell_story
 action(tell_story).
+
 argument(tell_story, teller, actor).
 argument(tell_story, audience, actor).
 initiator(tell_story, teller).

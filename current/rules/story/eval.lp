@@ -200,13 +200,17 @@ at(N, choice_structure(straightforward)) :-
 
 at(N, choice_structure(spoiled)) :-
   node_status_reached(N, branched),
-  All = { at(N, expectation(X, success)) },
-  All = { at(N, option(O)) }.
+  0 = #sum {
+    1,X:at(N, option(X));
+    -1,X:at(N, expectation(X, success))
+  }.
 
 at(N, choice_structure(grim)) :-
   node_status_reached(N, branched),
-  All = { at(N, expectation(X, failure)) },
-  All = { at(N, option(O)) }.
+  0 = #sum {
+    1,X:at(N, option(X));
+    -1,X:at(N, expectation(X, failure))
+  }.
 
 at(N, choice_structure(mysterious)) :-
   node_status_reached(N, branched),

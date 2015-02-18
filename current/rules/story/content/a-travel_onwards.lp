@@ -2,6 +2,7 @@
 action(travel_onwards).
 
 argument(travel_onwards, subject, actor).
+initiator(travel_onwards, subject).
 
 outcome(travel_onwards, onwards).
 

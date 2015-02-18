@@ -1,7 +1,7 @@
 % Action - trade
 
 :action/trade/option
-N#?buyer/they offer N#?seller/them to V#trade/inf/_plural N#?price/them for N#?goods/them
+N#?buyer/they V#offer/prs/?buyer V#trade/inf/?buyer N#?seller/them N#?price/them for N#?goods/them
 
 :action/trade/outcome/deal
 N#?buyer/they and N#?seller/them V#agree/prs/_plural to V#trade/inf/_plural N#?price/them for N#?goods/them

@@ -146,95 +146,139 @@ IRREGULAR = {
   ],
 }
 
+TIMESHIFTS = [
+  "future",
+  "past",
+  "infinitive",
+  "raw infinitive"
+]
 TIMESHIFT = {
   "present": {
     "future": "future",
     "past": "past",
+    "infinitive": "infinitive",
+    "raw infinitive": "raw infinitive",
   },
   "present continuous": {
     "future": "future continuous",
     "past": "past continuous",
+    "infinitive": "present continuous",
+    "raw infinitive": "present continuous",
   },
   "present participle": {
     "future": "present participle", # TODO: is this correct?
     "past": "present participle",
+    "infinitive": "present participle",
+    "raw infinitive": "present participle",
   },
   "past": {
     "future": "future perfect",
     "past": "past perfect",
+    "infinitive": "past",
+    "raw infinitive": "past",
   },
   "past continuous": {
     "future": "future perfect continuous",
     "past": "past perfect continuous",
+    "infinitive": "past continuous",
+    "raw infinitive": "past continuous",
   },
   "past participle": {
     "future": "past participle", # TODO: is this correct?
     "past": "past participle",
+    "infinitive": "past participle",
+    "raw infinitive": "past participle",
   },
   "future": {
     "future": "future", # does this work?
     "past": "past future", # TODO: I GIVE UP!
+    "infinitive": "future",
+    "raw infinitive": "future",
   },
   "future continuous": {
     "future": "future continuous",
     "past": "past future continuous",
+    "infinitive": "future continuous",
+    "raw infinitive": "future continuous",
   },
   "raw infinitive": {
     "future": "raw infinitive",
     "past": "raw infinitive",
+    "infinitive": "raw infinitive",
+    "raw infinitive": "raw infinitive",
   },
   "infinitive": {
     "future": "infinitive",
     "past": "infinitive",
+    "infinitive": "infinitive",
+    "raw infinitive": "infinitive",
   },
   "imperative": {
     "future": "imperative",
     "past": "imperative",
-  },
-  "imperative": {
-    "future": "imperative",
-    "past": "imperative",
+    "infinitive": "imperative",
+    "raw infinitive": "imperative",
   },
   "present perfect": {
     "future": "future perfect",
     "past": "past perfect",
+    "infinitive": "present perfect",
+    "raw infinitive": "present perfect",
   },
   "present perfect continuous": {
     "future": "future perfect continuous",
     "past": "past perfect continuous",
+    "infinitive": "present perfect continuous",
+    "raw infinitive": "present perfect continuous",
   },
   "past perfect": {
     "future": "future perfect", # TODO: is this right? (and below)
     "past": "past perfect",
+    "infinitive": "past perfect",
+    "raw infinitive": "past perfect",
   },
   "past perfect continuous": {
     "future": "future perfect continuous",
     "past": "past perfect continuous",
+    "infinitive": "past perfect continuous",
+    "raw infinitive": "past perfect continuous",
   },
   "future perfect": {
     "future": "future perfect",
     "past": "past future perfect",
+    "infinitive": "future perfect",
+    "raw infinitive": "future perfect",
   },
   "future perfect continuous": {
     "future": "future perfect continuous",
     "past": "past future perfect continuous",
+    "infinitive": "future perfect continuous",
+    "raw infinitive": "future perfect continuous",
   },
   # Made-up tenses:
   "past future": {
     "future": "ERROR: future past future",
     "past": "ERROR: past past future",
+    "infinitive": "ERROR: infinitive past future",
+    "raw infinitive": "ERROR: raw infinitive past future",
   },
   "past future continuous": {
     "future": "ERROR: future past future continuous",
     "past": "ERROR: past past future continuous",
+    "infinitive": "ERROR: infinitive past future continuous",
+    "raw infinitive": "ERROR: raw infinitive past future continuous",
   },
   "past future perfect": {
     "future": "ERROR: future past future perfect",
     "past": "ERROR: past past future perfect",
+    "infinitive": "ERROR: infinitive past future perfect",
+    "raw infinitive": "ERROR: raw infinitive past future perfect",
   },
   "past future perfect continuous": {
     "future": "ERROR: future past future perfect continuous",
     "past": "ERROR: past past future perfect continuous",
+    "infinitive": "ERROR: infinitive past future perfect continuous",
+    "raw infinitive": "ERROR: raw infinitive past future perfect continuous",
   },
 }
 

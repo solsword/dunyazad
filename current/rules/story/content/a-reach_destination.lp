@@ -2,6 +2,7 @@
 action(reach_destination).
 
 argument(reach_destination, subject, actor).
+initiator(reach_destination, subject).
 
 outcome(reach_destination, journey_over).
 
