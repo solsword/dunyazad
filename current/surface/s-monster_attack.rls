@@ -1,0 +1,134 @@
+% Setup - monster_attack
+
+:setup/monster_attack/intro
+[[misc/as_you]], [[setup/monster_attack/approach/?_type_of_monster@adverb=[[setup/monster_attack/adverbs/?_type_of_monster]]@activity=[[setup/monster_attack/activities/?_type_of_monster]]]]
+
+
+% Adverbs:
+%---------
+
+:setup/monster_attack/adverbs/?
+slowly
+
+:setup/monster_attack/adverbs/fast
+quickly
+swiftly
+
+:setup/monster_attack/adverbs/large
+thunderously
+
+:setup/monster_attack/adverbs/dragon
+[[setup/monster_attack/adverbs/fast]]
+[[setup/monster_attack/adverbs/large]]
+fiercely
+
+:setup/monster_attack/adverbs/chimera
+[[setup/monster_attack/adverbs/fast]]
+fiercely
+
+:setup/monster_attack/adverbs/leviathan
+[[setup/monster_attack/adverbs/large]]
+ponderously
+majestically
+
+:setup/monster_attack/adverbs/dire_bear
+[[setup/monster_attack/adverbs/large]]
+fiercely
+
+:setup/monster_attack/adverbs/goblin_horde
+[[setup/monster_attack/adverbs/fast]]
+fiercely
+
+:setup/monster_attack/adverbs/bloodbat_swarm
+[[setup/monster_attack/adverbs/fast]]
+
+
+% Activities:
+%---------
+
+:setup/monster_attack/activities/dragon
+roaring
+gyrating
+breathing fire
+breathing gouts of flame
+scales glinting in the sun
+wings flapping
+
+:setup/monster_attack/activities/chimera
+shrieking
+breathing fire
+breathing gouts of flame
+wings flapping
+
+:setup/monster_attack/activities/leviathan
+groaning
+spouting water
+tentacles curling
+
+:setup/monster_attack/activities/dire_bear
+growling
+massive arms flexing
+
+:setup/monster_attack/activities/goblin_horde
+yelling
+shrieking
+eyes glinting
+waving weapons
+
+:setup/monster_attack/activities/bloodbat_swarm
+shrieking
+screaming
+eyes glinting
+
+
+% Approaches:
+%---------
+
+:setup/monster_attack/approach/?
+N#?monster/they ?adverb V#approach/prs/?monster N#you/them
+?activity, N#?monster/they V#approach/prs/?monster N#you/them
+?activity, N#?monster/they ?adverb V#approach/prs/?monster N#you/them
+N#?monster/they V#approach/prs/?monster N#you/them, ?activity
+N#?monster/they ?adverb V#approach/prs/?monster N#you/them, ?activity
+
+:setup/monster_attack/approach/dragon
+N#?monster/they V#swoop/prs/?monster ?adverb down from the skies
+?activity, N#?monster/they V#swoop/prs/?monster ?adverb down from the skies
+N#?monster/they V#swoop/prs/?monster ?adverb down from the skies, ?activity
+?activity, N#?monster/they V#swoop/prs/?monster down from the skies
+N#?monster/they V#swoop/prs/?monster down from the skies, ?activity
+
+:setup/monster_attack/approach/chimera
+N#?monster/they V#swoop/prs/?monster ?adverb down from the skies
+?activity, N#?monster/they V#swoop/prs/?monster ?adverb down from the skies
+N#?monster/they V#swoop/prs/?monster ?adverb down from the skies, ?activity
+?activity, N#?monster/they V#swoop/prs/?monster down from the skies
+N#?monster/they V#swoop/prs/?monster down from the skies, ?activity
+
+:setup/monster_attack/approach/leviathan
+N#?monster/they V#rise/prs/?monster ?adverb up from the ocean
+?activity, N#?monster/they V#rise/prs/?monster ?adverb up from the ocean
+N#?monster/they V#rise/prs/?monster ?adverb up from the ocean, ?activity
+?activity, N#?monster/they V#rise/prs/?monster up from the ocean
+N#?monster/they V#rise/prs/?monster up from the ocean, ?activity
+
+:setup/monster_attack/approach/dire_bear
+N#?monster/they V#walk/prs/?monster ?adverb towards N#you/them
+?activity, N#?monster/they V#walk/prs/?monster ?adverb towards N#you/them
+N#?monster/they V#walk/prs/?monster ?adverb towards N#you/them, ?activity
+?activity, N#?monster/they V#walk/prs/?monster towards N#you/them
+N#?monster/they V#walk/prs/?monster towards N#you/them, ?activity
+
+:setup/monster_attack/approach/goblin_horde
+N#?monster/they ?adverb V#swarm/prs/?monster towards N#you/them
+?activity, N#?monster/they ?adverb V#swarm/prs/?monster towards N#you/them
+N#?monster/they ?adverb V#swarm/prs/?monster towards N#you/them, ?activity
+?activity, N#?monster/they V#swarm/prs/?monster towards N#you/them
+N#?monster/they V#swarm/prs/?monster towards N#you/them, ?activity
+
+:setup/monster_attack/approach/bloodbat_swarm
+N#?monster/they ?adverb V#fill/prs/?monster the sky with N#?monster/their wings
+?activity, N#?monster/they ?adverb V#fill/prs/?monster the sky with N#?monster/their wings
+N#?monster/they ?adverb V#fill/prs/?monster the sky with N#?monster/their wings, ?activity
+?activity, N#?monster/they V#fill/prs/?monster the sky with N#?monster/their wings
+N#?monster/they V#fill/prs/?monster the sky with N#?monster/their wings, ?activity

@@ -18,41 +18,47 @@ error(m("Missing potential text.", N, Type, Fact)) :-
 % Default values for name, person, number, gender, and determination:
 
 1 = {
-  sp_st(Setup, property(name, inst(Type, ID), Name))
-    : sp_st(Setup, property(name, inst(Type, ID), Name));
-  sp_st(Setup, property(name, inst(Type, ID), "nameless"));
+  sp_st(N, property(name, inst(Type, ID), Name))
+    : sp_st(N, property(name, inst(Type, ID), Name));
+  sp_st(N, property(name, inst(Type, ID), Name))
+    : default_name_for(Class, Name),
+      sp_st(N, property(type, inst(Type, ID), Class));
   error(m("Error with spontaneous instance name.", inst(Type, ID)))
 } :-
-  sp_st(Setup, inst(Type, ID)).
+  sp_st(N, inst(Type, ID)).
 
 1 = {
-  sp_st(Setup, property(person, inst(Type, ID), Name))
-    : sp_st(Setup, property(person, inst(Type, ID), Name));
-  sp_st(Setup, property(person, inst(Type, ID), third));
+  sp_st(N, property(person, inst(Type, ID), Name))
+    : sp_st(N, property(person, inst(Type, ID), Name));
+  sp_st(N, property(person, inst(Type, ID), third));
   error(m("Error with spontaneous instance person.", inst(Type, ID)))
 } :-
-  sp_st(Setup, inst(Type, ID)).
+  sp_st(N, inst(Type, ID)).
 
 1 = {
-  sp_st(Setup, property(number, inst(Type, ID), Name))
-    : sp_st(Setup, property(number, inst(Type, ID), Name));
-  sp_st(Setup, property(number, inst(Type, ID), singular));
+  sp_st(N, property(number, inst(Type, ID), Name))
+    : sp_st(N, property(number, inst(Type, ID), Name));
+  sp_st(N, property(number, inst(Type, ID), Number))
+    : default_number_for(Class, Number),
+      sp_st(N, property(type, inst(Type, ID), Class));
   error(m("Error with spontaneous instance number.", inst(Type, ID)))
 } :-
-  sp_st(Setup, inst(Type, ID)).
+  sp_st(N, inst(Type, ID)).
 
 1 = {
-  sp_st(Setup, property(gender, inst(Type, ID), Name))
-    : sp_st(Setup, property(gender, inst(Type, ID), Name));
-  sp_st(Setup, property(gender, inst(Type, ID), neuter));
+  sp_st(N, property(gender, inst(Type, ID), Name))
+    : sp_st(N, property(gender, inst(Type, ID), Name));
+  sp_st(N, property(number, inst(Type, ID), Gender))
+    : default_gender_for(Class, Gender),
+      sp_st(N, property(type, inst(Type, ID), Class));
   error(m("Error with spontaneous instance gender.", inst(Type, ID)))
 } :-
-  sp_st(Setup, inst(Type, ID)).
+  sp_st(N, inst(Type, ID)).
 
 1 = {
-  sp_st(Setup, property(determined, inst(Type, ID), Det)) :
-    sp_st(Setup, property(determined, inst(Type, ID), Det));
-  sp_st(Setup, property(determined, inst(Type, ID), true));
+  sp_st(N, property(determined, inst(Type, ID), Det)) :
+    sp_st(N, property(determined, inst(Type, ID), Det));
+  sp_st(N, property(determined, inst(Type, ID), true));
   error(m("Error with spontaneous instance determination.", inst(Type, ID)))
 } :-
-  sp_st(Setup, inst(Type, ID)).
+  sp_st(N, inst(Type, ID)).

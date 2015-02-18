@@ -4,6 +4,7 @@ choice_structure.lp
 core.lp
 eval.lp
 grow.lp
+actors.lp
 items.lp
 potential.lp
 settings.lp
@@ -14,7 +15,7 @@ the_party.lp
 vignettes.lp
 "
 core=`echo $core | tr "\n" " "`
-content="content/*.lp"
+content="content/*.lp content/*/*.lp"
 surface="surface.lp"
 constraints="test.lpt"
 sources="../utils.lp $core $surface $content"

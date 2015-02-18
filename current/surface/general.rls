@@ -6,3 +6,34 @@ N#you/they V#tell/prs/you D#timeshift/infinitive@@?statement@@D#timeshift/pop@@
 N#you/they V#let/prs/you D#timeshift/raw_infinitive@@?statement@@D#timeshift/pop@@
 N#you/they V#have/prs/you D#timeshift/raw_infinitive@@?statement@@D#timeshift/pop@@
 
+:misc/as_you
+[[misc/as_you/?_setting]]
+
+:misc/as_you/?
+as N#you/they V#continue/prs/you N#you/their journey
+as N#you/they V#continue/prs/you N#you/their travels
+as N#you/they V#journey/prs/you onwards
+as N#you/they V#travel/prs/you onwards
+
+:misc/as_you/city
+as N#you/they V#enter/prs/you the market
+as N#you/they V#stroll/prs/you down the main road
+as N#you/they V#pass/prs/you through a quiet neighborhood
+as N#you/they V#climb/prs/you a broad flight of steps
+as N#you/they V#stop/prs/you at a fountain
+
+:misc/as_you/town
+as N#you/they V#relax/prs/you at the inn
+as N#you/they V#enter/prs/you town
+as N#you/they V#pass/prs/you the market street
+
+:misc/as_you/road
+as N#you/they V#enter/prs/you a long valley
+as N#you/they V#round/prs/you a bend in the road
+as N#you/they V#continue/prs/you along the road
+
+:misc/as_you/wilderness
+as N#you/they V#crest/prs/you a hill
+as N#you/they V#fight/prs/you N#you/their way through the underbrush
+as N#you/they V#walk/prs/you among a stand of massive trees
+as N#you/they V#pass/prs/you an outcropping of gray stone

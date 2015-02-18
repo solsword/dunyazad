@@ -2,27 +2,11 @@
 
 possible_setup(threatened_innocents).
 
-setup_argument_create(threatened_innocents, attacker, inst(actor, attacker)).
-setup_argument_create(threatened_innocents, victim, inst(actor, victim)).
-setup_argument_create(threatened_innocents, goods, inst(item, goods)).
+setup_argument_create(threatened_innocents, attacker, inst(actor, bandits)).
+setup_argument_create(threatened_innocents, victim, inst(actor, merchants)).
+setup_argument_create(threatened_innocents, goods, inst(item, treasure)).
 
-% The attacker:
-s_st(threatened_innocents, property(c(name), v(attacker), c("bandits"))).
-s_st(threatened_innocents, property(c(number), v(attacker), c(plural))).
-s_st(threatened_innocents, property(c(type), v(attacker), c(bandit))).
-% default person/gender
-
-% The victim:
-s_st(threatened_innocents, property(c(name), v(victim), c("merchants"))).
-s_st(threatened_innocents, property(c(number), v(victim), c(plural))).
-s_st(threatened_innocents, property(c(type), v(victim), c(merchant))).
-% default person/gender
-
-% The victim owns some goods:
-s_st(threatened_innocents, property(c(name), v(goods), c("goods"))).
-s_st(threatened_innocents, property(c(number), v(goods), c(plural))).
-s_st(threatened_innocents, property(c(type), v(goods), c(treasure))).
-% default number/person/gender
+% The victim owns the goods:
 s_st(threatened_innocents, relation(c(has_item), v(victim), v(goods))).
 
 % The attacker is threatening the victim:

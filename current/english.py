@@ -249,6 +249,7 @@ def glean_context_variables(story):
   Takes a story and builds a variables dictionary that maps node/option pairs
   to variable mappings at that point in the story. Variables include:
 
+    '_setting' - the current setting
     '_action' - the name of the action
     '_outcome' - the outcome of the action
     '_initiator' -  the initiator of the action
@@ -427,7 +428,7 @@ def keymatch(test, key):
   if len(kp) > len(tp):
     return False
   for i, k in enumerate(kp):
-    if tp[i] != k and k != '?':
+    if tp[i] != k and tp[i] != '?' and k != '?':
       if i == len(kp) - 1 and k == '*':
         continue
       return False

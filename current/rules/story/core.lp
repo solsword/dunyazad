@@ -124,4 +124,14 @@ subclass(General, Specific) :-
   subclass(General, Intermediate),
   subclass(Intermediate, Specific).
 
+concrete_class_of(Abstract, Concrete) :-
+  subclass(Abstract, Concrete),
+  % TODO: Better here!
+  0 = { subclass(Concrete, Any) }.
+
+concrete_class_of(Concrete, Concrete) :-
+  subclass(Something, Concrete),
+  % TODO: Better here!
+  0 = { subclass(Concrete, Any) }.
+
 % TODO: Class/subclass hierarchies for things other than items!

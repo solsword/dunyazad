@@ -15,6 +15,7 @@ spontaneous(st(N, State)) :-
 % Rules for setup arguments:
 % --------------------------
 
+% normal arguments
 1 = {
   at(N, setup_arg(Arg, inst(Type, Inst))) : st(N, inst(Type, Inst));
   error(m("Unbound setup argument.", N, Setup, Arg, Type))
@@ -23,6 +24,15 @@ spontaneous(st(N, State)) :-
   setup_argument(Setup, Arg, Type),
   story_op(N, initialize_node).
 
+% optional arguments
+1 >= {
+  at(N, setup_arg(Arg, inst(Type, Inst))) : st(N, inst(Type, Inst))
+} :-
+  setup(N, Setup),
+  setup_argument_opt(Setup, Arg, Type),
+  story_op(N, initialize_node).
+
+% symbol arguments
 1 = {
   at(N, setup_arg(Arg, Symbol)) : symbol(SymType, Symbol);
   error(m("Unbound setup argument (symbol).", N, Setup, Arg, SymType))
@@ -31,21 +41,67 @@ spontaneous(st(N, State)) :-
   setup_argument_symbol(Setup, Arg, SymType),
   story_op(N, initialize_node).
 
-get_unique_key(s(N, setup_argument_create(Setup, Arg, inst(Type, I)))) :-
+% optional symbol arguments
+1 >= {
+  at(N, setup_arg(Arg, Symbol)) : symbol(SymType, Symbol)
+} :-
   setup(N, Setup),
-  setup_argument_create(Setup, Arg, inst(Type, I)),
+  setup_argument_symbol_opt(Setup, Arg, SymType),
   story_op(N, initialize_node).
 
-at(N, setup_arg(Arg, inst(Type, @inst(I, K)))) :-
-  unique_key(s(N, setup_argument_create(Setup, Arg, inst(Type, I))), K),
+% create arguments
+get_unique_key(s(N, setup_argument_create(Setup, Arg, inst(Type, Class)))) :-
   setup(N, Setup),
-  setup_argument_create(Setup, Arg, inst(Type, I)),
+  setup_argument_create(Setup, Arg, inst(Type, Class)),
+  story_op(N, initialize_node).
+
+at(N, setup_arg(Arg, inst(Type, @inst(Class, K)))) :-
+  unique_key(s(N, setup_argument_create(Setup, Arg, inst(Type, Class))), K),
+  setup(N, Setup),
   story_op(N, initialize_node).
 
 sp_st(N, Inst) :-
   setup(N, Setup),
   at(N, setup_arg(Arg, Inst)),
-  setup_argument_create(Setup, Arg, inst(Type, I)),
+  setup_argument_create(Setup, Arg, inst(Type, Class)),
+  story_op(N, initialize_node).
+
+1 = {
+  spontaneous_instance_concrete_class(N, Inst, Concrete)
+    : concrete_class_of(Class, Concrete);
+  error(m("Error with spontaneous instance concrete class.", N, Inst))
+} :-
+  setup(N, Setup),
+  at(N, setup_arg(Arg, Inst)),
+  setup_argument_create(Setup, Arg, inst(Type, Class)),
+  story_op(N, initialize_node).
+
+sp_st(N, property(type, Inst, Class)) :-
+  spontaneous_instance_concrete_class(N, Inst, Class).
+
+% optional create arguments
+1 >= {
+  get_unique_key(s(N, setup_argument_create_opt(Setup, Arg, inst(Type, Class))))
+} :-
+  setup(N, Setup),
+  setup_argument_create_opt(Setup, Arg, inst(Type, Class)),
+  story_op(N, initialize_node).
+
+at(N, setup_arg(Arg, inst(Type, @inst(Class, K)))) :-
+  unique_key(s(N, setup_argument_create_opt(Setup, Arg, inst(Type, Class))), K),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+sp_st(N, Inst) :-
+  setup(N, Setup),
+  at(N, setup_arg(Arg, Inst)),
+  unique_key(s(N, setup_argument_create_opt(Setup, Arg, inst(Type, Class))), K),
+  story_op(N, initialize_node).
+
+sp_st(N, property(type, Inst, Class)) :-
+  setup(N, Setup),
+  at(N, setup_arg(Arg, Inst)),
+  unique_key(s(N, setup_argument_create_opt(Setup, Arg, inst(Type, Class))), K),
   story_op(N, initialize_node).
 
 % Rules for argument substitution:

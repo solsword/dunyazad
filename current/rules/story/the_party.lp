@@ -115,10 +115,10 @@ st(R, property(type, Inst, Type)) :-
   supply_inst(R, Owner, Inst, Type).
 st(R, property(name, Inst, Name)) :-
   supply_inst(R, Owner, Inst, Type),
-  item(Type, GType, Name, Number).
+  item_def(Type, GType, Name, Number).
 st(R, property(number, Inst, Number)) :-
   supply_inst(R, Owner, Inst, Type),
-  item(Type, GType, Name, Number).
+  item_def(Type, GType, Name, Number).
 st(R, relation(has_item, inst(actor, Owner), Inst)) :-
   supply_inst(R, Owner, Inst, Type).
 
@@ -127,16 +127,16 @@ st(R, relation(has_item, inst(actor, Owner), Inst)) :-
 % You start with some basic items:
 1 = {
   supplies(you, Treasure) :
-    item(Treasure, treasure, Name, Number)
+    item_def(Treasure, treasure, Name, Number)
 } :- _sr(R).
 1 >= {
   supplies(you, Charm) :
-    item(Charm, charm, Name, Number)
+    item_def(Charm, charm, Name, Number)
 } :- _sr(R).
 
 1 = {
   supplies(you, Book) :
-    item(Book, book, Name, Number);
+    item_def(Book, book, Name, Number);
   error(m("No starting book."))
 } :- _sr(R).
 
@@ -144,7 +144,7 @@ st(R, relation(has_item, inst(actor, Owner), Inst)) :-
 1 = {
   supplies(Member, Tool) :
     nonbook_tool(Tool, Skill),
-    item(Tool, Type, Name, Number);
+    item_def(Tool, Type, Name, Number);
   error(m("Member didn't start with tool for skill.", Member, Skill))
 } :-
   1 <= { nonbook_tool(Tool, Skill) },
@@ -157,6 +157,6 @@ st(R, relation(has_item, inst(actor, Owner), Inst)) :-
   supplies(Member, Book) :
     party_member(Member, Relation),
     st(R, property(has_skill, inst(actor, Member), literacy)),
-    item(Book, book, BName, BNumber)
+    item_def(Book, book, BName, BNumber)
 } :-
   _sr(R).

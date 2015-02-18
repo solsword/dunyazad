@@ -3,20 +3,22 @@
 possible_setup(on_sale).
 
 setup_argument_create(on_sale, merchant, inst(actor, merchant)).
-setup_argument_symbol(on_sale, gender, person_gender).
-setup_argument_create(on_sale, goods, inst(item, goods)).
-% TODO: item type for these goods
+% TODO: better multi-args
+setup_argument_create_opt(on_sale, goods, inst(item, treasure)).
+setup_argument_create_opt(on_sale, goods, inst(item, charm)).
+setup_argument_create_opt(on_sale, goods, inst(item, tool)).
+setup_argument_create_opt(on_sale, goods, inst(item, book)).
+setup_argument_create_opt(on_sale, goods, inst(item, instrument)).
+setup_argument_create_opt(on_sale, goods, inst(item, weapon)).
 
-% There is a merchant
-s_st(on_sale, property(c(name), v(merchant), c("merchant"))).
-s_st(on_sale, property(c(gender), v(merchant), v(gender))).
-s_st(on_sale, property(c(type), v(merchant), c(merchant))).
-% default number/person
+error(m("Merchant selling nothing.", N)) :-
+  setup(N, on_sale),
+  1 > { i(Item) : at(N, setup_arg(goods, Item)) }.
 
-s_st(on_sale, property(c(name), v(goods), c("goods"))).
-s_st(on_sale, property(c(number), v(goods), c(plural))).
-s_st(on_sale, property(c(type), v(goods), c(treasure))).
-% default person/gender
+error(m("Merchant selling too much.", N)) :-
+  setup(N, on_sale),
+  3 < { i(Item) : at(N, setup_arg(goods, Item)) }.
+
 s_st(on_sale, relation(c(has_item), v(merchant), v(goods))).
 
 s_st(on_sale, relation(c(selling), v(merchant), v(goods))).
