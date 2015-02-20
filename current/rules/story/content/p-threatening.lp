@@ -15,7 +15,7 @@ potential_text(
     N,
     potential(
       problem,
-      relation(threatening, inst(T1, Threatening), inst(T2, Threatened))
+      relation(threatening, inst(Threatening), inst(Threatened))
     )
   ),
   story_op(N, add_surface).

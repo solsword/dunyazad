@@ -2,22 +2,9 @@
 
 possible_setup(on_sale).
 
-setup_argument_create(on_sale, merchant, inst(actor, merchant)).
+setup_argument_create(on_sale, merchant, businessperson).
 % TODO: better multi-args
-setup_argument_create_opt(on_sale, goods, inst(item, treasure)).
-setup_argument_create_opt(on_sale, goods, inst(item, charm)).
-setup_argument_create_opt(on_sale, goods, inst(item, tool)).
-setup_argument_create_opt(on_sale, goods, inst(item, book)).
-setup_argument_create_opt(on_sale, goods, inst(item, instrument)).
-setup_argument_create_opt(on_sale, goods, inst(item, weapon)).
-
-error(m("Merchant selling nothing.", N)) :-
-  setup(N, on_sale),
-  1 > { i(Item) : at(N, setup_arg(goods, Item)) }.
-
-error(m("Merchant selling too much.", N)) :-
-  setup(N, on_sale),
-  3 < { i(Item) : at(N, setup_arg(goods, Item)) }.
+setup_argument_create_n(on_sale, goods, item, 2, 3).
 
 s_st(on_sale, relation(c(has_item), v(merchant), v(goods))).
 
@@ -31,7 +18,7 @@ intro_text(
     LMcht, LMcht, LMcht, LMcht, LGds
   )
 ) :-
-  at(N, setup_arg(merchant, inst(actor, LMcht))),
-  at(N, setup_arg(goods, inst(item, LGds))),
+  at(N, setup_arg(merchant, inst(LMcht))),
+  at(N, setup_arg(goods, inst(LGds))),
   setup(N, on_sale),
   story_op(N, initialize_node).

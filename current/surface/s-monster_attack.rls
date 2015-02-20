@@ -35,9 +35,9 @@ majestically
 [[setup/monster_attack/adverbs/large]]
 fiercely
 
-:setup/monster_attack/adverbs/goblin_horde
+:setup/monster_attack/adverbs/ripper_pack
 [[setup/monster_attack/adverbs/fast]]
-fiercely
+murderously
 
 :setup/monster_attack/adverbs/bloodbat_swarm
 [[setup/monster_attack/adverbs/fast]]
@@ -69,11 +69,11 @@ tentacles curling
 growling
 massive arms flexing
 
-:setup/monster_attack/activities/goblin_horde
-yelling
-shrieking
+:setup/monster_attack/activities/ripper_pack
+clacking
+clattering
 eyes glinting
-waving weapons
+flailing their claws
 
 :setup/monster_attack/activities/bloodbat_swarm
 shrieking
@@ -119,7 +119,7 @@ N#?monster/they V#walk/prs/?monster ?adverb towards N#you/them, ?activity
 ?activity, N#?monster/they V#walk/prs/?monster towards N#you/them
 N#?monster/they V#walk/prs/?monster towards N#you/them, ?activity
 
-:setup/monster_attack/approach/goblin_horde
+:setup/monster_attack/approach/ripper_pack
 N#?monster/they ?adverb V#swarm/prs/?monster towards N#you/them
 ?activity, N#?monster/they ?adverb V#swarm/prs/?monster towards N#you/them
 N#?monster/they ?adverb V#swarm/prs/?monster towards N#you/them, ?activity

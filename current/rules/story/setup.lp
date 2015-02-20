@@ -16,93 +16,65 @@ spontaneous(st(N, State)) :-
 % --------------------------
 
 % normal arguments
-1 = {
-  at(N, setup_arg(Arg, inst(Type, Inst))) : st(N, inst(Type, Inst));
-  error(m("Unbound setup argument.", N, Setup, Arg, Type))
-} :-
-  setup(N, Setup),
-  setup_argument(Setup, Arg, Type),
-  story_op(N, initialize_node).
+setup_argument_n(Setup, Arg, Class, 1, 1) :-
+  setup_argument(Setup, Arg, Class).
 
-% optional arguments
 1 >= {
-  at(N, setup_arg(Arg, inst(Type, Inst))) : st(N, inst(Type, Inst))
+  error(m("Argument binding failed.", N, Setup, Arg))
 } :-
   setup(N, Setup),
-  setup_argument_opt(Setup, Arg, Type),
-  story_op(N, initialize_node).
+  setup_argument_n(Setup, Arg, Class, Min, Max).
 
-% symbol arguments
-1 = {
-  at(N, setup_arg(Arg, Symbol)) : symbol(SymType, Symbol);
-  error(m("Unbound setup argument (symbol).", N, Setup, Arg, SymType))
-} :-
+Min <= {
+  at(N, setup_arg(Arg, Inst)) : is_instance(N, Inst, Class)
+} <= Max :-
   setup(N, Setup),
-  setup_argument_symbol(Setup, Arg, SymType),
-  story_op(N, initialize_node).
-
-% optional symbol arguments
-1 >= {
-  at(N, setup_arg(Arg, Symbol)) : symbol(SymType, Symbol)
-} :-
-  setup(N, Setup),
-  setup_argument_symbol_opt(Setup, Arg, SymType),
+  setup_argument_n(Setup, Arg, Class, Min, Max),
+  not error(m("Argument binding failed.", N, Setup, Arg)),
   story_op(N, initialize_node).
 
 % create arguments
-get_unique_key(s(N, setup_argument_create(Setup, Arg, inst(Type, Class)))) :-
+
+setup_argument_create_n(Setup, Arg, Class, 1, 1) :-
+  setup_argument_create(Setup, Arg, Class).
+
+1 >= {
+  error(m("Creation argument binding failed.", N, Setup, Arg))
+} :-
   setup(N, Setup),
-  setup_argument_create(Setup, Arg, inst(Type, Class)),
+  setup_argument_create_n(Setup, Arg, Class, Min, Max).
+
+Min <= {
+  get_unique_key(s(N, sargcreate(Setup, Arg, Class), I)) : setup_arg_id(I)
+} <= Max :-
+  setup(N, Setup),
+  setup_argument_create_n(Setup, Arg, Class, Min, Max),
+  not error(m("Creation argument binding failed.", N, Setup, Arg)),
   story_op(N, initialize_node).
 
-at(N, setup_arg(Arg, inst(Type, @inst(Class, K)))) :-
-  unique_key(s(N, setup_argument_create(Setup, Arg, inst(Type, Class))), K),
+at(N, setup_arg(Arg, inst(@inst(Class, K)))) :-
+  unique_key(s(N, sargcreate(Setup, Arg, Class), I), K),
   setup(N, Setup),
   story_op(N, initialize_node).
 
 sp_st(N, Inst) :-
   setup(N, Setup),
   at(N, setup_arg(Arg, Inst)),
-  setup_argument_create(Setup, Arg, inst(Type, Class)),
+  setup_argument_create_n(Setup, Arg, Class, Min, Max),
   story_op(N, initialize_node).
 
 1 = {
-  spontaneous_instance_concrete_class(N, Inst, Concrete)
+  sp_inst_class(N, Inst, Concrete)
     : concrete_class_of(Class, Concrete);
   error(m("Error with spontaneous instance concrete class.", N, Inst))
 } :-
   setup(N, Setup),
   at(N, setup_arg(Arg, Inst)),
-  setup_argument_create(Setup, Arg, inst(Type, Class)),
+  setup_argument_create_n(Setup, Arg, Class, Min, Max),
   story_op(N, initialize_node).
 
 sp_st(N, property(type, Inst, Class)) :-
-  spontaneous_instance_concrete_class(N, Inst, Class).
-
-% optional create arguments
-1 >= {
-  get_unique_key(s(N, setup_argument_create_opt(Setup, Arg, inst(Type, Class))))
-} :-
-  setup(N, Setup),
-  setup_argument_create_opt(Setup, Arg, inst(Type, Class)),
-  story_op(N, initialize_node).
-
-at(N, setup_arg(Arg, inst(Type, @inst(Class, K)))) :-
-  unique_key(s(N, setup_argument_create_opt(Setup, Arg, inst(Type, Class))), K),
-  setup(N, Setup),
-  story_op(N, initialize_node).
-
-sp_st(N, Inst) :-
-  setup(N, Setup),
-  at(N, setup_arg(Arg, Inst)),
-  unique_key(s(N, setup_argument_create_opt(Setup, Arg, inst(Type, Class))), K),
-  story_op(N, initialize_node).
-
-sp_st(N, property(type, Inst, Class)) :-
-  setup(N, Setup),
-  at(N, setup_arg(Arg, Inst)),
-  unique_key(s(N, setup_argument_create_opt(Setup, Arg, inst(Type, Class))), K),
-  story_op(N, initialize_node).
+  sp_inst_class(N, Inst, Class).
 
 % Rules for argument substitution:
 % --------------------------------
@@ -237,3 +209,44 @@ sp_st(N, relation(RVal, V1, V2)) :-
   at(N, setup_arg(A2, V2)),
   setup(N, Setup),
   story_op(N, initialize_node).
+
+% Error checking:
+error(m("Negative argument arity.", Setup, Arg)) :-
+  setup_argument_n(Setup, Arg, Class, Min, Max),
+  Min < 0.
+
+error(m("Negative argument arity.", Setup, Arg)) :-
+  setup_argument_n(Setup, Arg, Class, Min, Max),
+  Max < 0.
+
+error(m("Invalid argument arity.", Setup, Arg)) :-
+  setup_argument_n(Setup, Arg, Class, Min, Max),
+  Min > Max.
+
+error(m("Excessive argument arity.", Setup, Arg)) :-
+  setup_argument_n(Setup, Arg, Class, Min, Max),
+  Min > max_setup_argument_arity.
+
+error(m("Excessive argument arity.", Setup, Arg)) :-
+  setup_argument_n(Setup, Arg, Class, Min, Max),
+  Max > max_setup_argument_arity.
+
+error(m("Negative argument arity.", Setup, Arg)) :-
+  setup_argument_create_n(Setup, Arg, Class, Min, Max),
+  Min < 0.
+
+error(m("Negative argument arity.", Setup, Arg)) :-
+  setup_argument_create_n(Setup, Arg, Class, Min, Max),
+  Max < 0.
+
+error(m("Invalid argument arity.", Setup, Arg)) :-
+  setup_argument_create_n(Setup, Arg, Class, Min, Max),
+  Min > Max.
+
+error(m("Excessive argument arity.", Setup, Arg)) :-
+  setup_argument_create_n(Setup, Arg, Class, Min, Max),
+  Min > max_setup_argument_arity.
+
+error(m("Excessive argument arity.", Setup, Arg)) :-
+  setup_argument_create_n(Setup, Arg, Class, Min, Max),
+  Max > max_setup_argument_arity.

@@ -11,8 +11,10 @@
 #const max_options=5.
 #const min_story_length=25.
 #const min_story_choices=15.
+#const max_setup_argument_arity=4.
 
 opt_num(1..max_options).
+setup_arg_id(1..max_setup_argument_arity).
 
 
 % Core node construction:
@@ -54,19 +56,11 @@ at(N, option(1)) :-
 
 % And all action arguments are filled in:
 1 = {
-  at(N, arg(X, Arg, inst(Type, Inst))) : st(N, inst(Type, Inst));
-  error(m("Unbound action argument.", N, Action, Arg, Type))
+  at(N, arg(X, Arg, Inst)) : is_instance(N, Inst, Class);
+  error(m("Unbound action argument.", N, Action, Arg, Class))
 } :-
   at(N, action(X, Action)),
-  argument(Action, Arg, Type),
-  story_op(N, build_options).
-
-1 = {
-  at(N, arg(X, Arg, Symbol)) : symbol(SymType, Symbol);
-  error(m("Unbound action argument (symbol).", N, Action, Arg, SymType))
-} :-
-  at(N, action(X, Action)),
-  argument_symbol(Action, Arg, SymType),
+  argument(Action, Arg, Class),
   story_op(N, build_options).
 
 
@@ -104,14 +98,28 @@ at(N, consequence(X, _not, relation(Rel, Old, Obj))) :-
 % Most actions can't be performed reflexively:
 error(m("Improperly reflexive action.", N, Opt)) :-
   at(N, action(Opt, Action)),
-  at(N, arg(Opt, Arg1, inst(actor, ID))),
-  at(N, arg(Opt, Arg2, inst(actor, ID))),
+  at(N, arg(Opt, Arg1, inst(ID))),
+  at(N, arg(Opt, Arg2, inst(ID))),
   Arg1 < Arg2,
   not reflexive(Action).
 
 
 % Typing rules:
 % -------------
+
+general_category(actor).
+general_category(item).
+% TODO: locations?
+
+category(N, Thing, Category) :-
+  is_instance(N, Thing, Category),
+  general_category(Category).
+
+error(m("Instance doesn't belong to a genereal category.", N, I)) :-
+  st(N, inst(I)),
+  0 = {
+    category(N, inst(I), Category)
+  }.
 
 is_instance(N, Thing, Class) :-
   st(N, property(type, Thing, Class)).
@@ -126,12 +134,7 @@ subclass(General, Specific) :-
 
 concrete_class_of(Abstract, Concrete) :-
   subclass(Abstract, Concrete),
-  % TODO: Better here!
-  0 = { subclass(Concrete, Any) }.
+  concrete(Concrete).
 
 concrete_class_of(Concrete, Concrete) :-
-  subclass(Something, Concrete),
-  % TODO: Better here!
-  0 = { subclass(Concrete, Any) }.
-
-% TODO: Class/subclass hierarchies for things other than items!
+  concrete(Concrete).

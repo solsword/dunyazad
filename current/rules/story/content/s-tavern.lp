@@ -2,22 +2,41 @@
 
 possible_setup(tavern).
 
-setup_argument_create(tavern, tinker, inst(actor, tinker)).
-setup_argument_create(tavern, goods, inst(item, treasure)).
-% TODO: Variety here
+setup_argument_create_n(tavern, merchant, merchant, 0, 1).
+setup_argument_create_n(tavern, noble, aristocrat, 0, 1).
+setup_argument_create_n(tavern, peasant, laborer, 0, 1).
+% TODO: More possibilities here?
 
-setup_argument_create(tavern, noble, inst(actor, noble)).
+setup_argument_create(tavern, innkeeper, innkeeper).
 
-setup_argument_create(tavern, innkeeper, inst(actor, innkeeper)).
+error(m("Tavern population too low.", N)) :-
+  setup(N, tavern),
+  2 > {
+    at(N, setup_arg(merchant, Merchant));
+    at(N, setup_arg(noble, Noble));
+    at(N, setup_arg(peasant, Peasant))
+  }.
 
-% The tinker's goods
-s_st(tavern, relation(c(has_item), v(tinker), v(goods))).
+% Some stuff for the merchant to sell:
+setup_argument_create_n(tavern, goods, item, 0, 2).
+
+error(m("Merchant but no goods.", N)) :-
+  setup(N, tavern),
+  at(N, setup_arg(merchant, Merchant)),
+  0 = {
+    at(N, setup_arg(goods, Goods))
+  }.
+
+% The merchant owns the goods:
+s_st(tavern, relation(c(has_item), v(merchant), v(goods))).
 
 % Potentials:
-s_st(tavern, relation(c(selling), v(tinker), v(goods))).
+s_st(tavern, relation(c(selling), v(merchant), v(goods))).
 s_st(tavern, state(c(bored), v(noble))).
+s_st(tavern, state(c(bored), v(peasant))).
 s_st(tavern, state(c(knows_gossip), v(innkeeper))).
 
+% TODO: Variable text here!
 intro_text(
   N,
   tavern,
@@ -25,13 +44,13 @@ intro_text(
     "N#{}/they V#enter/prs/{} a bustling tavern. @CAP@N#{}/they V#tend/prsc/{} the bar, where N#{}/they and N#{}/they V#relax/prsc/_plural. @CAP@N#{}/they V#look/prs/{} like N#{}/they V#might/prs/{} V#have/rinf/{} something to sell, while N#{}/they just V#look/prs/{} bored.",
     you, you,
     Innkeeper, Innkeeper,
-    Tinker, Noble,
-    Tinker, Tinker, Tinker, Tinker, Tinker,
+    Merchant, Noble,
+    Merchant, Merchant, Merchant, Merchant, Merchant,
     Noble, Noble
   )
 ) :-
-  at(N, setup_arg(tinker, inst(actor, Tinker))),
-  at(N, setup_arg(noble, inst(actor, Noble))),
-  at(N, setup_arg(innkeeper, inst(actor, Innkeeper))),
+  at(N, setup_arg(merchant, inst(Merchant))),
+  at(N, setup_arg(noble, inst(Noble))),
+  at(N, setup_arg(innkeeper, inst(Innkeeper))),
   setup(N, tavern),
   story_op(N, initialize_node).

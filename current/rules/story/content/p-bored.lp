@@ -15,7 +15,7 @@ potential_text(
     N,
     potential(
       opportunity,
-      state(bored, inst(Type, Bored))
+      state(bored, inst(Bored))
     )
   ),
   story_op(N, add_surface).

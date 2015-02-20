@@ -71,7 +71,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("type"),
-        Pr("inst", Vr("Type"), Vr("Key")),
+        Pr("inst", Vr("Key")),
         Vr("Class")
       )
     ),
@@ -81,7 +81,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("name"),
-        Pr("inst", Vr("Type"), Vr("Key")),
+        Pr("inst", Vr("Key")),
         Vr("Name")
       )
     ),
@@ -91,7 +91,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("number"),
-        Pr("inst", Vr("Type"), Vr("Key")),
+        Pr("inst", Vr("Key")),
         Vr("Number")
       )
     ),
@@ -101,7 +101,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("gender"),
-        Pr("inst", Vr("Type"), Vr("Key")),
+        Pr("inst", Vr("Key")),
         Vr("Gender")
       )
     ),
@@ -111,7 +111,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("person"),
-        Pr("inst", Vr("Type"), Vr("Key")),
+        Pr("inst", Vr("Key")),
         Vr("Person")
       )
     ),
@@ -121,7 +121,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("determined"),
-        Pr("inst", Vr("Type"), Vr("Key")),
+        Pr("inst", Vr("Key")),
         Vr("Determination")
       )
     ),
@@ -131,7 +131,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("state",
         Pr("party_member"),
-        Pr("inst", Vr("Type"), Vr("Key")),
+        Pr("inst", Vr("Key")),
       )
     ),
 }
@@ -170,7 +170,7 @@ STRUCTURE_SCHEMAS = {
     ),
 }
 
-INSTANCE_SCHEMA = Pr("inst", Vr("Type"), Vr("Key"))
+INSTANCE_SCHEMA = Pr("inst", Vr("Key"))
 
 TEXT_SCHEMAS = {
   "intro_text":
@@ -217,16 +217,14 @@ def glean_nouns(story):
   for sc, binding in ans.bindings(NOUN_SCHEMAS, story):
     if "st.property.inst.Key" in binding:
       n = binding["st.property.inst.Key"].unquoted()
-      t = binding["st.property.inst.Type"].unquoted()
     elif "st.state.inst.Key" in binding:
       n = binding["st.state.inst.Key"].unquoted()
-      t = binding["st.state.inst.Type"].unquoted()
     else:
       raise ValueError(
         "Unknown binding structure for noun schema:\n{}".format(binding)
       )
     if n not in result:
-      result[n] = nouns.Noun(n, t)
+      result[n] = nouns.Noun(n)
     if sc == "class":
       result[n].cls = binding["st.property.Class"].unquoted()
     elif sc == "name":

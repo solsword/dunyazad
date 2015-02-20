@@ -5,6 +5,8 @@ tasks.py
 import os
 import random
 
+from utils import *
+
 import asp
 import ans
 
@@ -21,10 +23,10 @@ BASE_SOURCES = [
   "utils.lp",
   opj("story", "core.lp"),
   opj("story", "setup.lp"),
-  opj("story", "symbols.lp"),
   opj("story", "the_party.lp"),
   opj("story", "skills.lp"),
   opj("story", "items.lp"),
+  opj("story", "actors.lp"),
   opj("story", "settings.lp"),
   opj("story", "potential.lp"),
   opj("story", "grow.lp"),
@@ -36,11 +38,12 @@ BASE_SOURCES = [
 
 CONTENT_DIR = opj("story", "content")
 
-CONTENT_SOURCES = [
-  opj(GLOBAL_RULES_DIR, CONTENT_DIR, f)
-    for f in os.listdir(opj(GLOBAL_RULES_DIR, CONTENT_DIR))
-    if f.endswith(".lp")
-]
+CONTENT_SOURCES = list(
+  walk_files(
+    opj(GLOBAL_RULES_DIR, CONTENT_DIR),
+    lambda f: f.endswith(".lp")
+  )
+)
 
 ALL_SOURCES = [
   opj(GLOBAL_RULES_DIR, path) for path in BASE_SOURCES

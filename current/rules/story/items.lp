@@ -5,6 +5,9 @@
 subclass(Imm, Spec) :-
   item_def(Spec, Imm, Name, Number).
 
+concrete(Spec) :-
+  item_def(Spec, Imm, Name, Number).
+
 default_name_for(Class, Name) :-
   item_def(Class, Superclass, Name, Number).
 
@@ -13,7 +16,7 @@ default_number_for(Class, Number) :-
 
 % All items are by default neuter:
 default_gender_for(Class, neuter) :-
-  item_def(Class, Superclass, Name, Number).
+  subclass(Class, item).
 
 % The concept of a 'nonbook tool' is used for setup
 nonbook_tool(Tool, Skill) :-

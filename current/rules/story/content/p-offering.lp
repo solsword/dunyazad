@@ -15,7 +15,7 @@ potential_text(
     N,
     potential(
       opportunity,
-      relation(selling, inst(T1, Merchant), inst(T2, Goods))
+      relation(selling, inst(Merchant), inst(Goods))
     )
   ),
   story_op(N, add_surface).

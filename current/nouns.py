@@ -52,7 +52,6 @@ class Noun:
   def __init__(
     self,
     tag,
-    typ="thing",
     cls="object",
     name="nameless",
     person="third",
@@ -62,7 +61,6 @@ class Noun:
     is_party_member=False,
   ):
     self.tag = tag
-    self.typ = typ
     self.cls = cls
     self.name = name
     self.person = person
@@ -72,9 +70,8 @@ class Noun:
     self.is_party_member = is_party_member
 
   def __str__(self):
-    return "Noun[{}:{}.{}/{}][{}/{}]".format(
+    return "Noun[{}.{}/{}][{}/{}]".format(
       self.tag,
-      self.typ,
       self.cls,
       self.name,
       definite(self),
@@ -82,9 +79,8 @@ class Noun:
     )
 
   def __repr__(self):
-    return "Noun({}, {}, {}, {}, {}, {}, {}, {}, {})".format(
+    return "Noun({}, {}, {}, {}, {}, {}, {}, {})".format(
       self.tag,
-      self.typ,
       self.cls,
       self.name,
       self.person,

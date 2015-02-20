@@ -2,12 +2,12 @@
 
 possible_setup(monster_attack).
 
-setup_argument_create(monster_attack, monster, inst(actor, monster)).
-setup_argument_create_opt(monster_attack, trophy, inst(item, trophy)).
+setup_argument_create(monster_attack, monster, monster).
+setup_argument_create_n(monster_attack, trophy, trophy, 0, 1).
 
 s_st(monster_attack, state(c(unintelligent), v(monster))).
 
-s_st(monster_attack, relation(c(threatening), v(monster), c(inst(actor, you)))).
+s_st(monster_attack, relation(c(threatening), v(monster), c(inst(you)))).
 
 % This will evaporate silently if there's no trophy:
 s_st(monster_attack, relation(c(has_item), v(monster), v(trophy))).
@@ -28,7 +28,7 @@ intro_text(
     LMonst, LMonst, LMonst
   )
 ) :-
-  at(N, setup_arg(monster, inst(actor, LMonst))),
-  st(N, property(type, inst(actor, LMonst), dragon)),
+  at(N, setup_arg(monster, inst(LMonst))),
+  st(N, property(type, inst(LMonst), dragon)),
   setup(N, monster_attack),
   story_op(N, initialize_node).

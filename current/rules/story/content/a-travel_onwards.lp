@@ -8,7 +8,7 @@ outcome(travel_onwards, onwards).
 
 % The argument of travel_onwards is fixed:
 
-at(N, arg(Opt, subject, inst(actor, you))) :-
+at(N, arg(Opt, subject, inst(you))) :-
   at(N, action(Opt, travel_onwards)).
 
 % travel_onwards as an option removes all existing opportunities (but it
@@ -28,12 +28,12 @@ at(N, nullifies(X, Opp)) :-
 % travelling onwards gets rid of all spontaneous instances and properties
 % thereof unless the party has picked up the instance to take with them:
 
-travel_away_from(N, X, inst(Typ, Inst)) :-
+travel_away_from(N, X, inst(Inst)) :-
   at(N, action(X, travel_onwards)),
   vignette(N, V),
-  spontaneous(st(V, inst(Typ, Inst))),
-  st(N, inst(Typ, Inst)),
-  not st(N, state(party_member, inst(Typ, Inst))),
+  spontaneous(st(V, inst(Inst))),
+  st(N, inst(Inst)),
+  not st(N, state(party_member, inst(Inst))),
   0 = {
     st(N, relation(has_item, PartyMember, Inst)) :
       st(N, state(party_member, PartyMember))
