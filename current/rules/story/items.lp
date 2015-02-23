@@ -16,7 +16,7 @@ default_number_for(Class, Number) :-
 
 % All items are by default neuter:
 default_gender_for(Class, neuter) :-
-  subclass(Class, item).
+  subclass(item, Class).
 
 % The concept of a 'nonbook tool' is used for setup
 nonbook_tool(Tool, Skill) :-

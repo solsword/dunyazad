@@ -3,7 +3,6 @@
 possible_setup(on_sale).
 
 setup_argument_create(on_sale, merchant, businessperson).
-% TODO: better multi-args
 setup_argument_create_n(on_sale, goods, item, 2, 3).
 
 s_st(on_sale, relation(c(has_item), v(merchant), v(goods))).
@@ -18,7 +17,7 @@ intro_text(
     LMcht, LMcht, LMcht, LMcht, LGds
   )
 ) :-
-  at(N, setup_arg(merchant, inst(LMcht))),
-  at(N, setup_arg(goods, inst(LGds))),
+  at(N, setup_arg(merchant, inst(MType, LMcht))),
+  at(N, setup_arg(goods, inst(GType, LGds))),
   setup(N, on_sale),
   story_op(N, initialize_node).

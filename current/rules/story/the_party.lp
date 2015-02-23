@@ -16,21 +16,21 @@ starting_skill(healing).
 starting_skill(prayer).
 starting_skill(acrobatics).
 
-st(R, inst(you)) :- _sr(R).
-st(R, state(party_member, inst(you))) :- _sr(R).
-st(R, property(name, inst(you), "Dunyazad")) :- _sr(R).
-st(R, property(person, inst(you), second)) :- _sr(R).
-st(R, property(gender, inst(you), feminine)) :- _sr(R).
-st(R, property(determined, inst(you), false)) :- _sr(R).
-st(R, property(type, inst(you), person)) :- _sr(R).
+st(R, inst(actor, you)) :- _sr(R).
+st(R, state(party_member, inst(actor, you))) :- _sr(R).
+st(R, property(name, inst(actor, you), "Dunyazad")) :- _sr(R).
+st(R, property(person, inst(actor, you), second)) :- _sr(R).
+st(R, property(gender, inst(actor, you), feminine)) :- _sr(R).
+st(R, property(determined, inst(actor, you), false)) :- _sr(R).
+st(R, property(type, inst(actor, you), person)) :- _sr(R).
 % You start with literacy, storytelling, and one other random skill (from the
 % list of "starting" skills):
 1 = {
-  st(R, property(has_skill, inst(you), Skill)) : starting_skill(Skill);
+  st(R, property(has_skill, inst(actor, you), Skill)) : starting_skill(Skill);
   error(m("Missing starting skill."))
 } :- _sr(R).
-st(R, property(has_skill, inst(you), literacy)) :- _sr(R).
-st(R, property(has_skill, inst(you), storytelling)) :- _sr(R).
+st(R, property(has_skill, inst(actor, you), literacy)) :- _sr(R).
+st(R, property(has_skill, inst(actor, you), storytelling)) :- _sr(R).
 % default number
 
 % Party member parameters:
@@ -67,47 +67,47 @@ error(m("Student and master both.")) :-
 
 % Party member unpacking:
 
-st(R, inst(Member)) :- party_member(Member, Relation), _sr(R).
-st(R, state(party_member, inst(Member))) :-
+st(R, inst(actor, Member)) :- party_member(Member, Relation), _sr(R).
+st(R, state(party_member, inst(actor, Member))) :-
   party_member(Member, Relation),
   _sr(R).
 1 = {
-  st(R, property(name, inst(Member), Name))
+  st(R, property(name, inst(actor, Member), Name))
     : party_member_name(Name);
   error(m("Party member without name.", Member))
 } :- party_member(Member, Relation), _sr(R).
 1 = {
-  st(R, property(gender, inst(Member), masculine));
-  st(R, property(gender, inst(Member), feminine));
+  st(R, property(gender, inst(actor, Member), masculine));
+  st(R, property(gender, inst(actor, Member), feminine));
   error(m("Party member without gender.", Member))
 } :- party_member(Member, Relation), _sr(R).
-st(R, property(relationship, inst(Member), Relation)) :-
+st(R, property(relationship, inst(actor, Member), Relation)) :-
   party_member(Member, Relation), _sr(R).
-st(R, property(determined, inst(Member), false)) :-
+st(R, property(determined, inst(actor, Member), false)) :-
   party_member(Member, Relation),
   _sr(R).
-st(R, property(type, inst(Member), person)) :-
+st(R, property(type, inst(actor, Member), person)) :-
   party_member(Member, Relation),
   _sr(R).
 % Each party member starts with 2 skills:
 2 = {
-  st(R, property(has_skill, inst(Member), Skill)) : skill(Skill);
+  st(R, property(has_skill, inst(actor, Member), Skill)) : skill(Skill);
   error(m("Party member missing starting skill 1.", Member));
   error(m("Party member missing starting skill 2.", Member))
 } :- party_member(Member, Relation), _sr(R).
 
 error(m("Party member initial skill overlap.", Skill)) :-
   skill(Skill),
-  st(R, property(has_skill, inst(you), Skill)),
-  st(R, property(has_skill, inst(Other), Skill)),
-  st(R, state(party_member, inst(Other))),
+  st(R, property(has_skill, inst(actor, you), Skill)),
+  st(R, property(has_skill, inst(actor, Other), Skill)),
+  st(R, state(party_member, inst(actor, Other))),
   Other != you,
   _sr(R).
 
 % Supply unpacking:
 
 get_unique_key(s(supplies(Owner, Item))) :- supplies(Owner, Item), _sr(R).
-supply_inst(R, Owner, inst(@inst(Item, K)), Item) :-
+supply_inst(R, Owner, inst(item, @inst(Item, K)), Item) :-
   unique_key(s(supplies(Owner, Item)), K),
   supplies(Owner, Item),
   _sr(R).
@@ -121,7 +121,7 @@ st(R, property(name, Inst, Name)) :-
 st(R, property(number, Inst, Number)) :-
   supply_inst(R, Owner, Inst, Type),
   item_def(Type, GType, Name, Number).
-st(R, relation(has_item, inst(Owner), Inst)) :-
+st(R, relation(has_item, inst(actor, Owner), Inst)) :-
   supply_inst(R, Owner, Inst, Type).
 
 % Supply details
@@ -151,14 +151,14 @@ st(R, relation(has_item, inst(Owner), Inst)) :-
 } :-
   1 <= { nonbook_tool(Tool, Skill) },
   party_member(Member, Relation),
-  st(R, property(has_skill, inst(Member), Skill)),
+  st(R, property(has_skill, inst(actor, Member), Skill)),
   _sr(R).
 
 % Your literate party members might also start with some random books:
 2 >= {
   supplies(Member, Book) :
     party_member(Member, Relation),
-    st(R, property(has_skill, inst(Member), literacy)),
+    st(R, property(has_skill, inst(actor, Member), literacy)),
     item_def(Book, book, BName, BNumber)
 } :-
   _sr(R).

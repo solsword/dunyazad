@@ -8,7 +8,7 @@ outcome(reach_destination, journey_over).
 
 % The argument of reach_destination is fixed:
 
-at(N, arg(Opt, subject, inst(you))) :-
+at(N, arg(Opt, subject, inst(actor, you))) :-
   at(N, action(Opt, reach_destination)).
 
 % reach_destination cannot happen except at an ending:

@@ -49,8 +49,8 @@ intro_text(
     Noble, Noble
   )
 ) :-
-  at(N, setup_arg(merchant, inst(Merchant))),
-  at(N, setup_arg(noble, inst(Noble))),
-  at(N, setup_arg(innkeeper, inst(Innkeeper))),
+  at(N, setup_arg(merchant, inst(MType, Merchant))),
+  at(N, setup_arg(noble, inst(NType, Noble))),
+  at(N, setup_arg(innkeeper, inst(IType, Innkeeper))),
   setup(N, tavern),
   story_op(N, initialize_node).

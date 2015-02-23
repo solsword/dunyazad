@@ -52,8 +52,9 @@ Min <= {
   not error(m("Creation argument binding failed.", N, Setup, Arg)),
   story_op(N, initialize_node).
 
-at(N, setup_arg(Arg, inst(@inst(Class, K)))) :-
+at(N, setup_arg(Arg, inst(Type, @inst(Class, K)))) :-
   unique_key(s(N, sargcreate(Setup, Arg, Class), I), K),
+  category_for(Class, Type),
   setup(N, Setup),
   story_op(N, initialize_node).
 

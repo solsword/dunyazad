@@ -15,7 +15,7 @@ potential_text(
     N,
     potential(
       opportunity,
-      state(knows_gossip, inst(Knowledgeable))
+      state(knows_gossip, inst(Type, Knowledgeable))
     )
   ),
   story_op(N, add_surface).

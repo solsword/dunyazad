@@ -22,7 +22,7 @@ intro_text(
     LAttk, LAttk, LVict
   )
 ) :-
-  at(N, setup_arg(attacker, inst(LAttk))),
-  at(N, setup_arg(victim, inst(LVict))),
+  at(N, setup_arg(attacker, inst(AType, LAttk))),
+  at(N, setup_arg(victim, inst(VType, LVict))),
   setup(N, threatened_innocents),
   story_op(N, initialize_node).

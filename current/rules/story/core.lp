@@ -97,11 +97,14 @@ at(N, consequence(X, _not, relation(Rel, Old, Obj))) :-
 
 % Most actions can't be performed reflexively:
 error(m("Improperly reflexive action.", N, Opt)) :-
+  reflexive(N, Opt),
   at(N, action(Opt, Action)),
-  at(N, arg(Opt, Arg1, inst(ID))),
-  at(N, arg(Opt, Arg2, inst(ID))),
-  Arg1 < Arg2,
   not reflexive(Action).
+
+reflexive(N, Opt) :-
+  at(N, arg(Opt, Arg1, inst(Type, ID))),
+  at(N, arg(Opt, Arg2, inst(Type, ID))),
+  Arg1 < Arg2.
 
 
 % Typing rules:
@@ -115,10 +118,17 @@ category(N, Thing, Category) :-
   is_instance(N, Thing, Category),
   general_category(Category).
 
+category_for(Category, Category) :-
+  general_category(Category).
+
+category_for(Class, Category) :-
+  subclass(Category, Class),
+  general_category(Category).
+
 error(m("Instance doesn't belong to a genereal category.", N, I)) :-
-  st(N, inst(I)),
+  st(N, inst(Type, I)),
   0 = {
-    category(N, inst(I), Category)
+    category(N, inst(Type, I), Category)
   }.
 
 is_instance(N, Thing, Class) :-
