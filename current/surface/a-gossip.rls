@@ -1,7 +1,7 @@
 % Action - gossip
 
 :action/gossip/option
-N#?interested/they V#gossip/prs/?teller with N#?knowledgeable/them
+N#?interested/they V#gossip/prs/?interested with N#?knowledgeable/them
 
 % TODO: This!!
 :action/gossip/outcome/useful

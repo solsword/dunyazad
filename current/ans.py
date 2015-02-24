@@ -1137,7 +1137,7 @@ def parse_ans(text):
 
 def parse_ans_fast(text):
   """
-  Parses the given ext as an answer set quickly, assuming normal clingo output
+  Parses the given text as an answer set quickly, assuming normal clingo output
   constraints.
   """
   qsplit = re.compile(r'("(?:[^\\"]|(?:\\.))*")')
@@ -1158,6 +1158,25 @@ def parse_ans_fast(text):
   predicates = []
   for p in prstrings:
     predicates.append(parser.parse_completely(p, Predicate, devour=devour_asp))
+  return predicates
+
+def parse_fans_fast(text):
+  """
+  Parses the given text as an answer set quickly, assuming formatted clingo
+  output (i.e., facts suitable for clingo input, one per line with periods, but
+  no rules or other non-predicate statements).
+  """
+  # Parse each line as a predicate individually:
+  lines = text.split('\n')
+  predicates = []
+  for l in lines:
+    if not l:
+      continue
+    if l[-1] != '.':
+      raise parser.ParseError("Line lacks trailing '.':\n{}".format(l))
+    predicates.append(
+      parser.parse_completely(l[:-1], Predicate, devour=devour_asp)
+    )
   return predicates
 
 def parse_asp(text):

@@ -44,7 +44,7 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
   if storyfile:
     with open(storyfile, 'r') as fin:
       # TODO: parse faster here!
-      sofar = list(ans.parse_ans(fin.read()))
+      sofar = list(ans.parse_fans_fast(fin.read()))
   else:
     try:
       program, setup = tasks.setup_story([], scaffolding)

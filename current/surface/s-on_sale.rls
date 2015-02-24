@@ -1,0 +1,6 @@
+% Setup - on_sale
+
+:setup/on_sale/intro
+N#?merchant/they V#show/prs/?merchant up and V#offer/prs/?merchant V#trade/inf/?merchant N#?goods/them.
+
+% TODO: Better here

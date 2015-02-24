@@ -1,20 +1,6 @@
 % surface.lp
 % Rules about surface text realization
 
-error(m("Missing intro text.", N, Setup)) :-
-  setup(N, Setup),
-  story_op(N, add_surface),
-  0 = {
-    intro_text(N, Setup, Text)
-  }.
-
-error(m("Missing potential text.", N, Type, Fact)) :-
-  at(N, potential(Type, Fact)),
-  story_op(N, add_surface),
-  0 = {
-    potential_text(N, Text)
-  }.
-
 % Gender values:
 gender(masculine).
 gender(feminine).
@@ -56,7 +42,7 @@ number(plural).
 1 = {
   sp_st(N, property(gender, inst(Type, ID), Name))
     : sp_st(N, property(gender, inst(Type, ID), Name));
-  sp_st(N, property(number, inst(Type, ID), Gender))
+  sp_st(N, property(gender, inst(Type, ID), Gender))
     : default_gender_for(Class, Gender),
       sp_st(N, property(type, inst(Type, ID), Class));
   error(m("Error with spontaneous instance gender.", inst(Type, ID)))

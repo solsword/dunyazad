@@ -1,0 +1,6 @@
+% Setup - tavern
+
+:setup/tavern/intro
+tavern!
+
+% TODO: how to handle optional arguments?

@@ -1,0 +1,17 @@
+% vim: syn=gringo
+% setup:
+% ------
+
+max_unique(0).
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+choice_structure_plan(0, grim).

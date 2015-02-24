@@ -71,7 +71,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("type"),
-        Pr("inst", Vr("Key")),
+        Pr("inst", Vr("Type"), Vr("Key")),
         Vr("Class")
       )
     ),
@@ -81,7 +81,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("name"),
-        Pr("inst", Vr("Key")),
+        Pr("inst", Vr("Type"), Vr("Key")),
         Vr("Name")
       )
     ),
@@ -91,7 +91,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("number"),
-        Pr("inst", Vr("Key")),
+        Pr("inst", Vr("Type"), Vr("Key")),
         Vr("Number")
       )
     ),
@@ -101,7 +101,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("gender"),
-        Pr("inst", Vr("Key")),
+        Pr("inst", Vr("Type"), Vr("Key")),
         Vr("Gender")
       )
     ),
@@ -111,7 +111,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("person"),
-        Pr("inst", Vr("Key")),
+        Pr("inst", Vr("Type"), Vr("Key")),
         Vr("Person")
       )
     ),
@@ -121,7 +121,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("property",
         Pr("determined"),
-        Pr("inst", Vr("Key")),
+        Pr("inst", Vr("Type"), Vr("Key")),
         Vr("Determination")
       )
     ),
@@ -131,7 +131,7 @@ NOUN_SCHEMAS = {
       Vr("Node"),
       Pr("state",
         Pr("party_member"),
-        Pr("inst", Vr("Key")),
+        Pr("inst", Vr("Type"), Vr("Key")),
       )
     ),
 }
@@ -161,6 +161,32 @@ STRUCTURE_SCHEMAS = {
       Vr("Node"),
       Pr("arg", Pr("option", Vr("Option")), Vr("Arg"), SbT("Value"))
     ),
+  "potential_state":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr("potential", Vr("PType"), Pr("state", Vr("SName"), SbT("Inst")))
+    ),
+  "potential_property":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr(
+        "potential",
+        Vr("PType"),
+        Pr("property", Vr("PName"), SbT("Inst"), Vr("PVal"))
+      )
+    ),
+  "potential_relation":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr(
+        "potential",
+        Vr("PType"),
+        Pr("relation", Vr("RName"), SbT("From"), SbT("To"))
+      )
+    ),
   "setup": Pr("setup", Vr("Node"), Vr("Setup")),
   "setup_arg":
     Pr(
@@ -170,7 +196,7 @@ STRUCTURE_SCHEMAS = {
     ),
 }
 
-INSTANCE_SCHEMA = Pr("inst", Vr("Key"))
+INSTANCE_SCHEMA = Pr("inst", Vr("Type"), Vr("Key"))
 
 TEXT_SCHEMAS = {
   "intro_text":
@@ -258,6 +284,17 @@ def glean_context_variables(story):
 
     '_setup' - the name of the setup
     - all setup arguments by name
+
+  Finally, each potential for a node gets put into the list node/'potentials'
+  as a dictionary with the following keys:
+
+    '_ptype' - the type of potential ('problem' or 'opportunity')
+    '_stype' - the type of state ('state', 'property', or 'relation')
+    '_sname' - the name of the state (e.g. 'threatening')
+    '_inst' - for 'state'- and 'property'-type states, the instance id
+    '_value' - for 'property'-type states, the property value
+    '_from' - for 'relation'-type states, the 'from' instance id
+    '_to' - for 'relation'-type states, the 'to' instance id
   """
   result = {}
   for sc, binding in ans.bindings(STRUCTURE_SCHEMAS, story):
@@ -268,8 +305,6 @@ def glean_context_variables(story):
         result[n] = {}
       if o not in result[n]:
         result[n][o] = {}
-      if "setup" not in result[n]:
-        result[n]["setup"] = {}
 
       a = binding["at.action.Action"].unquoted()
       result[n][o]["_action"] = a
@@ -318,6 +353,87 @@ def glean_context_variables(story):
         v = vpr.unquoted()
       result[n][o][a] = v
 
+    elif sc == "potential_state":
+      n = binding["at.Node"].unquoted()
+      if n not in result:
+        result[n] = {}
+      if "potentials" not in result[n]:
+        result[n]["potentials"] = []
+
+      pt = binding["at.potential.PType"]
+      sn = binding["at.potential.state.SName"]
+      si = binding["at.potential.state.Inst"]
+      sb = ans.bind(INSTANCE_SCHEMA, si)
+      if sb:
+        v = sb["inst.Key"].unquoted()
+      else:
+        v = si.unquoted()
+      result[n]["potentials"].append(
+        {
+          "_ptype": pt,
+          "_stype": "state",
+          "_sname": sn,
+          "_inst": v,
+        }
+      )
+
+    elif sc == "potential_property":
+      n = binding["at.Node"].unquoted()
+      if n not in result:
+        result[n] = {}
+      if "potentials" not in result[n]:
+        result[n]["potentials"] = []
+
+      pt = binding["at.potential.PType"]
+      pn = binding["at.potential.property.PName"]
+      pv = binding["at.potential.property.PVal"]
+      pi = binding["at.potential.property.Inst"]
+      sb = ans.bind(INSTANCE_SCHEMA, pi)
+      if sb:
+        v = sb["inst.Key"].unquoted()
+      else:
+        v = pi.unquoted()
+      result[n]["potentials"].append(
+        {
+          "_ptype": pt,
+          "_stype": "property",
+          "_sname": pn,
+          "_inst": v,
+          "_value": pv
+        }
+      )
+
+    elif sc == "potential_relation":
+      n = binding["at.Node"].unquoted()
+      if n not in result:
+        result[n] = {}
+      if "potentials" not in result[n]:
+        result[n]["potentials"] = []
+
+      pt = binding["at.potential.PType"]
+      rn = binding["at.potential.relation.RName"]
+      rf = binding["at.potential.relation.From"]
+      sb = ans.bind(INSTANCE_SCHEMA, rf)
+      if sb:
+        vf = sb["inst.Key"].unquoted()
+      else:
+        vf = rf.unquoted()
+      rt = binding["at.potential.relation.To"]
+      sb = ans.bind(INSTANCE_SCHEMA, rt)
+      if sb:
+        vt = sb["inst.Key"].unquoted()
+      else:
+        vt = rt.unquoted()
+      result[n]["potentials"].append(
+        {
+          "_ptype": pt,
+          "_stype": "relation",
+          "_sname": rn,
+          "_from": vf,
+          "_to": vt
+        }
+      )
+
     elif sc == "setup":
       n = binding["setup.Node"].unquoted()
       if n not in result:
@@ -344,6 +460,30 @@ def glean_context_variables(story):
         v = vpr.unquoted()
       result[n]["setup"][a] = v
   return result
+
+def enhance_context_variables(cvrs, nouns):
+  """
+  Adds _type_of_{} variables to each set of context variables in the given
+  context variables structure, using the given set of nouns.
+  """
+  for node in cvrs:
+    if "setup" in cvrs[node]:
+      enhance_vars(cvrs[node]["setup"], nouns)
+    if "potentials" in cvrs[node]:
+      for p in cvrs[node]["potentials"]:
+        enhance_vars(p, nouns)
+    for opt in [n for n in cvrs[node] if n != "setup" and n != "potentials"]:
+      enhance_vars(cvrs[node][opt], nouns)
+
+def enhance_vars(vs, nouns):
+  """
+  A helper for enhance_context_variables that enhances a flat dictionary of
+  variables.
+  """
+  for key in [k for k in vs.keys() if not k.startswith("_type_of_")]:
+    if vs[key] in nouns:
+      n = nouns[vs[key]]
+      vs["_type_of_" + key] = n.cls
 
 def collate_rules(story):
   """
@@ -493,6 +633,9 @@ def parse_kv(text):
   returns the pair as a tuple followed by any leftover text (which will either
   be empty or start with an '@').
   """
+  if text[0] != '@':
+    return None
+  text = text[1:]
   km = SBST_KEY.match(text)
   if not km:
     return None
@@ -563,7 +706,7 @@ def parse_initial_substituion(text):
     keyend = len(sbst)
 
   key = sbst[:keyend]
-  sbst = sbst[keyend + 1:]
+  sbst = sbst[keyend:]
 
   vs = {}
   while sbst:
@@ -780,22 +923,28 @@ def build_node_text(
   intro, _pnslots, _introduced = build_text(
     node["intro"],
     grammar_rules,
-    context_variables["setup"],
+    context_variables["setup"] if "setup" in context_variables else {},
     nouns,
     pnslots,
     introduced,
     timeshift
   )
   intro = sentence(intro)
-  situation, _pnslots, _introduced = build_text(
-    node["situation"],
-    grammar_rules,
-    context_variables["setup"],
-    nouns,
-    _pnslots,
-    _introduced,
-    timeshift
-  )
+  situation = ""
+  for i, stmpl in enumerate(node["situation"]):
+    stext, _pnslots, _introduced = build_text(
+      stmpl,
+      grammar_rules,
+      context_variables["potentials"][i],
+      nouns,
+      _pnslots,
+      _introduced,
+      timeshift
+    )
+    if situation:
+      situation += " and " + stext
+    else:
+      situation = stext
   situation = sentence(situation)
   options = ""
   if len(node["options"]) == 1:
@@ -893,30 +1042,17 @@ def build_story_text(story, timeshift=None):
     node_templates[node] = {
       "name": node,
       "intro": "",
-      "situation": "",
+      "situation": [],
       "options": {},
       "outcomes": {},
       # TODO: state-change text
     }
 
-  # Next, build the intro and potential templates for the story:
-  for sc, bnd in ans.bindings(TEXT_SCHEMAS, story):
-    node = bnd["txt.Node"].unquoted()
-    print("Adding {} template for node '{}'...".format(sc, node))
-    txt = bnd["txt.Text"].unquoted()
-    if sc == "intro_text":
-      if node_templates[node]["intro"]:
-        node_templates[node]["intro"] += " "
-      node_templates[node]["intro"] += txt
-    elif sc == "potential_text":
-      if node_templates[node]["situation"]:
-        node_templates[node]["situation"] += " and "
-      node_templates[node]["situation"] += txt
-
   # Next find context variables which also gives us an idea of the story
   # structure, as well as the nouns:
   cvrs = glean_context_variables(story)
   nouns = glean_nouns(story)
+  enhance_context_variables(cvrs, nouns)
 
   # Error check:
   for k in [key for key in cvrs if key not in node_templates]:
@@ -924,9 +1060,18 @@ def build_story_text(story, timeshift=None):
   for k in [key for key in node_templates if key not in cvrs]:
     print("WARNING: Node '{}' is polished, but has no context.".format(k))
 
-  # Iterate over our nodes and options adding static option/outcome templates:
+  # Iterate over our nodes and options adding text templates:
   for node in node_templates:
-    options = [o for o in cvrs[node] if o != "setup"]
+    if "setup" in cvrs[node]:
+      node_templates[node]["intro"] = "[[setup/{}/intro]]".format(
+        cvrs[node]["setup"]["_setup"]
+      )
+    if "potentials" in cvrs[node]:
+      for p in cvrs[node]["potentials"]:
+        node_templates[node]["situation"].append(
+          "[[potential/{}/{}]]".format(p["_stype"], p["_sname"])
+        )
+    options = [o for o in cvrs[node] if o != "setup" and o != "potentials"]
     for option in options:
       nts = node_templates[node]
       # If a party member is the initiator of an option at a choice...
@@ -1112,5 +1257,52 @@ _test_cases = [
       { "var": "initial"},
     ),
     "nested.. initial @CAP@Subst1 subst3 subst4 stop.subst2 initial"
+  ),
+  (
+    run_grammar,
+    (
+      "[[setup/monster_attack/approach/leviathan]]",
+      {
+        "setup/monster_attack/approach/?": [ "?monster test" ]
+      },
+      { "monster": "leviathan_17"},
+    ),
+    "leviathan_17 test"
+  ),
+  (
+    run_grammar,
+    (
+      "[[setup/monster_attack/approach/leviathan@adverb=majestically]]",
+      {
+        "setup/monster_attack/approach/leviathan":
+          [ "?adverb ?monster test" ]
+      },
+      { "monster": "leviathan_17"},
+    ),
+    "majestically leviathan_17 test"
+  ),
+  (
+    run_grammar,
+    (
+      "[[setup/monster_attack/approach/leviathan@adverb=majestically@monster=vv]]",
+      {
+        "setup/monster_attack/approach/leviathan":
+          [ "?adverb ?monster test" ]
+      },
+      { "monster": "leviathan_17"},
+    ),
+    "majestically vv test"
+  ),
+  (
+    run_grammar,
+    (
+      "[[setup/monster_attack/approach/leviathan@adverb=majestically@activity=tentacles curling]]",
+      {
+        "setup/monster_attack/approach/leviathan":
+          [ "?adverb ?activity ?monster test" ]
+      },
+      { "monster": "leviathan_17"},
+    ),
+    "majestically tentacles curling leviathan_17 test"
   ),
 ]
