@@ -110,6 +110,19 @@ IRREGULAR = {
     ("present participle", "any", "any", None),
     ("past participle", "any", "any", None),
   ],
+  "give": [
+    ("present", "singular", "first", "give"),
+    ("present", "singular", "second", "give"),
+    ("present", "singular", "third", "gives"),
+
+    ("present", "plural", "any", "give"),
+
+    ("past", "any", "any", "gave"),
+
+    ("present participle", "any", "any", "giving"),
+
+    ("past participle", "any", "any", "given"),
+  ],
   "come": [
     ("present", "singular", "first", "come"),
     ("present", "singular", "second", "come"),

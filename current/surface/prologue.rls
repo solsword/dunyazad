@@ -1,10 +1,13 @@
 % Prologue - rules that define the prologue
 
 :prologue
-[[prologue/setting]]@PAR@[[S|prologue/you]] [[S|prologue/members/?n_party_members]]
+[[prologue/setting]]@PAR@[[prologue/introductions]]@PAR@[[S|prologue/get_started]]
+
+:prologue/introductions
+[[S|prologue/you]] [[prologue/members/?n_party_members]]
 
 :prologue/setting
-You [[prologue/setting/pause]] [[prologue/setting/where]] looking back over your shoulder as if you could still see ?city. Your [[prologue/setting/journey]] has [[prologue/setting/just]] [[prologue/setting/started]], and already you are thinking of the [[prologue/setting/behind]] you left behind. Still, someone had to go on this ridiculous errand, this [[prologue/setting/journey]] that will span a continent, and it's not as if you hate the idea of an adventure. Maybe it will be exciting, and it might even [[prologue/setting/reason]]. Even if the claims of [[prologue/setting/claims1]] and [[prologue/setting/claims2]] were [[prologue/setting/wrong]], tasting the fruit of the tree of life and death would certainly be a once-in-a-lifetime experience.@PAR@[[prologue/setting/continuing]], you review [[prologue/setting/task]]: as a [[prologue/setting/delegate]] ?nation, you must represent your country in the Festival of Life in ?destination. Even though the last blooming was thousands of years ago, the traditions are still preserved, and participation in the Festival of Life would mean a taste of the fruit of the tree of life and death. It was a sign of the strength of those traditions that even a nation as far away as ?nation had the right to send a representative. Of course, the delegation they had chosen to send said something different about tradition. No grand procession, no royal guard, not even a train of servants, just [[prologue/the_party]].
+You [[prologue/setting/pause]] [[prologue/setting/where]] looking back over your shoulder as if you could still see ?city. Your [[prologue/setting/journey]] has [[prologue/setting/just]] [[prologue/setting/started]], and already you are thinking of the [[prologue/setting/behind]] you left behind. Still, someone had to go on this ridiculous errand, this [[prologue/setting/journey]] that will span a continent, and it's not as if you hate the idea of an adventure. Maybe it will be exciting, and it might even [[prologue/setting/reason]]. Even if the claims of [[prologue/setting/claims1]] and [[prologue/setting/claims2]] were [[prologue/setting/wrong]], tasting the fruit of the Tree of Life and Death would certainly be a once-in-a-lifetime experience.@PAR@[[prologue/setting/continuing]], you review [[prologue/setting/task]]: as a princess of ?nation, you must represent your country in the Festival of Life in ?destination. Even though the last blooming was thousands of years ago, the traditions are still preserved, and participation in the Festival of Life would mean a taste of the fruit of the Tree of Life and Death. It was a sign of the strength of those traditions that even a nation as far away as ?nation had the right to send a representative. Of course, the delegation they had chosen to send said something different about tradition. No grand procession, no royal guard, not even a small caravan: just [[prologue/the_party]].
 
 :prologue/setting/nation
 Uuland
@@ -116,11 +119,6 @@ your mission
 your goals
 the mission you were given
 
-:prologue/setting/delegate
-delegate from
-princess of
-noble from
-
 :prologue/the_party
 you[[prologue/the_rest/?n_party_members]]
 
@@ -137,7 +135,7 @@ you[[prologue/the_rest/?n_party_members]]
 your ?relation N#?tag/_them
 
 :prologue/you
-Of course, N#you/they V#be/prs/you not entirely without resources. @CAP@N#you/they V#manage/pst/you to V#bring/rinf/you along [[prologue/your_items]], and [[prologue/your_skills]].
+N#you/they V#be/prs/you not entirely without resources. @CAP@N#you/they V#manage/pst/you to V#bring/rinf/you along [[prologue/your_items]], and [[prologue/your_skills]].
 
 :prologue/your_items
 [[special/and_list@list=your_items@tmpl_prefix=nref/them]]
@@ -202,12 +200,10 @@ a [[prologue/skilled]] storyteller
 good at telling stories
 
 :prologue/members/two
-[[prologue/members/member@member=member_one@tag=?member_one_tag@relation=?member_one_relation]]
-:prologue/members/three
-[[prologue/members/two]]. [[prologue/members/member@member=member_two@tag=?member_two_tag@relation=?member_two_relation]]. 
+Meanwhile, N#you/their ?member_one_relation N#?member_one_tag/_them V#bring/pst/?member_one_tag [[prologue/member_items/?member_one_tag]]. [[S|prologue/member_skills/?member_one_tag]]
 
-:prologue/members/member
-@CAP@N#you/their ?relation N#?tag/_them V#bring/pst/?tag [[prologue/member_items/?member]]. @CAP@[[prologue/member_skills/?member]]
+:prologue/members/three
+Meanwhile, N#you/their ?member_one_relation N#?member_one_tag/_them V#bring/pst/?member_one_tag [[prologue/member_items/?member_one_tag]], and N#you/their ?member_two_relation N#?member_two_tag/_them V#bring/pst/?member_two_tag [[prologue/member_items/?member_two_tag]]. [[S|prologue/member_skills/?member_one_tag]] [[S|prologue/member_skills/?member_two_tag]]
 
 :prologue/member_items/member_one
 [[special/and_list@list=member_one_items@tmpl_prefix=nref/them]]
@@ -216,7 +212,17 @@ good at telling stories
 [[special/and_list@list=member_two_items@tmpl_prefix=nref/them]]
 
 :prologue/member_skills/member_one
-[[special/and_list@list=member_one_skills@tmpl_prefix=prologue/is_skilled@who=?member]]
+[[special/and_list@list=member_one_skills@tmpl_prefix=prologue/is_skilled@who=member_one]]
 
 :prologue/member_skills/member_two
-[[special/and_list@list=member_two_skills@tmpl_prefix=prologue/is_skilled@who=?member]]
+[[special/and_list@list=member_two_skills@tmpl_prefix=prologue/is_skilled@who=member_two]]
+
+:prologue/get_started
+Between the ?n_party_members of you, it should V#be/rinf/you possible to V#make/prs/you it to ?destination, and once N#you/they V#get/prs/you there, N#you/their family's disregard for the importance of the Festival of Life might just backfire on them. After all, they V#give/pst/_plural N#you/them full authority to represent ?nation at the Festival. @CAP@N#you/they V#shake/prs/you N#you/their head to clear it of thoughts of glory and doom. No matter what [[prologue/ahead]], only time V#tell/ftr/_plural if this [[prologue/setting/journey]] will be rewarding.
+
+:prologue/ahead
+V#lie/prs/_singular ahead
+V#await/prs/_singular N#you/them
+V#be/prs/_singular in store
+V#happen/ftr/_plural
+might V#happen/rinf/_plural

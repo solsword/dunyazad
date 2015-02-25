@@ -55,10 +55,14 @@ party_member_rel("beloved").
   party_member(member_one, Relation) : party_member_rel(Relation);
   error(m("Party member of no relation.", member_one))
 } :- _sr(R).
-1 >= {
+1 = {
   party_member(member_two, Relation) : party_member_rel(Relation);
   error(m("Party member of no relation.", member_two))
 } :- _sr(R).
+error(m("Multiple party members have the same relation.")) :-
+  party_member(M1, Relation),
+  party_member(M2, Relation),
+  M1 != M2.
 error(m("Polyamory is too complciated to handle.")) :-
   2 <= { party_member(M, "beloved") : party_member(M, R) }.
 error(m("Student and master both.")) :-
@@ -68,27 +72,40 @@ error(m("Student and master both.")) :-
 % Party member unpacking:
 
 st(R, inst(actor, Member)) :- party_member(Member, Relation), _sr(R).
+
 st(R, state(party_member, inst(actor, Member))) :-
   party_member(Member, Relation),
   _sr(R).
+
 1 = {
   st(R, property(name, inst(actor, Member), Name))
     : party_member_name(Name);
   error(m("Party member without name.", Member))
 } :- party_member(Member, Relation), _sr(R).
+
+error(m("Multiple party members have the same name.")) :-
+  st(R, property(name, inst(actor, M1), Name)),
+  st(R, property(name, inst(actor, M2), Name)),
+  M1 != M2,
+  _sr(R).
+
 1 = {
   st(R, property(gender, inst(actor, Member), masculine));
   st(R, property(gender, inst(actor, Member), feminine));
   error(m("Party member without gender.", Member))
 } :- party_member(Member, Relation), _sr(R).
+
 st(R, property(relationship, inst(actor, Member), Relation)) :-
   party_member(Member, Relation), _sr(R).
+
 st(R, property(determined, inst(actor, Member), false)) :-
   party_member(Member, Relation),
   _sr(R).
+
 st(R, property(type, inst(actor, Member), person)) :-
   party_member(Member, Relation),
   _sr(R).
+
 % Each party member starts with 2 skills:
 2 = {
   st(R, property(has_skill, inst(actor, Member), Skill)) : skill(Skill);
@@ -98,10 +115,11 @@ st(R, property(type, inst(actor, Member), person)) :-
 
 error(m("Party member initial skill overlap.", Skill)) :-
   skill(Skill),
-  st(R, property(has_skill, inst(actor, you), Skill)),
-  st(R, property(has_skill, inst(actor, Other), Skill)),
-  st(R, state(party_member, inst(actor, Other))),
-  Other != you,
+  st(R, property(has_skill, inst(actor, M1), Skill)),
+  st(R, property(has_skill, inst(actor, M2), Skill)),
+  st(R, state(party_member, inst(actor, M1))),
+  st(R, state(party_member, inst(actor, M2))),
+  M1 != M2,
   _sr(R).
 
 % Supply unpacking:

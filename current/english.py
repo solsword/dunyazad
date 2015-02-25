@@ -960,7 +960,7 @@ def build_text(
   rules,
   cvars,
   ndict,
-  pnslots=None,
+  base_pnslots=None,
   introduced=None,
   timeshift=None
 ):
@@ -972,7 +972,7 @@ def build_text(
   string and the resulting rules, pronoun slots, and noun introduction.
   """
   tsstack = [timeshift]
-  if pnslots == None:
+  if base_pnslots == None:
     pnslots = {
       "I": [0, set()],
       "we": [0, set()],
@@ -983,7 +983,7 @@ def build_text(
       "they": [0, set()],
     }
   else:
-    pnslots = copy.deepcopy(pnslots)
+    pnslots = copy.deepcopy(base_pnslots)
   if introduced == None:
     introduced = set()
   else:
@@ -998,12 +998,9 @@ def build_text(
     add = b
     if '.' in b: # TODO: Better sentence-counting! (?)
       # there's the end of a sentence somewhere in this bit: clean out
-      # ambiguous and expired slots
-      for s in pnslots:
-        if len(pnslots[s][1]) > 1 or pnslots[s][0] > 2:
-          pnslots[s] = [0, set()]
-        elif len(pnslots[s][1]) > 0:
-          pnslots[s][0] += 1
+      # all slots
+      pnslots = copy.deepcopy(base_pnslots)
+      # TODO: Fix this!!
     for t in TAGS:
       m = TAGS[t].fullmatch(b)
       if m:
@@ -1040,6 +1037,7 @@ def build_text(
           if noun in slot[1] and len(slot[1]) == 1 and not nopro:
             slot[0] = 0
             add = nouns.pronoun(ndict[noun], case, position)
+            # TODO: Gender introduction awareness!
           else:
             if slot[0] > 0:
               slot[0] = 0

@@ -38,7 +38,7 @@ def sentence(result):
     return result
   if result[0].islower():
     result = result[0].upper() + result[1:]
-  if result[-1] != '.':
+  if result[-1] not in '.?!':
     result = result + '.'
   return result
 
