@@ -7,9 +7,9 @@ skill(wilderness_lore).
 skill(music).
 skill(elocution).
 skill(healing).
-skill(thievery).
+%skill(thievery). TODO: Make this useful
 skill(literacy).
-skill(prayer).
+%skill(prayer). TODO: Make this useful
 skill(acrobatics).
 skill(storytelling).
 % TODO: sailing?

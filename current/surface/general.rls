@@ -1,5 +1,17 @@
 % General rules
 
+:nref/they/?
+N#?_/they
+
+:nref/them/?
+N#?_/them
+
+:nref/their/?
+N#?_/their
+
+:nref/theirs/?
+N#?_/theirs
+
 :misc/you_ask_for
 N#you/they V#ask/prs/you D#timeshift/infinitive@@?statement@@D#timeshift/pop@@
 N#you/they V#tell/prs/you D#timeshift/infinitive@@?statement@@D#timeshift/pop@@

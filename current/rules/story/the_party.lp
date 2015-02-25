@@ -52,12 +52,12 @@ party_member_rel("beloved").
 % Party member selection:
 
 1 = {
-  party_member(member_1, Relation) : party_member_rel(Relation);
-  error(m("Party member of no relation.", member_1))
+  party_member(member_one, Relation) : party_member_rel(Relation);
+  error(m("Party member of no relation.", member_one))
 } :- _sr(R).
 1 >= {
-  party_member(member_2, Relation) : party_member_rel(Relation);
-  error(m("Party member of no relation.", member_2))
+  party_member(member_two, Relation) : party_member_rel(Relation);
+  error(m("Party member of no relation.", member_two))
 } :- _sr(R).
 error(m("Polyamory is too complciated to handle.")) :-
   2 <= { party_member(M, "beloved") : party_member(M, R) }.

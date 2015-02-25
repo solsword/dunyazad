@@ -35,8 +35,8 @@ DEFMLEN = {
 }
 
 DEFMLEV = {
-  "city": 3,
-  "town": 3,
+  "city": 4,
+  "town": 4,
   "road": 3,
   "wilderness": 3,
   "name": 4,
@@ -44,12 +44,21 @@ DEFMLEV = {
 }
 
 DEFIGNPRB = {
-  "city": 0.4,
-  "town": 0.4,
+  "city": 0.25,
+  "town": 0.25,
   "road": 0.05,
   "wilderness": 0.01,
   "name": 0.03,
   "surname": 0.5,
+}
+
+INPUT = {
+  "city": set(),
+  "town": set(),
+  "road": set(),
+  "wilderness": set(),
+  "name": set(),
+  "surname": set(),
 }
 
 GRAMS = {
@@ -148,6 +157,8 @@ for c in CATEGORIES:
   sf = SOURCE_FILES[c]
   with open(sf) as fin:
     lines = [l[:-1] for l in fin.readlines()]
+    for l in lines:
+      INPUT[c].add(l)
   if c == "road":
     for i, l in enumerate(lines):
       bits = l.split()
@@ -214,7 +225,9 @@ def name(category, maxlevel=None, maxlen=None, ignoreprob=None):
   return n[1:-1].strip()
 
 def fancyname(category, maxlevel=None, maxlen=None, ignoreprob=None):
-  base = name(category, maxlevel, maxlen, ignoreprob)
+  base = ""
+  while not base or base in INPUT[category]:
+    base = name(category, maxlevel, maxlen, ignoreprob)
   pref = ''
   suf = ''
   if len(PREFIXES[category]) > 0:

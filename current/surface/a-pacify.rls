@@ -1,10 +1,10 @@
 % Action - pacify
 
 :action/pacify/option
-N#?pacifier/they V#pacify/prs/?pacifier N#?aggressive/them.
+N#?pacifier/they V#attempt/prs/?pacifier V#pacify/inf/?pacifier N#?aggressive/them with music.
 
 :action/pacify/outcome/pacified
-N#?pacifier/they V#pacify/prs/?pacifier N#?aggressive/them, and N#?aggressive/they V#become/prs/?aggressive calm
+N#?pacifier/they V#weave/prs/?pacifier a soothing melody, and N#?aggressive/they V#become/prs/?aggressive calm
 
 :action/pacify/outcome/enraged
 N#?pacifier/they V#try/prs/?pacifier V#pacify/inf/?pacifier N#?aggressive/them, but N#?aggressive/they V#become/prs/?aggressive enraged

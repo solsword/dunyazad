@@ -1,7 +1,7 @@
 % Action - flee
 
 :action/flee/option
-N#?fearful/they V#flee/prs/?fearful from N#?from/them
+N#?fearful/they V#try/prs/?fearful V#flee/inf/?fearful from N#?from/them
 
 :action/flee/outcome/escape
 N#?fearful/they V#flee/prs/?fearful from N#?from/them and V#escape/prs/?fearful

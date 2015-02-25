@@ -34,8 +34,8 @@ KV_TOKENS = re.compile(r"(@)|(\\.)|(\[\[)|(\]\])")
 
 ANYTAG = re.compile(r"(\b[A-Z]#[a-z_0-9/?]+\b)")
 
-CAP = re.compile(r"@CAP@(.)")
-
+CAP = re.compile(r"(?:@CAP@)+(.)")
+PAR = re.compile(r"@PAR@")
 BREAK = re.compile(r"@@")
 
 TAGS = {
@@ -198,14 +198,94 @@ STRUCTURE_SCHEMAS = {
 
 INSTANCE_SCHEMA = Pr("inst", Vr("Type"), Vr("Key"))
 
-TEXT_SCHEMAS = {
-  "intro_text":
-    PVr("txt", "intro_text", Vr("Node"), Vr("Setup"), Vr("Text")),
-  "potential_text":
-    PVr("txt", "potential_text", Vr("Node"), Vr("Text")),
+PROLOGUE_SCHEMAS = {
+  "has_item": 
+    Pr(
+      "st",
+      Pr("root"),
+      Pr(
+        "relation",
+        Pr("has_item"),
+        PVr("owner", "inst", Vr("Type"), Vr("Key")),
+        PVr("item", "inst", Vr("Type"), Vr("Key")),
+      )
+    ),
+  "has_skill": 
+    Pr(
+      "st",
+      Pr("root"),
+      Pr(
+        "property",
+        Pr("has_skill"),
+        PVr("inst", "inst", Vr("Type"), Vr("Key")),
+        Vr("Skill")
+      )
+    ),
+  "relationship":
+    Pr(
+      "st",
+      Pr("root"),
+      Pr(
+        "property",
+        Pr("relationship"),
+        Pr("inst", Vr("Type"), Vr("Key")),
+        Vr("Relationship")
+      )
+    ),
 }
 
 SUCCESSOR = Pr("successor", Vr("From"), Pr("option", Vr("Opt")), Vr("To"))
+
+NATIONS = [
+  "Uuland",
+  "Aswand",
+  "Zhawe",
+  "Fuella",
+  "Toowoad",
+  "Bebekken",
+  "Bixeira",
+  "Arre Cira",
+  "Velin",
+  "Jichish",
+  "Lincun",
+  "Guremi",
+  "Bryam",
+  "Kalkhan",
+  "Pora Zamot",
+  "Jyväsky",
+  "Ron Parcos",
+  "Jpenyu",
+  "Cejavri",
+  "Tucumán",
+  "Shenza",
+  "Gorholm Sal",
+  "Khāminár",
+]
+
+CITIES = [
+  "Evyame",
+  "Kikris",
+  "Quexian",
+  "Darsk",
+  "Nhatpur",
+  "Guato",
+  "Czel Yasa",
+  "Onarnówka",
+  "Muromai",
+  "Goplin",
+  "Charín",
+  "Ransk",
+  "Baghī",
+  "Prinernevon",
+  "Ha Loudi",
+  "Mochishi",
+  "Moinha",
+  "Újszállow",
+  "Enshya",
+  "Aix-un-Sakuts",
+  "Yúteld",
+  "Såbuhen",
+]
 
 def conjugation_table(verb):
   result = {
@@ -266,6 +346,76 @@ def glean_nouns(story):
       result[n].determined = d == "true"
     elif sc == "party_member":
       result[n].is_party_member = True
+  return result
+
+def glean_intro_variables(story, nouns):
+  """
+  Takes a story and builds a variables dictionary used for rendering the
+  prologue. The following variables are defined:
+
+      'nation' - the nation that you come from
+      'city' - the city that you come from
+      'destination' - the country that is your destination
+      'n_party_members' - the number of party members (including you). Either
+        "two" or "three"
+      'your_name' - the name of the main character
+      'your_items' - a list variable listing your items by key
+      'your_skills' - a list variable listing your skills by name
+
+      'member_*_tag' - the name of a party member (other than you)
+      'member_*_relation' - the relation of a party member
+      'member_*_items' - the items of a party member
+      'member_*_skills' - the skills of a party member
+
+      '*' here is 'one' or 'two'
+  """
+  result = {}
+  party_members = [nouns[n] for n in nouns if nouns[n].is_party_member]
+  if len(party_members) == 2:
+    result["n_party_members"] = "two"
+  elif len(party_members) == 3:
+    result["n_party_members"] = "three"
+  else:
+    result["n_party_members"] = "ERROR: bad number of party members: {}".format(
+      len(party_members)
+    )
+  random.shuffle(NATIONS)
+  result["nation"] = NATIONS[0]
+  result["destination"] = NATIONS[1]
+  result["city"] = random.choice(CITIES)
+  result["your_items"] = []
+  result["your_skills"] = []
+  # fill in defaults from noun info:
+  for pm in party_members:
+    if pm.tag == "you":
+      result["your_name"] = pm.name
+    else:
+      result[pm.tag + "_tag"] = pm.tag
+      result[pm.tag + "_relationship"] = "ERROR: unknown relationship"
+      result[pm.tag + "_items"] = []
+      result[pm.tag + "_skills"] = []
+  # update using predicate info:
+  for sc, b in ans.bindings(PROLOGUE_SCHEMAS, story):
+    if sc == "has_item":
+      o = b["st.relation.owner.Key"].unquoted()
+      i = b["st.relation.item.Key"].unquoted()
+      if o == "you":
+        result["your_items"].append(i)
+      elif nouns[o].is_party_member:
+        result[o + "_items"].append(i)
+    elif sc == "has_skill":
+      n = b["st.property.inst.Key"].unquoted()
+      s = b["st.property.Skill"].unquoted()
+      if n == "you":
+        result["your_skills"].append(s)
+      elif nouns[n].is_party_member:
+        result[n + "_skills"].append(s)
+    elif sc == "relationship":
+      n = b["st.property.inst.Key"].unquoted()
+      if nouns[n].is_party_member and n != "you":
+        result[n + "_relation"] = b["st.property.Relationship"].unquoted()
+    else:
+      raise ValueError("Unknown schema '{}' in PROLOGUE_SCHEMAS.".format(sc))
   return result
 
 def glean_context_variables(story):
@@ -560,19 +710,25 @@ def merge_txt_states(pilist):
 def keymatch(test, key):
   """
   Tests whether the given concrete key matches the given possibly variadic key.
+  Returns a boolean and a value for the '_' variable bound to the value of the
+  variadic key at the last place where the concrete key contained a '?', or the
+  empty string if the concrete key contained no '?'s.
   """
   tp = test.split('/')
   kp = key.split('/')
+  underscore = ""
   if len(kp) > len(tp):
-    return False
+    return False, ""
   for i, k in enumerate(kp):
     if tp[i] != k and tp[i] != '?' and k != '?':
       if i == len(kp) - 1 and k == '*':
         continue
-      return False
+      return False, ""
+    elif tp[i] == '?':
+      underscore = k
   if len(kp) < len(tp) and kp[-1] != '*':
-    return False
-  return True
+    return False, ""
+  return True, underscore
 
 def subst_vars(text, vs):
   """
@@ -587,7 +743,10 @@ def subst_vars(text, vs):
     if m:
       var = m.group(1)[1:] # take off the initial '?'
       if var in vs:
-        add = vs[var]
+        if type(vs[var]) == list:
+          add = ' '.join(vs[var])
+        else:
+          add = vs[var]
       else:
         add = "ERROR: unknown variable '{}'".format(var)
     result += add
@@ -608,24 +767,61 @@ class Substitution:
     self.key = key
     self.vs = vs or {}
 
-  def expand(self, rules):
+  def expand(self, rules, vs):
     """
     Given a set of substitution rules, returns the substitution result for this
     Substitution object.
     """
-    matching_keys = [k for k in rules if keymatch(k, self.key)]
+    if self.key.split('/')[0] == "special":
+      return self.special_expand(rules, vs)
+    matching_keys = []
+    for k in rules:
+      matches, underscore = keymatch(k, self.key)
+      if matches:
+        matching_keys.append((k, underscore))
     all_possibilities = []
-    for ps in [rules[k] for k in matching_keys]:
-      all_possibilities.extend(ps)
+    for (ps, u) in [(rules[k], u) for (k, u) in matching_keys]:
+      for p in ps:
+        all_possibilities.append((p, u))
     # TODO: better/controllable randomness?
     if (len(all_possibilities) == 0):
-      raise KeyError(
-        "ERROR: No possible substitutions for key '{}'.".format(self.key)
-      )
-    result = random.choice(all_possibilities)
+      raise KeyError("No possible substitutions for key '{}'.".format(self.key))
+    result, underscore = random.choice(all_possibilities)
     if 'S' in self.flags:
       result = "@CAP@" + sentence(result)
-    return result
+    return result, underscore
+
+  def special_expand(self, rules, vs):
+    """
+    Performs a special expansion function.
+    """
+    if self.key.split('/')[0] != "special":
+      raise KeyError("Special expand called with invalid key.")
+    function = self.key.split('/')[1:]
+    if function == ["and_list"]:
+      if "list" not in vs:
+        raise ValueError("and_list function: could not find variable ?list.")
+      if vs["list"] not in vs:
+        raise ValueError(
+          "and_list function: ?list '{}' not found.".format(vs["list"])
+        )
+      l = vs[vs["list"]]
+      if type(l) != list:
+        raise ValueError("and_list function: invalid ?list contents.")
+      if "tmpl_prefix" in vs:
+        l = ["[[{}/{}]]".format(vs["tmpl_prefix"], x) for x in l]
+      if len(l) == 0:
+        return ("nothing", "")
+      if len(l) == 1:
+        return (l[0], "")
+      elif len(l) == 2:
+        return (l[0] + " and " + l[1], "")
+      else:
+        return (l[0] + ", " + ", ".join(l[1:-1]) + ", and " + l[-1], "")
+    else:
+      raise KeyError(
+        "Unknown special function '{}'.".format('/'.join(function))
+      )
 
 def parse_kv(text):
   """
@@ -752,7 +948,9 @@ def run_grammar(text, rules, vs):
     if isinstance(b, Substitution):
       newvars = dict(vs)
       newvars.update(b.vs)
-      result += run_grammar(b.expand(rules), rules, newvars)
+      expansion, underscore = b.expand(rules, newvars)
+      newvars["_"] = underscore
+      result += run_grammar(expansion, rules, newvars)
     else:
       result += b
   return result
@@ -820,33 +1018,26 @@ def build_text(
               if len(tsstack) > 1:
                 tsstack = tsstack[:-1]
               else:
-                print("ERROR! Popped last timeshift from timeshift stack.")
-                print(template)
-                exit(1)
+                raise RuntimeError(
+                  "Popped last timeshift from timeshift stack."
+                )
             else:
-              print("ERROR! Unknown timeshift '{}'.".format(argument))
-              print(template)
-              exit(1)
+              raise ValueError("Unknown timeshift '{}'.".format(argument))
           else:
-            print("ERROR! Unknown directive '{}'.".format(directive))
-            print("Tag is: '{}'.".format(b))
-            print(template)
-            exit(1)
+            raise ValueError("Unknown directive '{}'.".format(directive))
           add = ""
         elif t == "noun":
           noun = m.group(1)
           if noun not in ndict:
-            # TODO: Something about this
-            print("ERROR! Noun '{}' not in ndict.".format(noun))
-            print("Match is: '{}'".format(str(m)))
-            print(template)
-            print(noun)
-            print(ndict)
-            exit(1)
+            raise KeyError("Noun '{}' not in ndict.".format(noun))
           pro = m.group(2)
+          nopro = False
+          if pro[0] == '_':
+            nopro = True
+            pro = pro[1:]
           case, position = nouns.casepos(pro)
           slot = pnslots[nouns.pnslot(ndict[noun])]
-          if noun in slot[1] and len(slot[1]) == 1:
+          if noun in slot[1] and len(slot[1]) == 1 and not nopro:
             slot[0] = 0
             add = nouns.pronoun(ndict[noun], case, position)
           else:
@@ -875,6 +1066,8 @@ def build_text(
     result += add
   # Finally process capitalization directives:
   result = re.sub(CAP, lambda m: m.group(1).upper(), result)
+  result = re.sub(CAP, lambda m: m.group(1).upper(), result)
+  result = re.sub(PAR, '\n\n', result)
   result = re.sub(BREAK, '', result)
   return result, pnslots, introduced
 
@@ -919,7 +1112,6 @@ def build_node_text(
   verbs in the text generated.
   """
   outgoing = {}
-  # TODO: A more rigorous capitalization approach.
   intro, _pnslots, _introduced = build_text(
     node["intro"],
     grammar_rules,
@@ -1022,16 +1214,29 @@ def build_node_text(
 )
   return result, outgoing
 
-def generate_intro(story, timeshift=None):
-  return ""
-  # TODO: HERE!
+def build_intro_text(
+  template,
+  grammar_rules,
+  context_variables,
+  nouns,
+  pnslots,
+  introduced,
+  timeshift=None
+):
+  result, _pnslots, introduced = build_text(
+    template,
+    grammar_rules,
+    context_variables,
+    nouns,
+    pnslots,
+    introduced,
+    timeshift
+  )
+  return result, introduced
 
 def build_story_text(story, timeshift=None):
   node_templates = {}
   gr_rules = collate_rules(story)
-
-  #print("Build story text rules:")
-  #print(gr_rules)
 
   # First, build the dictionary of templates for all polished nodes:
   for sc, bnd in ans.bindings(
@@ -1052,6 +1257,7 @@ def build_story_text(story, timeshift=None):
   # structure, as well as the nouns:
   cvrs = glean_context_variables(story)
   nouns = glean_nouns(story)
+  introvars = glean_intro_variables(story, nouns)
   enhance_context_variables(cvrs, nouns)
 
   # Error check:
@@ -1102,6 +1308,16 @@ def build_story_text(story, timeshift=None):
   }
   # You and your party members start as 'introduced'
   base_introduced = { "you" } | { n for n in nouns if nouns[n].is_party_member }
+  # Generate the intro text
+  intro_text, base_introduced = build_intro_text(
+    "[[prologue]]",
+    gr_rules,
+    introvars,
+    nouns,
+    base_pnslots,
+    base_introduced,
+    timeshift
+  )
   # Start with all root nodes on our open list:
   olist = [
     (n, base_pnslots, base_introduced) for n in node_templates.keys()
@@ -1116,10 +1332,8 @@ def build_story_text(story, timeshift=None):
       for n in node_templates.keys()
         if len(node_structure[n]["predecessors"]) > 0
   }
-  results = []
-  results.append(generate_intro(story, timeshift))
+  results = [intro_text]
   while olist:
-    #print("open:", [ole[0] for ole in olist])
     target, pnslots, introduced = olist.pop(0)
     # build node text:
     txt, outgoing = build_node_text(

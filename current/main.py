@@ -42,9 +42,11 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
 
   target = "unknown"
   if storyfile:
+    print("Parsing existing story file '{}'...".format(storyfile))
     with open(storyfile, 'r') as fin:
       # TODO: parse faster here!
       sofar = list(ans.parse_fans_fast(fin.read()))
+    print("  ...done.")
   else:
     try:
       program, setup = tasks.setup_story([], scaffolding)

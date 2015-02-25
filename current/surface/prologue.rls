@@ -1,0 +1,222 @@
+% Prologue - rules that define the prologue
+
+:prologue
+[[prologue/setting]]@PAR@[[S|prologue/you]] [[S|prologue/members/?n_party_members]]
+
+:prologue/setting
+You [[prologue/setting/pause]] [[prologue/setting/where]] looking back over your shoulder as if you could still see ?city. Your [[prologue/setting/journey]] has [[prologue/setting/just]] [[prologue/setting/started]], and already you are thinking of the [[prologue/setting/behind]] you left behind. Still, someone had to go on this ridiculous errand, this [[prologue/setting/journey]] that will span a continent, and it's not as if you hate the idea of an adventure. Maybe it will be exciting, and it might even [[prologue/setting/reason]]. Even if the claims of [[prologue/setting/claims1]] and [[prologue/setting/claims2]] were [[prologue/setting/wrong]], tasting the fruit of the tree of life and death would certainly be a once-in-a-lifetime experience.@PAR@[[prologue/setting/continuing]], you review [[prologue/setting/task]]: as a [[prologue/setting/delegate]] ?nation, you must represent your country in the Festival of Life in ?destination. Even though the last blooming was thousands of years ago, the traditions are still preserved, and participation in the Festival of Life would mean a taste of the fruit of the tree of life and death. It was a sign of the strength of those traditions that even a nation as far away as ?nation had the right to send a representative. Of course, the delegation they had chosen to send said something different about tradition. No grand procession, no royal guard, not even a train of servants, just [[prologue/the_party]].
+
+:prologue/setting/nation
+Uuland
+Aswand
+Zhawe
+Fuella
+Toowoad
+Bebekken
+Bixeira
+Arre Cira
+Velin
+Jichish
+Lincun
+
+:prologue/setting/destination
+Guremi
+Bryam
+Kalkhan
+Pora Zamot
+Jyväsky
+Ron Parcos
+Jpenyu
+Cejavri
+Tucumán
+Shenza
+Gorholm Sal
+Khāminár
+
+:prologue/setting/city
+Evyame
+Kikris
+Quexian
+Darsk
+Nhatpur
+Guato
+Czel Yasa
+Onarnówka
+Muromai
+Goplin
+Charín
+
+:prologue/setting/pause
+stand
+sit
+pause
+
+:prologue/setting/where
+on a hill
+at a fork in the road
+in the shade of a tall tree
+before the gates of another new town
+
+:prologue/setting/journey
+journey
+quest
+adventure
+expedition
+
+:prologue/setting/just
+just
+barely
+hardly
+
+:prologue/setting/started
+begun
+started
+
+:prologue/setting/behind
+city
+home
+people
+problems
+place
+
+:prologue/setting/reason
+help you finish the book you've been writing
+be a chance to learn something practical
+be an opportunity to make something of yourself
+turn into a story of its own
+
+:prologue/setting/claims1
+magic powers
+strange visitations
+enlightenment
+
+:prologue/setting/claims2
+visions of the future
+life-changing events
+heroic destinies
+
+:prologue/setting/wrong
+wrong
+lies
+just gossip
+no more than gossip
+exaggerated
+pure fantasy
+
+:prologue/setting/continuing
+Continuing your journey
+Walking onwards
+Walking again
+Moving onwards
+
+:prologue/setting/task
+the task ahead of you
+your quest
+your mission
+your goals
+the mission you were given
+
+:prologue/setting/delegate
+delegate from
+princess of
+noble from
+
+:prologue/the_party
+you[[prologue/the_rest/?n_party_members]]
+
+:prologue/the_rest/one
+@@
+
+:prologue/the_rest/two
+ and [[prologue/party_member@relation=?member_one_relation@tag=?member_one_tag]]
+
+:prologue/the_rest/three
+, [[prologue/party_member@relation=?member_one_relation@tag=?member_one_tag]], and [[prologue/party_member@relation=?member_two_relation@tag=?member_two_tag]]
+
+:prologue/party_member
+your ?relation N#?tag/_them
+
+:prologue/you
+Of course, N#you/they V#be/prs/you not entirely without resources. @CAP@N#you/they V#manage/pst/you to V#bring/rinf/you along [[prologue/your_items]], and [[prologue/your_skills]].
+
+:prologue/your_items
+[[special/and_list@list=your_items@tmpl_prefix=nref/them]]
+
+:prologue/your_skills
+[[special/and_list@list=your_skills@tmpl_prefix=prologue/is_skilled@who=you]]
+
+:prologue/is_skilled/?
+N#?who/they V#be/prs/?who [[prologue/skill/?_]]
+
+:prologue/skilled
+skilled
+competent
+capable
+
+:prologue/skill/tinkering
+good at making things
+good at repairing things
+a [[prologue/skilled]] engineer
+
+:prologue/skill/fighting
+skilled at fighting
+a [[prologue/skilled]] warrior
+a veteran warrior
+
+:prologue/skill/wilderness_lore
+knowledgeable about plants and animals
+good at surviving in the wild
+capable of surviving in the wilderness
+
+:prologue/skill/music
+a [[prologue/skilled]] musician
+[[prologue/skilled]] with an instrument
+
+:prologue/skill/elocution
+skilled at rhetoric
+a [[prologue/skilled]] public speaker
+notoriously persuasive
+
+:prologue/skill/healing
+knowledgeable about the healing arts
+a [[prologue/skilled]] doctor
+
+:prologue/skill/thievery
+a [[prologue/skilled]] thief
+% TODO: More here
+
+:prologue/skill/literacy
+literate
+able to read and write
+
+:prologue/skill/prayer
+devout
+% TODO: More here
+
+:prologue/skill/acrobatics
+a [[prologue/skilled]] acrobat
+good at running and jumping
+
+:prologue/skill/storytelling
+a [[prologue/skilled]] storyteller
+good at telling stories
+
+:prologue/members/two
+[[prologue/members/member@member=member_one@tag=?member_one_tag@relation=?member_one_relation]]
+:prologue/members/three
+[[prologue/members/two]]. [[prologue/members/member@member=member_two@tag=?member_two_tag@relation=?member_two_relation]]. 
+
+:prologue/members/member
+@CAP@N#you/their ?relation N#?tag/_them V#bring/pst/?tag [[prologue/member_items/?member]]. @CAP@[[prologue/member_skills/?member]]
+
+:prologue/member_items/member_one
+[[special/and_list@list=member_one_items@tmpl_prefix=nref/them]]
+
+:prologue/member_items/member_two
+[[special/and_list@list=member_two_items@tmpl_prefix=nref/them]]
+
+:prologue/member_skills/member_one
+[[special/and_list@list=member_one_skills@tmpl_prefix=prologue/is_skilled@who=?member]]
+
+:prologue/member_skills/member_two
+[[special/and_list@list=member_two_skills@tmpl_prefix=prologue/is_skilled@who=?member]]
