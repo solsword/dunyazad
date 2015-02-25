@@ -43,16 +43,3 @@
 %  monster_attack,
 %  relation(c(threatening), v(monster), c(inst(actor, the_party)))
 %).
-%
-%intro_text(
-%  N,
-%  monster_attack,
-%  @fmt(
-%    "Suddenly N#{}/they V#swoop/prs/{} down from the skies, clearly intent on V#attack/prp/{} N#the_party/them.",
-%    LMonst, LMonst, LMonst
-%  )
-%) :-
-%  at(N, setup_arg(monster, inst(actor, LMonst))),
-%  st(N, property(name, inst(actor, LMonst), "dragon")),
-%  setup(N, monster_attack),
-%  story_op(N, initialize_node).

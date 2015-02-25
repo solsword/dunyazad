@@ -19,16 +19,3 @@ error(m("Monster trophy mismatch.", N)) :-
   st(N, property(type, Monster, MType)),
   st(N, property(type, Trophy, TType)),
   not trophy(MType, TType).
-
-intro_text(
-  N,
-  monster_attack,
-  @fmt(
-    "[[misc/as_you]], N#{}/they V#swoop/prs/{} down from the skies, clearly intent on V#attack/prp/{} N#you/them.",
-    LMonst, LMonst, LMonst
-  )
-) :-
-  at(N, setup_arg(monster, inst(MType, LMonst))),
-  st(N, property(type, inst(MType, LMonst), dragon)),
-  setup(N, monster_attack),
-  story_op(N, initialize_node).

@@ -35,22 +35,3 @@ s_st(tavern, relation(c(selling), v(merchant), v(goods))).
 s_st(tavern, state(c(bored), v(noble))).
 s_st(tavern, state(c(bored), v(peasant))).
 s_st(tavern, state(c(knows_gossip), v(innkeeper))).
-
-% TODO: Variable text here!
-intro_text(
-  N,
-  tavern,
-  @fmt(
-    "N#{}/they V#enter/prs/{} a bustling tavern. @CAP@N#{}/they V#tend/prsc/{} the bar, where N#{}/they and N#{}/they V#relax/prsc/_plural. @CAP@N#{}/they V#look/prs/{} like N#{}/they V#might/prs/{} V#have/rinf/{} something to sell, while N#{}/they just V#look/prs/{} bored.",
-    you, you,
-    Innkeeper, Innkeeper,
-    Merchant, Noble,
-    Merchant, Merchant, Merchant, Merchant, Merchant,
-    Noble, Noble
-  )
-) :-
-  at(N, setup_arg(merchant, inst(MType, Merchant))),
-  at(N, setup_arg(noble, inst(NType, Noble))),
-  at(N, setup_arg(innkeeper, inst(IType, Innkeeper))),
-  setup(N, tavern),
-  story_op(N, initialize_node).
