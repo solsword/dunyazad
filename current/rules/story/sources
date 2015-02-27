@@ -3,7 +3,9 @@ core="
 choice_structure.lp
 core.lp
 eval.lp
+goals.lp
 grow.lp
+actions.lp
 actors.lp
 items.lp
 potential.lp

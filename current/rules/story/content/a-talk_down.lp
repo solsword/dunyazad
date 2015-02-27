@@ -3,10 +3,11 @@ action(talk_down).
 
 argument(talk_down, asking, actor).
 argument(talk_down, listening, actor).
+argument(talk_down, victim, actor).
 initiator(talk_down, asking).
 
-outcome(talk_down, convinced).
-outcome(talk_down, unconvinced).
+outcome_val(talk_down, attitude, convinced).
+outcome_val(talk_down, attitude, unconvinced).
 
 skill_link(talk_down, elocution).
 
@@ -22,26 +23,23 @@ error(m("Unintelligent listener.", N, X)) :-
   st(N, state(unintelligent, Listening)),
   story_op(N, build_options).
 
-1 = {
-  at(N, deals_with(X, relation(threatening, Listening, Someone)))
-    : st(N, relation(threatening, Listening, Someone));
-  error(m("Talk down didn't deal with existing threat.", N, X))
-  % TODO: other problems that can be solved by paying someone off?
-} :-
+error(m("Victim not being threatened.", N, X)) :-
   at(N, action(X, talk_down)),
-  at(N, outcome(X, convinced)),
-  at(N, arg(X, asking, Asking)),
   at(N, arg(X, listening, Listening)),
-  story_op(N, build_options).
+  at(N, arg(X, victim, Victim)),
+  not st(N, relation(threatening, Listening, Victim)).
 
-1 = {
-  at(N, emphasizes(X, relation(threatening, Listening, Someone)))
-    : st(N, relation(threatening, Listening, Someone));
-  error(m("Talk down didn't emphasize existing threat.", N, X))
-  % TODO: other problems here as well
-} :-
+% success convinces the threatener to back down
+at(
+  N,
+  consequence_of(
+    X,
+    o(attitude, convinced),
+    _not,
+    relation(threatening, Listening, Victim)
+  )
+) :-
   at(N, action(X, talk_down)),
-  at(N, outcome(X, unconvinced)),
-  at(N, arg(X, asking, Asking)),
   at(N, arg(X, listening, Listening)),
+  at(N, arg(X, victim, Victim)),
   story_op(N, build_options).

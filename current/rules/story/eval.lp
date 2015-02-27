@@ -1,239 +1,90 @@
 % eval.lp
 % Rules dealing with how choice structures are evaluated.
 
-% Quantitative outcome valorization:
+% Expectations:
+%--------------
 
-at(N, score(X, 12)) :-
-  at(N, deals_with(X, Pt)),
-  at(N, potential(problem, Pt)),
-  story_op(N, build_options).
+option_relevance(irrelevant).
+option_relevance(threatens).
+option_relevance(enables).
+option_relevance(fails).
+option_relevance(achieves).
 
-at(N, score(X, -12)) :-
-  at(N, emphasizes(X, Pt)),
-  at(N, potential(problem, Pt)),
-  story_op(N, build_options).
-
-at(N, score(X, 5)) :-
-  at(N, deals_with(X, Pt)),
-  at(N, potential(opportunity, Pt)),
-  story_op(N, build_options).
-
-at(N, score(X, -5)) :-
-  at(N, emphasizes(X, Pt)),
-  at(N, potential(opportunity, Pt)),
-  story_op(N, build_options).
-
-at(N, score(X, 3)) :-
-  at(N, nullifies(X, Prb)),
-  at(N, potential(problem, Prb)),
-  story_op(N, build_options).
-
-at(N, score(X, -3)) :-
-  at(N, nullifies(X, Opp)),
-  at(N, potential(opportunity, Opp)),
-  story_op(N, build_options).
-
-at(N, total_score(option(Opt), TS)) :-
-  story_node(N),
-  at(N, option(Opt)),
-  TS = #sum { S : at(N, score(option(Opt), S)) },
-  story_op(N, build_options).
-
-% Qualitative outcome valorization:
-
-at(N, utility(X, helpful)) :-
-  at(N, score(X, S)),
-  S > 0.
-
-at(N, utility(X, harmful)) :-
-  at(N, score(X, S)),
-  S < 0.
-
-at(N, utility(option(O), neutral)) :-
-  story_node(N),
-  at(N, option(O)),
-  not at(N, utility(option(O), helpful)),
-  not at(N, utility(option(O), harmful)).
-
-at(N, utility(X, mixed)) :-
-  at(N, utility(X, helpful)),
-  at(N, utility(X, harmful)).
-
-at(N, utility(X, pure_helpful)) :-
-  at(N, utility(X, helpful)),
-  not at(N, utility(X, harmful)).
-
-at(N, utility(X, pure_harmful)) :-
-  not at(N, utility(X, helpful)),
-  at(N, utility(X, harmful)).
-
-% Some simple edge-case double-checks:
-
-error(m("Purely helpful option with <= 0 utility.", N, X)) :-
-  at(N, utility(X, pure_helpful)),
-  at(N, total_score(X, S)),
-  S <= 0.
-
-error(m("Purely harmful option with >= 0 utility.", N, X)) :-
-  at(N, utility(X, pure_harmful)),
-  at(N, total_score(X, S)),
-  S >= 0.
-
-error(m("Neutral option with != 0 utility.", N, X)) :-
-  at(N, utility(X, neutral)),
-  at(N, total_score(X, S)),
-  S != 0.
-
-
-% Overall outcome classification:
-
-at(N, outcome_classification(X, great)) :-
-  at(N, utility(X, pure_helpful)),
-  at(N, total_score(X, S)),
-  S >= 6.
-
-at(N, outcome_classification(X, good)) :-
-  at(N, utility(X, pure_helpful)),
-  at(N, total_score(X, S)),
-  S <= 5.
-
-at(N, outcome_classification(X, bad)) :-
-  at(N, utility(X, pure_harmful)),
-  at(N, total_score(X, S)),
-  S >= -5.
-
-at(N, outcome_classification(X, awful)) :-
-  at(N, utility(X, pure_harmful)),
-  at(N, total_score(X, S)),
-  S <= -6.
-
-at(N, outcome_classification(X, neutral)) :-
-  at(N, utility(X, neutral)).
-
-at(N, outcome_classification(X, ambiguous)) :-
-  at(N, utility(X, mixed)),
-  at(N, total_score(X, S)),
-  S <= 3,
-  S >= -3.
-
-at(N, outcome_classification(X, worth)) :-
-  at(N, utility(X, mixed)),
-  at(N, total_score(X, S)),
-  S >= 4.
-
-at(N, outcome_classification(X, not_worth)) :-
-  at(N, utility(X, mixed)),
-  at(N, total_score(X, S)),
-  S <= -4.
-
-% Error check:
-
-error(m("Unclassified outcome.", N, option(O))) :-
-  story_node(N),
-  at(N, option(O)),
+% Options which have no other expectation are expected to be irrelevant:
+at(N, expectation(X, irrelevant, G)) :-
+  at(N, option(X)),
+  at(N, player_goal(G)),
   0 = {
-    at(N, outcome_classification(option(O), OC))
+    at(N, expectation(X, threatens, G));
+    at(N, expectation(X, enables, G));
+    at(N, expectation(X, fails, G));
+    at(N, expectation(X, achieves, G))
   }.
 
+% Threatens and enables based on possible outcomes:
 
-% Option expectations:
+at(N, expectation(X, threatens, Goal)) :-
+  at(N, consequence_of(X, Outcome, State)),
+  state_fails(Goal, State).
 
-at(N, expectation(X, unknown)) :-
-  at(N, action(X, Action)),
-  0 = {
-    at(N, skill_link(Action, Skill))
-  }.
+at(N, expectation(X, threatens, Goal)) :-
+  at(N, consequence_of(X, Outcome, _not, State)),
+  state_achieves(Goal, State).
 
-at(N, expectation(X, success)) :-
-  at(N, action(X, Action)),
-  at(N, skill_link(Action, Skill)),
-  at(N, initiator(X, Actor)),
-  st(N, property(has_skill, Actor, Skill)),
-  not requires_tool(Action).
+at(N, expectation(X, enables, Goal)) :-
+  at(N, consequence_of(X, Outcome, State)),
+  state_achieves(Goal, State).
 
-at(N, expectation(X, success)) :-
-  at(N, action(X, Action)),
-  at(N, skill_link(Action, Skill)),
-  at(N, initiator(X, Actor)),
-  st(N, property(has_skill, Actor, Skill)),
-  requires_tool(Action),
-  st(N, property(has_item, Actor, Tool)),
-  tool_for(Tool, Skill).
+at(N, expectation(X, enables, Goal)) :-
+  at(N, consequence_of(X, Outcome, _not, State)),
+  state_fails(Goal, State).
 
-at(N, expectation(X, failure)) :-
-  at(N, action(X, Action)),
-  at(N, initiator(X, Actor)),
-  1 <= {
-    at(N, skill_link(Action, Skill))
-  },
-  0 = {
-    st(N, property(has_skill, Actor, Skill)) : at(N, skill_link(Action, Skill))
-  }.
+% Fails and achieves based on 'likely' outcomes:
 
-at(N, expectation(X, failure)) :-
-  at(N, action(X, Action)),
-  at(N, initiator(X, Actor)),
-  requires_tool(Action),
-  1 <= {
-    at(N, skill_link(Action, Skill))
-  },
-  0 = {
-    st(N, property(has_skill, Actor, Skill)) :
-      at(N, skill_link(Action, Skill)),
-      st(N, property(has_item, Actor, Tool)),
-      tool_for(Tool, Skill)
-  }.
+at(N, expectation(X, fails, Goal)) :-
+  at(N, consequence_of(X, Outcome, State)),
+  state_fails(Goal, State),
+  at(N, likely_outcome(Outcome)).
 
-% Error check:
+at(N, expectation(X, fails, Goal)) :-
+  at(N, consequence_of(X, Outcome, _not, State)),
+  state_achieves(Goal, State),
+  at(N, likely_outcome(Outcome)).
 
-error(m("Multiple expectations.", N, X)) :-
-  at(N, expectation(X, E1)),
-  at(N, expectation(X, E2)),
-  E1 != E2.
+at(N, expectation(X, achieves, Goal)) :-
+  at(N, consequence_of(X, Outcome, State)),
+  state_achieves(Goal, State),
+  at(N, likely_outcome(Outcome)).
 
-% Overall choice structure evaluation:
+at(N, expectation(X, achieves, Goal)) :-
+  at(N, consequence_of(X, Outcome, _not, State)),
+  state_fails(Goal, State),
+  at(N, likely_outcome(Outcome)).
 
-at(N, choice_structure(straightforward)) :-
-  node_status_reached(N, branched),
-  at(N, expectation(X, success)),
-  at(N, expectation(Y, failure)).
 
-at(N, choice_structure(spoiled)) :-
-  node_status_reached(N, branched),
-  0 = #sum {
-    1,X:at(N, option(X));
-    -1,X:at(N, expectation(X, success))
-  }.
+% Outcomes:
+%----------
 
-at(N, choice_structure(grim)) :-
-  node_status_reached(N, branched),
-  0 = #sum {
-    1,X:at(N, option(X));
-    -1,X:at(N, expectation(X, failure))
-  }.
+outcome_perception(irrelevant).
+outcome_perception(hinders).
+outcome_perception(advances).
+outcome_perception(fails).
+outcome_perception(achieves).
 
-at(N, choice_structure(mysterious)) :-
-  node_status_reached(N, branched),
-  story_node(N),
-  0 = {
-    at(N, expectation(X, success));
-    at(N, expectation(Y, failure))
-  }.
+% TODO: hinders and advances!
 
-at(N, choice_structure(relaxed)) :-
-  node_status_reached(N, branched),
-  at(N, expectation(X, success)),
-  at(N, expectation(Z, unknown)),
-  0 = { at(N, expectation(W, failure)) }.
+at(N, outcome_perception(X, fails, Goal)) :-
+  at(N, consequence(X, State)),
+  state_fails(Goal, State).
 
-at(N, choice_structure(desperate)) :-
-  node_status_reached(N, branched),
-  at(N, expectation(X, failure)),
-  at(N, expectation(Z, unknown)),
-  0 = { at(N, expectation(W, success)) }.
+at(N, outcome_perception(X, fails, Goal)) :-
+  at(N, consequence(X, _not, State)),
+  state_achieves(Goal, State).
 
-% Error checking:
+at(N, outcome_perception(X, achieves, Goal)) :-
+  at(N, consequence(X, State)),
+  state_achieves(Goal, State).
 
-error(m("Choice has multiple structures.", N)) :-
-  story_node(N),
-  2 <= { at(N, choice_structure(CS)) }.
+at(N, outcome_perception(X, achieves, Goal)) :-
+  at(N, consequence(X, _not, State)),
+  state_fails(Goal, State).

@@ -38,31 +38,6 @@ at(N, option(1)) :-
   node_type(N, event),
   story_op(N, build_options).
 
-% Every option has an action:
-1 = {
-  at(N, action(option(X), Act)) : action(Act);
-  error(m("Option without action.", N, option(X)))
-} :-
-  at(N, option(X)),
-  story_op(N, build_options).
-
-% And every action has an outcome:
-1 = {
-  at(N, outcome(X, Outcome)) : outcome(Action, Outcome);
-  error(m("Action without outcome.", N, X, Action))
-} :-
-  at(N, action(X, Action)),
-  story_op(N, build_options).
-
-% And all action arguments are filled in:
-1 = {
-  at(N, arg(X, Arg, Inst)) : is_instance(N, Inst, Class);
-  error(m("Unbound action argument.", N, Action, Arg, Class))
-} :-
-  at(N, action(X, Action)),
-  argument(Action, Arg, Class),
-  story_op(N, build_options).
-
 
 % Misc rules:
 % -----------
@@ -88,8 +63,8 @@ error(m("Action without initiator.", N, X)) :-
 % Exclusive relationships:
 exclusive(has_item).
 
-at(N, consequence(X, _not, relation(Rel, Old, Obj))) :-
-  at(N, consequence(X, relation(Rel, New, Obj))),
+at(N, consequence_of(X, O, _not, relation(Rel, Old, Obj))) :-
+  at(N, consequence_of(X, O, relation(Rel, New, Obj))),
   exclusive(Rel),
   st(N, relation(Rel, Old, Obj)),
   Old != New,

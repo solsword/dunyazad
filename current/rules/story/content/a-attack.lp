@@ -5,88 +5,103 @@ argument(attack, aggressor, actor).
 argument(attack, target, actor).
 initiator(attack, aggressor).
 
-outcome(attack, victory).
-outcome(attack, defeat).
-outcome(attack, parley).
+outcome_val(attack, aggressor_state, unharmed).
+outcome_val(attack, aggressor_state, injured).
+outcome_val(attack, aggressor_state, killed).
 
+outcome_val(attack, target_state, unharmed).
+outcome_val(attack, target_state, injured).
+outcome_val(attack, target_state, killed).
 
-dangerous(attack).
+outcome_val(attack, get_loot, loot).
+outcome_val(attack, get_loot, nothing).
+
+outcome_val(attack, success, victory).
+outcome_val(attack, success, defeat).
+outcome_val(attack, success, tie).
+
+outcome_excludes(attack, o(success, victory), o(aggressor_state, killed)).
+outcome_excludes(attack, o(success, defeat), o(target_state, killed)).
+
+outcome_excludes(attack, o(success, tie), o(aggressor_state, killed)).
+
+outcome_excludes(attack, o(success, tie), o(get_loot, loot)).
+outcome_excludes(attack, o(success, defeat), o(get_loot, loot)).
+
+outcome_excludes(
+  attack,
+  o(success, tie),
+  o(target_state, killed)
+).
+
+outcome_excludes(
+  attack,
+  o(aggressor_state, unharmed),
+  o(target_state, unharmed)
+).
+
+outcome_excludes(
+  attack,
+  o(target_state, unharmed),
+  o(aggressor_state, unharmed)
+).
+
+chaotic(attack).
 skill_link(attack, fighting).
 requires_tool(attack).
 
 
-% you can't parley if one side of the conflict is unintelligent:
-error(m("Parley with unintelligent target.", N, X)) :-
-  at(N, outcome(X, parley)),
-  at(N, arg(X, target, Target)),
-  st(N, state(unintelligent, Target)),
-  story_op(N, build_options).
-
-error(m("Parley with unintelligent agressor.", N, X)) :-
-  at(N, outcome(X, parley)),
-  at(N, arg(X, aggressor, Aggressor)),
-  st(N, state(unintelligent, Aggressor)),
-  story_op(N, build_options).
-
 % attacking is one way to deal with a threat
-at(N, deals_with(X, relation(threatening, Target, Someone))) :-
+at(
+  N,
+  consequence_of(
+    X,
+    o(success, victory),
+    _not,
+    relation(threatening, Target, Someone)
+  )
+) :-
   at(N, action(X, attack)),
-  1= {
-    at(N, outcome(X, parley));
-    at(N, outcome(X, victory))
-  },
-  at(N, arg(X, target, Target)),
-  st(N, relation(threatening, Target, Someone)),
-  story_op(N, build_options).
-
-% if things go badly it serves to emphasize the problem
-at(N, emphasizes(X, relation(threatening, Target, Someone))) :-
-  at(N, action(X, attack)),
-  at(N, outcome(X, defeat)),
   at(N, arg(X, target, Target)),
   st(N, relation(threatening, Target, Someone)),
   story_op(N, build_options).
 
 % fighting is dangerous:
-0 <= {
-  at(N, consequence(X, state(injured, Aggressor)));
-  at(N, consequence(X, state(injured, Target)))
-} <= 2 :-
+at(
+  N,
+  consequence_of(X, o(aggressor_state, injured), state(injured, Aggressor))
+) :-
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, Aggressor)),
+  story_op(N, build_options).
+
+at(
+  N,
+  consequence_of(X, o(aggressor_state, killed), state(killed, Aggressor))
+) :-
+  at(N, action(X, attack)),
+  at(N, arg(X, aggressor, Aggressor)),
+  story_op(N, build_options).
+
+at(N, consequence_of(X, o(target_state, injured), state(injured, Target))) :-
+  at(N, action(X, attack)),
   at(N, arg(X, target, Target)),
   story_op(N, build_options).
 
-1 = {
-  at(N, consequence(X, state(injured, Target)));
-  at(N, consequence(X, state(killed, Target)));
-  error(m("Victory without consequences.", N, X))
-} :-
+at(N, consequence_of(X, o(target_state, killed), state(killed, Target))) :-
   at(N, action(X, attack)),
   at(N, arg(X, target, Target)),
-  at(N, outcome(X, victory)),
-  story_op(N, build_options).
-
-1 = {
-  at(N, consequence(X, state(injured, Aggressor)));
-  at(N, consequence(X, state(killed, Aggressor)));
-  error(m("Defeat without consequences.", N, X))
-} :-
-  at(N, action(X, attack)),
-  at(N, arg(X, aggressor, Aggressor)),
-  at(N, outcome(X, defeat)),
   story_op(N, build_options).
 
 % Looting is a possibility:
-0 <= {
-  at(N, consequence(X, relation(has_item, Aggressor, Item))) :
-    st(N, relation(has_item, Target, Item))
-} <= 1 :-
+
+1 = {
+  at(
+    N,
+    consequence_of(X, o(get_loot, loot), relation(has_item, Aggressor, Item))
+  ) : st(N, relation(has_item, Aggressor, Item))
+} :-
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, Aggressor)),
-  at(N, arg(X, target, Target)),
-  1 = {
-    at(N, outcome(X, victory));
-    at(N, outcome(X, parley))
-  },
+  1 <= { st(N, relation(has_item, Aggressor, Item)) },
   story_op(N, build_options).

@@ -110,8 +110,6 @@ do
   grep "outcome(option" < out/events >> out/core
   echo "" >> out/core
   grep "consequence(option" < out/events >> out/core
-  echo "" >> out/core
-  grep "emphasizes(option" < out/events >> out/core
   echo "---"
 done
 

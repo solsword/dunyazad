@@ -4,7 +4,7 @@ action(reach_destination).
 argument(reach_destination, subject, actor).
 initiator(reach_destination, subject).
 
-outcome(reach_destination, journey_over).
+outcome_val(reach_destination, journey, over).
 
 % The argument of reach_destination is fixed:
 
@@ -17,9 +17,9 @@ error(m("Reached destination before end of story", N, X)) :-
   at(N, action(X, reach_destination)),
   not node_type(N, ending).
 
-% reach_destination nullifies all existing potentials:
+% reach_destination gets rid of all existing potentials:
 
-at(N, nullifies(X, Pt)) :-
+at(N, consequence_of(X, o(journey, over), _not, Pt)) :-
   at(N, action(X, reach_destination)),
   at(N, potential(Any, Pt)),
   story_op(N, build_options).

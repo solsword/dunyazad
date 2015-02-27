@@ -4,11 +4,13 @@ argument(flee, fearful, actor).
 argument(flee, from, actor).
 initiator(flee, fearful).
 
-outcome(flee, escape).
-outcome(flee, failure).
+outcome_val(flee, success, escape).
+outcome_val(flee, success, failure).
+
+outcome_val(flee, get_injured, injured).
+outcome_val(flee, get_injured, safe).
 
 
-dangerous(flee).
 at(N, skill_link(flee, acrobatics)) :-
   1 <= {
     setting(N, city);
@@ -22,28 +24,27 @@ at(N, skill_link(flee, wilderness_lore)) :-
   },
   story_node(N).
 
+% TODO: Put the fleeing actor and their items off-stage!
 
-at(N, deals_with(X, relation(threatening, From, Fearful))) :-
+% Fleeing gets rid of threats
+at(
+  N,
+  consequence_of(
+    X,
+    o(success, escape),
+    _not,
+    relation(threatening, From, Fearful)
+  )
+) :-
   at(N, action(X, flee)),
-  at(N, outcome(X, escape)),
   at(N, arg(X, fearful, Fearful)),
   at(N, arg(X, from, From)),
   st(N, relation(threatening, From, Fearful)),
   story_op(N, build_options).
 
-at(N, emphasizes(X, relation(threatening, From, Fearful))) :-
-  at(N, action(X, flee)),
-  at(N, outcome(X, failure)),
-  at(N, arg(X, fearful, Fearful)),
-  at(N, arg(X, from, From)),
-  st(N, relation(threatening, From, Fearful)),
-  story_op(N, build_options).
-
-0 <= {
-  at(N, consequence(X, state(injured, Fearful)))
-} <= 1 :-
+% You can be injured if you fail to escape:
+at(N, consequence_of(X, o(get_injured, injured), state(injured, Fearful))) :-
   at(N, action(X, flee)),
   at(N, arg(X, fearful, Fearful)),
-  at(N, outcome(X, failure)),
   story_op(N, build_options).
-% TODO: something about the attacker's intent
+% TODO: something about the attacker's intent?

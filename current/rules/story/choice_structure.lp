@@ -1,15 +1,9 @@
 % option constraints:
 % -------------------
 
-% relevance
+% relevance: any action which might cause a potential to dissappear is relevant
 at(N, relevant(option(X))) :-
-  at(N, consequence(option(X), _not, Something)),
-  at(N, potential(PTyp, Something)),
-  at(N, option(X)),
-  story_op(N, build_options).
-
-at(N, relevant(option(X))) :-
-  at(N, emphasizes(option(X), Something)),
+  at(N, consequence_of(option(X), Outcome, _not, Something)),
   at(N, potential(PTyp, Something)),
   at(N, option(X)),
   story_op(N, build_options).
@@ -77,13 +71,33 @@ error(m("Event duplicates previous action", N, Prev, Action)) :-
   not arg_mismatch(Prev, Opt, N, AnyOpt),
   story_op(N, build_options).
 
-% emphasizing something once is enough
-error(m("Repeated emphasis", N, option(X))) :-
-  story_node(N),
-  at(Prev, emphasizes(option(X), Something)),
-  successor(Prev, option(X), N),
-  at(N, emphasizes(option(Y), Something)),
-  story_op(N, build_options).
+% failing to deal with a problem twice is enough
+error(m("Repeated failure", Three, option(Z))) :-
+  story_node(One),
+  successor(One, option(X), Two),
+  successor(Two, option(Y), Three),
+  at(One, potential(PTyp, Something)),
+  at(Two, potential(PTyp, Something)),
+  at(Three, potential(PTyp, Something)),
+  at(One, consequence_of(option(X), DidntHappen, _not, Something)),
+  not at(One, outcome(option(X), DidntHappen)),
+  at(Two, consequence_of(option(Y), AlsoDidntHappen, _not, Something)),
+  not at(Two, outcome(option(Y), AlsoDidntHappen)),
+  at(Three, consequence_of(option(Z), MustHappen, _not, Something)),
+  not at(Three, outcome(option(Z), MustHappen)),
+  story_op(Three, build_options).
+
+% failing to deal with a problem is no excuse for ignoring it (opportunities
+% don't care)
+error(m("Ignored failure to solve problem", Two, option(Y))) :-
+  story_node(One),
+  successor(One, option(X), Two),
+  successor(Two, option(Y), Three),
+  at(One, potential(problem, Problem)),
+  at(Two, potential(problem, Problem)),
+  at(One, consequence_of(option(X), DidntHappen, _not, Problem)),
+  0 = { at(Two, consequence_of(option(Y), Any, _not, Problem)) },
+  story_op(Two, build_options).
 
 
 % vignette structure constraints:

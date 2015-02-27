@@ -7,8 +7,8 @@ argument(trade, price, item).
 argument(trade, goods, item).
 initiator(trade, buyer).
 
-outcome(trade, deal).
-outcome(trade, no_deal).
+outcome_val(trade, deal, deal).
+outcome_val(trade, deal, no_deal).
 
 skill_link(trade, elocution).
 
@@ -42,24 +42,24 @@ error(m("Seller doesn't have goods.", N, X, Seller, Goods)) :-
   },
   story_op(N, build_options).
 
-at(N, consequence(X, relation(has_item, Buyer, Goods))) :-
+at(N, consequence_of(X, o(deal, deal), relation(has_item, Buyer, Goods))) :-
   at(N, action(X, trade)),
-  at(N, outcome(X, deal)),
   at(N, arg(X, buyer, Buyer)),
   at(N, arg(X, goods, Goods)),
   story_op(N, build_options).
 
-at(N, consequence(X, relation(has_item, Seller, Price))) :-
+at(N, consequence_of(X, o(deal, deal), relation(has_item, Seller, Price))) :-
   at(N, action(X, trade)),
-  at(N, outcome(X, deal)),
   at(N, arg(X, seller, Seller)),
   at(N, arg(X, price, Price)),
   story_op(N, build_options).
 
 % trading is how you buy stuff:
-at(N, deals_with(X, relation(selling, Seller, Goods))) :-
+at(
+  N,
+  consequence_of(X, o(deal, deal), _not, relation(selling, Seller, Goods))
+) :-
   at(N, action(X, trade)),
-  at(N, outcome(X, deal)),
   at(N, arg(X, seller, Seller)),
   at(N, arg(X, goods, Goods)),
   st(N, relation(selling, Seller, Goods)),

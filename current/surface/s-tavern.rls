@@ -1,7 +1,8 @@
 % Setup - tavern
 
 :setup/tavern/intro
-tavern!
+N#you/they V#come/prs/you to a tavern and V#decide/prs/you to V#rest/prs/you for a while.
+% TODO: Better here!!
 
 %"N#{}/they V#enter/prs/{} a bustling tavern. @CAP@N#{}/they V#tend/prsc/{} the bar, where N#{}/they and N#{}/they V#relax/prsc/_plural. @CAP@N#{}/they V#look/prs/{} like N#{}/they V#might/prs/{} V#have/rinf/{} something to sell, while N#{}/they just V#look/prs/{} bored.",
 

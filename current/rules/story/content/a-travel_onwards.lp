@@ -4,7 +4,7 @@ action(travel_onwards).
 argument(travel_onwards, subject, actor).
 initiator(travel_onwards, subject).
 
-outcome(travel_onwards, onwards).
+outcome_val(travel_onwards, onwards, onwards).
 
 % The argument of travel_onwards is fixed:
 
@@ -19,7 +19,7 @@ error(m("Left a problem behind.", N, Prb)) :-
   at(N, potential(problem, Prb)),
   story_op(N, build_options).
 
-at(N, nullifies(X, Opp)) :-
+at(N, consequence_of(X, o(onwards, onwards), _not, Opp)) :-
   at(N, action(X, travel_onwards)),
   at(N, potential(opportunity, Opp)),
   node_type(N, choice),
@@ -40,21 +40,30 @@ travel_away_from(N, X, inst(Type, Inst)) :-
   },
   story_op(N, build_options).
 
-at(N, consequence(X, _not, Inst)) :-
+at(N, consequence_of(X, o(onwards, onwards), _not, Inst)) :-
   travel_away_from(N, X, Inst).
 
-at(N, consequence(X, _not, state(State, Inst))) :-
+at(N, consequence_of(X, o(onwards, onwards), _not, state(State, Inst))) :-
   st(N, state(State, Inst)),
   travel_away_from(N, X, Inst).
 
-at(N, consequence(X, _not, property(Prop, Inst, Value))) :-
+at(
+  N,
+  consequence_of(X, o(onwards, onwards), _not, property(Prop, Inst, Value))
+) :-
   st(N, property(Prop, Inst, Value)),
   travel_away_from(N, X, Inst).
 
-at(N, consequence(X, _not, relation(Rel, Inst, Other))) :-
+at(
+  N,
+  consequence_of(X, o(onwards, onwards), _not, relation(Rel, Inst, Other))
+) :-
   st(N, relation(Rel, Inst, Other)),
   travel_away_from(N, X, Inst).
 
-at(N, consequence(X, _not, relation(Rel, Other, Inst))) :-
+at(
+  N,
+  consequence_of(X, o(onwards, onwards), _not, relation(Rel, Other, Inst))
+) :-
   st(N, relation(Rel, Other, Inst)),
   travel_away_from(N, X, Inst).

@@ -5,11 +5,14 @@ argument(pacify, pacifier, actor).
 argument(pacify, aggressive, actor).
 initiator(pacify, pacifier).
 
-outcome(pacify, pacified).
-outcome(pacify, enraged).
+outcome_val(pacify, mood, relaxed).
+outcome_val(pacify, mood, enraged).
 
+outcome_val(pacify, get_injured, injured).
+outcome_val(pacify, get_injured, safe).
 
-dangerous(pacify).
+outcome_excludes(pacify, o(mood, relaxed), o(get_injured, injured)).
+
 skill_link(pacify, music).
 requires_tool(pacify).
 %skill_link(pacify, elocution).
@@ -22,47 +25,53 @@ error(m("Pacification of intelligent target.", N, X)) :-
   story_op(N, build_options).
 
 % pacifying is one way to deal with a threat
-at(N, deals_with(X, relation(threatening, Aggressive, Someone))) :-
+at(
+  N,
+  consequence_of(
+    X,
+    o(mood, relaxed),
+    _not,
+    relation(threatening, Aggressive, Someone)
+  )
+) :-
   at(N, action(X, pacify)),
-  at(N, outcome(X, pacified)),
   at(N, arg(X, aggressive, Aggressive)),
   st(N, relation(threatening, Aggressive, Someone)),
   story_op(N, build_options).
 
-% if things go badly and the target is threatening the actor, it emphasizes the
-% problem.
-at(N, emphasizes(X, relation(threatening, Aggressive, Pacifier))) :-
+% if things go badly the subject threatens you
+at(
+  N,
+  consequence_of(
+    X,
+    o(mood, enraged),
+    relation(threatening, Aggressive, Pacifier)
+  )
+) :-
   at(N, action(X, pacify)),
-  at(N, outcome(X, enraged)),
   at(N, arg(X, aggressive, Aggressive)),
   at(N, arg(X, pacifier, Pacifier)),
-  st(N, relation(threatening, Aggressive, Pacifier)),
   story_op(N, build_options).
 
-% otherwise if things go badly it changes the target of aggression.
-at(N, nullifies(X, relation(threatening, Aggressive, Someone))) :-
+% and ignores anyone else
+at(
+  N,
+  consequence_of(
+    X,
+    o(mood, enraged),
+    _not,
+    relation(threatening, Aggressive, Someone)
+  )
+) :-
   at(N, action(X, pacify)),
-  at(N, outcome(X, enraged)),
   at(N, arg(X, aggressive, Aggressive)),
   at(N, arg(X, pacifier, Pacifier)),
   st(N, relation(threatening, Aggressive, Someone)),
-  Pacifier != Someone,
+  Someone != Pacifier,
   story_op(N, build_options).
 
-at(N, consequence(X, relation(threatening, Aggressive, Pacifier))) :-
-  at(N, action(X, pacify)),
-  at(N, outcome(X, enraged)),
-  at(N, arg(X, aggressive, Aggressive)),
-  at(N, arg(X, pacifier, Pacifier)),
-  st(N, relation(threatening, Aggressive, Someone)),
-  Pacifier != Someone,
-  story_op(N, build_options).
-
-% You can also get injured if things go badly.
-0 <= {
-  at(N, consequence(X, state(injured, Pacifier)))
-} <= 1 :-
+% You can get injured if things go badly.
+at(N, consequence_of(X, o(get_injured, injured), state(injured, Pacifier))) :-
   at(N, action(X, pacify)),
   at(N, arg(X, pacifier, Pacifier)),
-  at(N, outcome(X, enraged)),
   story_op(N, build_options).

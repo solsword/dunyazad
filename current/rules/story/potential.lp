@@ -1,14 +1,7 @@
 % potential.lp
 % Rules about potential problems and opportunities.
 
-% deals_with and nullifies:
-% -------------------------
-
-at(N, consequence(X, _not, Pt)) :-
-  at(N, deals_with(X, Pt)).
-
-at(N, consequence(X, _not, Pt)) :-
-  at(N, nullifies(X, Pt)).
+% TODO: How to indicate resolution success?!
 
 % Problematic/opportune states:
 % -----------------------------

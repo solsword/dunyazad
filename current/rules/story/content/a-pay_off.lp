@@ -3,11 +3,12 @@ action(pay_off).
 
 argument(pay_off, asking, actor).
 argument(pay_off, listening, actor).
+argument(pay_off, victim, actor).
 argument(pay_off, price, item).
 initiator(pay_off, asking).
 
-outcome(pay_off, deal).
-outcome(pay_off, no_deal).
+outcome_val(pay_off, deal, deal).
+outcome_val(pay_off, deal, no_deal).
 
 error(m("Pay off without price.", N, X)) :-
   at(N, action(X, pay_off)),
@@ -35,33 +36,24 @@ error(m("Unintelligent listener.", N, X)) :-
   st(N, state(unintelligent, Listening)),
   story_op(N, build_options).
 
-1 = {
-  at(N, deals_with(X, relation(threatening, Listening, Someone)))
-    : st(N, relation(threatening, Listening, Someone));
-  error(m("Pay off didn't deal with existing threat.", N, X))
-  % TODO: other problems that can be solved by paying someone off?
-} :-
+% the threat is withdrawn:
+at(
+  N,
+  consequence_of(
+    X,
+    o(deal, deal),
+    _not,
+    relation(threatening, Listening, Victim)
+  )
+) :-
   at(N, action(X, pay_off)),
-  at(N, outcome(X, deal)),
-  at(N, arg(X, asking, Asking)),
   at(N, arg(X, listening, Listening)),
+  at(N, arg(X, victim, Victim)),
   story_op(N, build_options).
 
-1 = {
-  at(N, emphasizes(X, relation(threatening, Listening, Someone)))
-    : st(N, relation(threatening, Listening, Someone));
-  error(m("Pay off didn't emphasize existing threat.", N, X))
-  % TODO: other problems here as well
-} :-
+% but the price must be paid:
+at(N, consequence_of(X, o(deal, deal), relation(has_item, Listening, Item))) :-
   at(N, action(X, pay_off)),
-  at(N, outcome(X, no_deal)),
-  at(N, arg(X, asking, Asking)),
-  at(N, arg(X, listening, Listening)),
-  story_op(N, build_options).
-
-at(N, consequence(X, relation(has_item, Listening, Item))) :-
-  at(N, action(X, pay_off)),
-  at(N, outcome(X, deal)),
   at(N, arg(X, listening, Listening)),
   at(N, arg(X, price, Item)),
   story_op(N, build_options).
