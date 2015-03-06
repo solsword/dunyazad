@@ -14,11 +14,11 @@ story_op(root, add_surface).
 
 :- not setup(root, monster_attack).
 :- not at(root, action(option(1), attack)).
-:- not at(root, outcome(option(1), defeat)).
+:- not at(root, outcome(option(1), o(success, defeat))).
 :- not at(root, action(option(2), flee)).
-:- not at(root, outcome(option(2), failure)).
+:- not at(root, outcome(option(2), o(success, failure))).
 :- not at(root, action(option(3), pacify)).
-:- not at(root, outcome(option(3), pacified)).
+:- not at(root, outcome(option(3), o(mood, relaxed))).
 
 :- not successor(root, option(2), root_2).
 :- not successor(root, option(3), root_2).

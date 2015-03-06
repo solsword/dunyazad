@@ -12,16 +12,16 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-:- not setup(root, monster_attack).
-:- not at(root, action(option(1), attack)).
-:- not at(root, outcome(option(1), victory)).
-:- not at(root, action(option(2), flee)).
-:- not at(root, outcome(option(2), failure)).
-:- not at(root, action(option(3), pacify)).
-:- not at(root, outcome(option(3), enraged)).
+error(m(1)) :- not setup(root, monster_attack).
+error(m(2)) :- not at(root, action(option(1), attack)).
+error(m(3)) :- not at(root, outcome(option(1), o(success, victory))).
+error(m(4)) :- not at(root, action(option(2), flee)).
+error(m(5)) :- not at(root, outcome(option(2), o(success, failure))).
+error(m(6)) :- not at(root, action(option(3), pacify)).
+error(m(7)) :- not at(root, outcome(option(3), o(mood, enraged))).
 
-:- not successor(root, option(2), root_2).
-:- not successor(root, option(3), root_2).
+error(m(8)) :- not successor(root, option(2), root_2).
+error(m(9)) :- not successor(root, option(3), root_2).
 %story_op(root_2, initialize_node).
 %story_op(root_2, build_options).
 %story_op(root_1, add_branch_nodes).

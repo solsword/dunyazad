@@ -14,7 +14,7 @@ story_op(root, add_surface).
 
 :- not setup(root, threatened_innocents).
 :- not at(root, action(option(1), attack)).
-:- not at(root, outcome(option(1), victory)).
+:- not at(root, outcome(option(1), o(success, victory))).
 
 :- not at(root, action(option(2), pay_off)).
 

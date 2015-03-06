@@ -12,11 +12,11 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-:- not setup(root, on_sale).
+error(m(1)) :- not setup(root, on_sale).
 st(root, property(has_skill, inst(actor, member_1), music)).
-:- not at(root, action(option(1), trade)).
-:- not at(root, outcome(option(1), deal)).
+error(m(2)) :- not at(root, action(option(1), trade)).
+error(m(3)) :- not at(root, outcome(option(1), o(deal, deal))).
 
-:- not successor(root, option(1), root_1).
+error(m(4)) :- not successor(root, option(1), root_1).
 story_op(root_1, initialize_node).
 story_op(root_1, build_options).
