@@ -19,7 +19,7 @@ N#?aggressor/they V#attack/prs/?aggressor N#?target/them
 
 :combat/losing
 N#?target/they V#fight/prs/?target back
-N#?target/they V#attack/prs/?aggressor N#?aggressor
+N#?target/they V#attack/prs/?aggressor N#?aggressor/them
 
 %:combat/neutral
 %[[aspects/?aggressor/active]]
