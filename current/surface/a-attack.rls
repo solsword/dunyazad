@@ -3,20 +3,23 @@
 :action/attack/option
 N#?aggressor/they V#attack/prs/?aggressor N#?target/them
 
-:action/attack/outcome/victory
+:action/attack/outcome
+{at(Now,outcome(option(Opt),o(success,victory)))}
 N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/?]] [[S|combat/?]] [[S|combat/?]] N#?target/they V#be/prs/?target V#defeat/pst/?target
 
-:action/attack/outcome/parley
-N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/winning]] [[S|combat/losing]] [[S|combat/winning]] [[S|combat/winning]] Finally N#?aggressor/they and N#?target/they V#agree/prs/_plural to a truce
+{at(Now,outcome(option(Opt),o(success,tie)))}
+N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/winning]] [[S|combat/losing]] [[S|combat/winning]] [[S|combat/winning]] Finally N#?aggressor/they and N#?target/they V#withdraw/prs/_plural from combat, exhausted.
 
-:action/attack/outcome/defeat
+{at(Now,outcome(option(Opt),o(success,defeat)))}
 N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/?]] [[S|combat/?]] [[S|combat/winning]] Suddenly N#?target/they V#rally/prs/?target and fiercely V#strike/prs/?target back at N#?aggressor/them, and N#?aggressor/they V#be/prs/?aggressor defeated
 
 :combat/winning
 N#?aggressor/they V#strike/prs/?aggressor at N#?target/them
+N#?aggressor/they V#attack/prs/?aggressor N#?target/them
 
 :combat/losing
 N#?target/they V#fight/prs/?target back
+N#?target/they V#attack/prs/?aggressor N#?aggressor
 
 %:combat/neutral
 %[[aspects/?aggressor/active]]

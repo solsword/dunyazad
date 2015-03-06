@@ -3,10 +3,11 @@
 :action/pacify/option
 N#?pacifier/they V#attempt/prs/?pacifier V#pacify/inf/?pacifier N#?aggressive/them with music.
 
-:action/pacify/outcome/pacified
+:action/pacify/outcome
+{at(Now,outcome(option(Opt),o(mood,relaxed)))}
 N#?pacifier/they V#weave/prs/?pacifier a soothing melody, and N#?aggressive/they V#become/prs/?aggressive calm
 
-:action/pacify/outcome/enraged
+{at(Now,outcome(option(Opt),o(mood,enraged)))}
 N#?pacifier/they V#try/prs/?pacifier V#pacify/inf/?pacifier N#?aggressive/them, but N#?aggressive/they V#become/prs/?aggressive enraged
 
 % TODO: More here!

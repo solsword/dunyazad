@@ -3,10 +3,11 @@
 :action/trade/option
 N#?buyer/they V#offer/prs/?buyer V#trade/inf/?buyer N#?seller/them N#?price/them for N#?goods/them
 
-:action/trade/outcome/deal
+:action/trade/outcome
+{at(Now,outcome(option(Opt),o(deal,deal)))}
 N#?buyer/they and N#?seller/them V#agree/prs/_plural to V#trade/inf/_plural N#?price/them for N#?goods/them
 
-:action/trade/outcome/no_deal
+{at(Now,outcome(option(Opt),o(deal,no_deal)))}
 N#?buyer/they and N#?seller/them V#haggle/prs/_plural over N#?price/them and N#?goods/them, but V#can/prs/_plural not V#agree/rinf/_plural to the trade
 
 % TODO: More here!

@@ -3,10 +3,11 @@
 :action/talk_down/option
 N#?asking/they V#talk/prs/?asking N#?listening/them down
 
-:action/talk_down/outcome/convinced
+:action/talk_down/outcome
+{at(Now,outcome(option(Opt),o(attitude,convinced)))}
 N#?asking/they V#calm/prs/?asking N#?listening/them down and N#?listening/they V#agree/prs/?listening to back off
 
-:action/talk_down/outcome/unconvinced
+{at(Now,outcome(option(Opt),o(attitude,unconvinced)))}
 N#?asking/they V#talk/prs/?asking with N#?listening/them, but N#?listening/they V#refuse/prs/?listening to back down
 
 % TODO: More here!

@@ -10,6 +10,8 @@ import os
 
 from utils import *
 
+import parser
+
 import ans
 
 from ans import Pr, Vr, PVr, SbT
@@ -25,14 +27,14 @@ STATIC_RULES_SOURCES = list(
   walk_files(STATIC_RULES_DIR, lambda f: f.endswith(".rls"))
 )
 
-VAR = re.compile(r"(\?[a-z_]+)")
+VAR = re.compile(r"(\?[a-z_A-Z0-9]+)")
 
 SBST_FLAGS = re.compile(r"([A-Z]+)\|")
 SBST_KEY = re.compile(r"([A-Za-z_0-9]+)=")
 
 KV_TOKENS = re.compile(r"(@)|(\\.)|(\[\[)|(\]\])")
 
-ANYTAG = re.compile(r"(\b[A-Z]#[a-z_0-9/?]+\b)")
+ANYTAG = re.compile(r"(\b[A-Z]#[a-zA-Z_0-9/?]+\b)")
 
 CAP = re.compile(r"(?:@CAP@)+(.)")
 PAR = re.compile(r"@PAR@")
@@ -40,8 +42,9 @@ BREAK = re.compile(r"@@")
 
 TAGS = {
   "directive": re.compile(r"\bD#([a-z_][a-z_0-9]*)/(\??[a-z_][a-z_0-9]*)\b"),
-  "noun": re.compile(r"\bN#(\??[a-z_][a-z_0-9]*)/([a-z_]+)\b"),
-  "verb": re.compile(r"\bV#([a-z]+)/([a-z]+)/(\??[a-z_][a-z_0-9]*)\b"),
+  "noun": re.compile(r"\bN#(\??[a-z_A-Z][a-z_A-Z0-9]*)/([a-z_]+)\b"),
+  "verb":
+    re.compile(r"\bV#([a-zA-Z']+)/([a-z]+)/(\??[a-z_A_Z][a-z_A-Z0-9]*)\b"),
 }
 
 TSABR = {
@@ -147,7 +150,11 @@ STRUCTURE_SCHEMAS = {
     Pr(
       "at",
       Vr("Node"),
-      Pr("outcome", Pr("option", Vr("Option")), Vr("Outcome"))
+      Pr(
+        "outcome",
+        Pr("option", Vr("Option")),
+        Pr("o", Vr("OutVar"), Vr("OutVal"))
+      )
     ),
   "initiator":
     Pr(
@@ -287,6 +294,12 @@ CITIES = [
   "Såbuhen",
 ]
 
+SPECIAL_FILTERING_VARIABLES = {
+  "Now": "_node",
+  "Opt": "_option",
+  "Act": "_action",
+}
+
 def conjugation_table(verb):
   result = {
     tense : [
@@ -423,9 +436,11 @@ def glean_context_variables(story):
   Takes a story and builds a variables dictionary that maps node/option pairs
   to variable mappings at that point in the story. Variables include:
 
+    '_node' - the id of the current node
+    '_option' - the number of the current option
     '_setting' - the current setting
     '_action' - the name of the action
-    '_outcome' - the outcome of the action
+    '_outcome_*' - the values of each outcome variable for the action
     '_initiator' -  the initiator of the action
     - all action arguments by name
 
@@ -456,6 +471,9 @@ def glean_context_variables(story):
       if o not in result[n]:
         result[n][o] = {}
 
+      result[n][o]["_node"] = n
+      result[n][o]["_option"] = o
+
       a = binding["at.action.Action"].unquoted()
       result[n][o]["_action"] = a
 
@@ -467,8 +485,9 @@ def glean_context_variables(story):
       if o not in result[n]:
         result[n][o] = {}
 
-      out = binding["at.outcome.Outcome"].unquoted()
-      result[n][o]["_outcome"] = out
+      outvar = binding["at.outcome.o.OutVar"].unquoted()
+      outval = binding["at.outcome.o.OutVal"].unquoted()
+      result[n][o]["_outcome_" + outvar] = outval
 
     elif sc == "initiator":
       n = binding["at.Node"].unquoted()
@@ -646,28 +665,41 @@ def collate_rules(story):
       key = None
       mode = "lines"
       para = ""
+      preconditions = []
       for ln, line in enumerate(fin.readlines()):
         if mode == "lines":
           if not line.strip() or line.strip()[0] == "%":
             continue
-          if line[0] == ":":
+          if line[0] == ':':
             key = line[1:-1]
             if key not in result:
               result[key] = []
             mode = "lines"
+            preconditions = []
+          elif line[0] == '{':
+            if line[-2] != '}':
+              raise ValueError("Invalid predicate filter:\n{}".format(line))
+            fltr = line[1:-2]
+            pcs = parser.parse_completely(
+              fltr,
+              parser.SepList(ans.SimpleTerm, sep=';')
+            )
+            preconditions = tuple(ans.build_fancy_schema(p) for p in pcs)
           elif line[0] == ">":
             key = line[1:-1]
+            if key not in result:
+              result[key] = []
             mode = "paragraph"
             para = ""
           elif key and line.strip():
-            result[key].append(line[:-1]) # get rid of the newline
+            result[key].append((preconditions, line[:-1])) # no newline
           elif key == None and line.strip():
             raise ValueError(
               "{}:{} - Rule product has no key.".format(f,ln)
             )
         elif mode == "paragraph":
-          if line == "<":
-            result[key].append(para)
+          if line == "<\n":
+            result[key].append((preconditions, para))
             key = None
             mode = "lines"
           else:
@@ -767,7 +799,7 @@ class Substitution:
     self.key = key
     self.vs = vs or {}
 
-  def expand(self, rules, vs):
+  def expand(self, rules, vs, story):
     """
     Given a set of substitution rules, returns the substitution result for this
     Substitution object.
@@ -781,8 +813,40 @@ class Substitution:
         matching_keys.append((k, underscore))
     all_possibilities = []
     for (ps, u) in [(rules[k], u) for (k, u) in matching_keys]:
-      for p in ps:
-        all_possibilities.append((p, u))
+
+      for precond, expand in ps: # for each possible expansion
+        prvars = {'_': u}
+        works = True
+
+        for pre in precond: # for each precondition of an expansion
+          hit = False
+
+          for fact in story: # try to find a matching fact:
+            b = ans.bind(pre, fact)
+            if b:
+              fail = False
+
+              for key in b: # scan our keys to produce extra variables:
+                pk = key.split('.')[-1]
+                if pk in SPECIAL_FILTERING_VARIABLES:
+                  if vs[SPECIAL_FILTERING_VARIABLES[pk]] != b[key].unquoted():
+                    fail = True
+                    break
+                prvars['_' + pk] = b[key].unquoted()
+              if fail:
+                continue # this wasn't a match after all
+              hit = True
+              break # done searching for matching facts (found one)
+
+          if not hit:
+            # if we didn't a matching fact, this precondition rules out this
+            # expansion
+            works = False
+            break
+
+        if works: # if this expansion works, add it to our list:
+          all_possibilities.append((expand, prvars))
+
     # TODO: better/controllable randomness?
     if (len(all_possibilities) == 0):
       raise KeyError("No possible substitutions for key '{}'.".format(self.key))
@@ -934,10 +998,10 @@ def parse_substitutions(text):
       text = text[1:]
   return result
 
-def run_grammar(text, rules, vs):
+def run_grammar(text, rules, vs, story):
   """
   Runs the given grammar rules of the text, expanding it recursively as
-  necessary, using the given variable mappings.
+  necessary, using the given variable mappings and story predicates.
   """
   # First exhaust variable substitutions:
   text = subst_all_vars(text, vs)
@@ -948,9 +1012,9 @@ def run_grammar(text, rules, vs):
     if isinstance(b, Substitution):
       newvars = dict(vs)
       newvars.update(b.vs)
-      expansion, underscore = b.expand(rules, newvars)
-      newvars["_"] = underscore
-      result += run_grammar(expansion, rules, newvars)
+      expansion, exvars = b.expand(rules, newvars, story)
+      newvars.update(exvars)
+      result += run_grammar(expansion, rules, newvars, story)
     else:
       result += b
   return result
@@ -959,6 +1023,7 @@ def build_text(
   template,
   rules,
   cvars,
+  story,
   ndict,
   base_pnslots=None,
   introduced=None,
@@ -990,7 +1055,7 @@ def build_text(
     introduced = set(introduced)
   # First, recursively perform variable and rule substitutions until we've
   # reached a base text:
-  template = run_grammar(template, rules, cvars)
+  template = run_grammar(template, rules, cvars, story)
   # Next, fill in any tags:
   bits = re.split(ANYTAG, template)
   result = ""
@@ -1097,6 +1162,7 @@ def build_node_text(
   node_structure,
   grammar_rules,
   context_variables,
+  story,
   nouns,
   pnslots,
   introduced,
@@ -1114,6 +1180,7 @@ def build_node_text(
     node["intro"],
     grammar_rules,
     context_variables["setup"] if "setup" in context_variables else {},
+    story,
     nouns,
     pnslots,
     introduced,
@@ -1126,6 +1193,7 @@ def build_node_text(
       stmpl,
       grammar_rules,
       context_variables["potentials"][i],
+      story,
       nouns,
       _pnslots,
       _introduced,
@@ -1144,6 +1212,7 @@ def build_node_text(
       node["options"][opt],
       grammar_rules,
       context_variables[opt],
+      story,
       nouns,
       _pnslots,
       _introduced,
@@ -1154,6 +1223,7 @@ def build_node_text(
       node["outcomes"][opt],
       grammar_rules,
       context_variables[opt],
+      story,
       nouns,
       pnout,
       intout,
@@ -1174,6 +1244,7 @@ def build_node_text(
         node["options"][opt],
         grammar_rules,
         context_variables[opt],
+        story,
         nouns,
         _pnslots,
         _introduced,
@@ -1184,6 +1255,7 @@ def build_node_text(
         node["outcomes"][opt],
         grammar_rules,
         context_variables[opt],
+        story,
         nouns,
         pnout,
         intout,
@@ -1216,6 +1288,7 @@ def build_intro_text(
   template,
   grammar_rules,
   context_variables,
+  story,
   nouns,
   pnslots,
   introduced,
@@ -1225,6 +1298,7 @@ def build_intro_text(
     template,
     grammar_rules,
     context_variables,
+    story,
     nouns,
     pnslots,
     introduced,
@@ -1290,7 +1364,9 @@ def build_story_text(story, timeshift=None):
             "[[misc/you_ask_for@statement=[[action/?_action/option]]]]"
       else:
         nts["options"][option] = "[[action/?_action/option]]"
-      nts["outcomes"][option] = "[[S|action/?_action/outcome/?_outcome]]"
+      nts["outcomes"][option] = "[[S|action/?_action/outcome]]"
+      # TODO: Filter grammar expansions based on combinations of variable
+      # values!
 
   # Next, use the node structure to recursively render the story text in
   # ChoiceScript:
@@ -1311,6 +1387,7 @@ def build_story_text(story, timeshift=None):
     "[[prologue]]",
     gr_rules,
     introvars,
+    story,
     nouns,
     base_pnslots,
     base_introduced,
@@ -1339,6 +1416,7 @@ def build_story_text(story, timeshift=None):
       node_structure,
       gr_rules,
       cvrs[target],
+      story,
       nouns,
       pnslots,
       introduced,
@@ -1442,8 +1520,9 @@ _test_cases = [
     run_grammar,
     (
       "template.. [[S|a/b]]",
-      { "a/b": [ "sentence substitution test" ] },
+      { "a/b": [ ((), "sentence substitution test") ] },
       {},
+      set(),
     ),
     "template.. @CAP@Sentence substitution test."
   ),
@@ -1453,6 +1532,7 @@ _test_cases = [
       "variable.. ?var",
       {},
       { "var": "val"},
+      set(),
     ),
     "variable.. val"
   ),
@@ -1461,12 +1541,13 @@ _test_cases = [
     (
       "nested.. ?var [[S|test@var=[[test3@var=[[test4@var=stop]]]]]][[test2]]",
       {
-        "test": [ "subst1 ?var" ],
-        "test2": [ "subst2 ?var" ],
-        "test3": [ "subst3 ?var" ],
-        "test4": [ "subst4 ?var" ],
+        "test":  [((), "subst1 ?var") ],
+        "test2": [((), "subst2 ?var") ],
+        "test3": [((), "subst3 ?var") ],
+        "test4": [((), "subst4 ?var") ],
       },
       { "var": "initial"},
+      set(),
     ),
     "nested.. initial @CAP@Subst1 subst3 subst4 stop.subst2 initial"
   ),
@@ -1475,9 +1556,10 @@ _test_cases = [
     (
       "[[setup/monster_attack/approach/leviathan]]",
       {
-        "setup/monster_attack/approach/?": [ "?monster test" ]
+        "setup/monster_attack/approach/?": [ ((), "?monster test") ]
       },
       { "monster": "leviathan_17"},
+      set(),
     ),
     "leviathan_17 test"
   ),
@@ -1487,9 +1569,10 @@ _test_cases = [
       "[[setup/monster_attack/approach/leviathan@adverb=majestically]]",
       {
         "setup/monster_attack/approach/leviathan":
-          [ "?adverb ?monster test" ]
+          [ ((), "?adverb ?monster test") ]
       },
       { "monster": "leviathan_17"},
+      set(),
     ),
     "majestically leviathan_17 test"
   ),
@@ -1499,9 +1582,10 @@ _test_cases = [
       "[[setup/monster_attack/approach/leviathan@adverb=majestically@monster=vv]]",
       {
         "setup/monster_attack/approach/leviathan":
-          [ "?adverb ?monster test" ]
+          [ ((), "?adverb ?monster test") ]
       },
       { "monster": "leviathan_17"},
+      set(),
     ),
     "majestically vv test"
   ),
@@ -1511,10 +1595,39 @@ _test_cases = [
       "[[setup/monster_attack/approach/leviathan@adverb=majestically@activity=tentacles curling]]",
       {
         "setup/monster_attack/approach/leviathan":
-          [ "?adverb ?activity ?monster test" ]
+          [ ((), "?adverb ?activity ?monster test") ]
       },
       { "monster": "leviathan_17"},
+      set(),
     ),
     "majestically tentacles curling leviathan_17 test"
+  ),
+  (
+    run_grammar,
+    (
+      "[[test]] [[t2]]",
+      {
+        "test":
+          [
+            (
+              ( Pr("test", Vr("A1"), Vr("A2")), ),
+              "test ?_A1 ?_A2"
+            )
+          ],
+        "t2":
+          [
+            (
+              ( Vr("U", Pr("gosh")), ),
+              "t2 ?_U gosh"
+            )
+          ],
+      },
+      {},
+      {
+        Pr("test", Pr("foo"), Pr("bar")),
+        Pr("t2", Pr("gosh"))
+      },
+    ),
+    "test foo bar t2 t2(gosh) gosh"
   ),
 ]

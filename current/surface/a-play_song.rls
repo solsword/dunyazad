@@ -4,9 +4,10 @@
 N#?musician/they V#play/prs/?musician a song for N#?audience/them
 
 :action/play_song/outcome/harmonious
+{at(Now,outcome(option(Opt),o(quality,harmonious)))}
 N#?musician/their song V#sound/prs/_singular lovely, and N#?audience/they V#be/prs/?audience enraptured
 
-:action/play_song/outcome/discordant
+{at(Now,outcome(option(Opt),o(quality,plain)))}
 N#?musician/their song V#sound/prs/_singular awful, and N#?audience/they V#shudder/prs/?audience
 
 % TODO: More here!

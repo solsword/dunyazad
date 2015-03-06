@@ -163,7 +163,7 @@ class Predicate:
     if self.args:
       return "{}({})".format(
         dequote(self.name),
-        ', '.join(a.unquoted_string() for a in self.args)
+        ', '.join(a.unquoted() for a in self.args)
       )
     else:
       return dequote(str(self.name))
@@ -353,6 +353,29 @@ def build_schema(predicate):
   if type(predicate.name) == str \
   and predicate.name[0] in string.ascii_uppercase:
     return Variable(predicate.name, *predicate.args)
+  else:
+    return predicate
+
+def build_fancy_schema(predicate):
+  """
+  Just like build_schema, but converts predicates that start with 'ST' into
+  Subtree objects instead of normal Variables. Their arguments are ignored.
+  """
+  if isinstance(predicate, SimpleTerm):
+    if predicate.terms:
+      predicate = Predicate(predicate.id, *predicate.terms)
+    else:
+      predicate = Predicate(predicate.id)
+  new_args = []
+  for arg in predicate.args:
+    new_args.append(build_fancy_schema(arg))
+  predicate.args = tuple(new_args)
+  if type(predicate.name) == str \
+  and predicate.name[0] in string.ascii_uppercase:
+    if predicate.name[:2] == "ST":
+      return Subtree(predicate.name)
+    else:
+      return Variable(predicate.name, *predicate.args)
   else:
     return predicate
 
@@ -1294,6 +1317,11 @@ _test_cases = [
     (Predicate("two_part"), '')
   ),
   (
+    _test_parse_completely_as_term,
+    "Capitalized",
+    SimpleTerm("Capitalized")
+  ),
+  (
     _test_parse_as_predicate,
     "with_period.",
     (Predicate("with_period"), '.')
@@ -1600,6 +1628,42 @@ _test_cases = [
         Pr("lee")
       ),
       "foo.Baz.Jig": Pr("lee")
+    }
+  ),
+  (
+    bind,
+    (
+      Pr(
+        "foo",
+        Vr("X"),
+        Vr("X"),
+      ),
+      Pr(
+        "foo",
+        Pr("bar"),
+        Pr("bar"),
+      ),
+    ),
+    {
+      "foo.X": Pr("bar")
+    }
+  ),
+  (
+    bind,
+    (
+      Pr(
+        "foo",
+        Vr("X"),
+        Vr("X"),
+      ),
+      Pr(
+        "foo",
+        Pr("bar"),
+        Pr("baz"),
+      ),
+    ),
+    {
+      "foo.X": Pr("baz")
     }
   ),
   # TODO: add more tests for binding with pattern variables and subtrees.
@@ -2415,6 +2479,29 @@ bar(3, 5)?""",
     _test_restring_program,
     "#minimize { 1@0, test(Foo) : test(Foo) }.",
     "#minimize { 1@0, test(Foo) : test(Foo) }.",
+  ),
+  (
+    _test_parse_completely_as_term,
+    "at(Now,outcome(option(Opt),o(success,victory)))",
+    SimpleTerm(
+      "at",
+      (
+        SimpleTerm("Now"),
+        SimpleTerm(
+          "outcome",
+          (
+            SimpleTerm("option", ( SimpleTerm("Opt"), )),
+            SimpleTerm(
+              "o",
+              (
+                SimpleTerm("success"),
+                SimpleTerm("victory"),
+              )
+            ),
+          )
+        ),
+      )
+   ),
   ),
   (
     _test_parse_as_predicate,

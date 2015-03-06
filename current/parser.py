@@ -531,7 +531,7 @@ def parse_completely(
     l = devour(l)
   if l:
     raise ParseError(
-      "Parse successful but incomplete. Remainder: '{}'".format(
+      "Parse incomplete. Remainder: '{}'".format(
         error_context(l)
       )
     )
@@ -693,6 +693,11 @@ _test_cases = [
     ),
     "to(7)",
     _TestObject(b=7)
+  ),
+  (
+    _test_parse( SepList(REToken(r'[a-z]+'), sep='^') ),
+    "foo^bar^baz",
+    ("foo", "bar", "baz"),
   ),
   (
     _test_parse( Sequence( Word, StrToken("("), Integer, ",", Integer, ")" ) ),

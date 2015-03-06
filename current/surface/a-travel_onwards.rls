@@ -3,7 +3,7 @@
 :action/travel_onwards/option
 N#?subject/they V#travel/prs/?subject onwards
 
-:action/travel_onwards/outcome/onwards
+:action/travel_onwards/outcome
 N#?subject/they V#continue/prs/?subject N#?subject/their journey
 
 % TODO: More here!
