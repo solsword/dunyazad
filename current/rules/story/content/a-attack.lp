@@ -1,9 +1,15 @@
 % attack
 action(attack).
 
+chaotic(attack).
+
+% arguments
+
 argument(attack, aggressor, actor).
 argument(attack, target, actor).
 initiator(attack, aggressor).
+
+% outcomes
 
 outcome_val(attack, aggressor_state, unharmed).
 outcome_val(attack, aggressor_state, injured).
@@ -46,10 +52,28 @@ outcome_excludes(
   o(aggressor_state, unharmed)
 ).
 
-chaotic(attack).
-skill_link(attack, fighting).
-requires_tool(attack).
+% skills:
 
+skill_link(
+  fighting, contest, tool,
+  attack,
+  between(aggressor, target),
+  either(o(aggressor_state, unharmed), o(aggressor_state, injured))
+).
+
+skill_link(
+  fighting, contest, tool,
+  attack,
+  between(aggressor, target),
+  either(o(target_state, injured), o(target_state, unharmed))
+).
+
+skill_link(
+  fighting, contest, tool,
+  attack,
+  between(aggressor, target),
+  either(o(success, victory), o(success, defeat))
+).
 
 % attacking is one way to deal with a threat
 at(

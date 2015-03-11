@@ -29,16 +29,8 @@ at(N, requires_tool(Action)) :-
   story_node(N),
   requires_tool(Action).
 
-% Tool requirement enforcement:
-
-% TODO: remove this?
-error(m("Action requires tool", Action)) :-
-  at(N, action(Option, Action)),
-  at(N, requires_tool(Action)),
-  at(N, initiator(Option, Init)),
-  0 = {
-    st(N, relation(has_item, Init, Tool)) :
-      st(N, property(type, Tool, Type)),
-      at(N, skill_link(Action, Skill)),
-      tool_for(Type, Skill)
-  }.
+at(N, has_tool_for(Actor, Skill)) :-
+  st(N, relation(has_item, Actor, Item)),
+  is_instance(N, Item, Category),
+  tool_for(Category, Skill),
+  story_op(N, initialize_node).

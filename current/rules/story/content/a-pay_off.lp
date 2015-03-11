@@ -10,6 +10,8 @@ initiator(pay_off, asking).
 outcome_val(pay_off, deal, deal).
 outcome_val(pay_off, deal, no_deal).
 
+% TODO: Skills?
+
 error(m("Pay off without price.", N, X)) :-
   at(N, action(X, pay_off)),
   at(N, arg(X, asking, Asking)),

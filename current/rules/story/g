@@ -23,13 +23,13 @@ time --format="%E, %K KB" gringo -t $sources >> out/grounded
 echo "  ...done."
 
 
-echo "% vim"": syn=lua" > out/stats
-echo "---"
-echo "Running: \"clingo --stats $timelimit $args $sources\""
-time --format="%E, %K KB" \
-  clingo --stats $timelimit $args $sources |\
-  tail -n 29 | head -n -1 >> out/stats
-echo "  ...done."
+#echo "% vim"": syn=lua" > out/stats
+#echo "---"
+#echo "Running: \"clingo --stats $timelimit $args $sources\""
+#time --format="%E, %K KB" \
+#  clingo --stats $timelimit $args $sources |\
+#  tail -n 29 | head -n -1 >> out/stats
+#echo "  ...done."
 
 
 echo "% vim"": syn=gringo" > out/events

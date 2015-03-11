@@ -13,9 +13,18 @@ outcome_val(pacify, get_injured, safe).
 
 outcome_excludes(pacify, o(mood, relaxed), o(get_injured, injured)).
 
-skill_link(pacify, music).
-requires_tool(pacify).
-%skill_link(pacify, elocution).
+
+skill_link(
+  music, required, tool,
+  pacify, pacifier,
+  o(mood, relaxed)
+).
+
+skill_link(
+  music, required, no_tool,
+  pacify, pacifier,
+  o(get_injured, safe)
+).
 
 
 % you can only pacify unintelligent beings: TODO: Change this?

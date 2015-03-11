@@ -9,7 +9,11 @@ initiator(talk_down, asking).
 outcome_val(talk_down, attitude, convinced).
 outcome_val(talk_down, attitude, unconvinced).
 
-skill_link(talk_down, elocution).
+skill_link(
+  elocution, required, no_tool,
+  talk_down, asking,
+  o(attitude, convinced)
+).
 
 error(m("Unintelligent asker.", N, X)) :-
   at(N, action(X, talk_down)),

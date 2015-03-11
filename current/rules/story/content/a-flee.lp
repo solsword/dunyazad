@@ -1,8 +1,15 @@
 % flee
 action(flee).
+
+chaotic(attack).
+
+% arguments
+
 argument(flee, fearful, actor).
 argument(flee, from, actor).
 initiator(flee, fearful).
+
+% outcomes
 
 outcome_val(flee, success, escape).
 outcome_val(flee, success, failure).
@@ -10,14 +17,25 @@ outcome_val(flee, success, failure).
 outcome_val(flee, get_injured, injured).
 outcome_val(flee, get_injured, safe).
 
-
-at(N, skill_link(flee, acrobatics)) :-
+% skills
+at(
+  N,
+  skill_link(acrobatics, promotes, no_tool, flee, fearful, o(success, escape))
+) :-
   1 <= {
     setting(N, city);
     setting(N, town)
   },
   story_node(N).
-at(N, skill_link(flee, wilderness_lore)) :-
+
+at(
+  N,
+  skill_link(
+    wilderness_lore, promotes, no_tool,
+    flee, fearful,
+    o(success, escape)
+  )
+) :-
   1 <= {
     setting(N, road);
     setting(N, wilderness)

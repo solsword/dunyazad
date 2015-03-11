@@ -6,6 +6,7 @@ setup_argument_create(monster_attack, monster, monster).
 setup_argument_create_n(monster_attack, trophy, trophy, 0, 1).
 
 s_st(monster_attack, state(c(unintelligent), v(monster))).
+s_st(monster_attack, property(c(has_skill), v(monster), c(fighting))).
 
 s_st(monster_attack, relation(c(threatening), v(monster), c(inst(actor, you)))).
 

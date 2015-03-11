@@ -8,8 +8,17 @@ initiator(tell_story, teller).
 outcome_val(tell_story, quality, entertaining).
 outcome_val(tell_story, quality, boring).
 
-skill_link(tell_story, elocution).
-skill_link(tell_story, storytelling).
+skill_link(
+  elocution, promotes, no_tool,
+  tell_story, teller,
+  o(quality, entertaining)
+).
+
+skill_link(
+  storytelling, promotes, no_tool,
+  tell_story, teller,
+  o(quality, entertaining)
+).
 
 at(
   N,

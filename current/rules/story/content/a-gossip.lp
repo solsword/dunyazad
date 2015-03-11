@@ -7,8 +7,18 @@ initiator(gossip, interested).
 outcome_val(gossip, utility, useful).
 outcome_val(gossip, utility, useless).
 
-skill_link(gossip, elocution).
-skill_link(gossip, storytelling).
+% skills
+
+skill_link(
+  elocution, promotes, no_tool,
+  gossip, interested,
+  o(utility, useful)
+).
+skill_link(
+  storytelling, promotes, no_tool,
+  gossip, interested,
+  o(utility, useful)
+).
 
 % Either way you can't gossip with the same actor again.
 at(

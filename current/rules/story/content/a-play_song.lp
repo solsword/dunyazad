@@ -10,7 +10,11 @@ outcome_val(play_song, quality, harmonious).
 outcome_val(play_song, quality, plain).
 % TODO: add discordant?
 
-skill_link(play_song, music).
+skill_link(
+  music, required, tool,
+  play_song, musician,
+  o(quality, harmonious)
+).
 
 at(N, consequence_of(X, o(quality, harmonious), _not, state(bored, Audience))):-
   at(N, action(X, play_song)),

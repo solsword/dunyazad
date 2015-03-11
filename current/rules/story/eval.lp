@@ -44,22 +44,22 @@ at(N, expectation(X, enables, Goal)) :-
 at(N, expectation(X, fails, Goal)) :-
   at(N, consequence_of(X, Outcome, State)),
   state_fails(Goal, State),
-  at(N, likely_outcome(Outcome)).
+  at(N, likely_outcome(X, Outcome)).
 
 at(N, expectation(X, fails, Goal)) :-
   at(N, consequence_of(X, Outcome, _not, State)),
   state_achieves(Goal, State),
-  at(N, likely_outcome(Outcome)).
+  at(N, likely_outcome(X, Outcome)).
 
 at(N, expectation(X, achieves, Goal)) :-
   at(N, consequence_of(X, Outcome, State)),
   state_achieves(Goal, State),
-  at(N, likely_outcome(Outcome)).
+  at(N, likely_outcome(X, Outcome)).
 
 at(N, expectation(X, achieves, Goal)) :-
   at(N, consequence_of(X, Outcome, _not, State)),
   state_fails(Goal, State),
-  at(N, likely_outcome(Outcome)).
+  at(N, likely_outcome(X, Outcome)).
 
 
 % Outcomes:
