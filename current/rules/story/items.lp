@@ -25,10 +25,6 @@ nonbook_tool(Tool, Skill) :-
 
 % Universal tool requirements:
 
-at(N, requires_tool(Action)) :-
-  story_node(N),
-  requires_tool(Action).
-
 at(N, has_tool_for(Actor, Skill)) :-
   st(N, relation(has_item, Actor, Item)),
   is_instance(N, Item, Category),

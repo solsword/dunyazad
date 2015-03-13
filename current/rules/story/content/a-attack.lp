@@ -8,6 +8,7 @@ chaotic(attack).
 argument(attack, aggressor, actor).
 argument(attack, target, actor).
 initiator(attack, aggressor).
+default_intent(attack, o(success, victory)).
 
 % outcomes
 

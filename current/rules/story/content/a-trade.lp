@@ -1,14 +1,21 @@
 % trade
 action(trade).
 
+% arguments
+
 argument(trade, buyer, actor).
 argument(trade, seller, actor).
 argument(trade, price, item).
 argument(trade, goods, item).
 initiator(trade, buyer).
+default_intent(trade, o(deal, deal)).
+
+% outcomes
 
 outcome_val(trade, deal, deal).
 outcome_val(trade, deal, no_deal).
+
+% skills
 
 skill_link(
   elocution, promotes, no_tool,

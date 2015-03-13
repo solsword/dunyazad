@@ -1,12 +1,19 @@
 % tell_story
 action(tell_story).
 
+% arguments
+
 argument(tell_story, teller, actor).
 argument(tell_story, audience, actor).
 initiator(tell_story, teller).
+default_intent(tell_story, o(quality, entertaining)).
+
+% outcomes
 
 outcome_val(tell_story, quality, entertaining).
 outcome_val(tell_story, quality, boring).
+
+% skills
 
 skill_link(
   elocution, promotes, no_tool,

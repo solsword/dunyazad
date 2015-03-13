@@ -1,10 +1,16 @@
 % travel_onwards: a special party-only action that moves to the next vignette
 action(travel_onwards).
 
+% arguments
+
 argument(travel_onwards, subject, actor).
 initiator(travel_onwards, subject).
 
+% outcomes
+
 outcome_val(travel_onwards, onwards, onwards).
+
+% no skills
 
 % The argument of travel_onwards is fixed:
 

@@ -1,9 +1,14 @@
 % pacify
 action(pacify).
 
+% arguments
+
 argument(pacify, pacifier, actor).
 argument(pacify, aggressive, actor).
 initiator(pacify, pacifier).
+default_intent(pacify, o(mood, relaxed)).
+
+% outcomes
 
 outcome_val(pacify, mood, relaxed).
 outcome_val(pacify, mood, enraged).
@@ -13,6 +18,7 @@ outcome_val(pacify, get_injured, safe).
 
 outcome_excludes(pacify, o(mood, relaxed), o(get_injured, injured)).
 
+% skills
 
 skill_link(
   music, required, tool,

@@ -1,13 +1,20 @@
 % talk_down
 action(talk_down).
 
+% arguments
+
 argument(talk_down, asking, actor).
 argument(talk_down, listening, actor).
 argument(talk_down, victim, actor).
 initiator(talk_down, asking).
+default_intent(talk_down, o(attitude, convinced)).
+
+% outcomes
 
 outcome_val(talk_down, attitude, convinced).
 outcome_val(talk_down, attitude, unconvinced).
+
+% skills
 
 skill_link(
   elocution, required, no_tool,

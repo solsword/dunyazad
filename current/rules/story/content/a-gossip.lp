@@ -1,8 +1,14 @@
 % gossip
 action(gossip).
+
+% arguments
+
 argument(gossip, interested, actor).
 argument(gossip, knowledgeable, actor).
 initiator(gossip, interested).
+default_intent(gossip, o(utility, useful)).
+
+% outcomes
 
 outcome_val(gossip, utility, useful).
 outcome_val(gossip, utility, useless).

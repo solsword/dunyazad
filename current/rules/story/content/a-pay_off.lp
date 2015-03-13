@@ -1,16 +1,27 @@
 % pay_off
 action(pay_off).
 
+% arguments
+
 argument(pay_off, asking, actor).
 argument(pay_off, listening, actor).
 argument(pay_off, victim, actor).
 argument(pay_off, price, item).
 initiator(pay_off, asking).
+default_intent(pay_off, o(deal, deal)).
+
+% outcomes
 
 outcome_val(pay_off, deal, deal).
 outcome_val(pay_off, deal, no_deal).
 
-% TODO: Skills?
+% skills
+
+skill_link(
+  elocution, promotes, no_tool,
+  pay_off, asking,
+  o(deal, deal)
+).
 
 error(m("Pay off without price.", N, X)) :-
   at(N, action(X, pay_off)),

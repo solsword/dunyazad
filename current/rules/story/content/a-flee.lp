@@ -8,6 +8,7 @@ chaotic(attack).
 argument(flee, fearful, actor).
 argument(flee, from, actor).
 initiator(flee, fearful).
+default_intent(flee, o(success, escape)).
 
 % outcomes
 
@@ -18,6 +19,7 @@ outcome_val(flee, get_injured, injured).
 outcome_val(flee, get_injured, safe).
 
 % skills
+
 at(
   N,
   skill_link(acrobatics, promotes, no_tool, flee, fearful, o(success, escape))

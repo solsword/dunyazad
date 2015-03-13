@@ -2,6 +2,8 @@ subclass(animal, monster).
 
 actor_def(dragon, monster, "dragon", singular, neuter).
 item_def(dragon_scale, treasure, "dragon scale", singular).
+item_def(dragon_claws, weapon, "claws", plural).
+natural_weapon(dragon, dragon_claws).
 trophy(dragon, dragon_scale).
 
 %actor_def(leviathan, monster, "leviathan", singular, neuter).

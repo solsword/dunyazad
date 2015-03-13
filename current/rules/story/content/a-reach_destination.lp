@@ -1,10 +1,16 @@
 % reach_destination: a special party-only action that ends the story
 action(reach_destination).
 
+% arguments
+
 argument(reach_destination, subject, actor).
 initiator(reach_destination, subject).
 
+% outcomes
+
 outcome_val(reach_destination, journey, over).
+
+% no skills
 
 % The argument of reach_destination is fixed:
 
