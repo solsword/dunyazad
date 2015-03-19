@@ -699,6 +699,8 @@ def collate_rules(story):
             )
         elif mode == "paragraph":
           if line == "<\n":
+            if para[-1] == '\n':
+              para = para[:-1]
             result[key].append((preconditions, para))
             key = None
             mode = "lines"
