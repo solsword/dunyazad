@@ -26,13 +26,13 @@ skill_link(
 error(m("Unintelligent buyer.", N, X, Buyer)) :-
   at(N, action(X, trade)),
   at(N, arg(X, buyer, Buyer)),
-  st(N, state(unintelligent, Buyer)),
+  st(N, property(has_skill, Buyer, unintelligent)),
   story_op(N, build_options).
 
 error(m("Unintelligent seller.", N, X, Seller)) :-
   at(N, action(X, trade)),
   at(N, arg(X, seller, Seller)),
-  st(N, state(unintelligent, Seller)),
+  st(N, property(has_skill, Seller, unintelligent)),
   story_op(N, build_options).
 
 error(m("Buyer doesn't have price.", N, X, Buyer, Price)) :-

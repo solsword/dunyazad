@@ -225,6 +225,12 @@ good at running and jumping
 a [[prologue/skilled]] storyteller
 good at telling stories
 
+:prologue/skill/monstrous
+ERROR: party member is monstrous!
+
+:prologue/skill/unintelligent
+ERROR: party member is unintelligent!
+
 :prologue/members/two
 Meanwhile, N#you/their ?member_one_relation N#?member_one_tag/_them V#bring/pst/?member_one_tag [[prologue/member_items/?member_one_tag]]. [[S|prologue/member_skills/?member_one_tag]]
 

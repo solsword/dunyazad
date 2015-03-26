@@ -36,7 +36,7 @@ skill_link(
 % you can only pacify unintelligent beings: TODO: Change this?
 error(m("Pacification of intelligent target.", N, X)) :-
   at(N, arg(X, aggressive, Aggressive)),
-  not st(N, state(unintelligent, Aggressive)),
+  not st(N, property(has_skill, Aggressive, unintelligent)),
   story_op(N, build_options).
 
 % pacifying is one way to deal with a threat

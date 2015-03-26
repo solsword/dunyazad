@@ -77,6 +77,55 @@ sp_st(N, Inst) :-
 sp_st(N, property(type, Inst, Class)) :-
   sp_inst_class(N, Inst, Class).
 
+% Add class skills:
+0 <= {
+  sp_st(N, property(has_skill, Inst, Skill))
+} <= 1 :-
+  sp_inst_class(N, Inst, Class),
+  is_instance(N, Inst, Superclass),
+  class_skill(Superclass, Skill, sometimes).
+
+sp_st(N, property(has_skill, Inst, Skill)) :-
+  sp_inst_class(N, Inst, Class),
+  is_instance(N, Inst, Superclass),
+  class_skill(Superclass, Skill, always).
+
+% Create class items
+
+1 >= {
+  error(m("Creation side-effect binding failed.", N, Setup, Arg))
+} :-
+  setup(N, Setup),
+  setup_argument_create_n(Setup, Arg, Class, Min, Max),
+  subclass(Class, Someclass),
+  class_item(Someclass, IClass, Min, Max).
+
+Min <= {
+  get_unique_key(s(N, createclassitem(Setup, Arg, CIClass), I))
+    : setup_arg_id(I), concrete_class_of(IClass, CIClass)
+} <= Max :-
+  setup(N, Setup),
+  setup_argument_create_n(Setup, Arg, Class, Min, Max),
+  %not error(m("Creation side-effect binding failed.", N, Setup, Arg)),
+  subclass(Class, Someclass),
+  class_item(Someclass, IClass, Min, Max),
+  story_op(N, initialize_node).
+
+sp_st(N, inst(Type, @inst(CIClass, K))) :-
+  unique_key(s(N, createclassitem(Setup, Arg, CIClass), I), K),
+  category_for(CIClass, Type),
+  story_op(N, initialize_node).
+
+sp_st(N, relation(has_item, Owner, inst(Type, @inst(CIClass, K)))) :-
+  unique_key(s(N, createclassitem(Setup, Arg, CIClass), I), K),
+  category_for(CIClass, Type),
+  at(N, setup_arg(Arg, Owner)).
+
+sp_st(N, property(type, inst(Type, @inst(CIClass, K)), CIClass)) :-
+  unique_key(s(N, createclassitem(Setup, Arg, CIClass), I), K),
+  category_for(CIClass, Type),
+  at(N, setup_arg(Arg, Owner)).
+
 % Rules for argument substitution:
 % --------------------------------
 

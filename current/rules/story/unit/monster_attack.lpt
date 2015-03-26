@@ -12,7 +12,8 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-error(m(1)) :- not setup(root, monster_attack).
+%error(m(1)) :- not setup(root, monster_attack).
+:- not setup(root, monster_attack).
 error(m(2)) :- not at(root, action(option(1), attack)).
 error(m(3)) :- not at(root, outcome(option(1), o(success, victory))).
 error(m(4)) :- not at(root, action(option(2), pacify)).

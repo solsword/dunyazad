@@ -108,7 +108,9 @@ st(R, property(type, inst(actor, Member), person)) :-
 
 % Each party member starts with 2 skills:
 2 = {
-  st(R, property(has_skill, inst(actor, Member), Skill)) : skill(Skill);
+  st(R, property(has_skill, inst(actor, Member), Skill))
+    : skill(Skill),
+      not restricted_skill(Skill);
   error(m("Party member missing starting skill 1.", Member));
   error(m("Party member missing starting skill 2.", Member))
 } :- party_member(Member, Relation), _sr(R).

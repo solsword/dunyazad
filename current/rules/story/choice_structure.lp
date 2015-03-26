@@ -6,6 +6,8 @@ at(N, relevant_to(option(X), potential(PTyp, Something))) :-
   at(N, consequence_of(option(X), Outcome, _not, Something)),
   at(N, potential(PTyp, Something)),
   at(N, option(X)),
+  not at(N, action(option(X), travel_onwards)),
+  not at(N, action(option(X), reach_destination)),
   story_op(N, build_options).
 
 error(m("Irrelevant option", N, option(X))) :-
@@ -13,8 +15,8 @@ error(m("Irrelevant option", N, option(X))) :-
   0 = {
     at(N, relevant_to(option(X), Anything))
   },
-  %not at(N, action(option(X), travel_onwards)),
-  %not at(N, action(option(X), reach_destination)),
+  not at(N, action(option(X), travel_onwards)),
+  not at(N, action(option(X), reach_destination)),
   story_op(N, build_options).
 
 error(m("Unaddressed important potential", N)) :-

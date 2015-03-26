@@ -33,7 +33,7 @@
 %
 %s_st(thief, property(c(name), v(monster), c("dragon"))).
 %% default number/person/gender
-%s_st(monster_attack, state(c(unintelligent), v(monster))).
+%s_st(monster_attack, property(c(has_skill), v(monster), c(unintelligent))).
 %
 %s_st(monster_attack, property(c(name), v(trophy), c("dragon scale"))).
 %% default number/person/gender

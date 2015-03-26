@@ -27,6 +27,8 @@ default_gender_for(Class, feminine) :-
 % Some  high-level actor ontology structure:
 subclass(actor, person).
 subclass(actor, animal).
+class_skill(animal, wilderness_lore, always).
+class_skill(animal, unintelligent, always).
 
 % Power relations:
 

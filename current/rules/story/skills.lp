@@ -1,13 +1,18 @@
 % skills.lp
 % Rules about skills and actions.
 
+skill(unintelligent).
+skill(monstrous).
+restricted_skill(unintelligent).
+restricted_skill(monstrous).
+
 skill(tinkering).
 skill(fighting).
 skill(wilderness_lore).
 skill(music).
 skill(elocution).
 skill(healing).
-%skill(thievery). TODO: Make this useful
+skill(thievery). %TODO: Make this useful
 skill(literacy).
 %skill(prayer). TODO: Make this useful
 skill(acrobatics).
@@ -15,6 +20,8 @@ skill(storytelling).
 % TODO: sailing?
 % TODO: More skills!
 
+skill_name(unintelligent, "unintelligent").
+skill_name(monstrous, "monstrous").
 skill_name(tinkering, "tinkering").
 skill_name(fighting, "fighting").
 skill_name(wilderness_lore, "wilderness lore").

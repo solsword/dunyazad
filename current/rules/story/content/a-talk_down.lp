@@ -25,13 +25,13 @@ skill_link(
 error(m("Unintelligent asker.", N, X)) :-
   at(N, action(X, talk_down)),
   at(N, arg(X, asking, Asking)),
-  st(N, state(unintelligent, Asking)),
+  st(N, property(has_skill, Asking, unintelligent)),
   story_op(N, build_options).
 
 error(m("Unintelligent listener.", N, X)) :-
   at(N, action(X, talk_down)),
   at(N, arg(X, listening, Listening)),
-  st(N, state(unintelligent, Listening)),
+  st(N, property(has_skill, Listening, unintelligent)),
   story_op(N, build_options).
 
 error(m("Victim not being threatened.", N, X)) :-
