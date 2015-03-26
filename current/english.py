@@ -34,7 +34,7 @@ SBST_KEY = re.compile(r"([A-Za-z_0-9]+)=")
 
 KV_TOKENS = re.compile(r"(@)|(\\.)|(\[\[)|(\]\])")
 
-ANYTAG = re.compile(r"(\b[A-Z]#[a-zA-Z_0-9/?]+\b)")
+ANYTAG = re.compile(r"(\b[A-Z]#[a-zA-Z_0-9/?']+\b)")
 
 CAP = re.compile(r"(?:@CAP@)+(.)")
 PAR = re.compile(r"@PAR@")
@@ -126,6 +126,17 @@ NOUN_SCHEMAS = {
         Pr("determined"),
         Pr("inst", Vr("Type"), Vr("Key")),
         Vr("Determination")
+      )
+    ),
+  "has_item": 
+    Pr(
+      "st",
+      Pr("root"),
+      Pr(
+        "relation",
+        Pr("has_item"),
+        PVr("owner", "inst", Vr("Type"), Vr("Key")),
+        PVr("item", "inst", Vr("Type"), Vr("Key")),
       )
     ),
   "party_member":
@@ -338,6 +349,8 @@ def glean_nouns(story):
       n = binding["st.property.inst.Key"].unquoted()
     elif "st.state.inst.Key" in binding:
       n = binding["st.state.inst.Key"].unquoted()
+    elif "st.relation.item.Key" in binding:
+      n = binding["st.relation.item.Key"].unquoted()
     else:
       raise ValueError(
         "Unknown binding structure for noun schema:\n{}".format(binding)
@@ -357,6 +370,11 @@ def glean_nouns(story):
     elif sc == "determined":
       d = binding["st.property.Determination"].unquoted()
       result[n].determined = d == "true"
+    elif sc == "has_item":
+      o = binding["st.relation.owner.Key"].unquoted()
+      if o not in result:
+        result[o] = nouns.Noun(o)
+      result[n].owner = result[o]
     elif sc == "party_member":
       result[n].is_party_member = True
   return result
@@ -1061,79 +1079,93 @@ def build_text(
   # reached a base text:
   template = run_grammar(template, rules, cvars, story)
   # Next, fill in any tags:
-  bits = re.split(ANYTAG, template)
-  result = ""
-  for b in bits:
-    add = b
-    if '.' in b: # TODO: Better sentence-counting! (?)
-      # there's the end of a sentence somewhere in this bit: clean out
-      # all slots
-      pnslots = copy.deepcopy(base_pnslots)
-      # TODO: Fix this!!
-    for t in TAGS:
-      m = TAGS[t].fullmatch(b)
-      if m:
-        if t == "directive":
-          directive = m.group(1)
-          argument = m.group(2)
-          if directive == "timeshift":
-            argument = argument.replace('_', ' ')
-            if argument in verbs.TIMESHIFTS:
-              tsstack.append(argument)
-            elif argument == "pop":
-              if len(tsstack) > 1:
-                tsstack = tsstack[:-1]
+  result = template
+  while ANYTAG.search(result):
+    bits = re.split(ANYTAG, result)
+    result = ""
+    for b in bits:
+      add = b
+      if '.' in b: # TODO: Better sentence-counting! (?)
+        # there's the end of a sentence somewhere in this bit: clean out
+        # all slots
+        pnslots = copy.deepcopy(base_pnslots)
+        # TODO: Fix this!!
+      for t in TAGS:
+        m = TAGS[t].fullmatch(b)
+        if m:
+          if t == "directive":
+            directive = m.group(1)
+            argument = m.group(2)
+            if directive == "timeshift":
+              argument = argument.replace('_', ' ')
+              if argument in verbs.TIMESHIFTS:
+                tsstack.append(argument)
+              elif argument == "pop":
+                if len(tsstack) > 1:
+                  tsstack = tsstack[:-1]
+                else:
+                  raise RuntimeError(
+                    "Popped last timeshift from timeshift stack."
+                  )
               else:
-                raise RuntimeError(
-                  "Popped last timeshift from timeshift stack."
-                )
+                raise ValueError("Unknown timeshift '{}'.".format(argument))
             else:
-              raise ValueError("Unknown timeshift '{}'.".format(argument))
-          else:
-            raise ValueError("Unknown directive '{}'.".format(directive))
-          add = ""
-        elif t == "noun":
-          noun = m.group(1)
-          if noun not in ndict:
-            raise KeyError("Noun '{}' not in ndict.".format(noun))
-          pro = m.group(2)
-          nopro = False
-          if pro[0] == '_':
-            nopro = True
-            pro = pro[1:]
-          case, position = nouns.casepos(pro)
-          slot = pnslots[nouns.pnslot(ndict[noun])]
-          if noun in slot[1] and len(slot[1]) == 1 and not nopro:
-            slot[0] = 0
-            add = nouns.pronoun(ndict[noun], case, position)
-            # TODO: Gender introduction awareness!
-          else:
-            if slot[0] > 0:
+              raise ValueError("Unknown directive '{}'.".format(directive))
+            add = ""
+          elif t == "noun":
+            noun = m.group(1)
+            if noun not in ndict:
+              raise KeyError("Noun '{}' not in ndict.".format(noun))
+            pro = m.group(2)
+            nopro = False
+            if pro[0] == '_':
+              nopro = True
+              pro = pro[1:]
+            case, position = nouns.casepos(pro)
+            slot = pnslots[nouns.pnslot(ndict[noun])]
+            if noun in slot[1] and len(slot[1]) == 1 and not nopro:
               slot[0] = 0
-              slot[1] = { noun }
+              add = nouns.pronoun(ndict[noun], case, position)
+              # TODO: Gender introduction awareness!
             else:
-              slot[1].add(noun)
-            if noun in introduced:
-              add = nouns.definite(ndict[noun])
+              if slot[0] > 0:
+                slot[0] = 0
+                slot[1] = { noun }
+              else:
+                slot[1].add(noun)
+              if noun in introduced:
+                add = nouns.definite(ndict[noun])
+              else:
+                introduced.add(noun)
+                add = nouns.indefinite(ndict[noun])
+          elif t == "verb":
+            verb = m.group(1)
+            tense = TSABR[m.group(2)]
+            agree = m.group(3)
+            if agree == "_plural":
+              add = verbs.conjugation(
+                verb,
+                tense,
+                "plural",
+                "third",
+                tsstack[-1]
+              )
+            elif agree == "_singular":
+              add = verbs.conjugation(
+                verb,
+                tense,
+                "singular",
+                "third",
+                tsstack[-1]
+              )
             else:
-              introduced.add(noun)
-              add = nouns.indefinite(ndict[noun])
-        elif t == "verb":
-          verb = m.group(1)
-          tense = TSABR[m.group(2)]
-          agree = m.group(3)
-          if agree == "_plural":
-            add = verbs.conjugation(verb, tense, "plural", "third", tsstack[-1])
-          elif agree == "_singular":
-            add = verbs.conjugation(verb, tense, "singular","third",tsstack[-1])
-          else:
-            add = verbs.conj_ref(ndict[agree], verb, tense, tsstack[-1])
-        # if we matched a tag, don't bother checking the other tags:
-        break
-    result += add
+              add = verbs.conj_ref(ndict[agree], verb, tense, tsstack[-1])
+          # if we matched a tag, don't bother checking the other tags:
+          break
+      result += add
   # Finally process capitalization directives:
   result = re.sub(CAP, lambda m: m.group(1).upper(), result)
-  result = re.sub(CAP, lambda m: m.group(1).upper(), result)
+  #result = re.sub(CAP, lambda m: m.group(1).upper(), result)
   result = re.sub(PAR, '\n\n', result)
   result = re.sub(BREAK, '', result)
   return result, pnslots, introduced

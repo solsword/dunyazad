@@ -1,6 +1,9 @@
 subclass(person, bad_guy).
+powerful(bad_guy).
+
 subclass(bad_guy, stealer).
 subclass(bad_guy, tough).
+
 
 actor_def(bandits, tough, "bandits", plural, neuter).
 

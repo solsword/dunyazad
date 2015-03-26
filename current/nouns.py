@@ -58,6 +58,7 @@ class Noun:
     number="singular",
     gender="neuter",
     determined=True,
+    owner=None,
     is_party_member=False,
   ):
     self.tag = tag
@@ -67,6 +68,7 @@ class Noun:
     self.number = number
     self.gender = gender
     self.determined = determined
+    self.owner = owner
     self.is_party_member = is_party_member
 
   def __str__(self):
@@ -149,7 +151,9 @@ def definite(thing):
   """
   Returns a definite reference to the given noun, e.g. "the monster" or "Sam"
   """
-  if thing.determined:
+  if thing.owner:
+    return "N#{}/their {}".format(thing.owner.tag, thing.name)
+  elif thing.determined:
     return "the {}".format(thing.name)
   else:
     return thing.name

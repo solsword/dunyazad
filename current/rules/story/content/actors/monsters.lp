@@ -1,4 +1,5 @@
 subclass(animal, monster).
+powerful(monster).
 
 actor_def(dragon, monster, "dragon", singular, neuter).
 item_def(dragon_scale, treasure, "dragon scale", singular).

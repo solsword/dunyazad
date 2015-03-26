@@ -1,4 +1,5 @@
 subclass(person, commoner).
+powerless(commoner).
 
 % General commoners
 actor_def(innkeeper, commoner, "innkeeper", singular, either).

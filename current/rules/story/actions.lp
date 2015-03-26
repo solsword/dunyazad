@@ -26,7 +26,8 @@ error(m("Exclusive outcome values.", N, X)) :-
   at(N, outcome(X, o(Var1, Val1))),
   at(N, outcome(X, o(Var2, Val2))),
   Var1 != Var2,
-  outcome_excludes(Action, o(Var1, Val1), o(Var2, Val2)).
+  outcome_excludes(Action, o(Var1, Val1), o(Var2, Val2)),
+  story_op(N, build_options).
 
 % And all action arguments are filled in:
 1 = {
@@ -40,11 +41,13 @@ error(m("Exclusive outcome values.", N, X)) :-
 % Actual consequences depend on which outcome variables have which values:
 at(N, consequence(X, Consequence)) :-
   at(N, consequence_of(X, Outcome, Consequence)),
-  at(N, outcome(X, Outcome)).
+  at(N, outcome(X, Outcome)),
+  story_op(N, build_options).
 
 at(N, consequence(X, _not, Consequence)) :-
   at(N, consequence_of(X, Outcome, _not, Consequence)),
-  at(N, outcome(X, Outcome)).
+  at(N, outcome(X, Outcome)),
+  story_op(N, build_options).
 
 % Being injured, dead, or off-stage limits what actions you can take and which
 % actions can be taken on you:

@@ -24,12 +24,12 @@ error(m("Wrong option 3")) :-
 
 error(m("Wrong outcome 1")) :-
   node_status_reached(root, built),
-  not at(root, outcome(option(1), defeat)).
+  not at(root, outcome(option(1), o(success, defeat))).
 
 error(m("Wrong outcome 2")) :-
   node_status_reached(root, built),
-  not at(root, outcome(option(2), failure)).
+  not at(root, outcome(option(2), o(success, failure))).
 
 error(m("Wrong outcome 3")) :-
   node_status_reached(root, built),
-  not at(root, outcome(option(3), pacified)).
+  not at(root, outcome(option(3), o(mood, relaxed))).

@@ -27,3 +27,13 @@ default_gender_for(Class, feminine) :-
 % Some  high-level actor ontology structure:
 subclass(actor, person).
 subclass(actor, animal).
+
+% Power relations:
+
+at(N, is_powerful(Inst)) :-
+  is_instance(N, Inst, Category),
+  powerful(Category).
+
+at(N, is_powerless(Inst)) :-
+  is_instance(N, Inst, Category),
+  powerless(Category).

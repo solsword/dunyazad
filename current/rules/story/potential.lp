@@ -21,6 +21,67 @@ at(N, potential(PTyp, relation(PRel, I1, I2))) :-
   st(N, relation(PRel, I1, I2)),
   story_op(N, build_options).
 
+% Potentials have categories, including "urgent" and "immediate":
+at(N, category(potential(PTyp, state(PState, Inst)), Category)) :-
+  at(N, potential(PTyp, state(PState, Inst))),
+  pcategory(potential(PTyp, state, PState), Category),
+  story_op(N, build_options).
+
+at(N, category(potential(PTyp, property(PProp, Inst, PVal)), Category)) :-
+  at(N, potential(PTyp, property(PProp, Inst, PVal))),
+  pcategory(potential(PTyp, property, PProp, PVal), Category),
+  story_op(N, build_options).
+
+at(N, category(potential(PTyp, relation(PRel, I1, I2)), Category)) :-
+  at(N, potential(PTyp, relation(PRel, I1, I2))),
+  pcategory(potential(PTyp, relation, PRel), Category),
+  story_op(N, build_options).
+
+% From immediate problems to mere opportunities some potentials are more
+% important than others.
+at(N, most_important(Pt)) :-
+  at(N, importance(I, Pt)),
+  0 = {
+    at(N, some_importance(O)) : O < I
+  }.
+
+at(N, some_importance(I)) :-
+  at(N, importance(I, Something)).
+
+at(N, importance(1, potential(problem, Pt))) :-
+  at(N, category(potential(problem, Pt), urgent)),
+  at(N, category(potential(problem, Pt), immediate)),
+  story_op(N, build_options).
+
+at(N, importance(2, potential(problem, Pt))) :-
+  at(N, category(potential(problem, Pt), immediate)),
+  story_op(N, build_options).
+
+at(N, importance(3, potential(problem, Pt))) :-
+  at(N, category(potential(problem, Pt), urgent)),
+  story_op(N, build_options).
+
+at(N, importance(4, potential(problem, Pt))) :-
+  at(N, potential(problem, Pt)),
+  story_op(N, build_options).
+
+at(N, importance(5, potential(opportunity, Pt))) :-
+  at(N, category(potential(opportunity, Pt), urgent)),
+  at(N, category(potential(opportunity, Pt), immediate)),
+  story_op(N, build_options).
+
+at(N, importance(6, potential(opportunity, Pt))) :-
+  at(N, category(potential(opportunity, Pt), immediate)),
+  story_op(N, build_options).
+
+at(N, importance(7, potential(opportunity, Pt))) :-
+  at(N, category(potential(opportunity, Pt), urgent)),
+  story_op(N, build_options).
+
+at(N, importance(8, potential(opportunity, Pt))) :-
+  at(N, potential(opportunity, Pt)),
+  story_op(N, build_options).
+
 % The idea of "unresolved" potential:
 unresolved_potential(N, option(O), potential(PTyp, Pt)) :-
   at(N, potential(PTyp, Pt)),

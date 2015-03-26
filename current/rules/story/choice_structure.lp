@@ -2,7 +2,7 @@
 % -------------------
 
 % relevance: any action which might cause a potential to dissappear is relevant
-at(N, relevant(option(X))) :-
+at(N, relevant_to(option(X), potential(PTyp, Something))) :-
   at(N, consequence_of(option(X), Outcome, _not, Something)),
   at(N, potential(PTyp, Something)),
   at(N, option(X)),
@@ -10,9 +10,18 @@ at(N, relevant(option(X))) :-
 
 error(m("Irrelevant option", N, option(X))) :-
   at(N, option(X)),
-  not at(N, relevant(option(X))),
-  not at(N, action(option(X), travel_onwards)),
-  not at(N, action(option(X), reach_destination)),
+  0 = {
+    at(N, relevant_to(option(X), Anything))
+  },
+  %not at(N, action(option(X), travel_onwards)),
+  %not at(N, action(option(X), reach_destination)),
+  story_op(N, build_options).
+
+error(m("Unaddressed important potential", N)) :-
+  at(N, most_important(potential(PTyp, Something))),
+  0 = {
+    at(N, option(X)) : at(N, relevant_to(option(X), potential(PTyp, Something)))
+  },
   story_op(N, build_options).
 
 % redundancy
@@ -29,6 +38,72 @@ error(m("Non-party-initiated option", N, option(X))) :-
   at(N, initiator(option(X), Init)),
   not st(N, state(party_member, Init)),
   story_op(N, build_options).
+
+% your party shouldn't act outside of choices:
+error(m("Party-initiated event", N, X)) :-
+  node_type(N, event),
+  at(N, initiator(X, Init)),
+  st(N, state(party_member, Init)),
+  not at(N, action(X, travel_onwards)),
+  not at(N, action(X, reach_destination)),
+  story_op(N, build_options).
+
+% No trick options:
+error(m("Trick option", N, X)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, Arg, PartyMember)),
+  st(N, state(party_member, PartyMember)),
+  st(N, state(party_member, OtherMember)),
+  default_intent(Action, Outcome),
+  at(N, skill_link(Skill, required, NeedsTool, Action, Arg, Outcome)),
+  not st(N, property(has_skill, PartyMember, Skill)),
+  st(N, property(has_skill, OtherMember, Skill)).
+
+error(m("Trick option", N, X)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, Arg, PartyMember)),
+  st(N, state(party_member, PartyMember)),
+  st(N, state(party_member, OtherMember)),
+  default_intent(Action, Outcome),
+  at(N, skill_link(Skill, promotes, NeedsTool, Action, Arg, Outcome)),
+  not st(N, property(has_skill, PartyMember, Skill)),
+  st(N, property(has_skill, OtherMember, Skill)).
+
+error(m("Trick option", N, X)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, Arg, PartyMember)),
+  st(N, state(party_member, PartyMember)),
+  st(N, state(party_member, OtherMember)),
+  default_intent(Action, Outcome),
+  at(
+    N,
+    skill_link(
+      Skill, contest, NeedsTool,
+      Action,
+      between(Arg, Opponent),
+      either(Outcome, Bad)
+    )
+  ),
+  not st(N, property(has_skill, PartyMember, Skill)),
+  st(N, property(has_skill, OtherMember, Skill)).
+
+error(m("Trick option", N, X)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, Arg, PartyMember)),
+  st(N, state(party_member, PartyMember)),
+  st(N, state(party_member, OtherMember)),
+  default_intent(Action, Outcome),
+  at(
+    N,
+    skill_link(
+      Skill, contest, NeedsTool,
+      Action,
+      between(Opponent, Arg),
+      either(Bad, Outcome)
+    )
+  ),
+  not st(N, property(has_skill, PartyMember, Skill)),
+  st(N, property(has_skill, OtherMember, Skill)).
 
 % overall structure constraints:
 % ------------------------------
