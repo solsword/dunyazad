@@ -1,0 +1,10 @@
+% Action - arrive
+
+:action/arrive/option
+N#?subject/they V#arrive/prs/?subject
+
+:action/arrive/outcome
+{at(Now,outcome(option(Opt),o(result,arrived)))}
+N#?subject/they V#arrive/prs/?subject
+
+% TODO: More here!

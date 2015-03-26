@@ -148,6 +148,32 @@ IRREGULAR = {
 
     ("past participle", "any", "any", "brought"),
   ],
+  "cannot": [
+    ("present", "singular", "first", "cannot"),
+    ("present", "singular", "second", "cannot"),
+    ("present", "singular", "third", "cannot"),
+
+    ("present", "plural", "any", "cannot"),
+
+    ("past", "any", "any", "could not"),
+
+    ("present participle", "any", "any", None),
+
+    ("past participle", "any", "any", None),
+  ],
+  "can't": [
+    ("present", "singular", "first", "can't"),
+    ("present", "singular", "second", "can't"),
+    ("present", "singular", "third", "can't"),
+
+    ("present", "plural", "any", "can't"),
+
+    ("past", "any", "any", "couldn't"),
+
+    ("present participle", "any", "any", None),
+
+    ("past participle", "any", "any", None),
+  ],
   "don't": [
     ("present", "singular", "first", "don't"),
     ("present", "singular", "second", "don't"),

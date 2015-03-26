@@ -1,7 +1,7 @@
 % flee
 action(flee).
 
-chaotic(attack).
+chaotic(flee).
 
 % arguments
 
@@ -22,7 +22,12 @@ outcome_val(flee, get_injured, safe).
 
 at(
   N,
-  skill_link(acrobatics, promotes, no_tool, flee, fearful, o(success, escape))
+  skill_link(
+    acrobatics, contest, no_tool,
+    flee,
+    between(fearful, from),
+    either(o(success, escape), o(success, failure))
+  )
 ) :-
   1 <= {
     setting(N, city);
@@ -33,9 +38,10 @@ at(
 at(
   N,
   skill_link(
-    wilderness_lore, promotes, no_tool,
-    flee, fearful,
-    o(success, escape)
+    wilderness_lore, contest, no_tool,
+    flee,
+    between(fearful, from),
+    either(o(success, escape), o(success, failure))
   )
 ) :-
   1 <= {
@@ -43,8 +49,6 @@ at(
     setting(N, wilderness)
   },
   story_node(N).
-
-% TODO: Put the fleeing actor and their items off-stage!
 
 % Fleeing gets rid of threats
 at(
@@ -62,7 +66,54 @@ at(
   st(N, relation(threatening, From, Fearful)),
   story_op(N, build_options).
 
+% Fleeing puts things off-stage, unless they're a party member, in which case
+% it puts everything not in your party or belonging to it off-stage:
+
+at(
+  N,
+  consequence_of(X, o(success, escape), state(off_stage, Fearful))
+) :-
+  at(N, action(X, leave)),
+  at(N, arg(X, fearful, Fearful)),
+  not st(N, state(party_member, Fearful)),
+  story_op(N, build_options).
+
+at(
+  N,
+  consequence_of(X, o(success, escape), state(off_stage, Item))
+) :-
+  at(N, action(X, leave)),
+  at(N, arg(X, fearful, Fearful)),
+  not st(N, state(party_member, Fearful)),
+  st(N, relation(has_item, Fearful, Item)),
+  story_op(N, build_options).
+
+% All of the things you are moving away from: 
+
+move_away_from(N, X, inst(Type, Inst)) :-
+  at(N, action(X, flee)),
+  at(N, arg(X, fearful, Fearful)),
+  st(N, state(party_member, Fearful)),
+  st(N, inst(Type, Inst)),
+  not st(N, state(party_member, inst(Type, Inst))),
+  0 = {
+    st(N, relation(has_item, PartyMember, inst(Type, Inst))) :
+      st(N, state(party_member, PartyMember))
+  },
+  story_op(N, build_options).
+
+at(
+  N,
+  consequence_of(X, o(success, escape), state(off_stage, Thing))
+) :-
+  at(N, action(X, leave)),
+  at(N, arg(X, fearful, Fearful)),
+  st(N, state(party_member, Fearful)),
+  move_away_from(N, X, Thing),
+  story_op(N, build_options).
+
 % You can be injured if you fail to escape:
+
 at(N, consequence_of(X, o(get_injured, injured), state(injured, Fearful))) :-
   at(N, action(X, flee)),
   at(N, arg(X, fearful, Fearful)),

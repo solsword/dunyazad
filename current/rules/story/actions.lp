@@ -45,3 +45,27 @@ at(N, consequence(X, Consequence)) :-
 at(N, consequence(X, _not, Consequence)) :-
   at(N, consequence_of(X, Outcome, _not, Consequence)),
   at(N, outcome(X, Outcome)).
+
+% Being injured, dead, or off-stage limits what actions you can take and which
+% actions can be taken on you:
+
+error(m("Injured actor initiated an action.", N, X)) :-
+  at(N, action(X, Action)),
+  at(N, initiator(X, Initiator)),
+  st(N, state(injured, Initiator)),
+  not injured_can_initiate(Action),
+  story_op(N, build_options).
+
+error(m("Interaction with dead actor.", N, X)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, Arg, Inst)),
+  st(N, state(dead, Inst)),
+  not dead_okay(Action, Arg),
+  story_op(N, build_options).
+
+error(m("Interaction with off-stage instance.", N, X)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, Arg, Inst)),
+  st(N, state(off_stage, Inst)),
+  not off_stage_okay(Action, Arg),
+  story_op(N, build_options).

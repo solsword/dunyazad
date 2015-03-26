@@ -1,0 +1,21 @@
+% Action - treat_injury
+
+:action/treat_injury/option
+N#?doctor/they V#attempt/prs/?doctor V#treat/inf/?doctor N#?patient/them
+
+:action/treat_injury/outcome
+{at(Now,outcome(option(Opt),o(result,healed)))}
+N#?doctor/they V#treat/prs/?doctor N#?patient/them and N#?patient/they V#be/prs/?patient healed
+
+{at(Now,outcome(option(Opt),o(result,still_injured)))}
+N#?doctor/they V#treat/prs/?doctor N#?patient/them but V#cannot/prs/?doctor V#cure/rinf/?doctor N#?patient/them
+
+{at(Now,outcome(option(Opt),o(result,killed)))}
+N#?doctor/they V#try/prs/?doctor V#treat/inf/?doctor N#?patient/them but despite N#?doctor/their best efforts, N#?patient/they V#succumb/prs/?patient to N#?patient/their injuries
+
+% TODO: Skill levels like this (requires precondition join matching and
+% negative preconditions):
+%{at(Now,outcome(option(Opt),o(result,killed)));at(N,arg(option(Opt),doctor,STDoc));at(Now,property(has_skill,STDoc,healing))}
+%{at(Now,outcome(option(Opt),o(result,killed)));at(N,arg(option(Opt),doctor,STDoc));not at(Now,property(has_skill,STDoc,healing))}
+
+% TODO: More here!

@@ -17,18 +17,44 @@ outcome_val(travel_onwards, onwards, onwards).
 at(N, arg(Opt, subject, inst(actor, you))) :-
   at(N, action(Opt, travel_onwards)).
 
-% travel_onwards as an option removes all existing opportunities (but it
-% can't be an option if there are problems):
+% travel_onwards as an option removes all problems and opportunities related to
+% things left behind, but it can't be an option if doing so would remove a
+% non-hidden problem.
 
-error(m("Left a problem behind.", N, Prb)) :-
+removed_by(N, X, potential(PType, state(PState, Subject))) :-
   at(N, action(X, travel_onwards)),
-  at(N, potential(problem, Prb)),
+  at(N, potential(PType, state(PState, Subject))),
+  travel_away_from(N, X, Subject),
   story_op(N, build_options).
 
-at(N, consequence_of(X, o(onwards, onwards), _not, Opp)) :-
+removed_by(N, X, potential(PType, property(PProp, Subject, PVal))) :-
   at(N, action(X, travel_onwards)),
-  at(N, potential(opportunity, Opp)),
-  node_type(N, choice),
+  at(N, potential(PType, property(PProp, Subject, PVal))),
+  travel_away_from(N, X, Subject),
+  story_op(N, build_options).
+
+removed_by(N, X, potential(PType, relation(PRel, Subject, Object))) :-
+  at(N, action(X, travel_onwards)),
+  at(N, potential(PType, relation(PRel, Subject, Object))),
+  travel_away_from(N, X, Subject),
+  story_op(N, build_options).
+
+removed_by(N, X, potential(PType, relation(PRel, Subject, Object))) :-
+  at(N, action(X, travel_onwards)),
+  at(N, potential(PType, relation(PRel, Subject, Object))),
+  travel_away_from(N, X, Object),
+  story_op(N, build_options).
+
+error(m("Left a non-hidden problem behind.", N, Prb)) :-
+  at(N, action(X, travel_onwards)),
+  removed_by(N, X, potential(problem, Prb)),
+  not at(N, hidden(potential(problem, Prb))),
+  story_op(N, build_options).
+
+at(N, consequence_of(X, o(onwards, onwards), _not, Pot)) :-
+  at(N, action(X, travel_onwards)),
+  at(N, potential(PType, Pot)),
+  removed_by(N, X, potential(PType, Pot)),
   story_op(N, build_options).
 
 % travelling onwards gets rid of all spontaneous instances and properties

@@ -33,6 +33,8 @@ at(N, skill_link(Skill, Link, NeedsTool, Action, Arg, Outcome)) :-
   story_op(N, build_options).
 
 % Skill link unpacking:
+
+% 'required' skill links depress expectations if a skill and/or tool is missing:
 at(N, unlikely_outcome(X, Outcome)) :-
   at(N, action(X, Action)),
   at(N, arg(X, Arg, Actor)),
@@ -75,6 +77,22 @@ at(N, likely_outcome(X, Outcome)) :-
   at(N, action(X, Action)),
   at(N, arg(X, Arg, Actor)),
   at(N, skill_link(Skill, promotes, tool, Action, Arg, Outcome)),
+  st(N, property(has_skill, Actor, Skill)),
+  at(N, has_tool_for(Actor, Skill)),
+  story_op(N, build_options).
+
+% 'avoids' is the inverse of 'promotes':
+at(N, unlikely_outcome(X, Outcome)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, Arg, Actor)),
+  at(N, skill_link(Skill, avoids, no_tool, Action, Arg, Outcome)),
+  st(N, property(has_skill, Actor, Skill)),
+  story_op(N, build_options).
+
+at(N, unlikely_outcome(X, Outcome)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, Arg, Actor)),
+  at(N, skill_link(Skill, avoids, tool, Action, Arg, Outcome)),
   st(N, property(has_skill, Actor, Skill)),
   at(N, has_tool_for(Actor, Skill)),
   story_op(N, build_options).

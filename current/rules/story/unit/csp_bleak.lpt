@@ -14,4 +14,4 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-choice_structure_plan(0, spoiled).
+choice_structure_plan(0, bleak).

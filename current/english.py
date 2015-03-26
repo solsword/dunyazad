@@ -821,6 +821,8 @@ class Substitution:
         works = True
 
         for pre in precond: # for each precondition of an expansion
+          # TODO: Enforce variable matching between preconditions...
+          # TODO: Allow negative preconditions
           hit = False
 
           for fact in story: # try to find a matching fact:

@@ -42,3 +42,29 @@ unresolved_potential(N, Opt, potential(PTyp, relation(PRel, I1, I2))) :-
   at(N, consequence(Opt, relation(PRel, I1, I2))),
   potential(PTyp, relation, PRel),
   story_op(N, build_options).
+
+% Potential can be hidden if something involved is off-stage:
+% TODO: Hide base states/properties/relations instead/as well?
+at(N, hidden(potential(PTyp, state, PState))) :-
+  at(N, potential(PTyp, state, PState)),
+  st(N, state(PState, Inst)),
+  st(N, state(off_stage, Inst)),
+  story_op(N, build_options).
+
+at(N, hidden(potential(PTyp, property(PProp, Inst, PVal)))) :-
+  potential(PTyp, property, PProp, PVal),
+  st(N, property(PProp, Inst, PVal)),
+  st(N, state(off_stage, Inst)),
+  story_op(N, build_options).
+
+at(N, hidden(potential(PTyp, relation(PRel, I1, I2)))) :-
+  potential(PTyp, relation, PRel),
+  st(N, relation(PRel, I1, I2)),
+  st(N, state(off_stage, I1)),
+  story_op(N, build_options).
+
+at(N, hidden(potential(PTyp, relation(PRel, I1, I2)))) :-
+  potential(PTyp, relation, PRel),
+  st(N, relation(PRel, I1, I2)),
+  st(N, state(off_stage, I2)),
+  story_op(N, build_options).
