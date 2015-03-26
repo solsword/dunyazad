@@ -71,7 +71,7 @@ error(m("Event duplicates previous action", N, Prev, Action)) :-
   not arg_mismatch(Prev, Opt, N, AnyOpt),
   story_op(N, build_options).
 
-% failing to deal with a problem twice is enough
+% failing to deal with a potential twice is enough
 error(m("Repeated failure", Three, option(Z))) :-
   story_node(One),
   successor(One, option(X), Two),
@@ -99,6 +99,16 @@ error(m("Ignored failure to solve problem", Two, option(Y))) :-
   0 = { at(Two, consequence_of(option(Y), Any, _not, Problem)) },
   story_op(Two, build_options).
 
+% problems shouldn't re-occur within a vignette
+error(m("Recurring potential", Second)) :-
+  story_node(First),
+  before(First, Second),
+  vignette(First, V),
+  vignette(Second, V),
+  at(First, potential(PType, Pot)),
+  not at(Second, potential(PType, Pot)),
+  at(Second, consequence(option(X), Pot)),
+  story_op(Second, build_options).
 
 % vignette structure constraints:
 % -------------------------------
