@@ -1134,10 +1134,10 @@ def build_text(
               else:
                 slot[1].add(noun)
               if noun in introduced:
-                add = nouns.definite(ndict[noun])
+                add = nouns.definite(ndict[noun], case)
               else:
                 introduced.add(noun)
-                add = nouns.indefinite(ndict[noun])
+                add = nouns.indefinite(ndict[noun], case)
           elif t == "verb":
             verb = m.group(1)
             tense = TSABR[m.group(2)]
@@ -1272,7 +1272,7 @@ def build_node_text(
       outgoing[scc] = (pnout, intout)
       options += "\n*goto {}\n".format(scc)
     else:
-      options += "*finish\n"
+      options += "\n*finish\n"
   elif len(node["options"]) > 1:
     options = "*choice\n"
     for opt in node["options"]:
@@ -1306,7 +1306,7 @@ def build_node_text(
       else:
         options += "    *finish\n"
   else:
-    options = "*finish"
+    options = "\n*finish"
   result = """
 *label {label}
 {intro}

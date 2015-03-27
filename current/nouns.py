@@ -147,25 +147,41 @@ def casepos(pronoun):
       return (case, position)
   raise ValueError("Unknown reference pronoun '{}'.".format(pronoun))
 
-def definite(thing):
+def definite(thing, case="subjective"):
   """
   Returns a definite reference to the given noun, e.g. "the monster" or "Sam"
   """
+  result = ""
   if thing.owner:
-    return "N#{}/their {}".format(thing.owner.tag, thing.name)
+    result = "N#{}/their {}".format(thing.owner.tag, thing.name)
   elif thing.determined:
-    return "the {}".format(thing.name)
+    result = "the {}".format(thing.name)
   else:
-    return thing.name
+    result = thing.name
+  if case == "possessive":
+    if result[-1] in "sz":
+      return result + "’"
+    else:
+      return result + "’s"
+  else:
+    return result
 
-def indefinite(thing):
+def indefinite(thing, case="subjective"):
+  result = ""
   if not thing.determined:
-    return "a {} named {}".format(thing.cls, thing.name)
+    result = "a {} named {}".format(thing.cls, thing.name)
   else:
     if thing.number == "singular":
       if thing.name[0] in vowels: # TODO: better than this T_T
-        return "an {}".format(thing.name)
+        result = "an {}".format(thing.name)
       else:
-        return "a {}".format(thing.name)
+        result = "a {}".format(thing.name)
     else:
-      return "some {}".format(thing.name)
+      result = "some {}".format(thing.name)
+  if case == "possessive":
+    if result[-1] in "sz":
+      return result + "'"
+    else:
+      return result + "'s"
+  else:
+    return result

@@ -4,6 +4,7 @@
 %#minimize { 1@0, error(Message) : error(Message) }.
 :- error(Message).
 %:- error(m("Story too short", N)).
+%:- error(m("Vignette starts with an event!")).
 %:- error(m("Irrelevant option", Node, Option)).
 %:- error(m("Unbound action argument.", Node, Action, Arg, ArgType)).
 %:- error(m("Price is not a treasure.", Node, Option)).

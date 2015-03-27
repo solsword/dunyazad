@@ -8,6 +8,7 @@ chaotic(flee).
 argument(flee, fearful, actor).
 argument(flee, from, actor).
 initiator(flee, fearful).
+injured_can_initiate(flee).
 default_intent(flee, o(success, escape)).
 
 % outcomes

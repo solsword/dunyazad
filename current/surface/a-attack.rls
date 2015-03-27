@@ -5,7 +5,7 @@ N#?aggressor/they V#attack/prs/?aggressor N#?target/them
 
 :action/attack/outcome
 {at(Now,outcome(option(Opt),o(success,victory)))}
-N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/?]] [[S|combat/?]] [[S|combat/?]] N#?target/they V#be/prs/?target V#defeat/pst/?target
+N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/?]] [[S|combat/?]] [[S|combat/?]] @CAP@N#?target/they V#be/prs/?target defeated
 
 {at(Now,outcome(option(Opt),o(success,tie)))}
 N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/winning]] [[S|combat/losing]] [[S|combat/winning]] [[S|combat/winning]] Finally N#?aggressor/they and N#?target/they V#withdraw/prs/_plural from combat, exhausted.
@@ -19,7 +19,7 @@ N#?aggressor/they V#attack/prs/?aggressor N#?target/them
 
 :combat/losing
 N#?target/they V#fight/prs/?target back
-N#?target/they V#attack/prs/?aggressor N#?aggressor/them
+N#?target/they V#attack/prs/?target N#?aggressor/them
 
 %:combat/neutral
 %[[aspects/?aggressor/active]]

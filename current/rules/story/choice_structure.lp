@@ -24,19 +24,75 @@ error(m("Unaddressed important potential", N)) :-
   0 = {
     at(N, option(X)) : at(N, relevant_to(option(X), potential(PTyp, Something)))
   },
+  2 >= { at(N, option(X)) },
+  node_type(N, choice),
   story_op(N, build_options).
 
+% motivation
+at(N, motivated(X)) :-
+  at(N, consequence_of(X, Outcome, _not, Problem)),
+  at(N, potential(PTyp, Problem)),
+  at(N, initiator(X, Initiator)),
+  at(N, problematic_for(potential(PTyp, Problem), Initiator)),
+  story_op(N, build_options).
+
+at(N, motivated(X)) :-
+  at(N, expectation(X, enables, Goal)),
+  at(N, initiator(X, Initiator)),
+  st(N, state(party_member, Initiator)),
+  story_op(N, build_options).
+
+at(N, motivated(X)) :-
+  at(N, consequence_of(X, Outcome, _not, Opportunity)),
+  at(N, potential(opportunity, Opportunity)),
+  at(N, initiator(X, Initiator)),
+  not at(N, initiated_by(potential(opportunity, Opportunity), Initiator)),
+  story_op(N, build_options).
+
+at(N, motivated(X)) :-
+  at(N, action(X, travel_onwards)),
+  story_op(N, build_options).
+
+at(N, motivated(X)) :-
+  at(N, action(X, reach_destination)),
+  story_op(N, build_options).
+
+error(m("Unmotivated action", N, option(X))) :-
+  at(N, option(X)),
+  not at(N, motivated(option(X))).
+
 % redundancy
-error(m("Redundant option", N, option(X))) :-
+error(m("Redundant option", N, X)) :-
   node_type(N, choice),
   at(N, action(X, Action)),
   at(N, action(Y, Action)),
-  0 = {
-    at(N, arg(X, Arg, Val)) :
-      at(N, arg(X, Arg, Val)),
-      not at(N, arg(Y, Arg, Val))
-  },
+  at(N, relevant_to(X, P1)),
+  at(N, relevant_to(Y, P1)),
   X < Y,
+  story_op(N, build_options).
+
+error(m("Redundant option", N, X)) :-
+  at(N, action(X, travel_onwards)),
+  at(N, action(Y, travel_onwards)),
+  X < Y,
+  story_op(N, build_options).
+
+error(m("Redundant option", N, X)) :-
+  at(N, action(X, reach_destination)),
+  at(N, action(Y, reach_destination)),
+  X < Y,
+  story_op(N, build_options).
+
+% boredom
+error(m("Boring action", N, X)) :-
+  at(Prev, action(X, Action)),
+  successor(Prev, POpt, N),
+  at(N, action(X, Action)),
+  0 = {
+    at(N, outcome(X, Outcome))
+      : at(N, outcome(X, Outcome)),
+        not at(Prev, outcome(POpt, Outcome))
+  }
   story_op(N, build_options).
 
 % your party as the active agent:
@@ -64,7 +120,9 @@ error(m("Trick option", N, X)) :-
   default_intent(Action, Outcome),
   at(N, skill_link(Skill, required, NeedsTool, Action, Arg, Outcome)),
   not st(N, property(has_skill, PartyMember, Skill)),
-  st(N, property(has_skill, OtherMember, Skill)).
+  st(N, property(has_skill, OtherMember, Skill)),
+  not st(N, state(injured, OtherMember)),
+  not st(N, state(dead, OtherMember)).
 
 error(m("Trick option", N, X)) :-
   at(N, action(X, Action)),
@@ -74,7 +132,9 @@ error(m("Trick option", N, X)) :-
   default_intent(Action, Outcome),
   at(N, skill_link(Skill, promotes, NeedsTool, Action, Arg, Outcome)),
   not st(N, property(has_skill, PartyMember, Skill)),
-  st(N, property(has_skill, OtherMember, Skill)).
+  st(N, property(has_skill, OtherMember, Skill)),
+  not st(N, state(injured, OtherMember)),
+  not st(N, state(dead, OtherMember)).
 
 error(m("Trick option", N, X)) :-
   at(N, action(X, Action)),
@@ -129,6 +189,10 @@ error(m("Not enough choices", A, B, C)) :-
   not node_type(B, choice),
   not node_type(C, choice),
   not resolves_vignette(B, BOpt),
+  not at(B, action(BOpt, travel_onwards)),
+  0 = {
+    at(C, action(AnyOpt, travel_onwards))
+  },
   story_op(C, build_options).
 
 % events shouldn't re-hash the choice you just made or a prevoius event

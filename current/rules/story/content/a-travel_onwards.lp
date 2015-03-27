@@ -5,6 +5,7 @@ action(travel_onwards).
 
 argument(travel_onwards, subject, actor).
 initiator(travel_onwards, subject).
+injured_can_initiate(travel_onwards).
 
 % outcomes
 
@@ -49,6 +50,10 @@ error(m("Left a non-hidden problem behind.", N, Prb)) :-
   at(N, action(X, travel_onwards)),
   removed_by(N, X, potential(problem, Prb)),
   not at(N, hidden(potential(problem, Prb))),
+  1 <= {
+    st(N, state(party_member, Member))
+      : at(N, problematic_for(potential(problem, Prb), Member))
+  },
   story_op(N, build_options).
 
 at(N, consequence_of(X, o(onwards, onwards), _not, Pot)) :-

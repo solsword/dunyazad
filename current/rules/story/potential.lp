@@ -21,6 +21,41 @@ at(N, potential(PTyp, relation(PRel, I1, I2))) :-
   st(N, relation(PRel, I1, I2)),
   story_op(N, build_options).
 
+% certain parties are the initiators of and/or are troubled by different
+% potentials.
+
+at(N, initiated_by(potential(PTyp, state(PState, Inst)), Inst)) :-
+  at(N, potential(PTyp, state(PState, Inst))),
+  initiated_by(PTyp, state, PState, inst).
+
+at(N, initiated_by(potential(PTyp, property(PProp, Inst, PVal)), Inst)) :-
+  at(N, potential(PTyp, property(PProp, Inst, PVal))),
+  initiated_by(PTyp, property, PProp, PVal, inst).
+
+at(N, initiated_by(potential(PTyp, relation(PRel, From, To)), From)) :-
+  at(N, potential(PTyp, relation(PRel, From, To))),
+  initiated_by(PTyp, relation, PRel, from).
+
+at(N, initiated_by(potential(PTyp, relation(PRel, From, To)), To)) :-
+  at(N, potential(PTyp, relation(PRel, From, To))),
+  initiated_by(PTyp, relation, PRel, to).
+
+at(N, problematic_for(potential(PTyp, state(PState, Inst)), Inst)) :-
+  at(N, potential(PTyp, state(PState, Inst))),
+  problematic_for(PTyp, state, PState, inst).
+
+at(N, problematic_for(potential(PTyp, property(PProp, Inst, PVal)), Inst)) :-
+  at(N, potential(PTyp, property(PProp, Inst, PVal))),
+  problematic_for(PTyp, property, PProp, PVal, inst).
+
+at(N, problematic_for(potential(PTyp, relation(PRel, From, To)), From)) :-
+  at(N, potential(PTyp, relation(PRel, From, To))),
+  problematic_for(PTyp, relation, PRel, from).
+
+at(N, problematic_for(potential(PTyp, relation(PRel, From, To)), To)) :-
+  at(N, potential(PTyp, relation(PRel, From, To))),
+  problematic_for(PTyp, relation, PRel, to).
+
 % Potentials have categories, including "urgent" and "immediate":
 at(N, category(potential(PTyp, state(PState, Inst)), Category)) :-
   at(N, potential(PTyp, state(PState, Inst))),
