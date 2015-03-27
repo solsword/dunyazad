@@ -29,9 +29,14 @@ error(m("Unaddressed important potential", N)) :-
 % redundancy
 error(m("Redundant option", N, option(X))) :-
   node_type(N, choice),
-  at(N, action(option(X), Act)),
-  at(N, action(option(Y), Act)),
-  X != Y,
+  at(N, action(X, Action)),
+  at(N, action(Y, Action)),
+  0 = {
+    at(N, arg(X, Arg, Val)) :
+      at(N, arg(X, Arg, Val)),
+      not at(N, arg(Y, Arg, Val))
+  },
+  X < Y,
   story_op(N, build_options).
 
 % your party as the active agent:
