@@ -256,12 +256,31 @@ error(m("Recurring potential", Second)) :-
   at(Second, consequence(option(X), Pot)),
   story_op(Second, build_options).
 
+% vignettes shouldn't drag on too long
+error(m("Vignette dragging on...", N, option(X))) :-
+  vignette(N, R),
+  before(R, I1),
+  before(I1, I2),
+  before(I2, I3),
+  before(I3, N), % N is at least the fourth node since R on some path
+  at(N, option(X)),
+  not resolves_vignette(N, option(X)),
+  not at(N, action(option(X), travel_onwards)),
+  story_op(N, build_options).
+
 % vignette structure constraints:
 % -------------------------------
 
 % vignette-level boredom
 error(m("Repeated vignette setup", N, R)) :-
   story_op(N, build_options),
+  setup(N, Boring),
+  successor(Prev, Opt, N),
+  vignette(Prev, R),
+  setup(R, Boring).
+
+error(m("Repeated vignette setup", N, R)) :-
+  story_op(Prev, add_branch_nodes),
   setup(N, Boring),
   successor(Prev, Opt, N),
   vignette(Prev, R),

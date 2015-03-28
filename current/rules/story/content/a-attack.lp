@@ -77,11 +77,71 @@ skill_link(
 ).
 
 % attacking is one way to deal with a threat
+
 at(
   N,
   consequence_of(
     X,
     o(success, victory),
+    _not,
+    relation(threatening, Target, Someone)
+  )
+) :-
+  at(N, action(X, attack)),
+  at(N, arg(X, target, Target)),
+  st(N, relation(threatening, Target, Someone)),
+  story_op(N, build_options).
+
+% no matter the outcome, an attack that winds up injuring a threat resolves the
+% threat
+
+at(
+  N,
+  consequence_of(
+    X,
+    o(aggressor_state, injured),
+    _not,
+    relation(threatening, Aggressor, Someone)
+  )
+) :-
+  at(N, action(X, attack)),
+  at(N, arg(X, aggressor, Aggressor)),
+  st(N, relation(threatening, Aggressor, Someone)),
+  story_op(N, build_options).
+
+at(
+  N,
+  consequence_of(
+    X,
+    o(aggressor_state, killed),
+    _not,
+    relation(threatening, Aggressor, Someone)
+  )
+) :-
+  at(N, action(X, attack)),
+  at(N, arg(X, aggressor, Aggressor)),
+  st(N, relation(threatening, Aggressor, Someone)),
+  story_op(N, build_options).
+
+at(
+  N,
+  consequence_of(
+    X,
+    o(target_state, injured),
+    _not,
+    relation(threatening, Target, Someone)
+  )
+) :-
+  at(N, action(X, attack)),
+  at(N, arg(X, target, Target)),
+  st(N, relation(threatening, Target, Someone)),
+  story_op(N, build_options).
+
+at(
+  N,
+  consequence_of(
+    X,
+    o(target_state, killed),
     _not,
     relation(threatening, Target, Someone)
   )
