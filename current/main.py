@@ -48,6 +48,11 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
       sofar = list(ans.parse_fans_fast(fin.read()))
     print("  ...done.")
   else:
+    scaffolding += (
+      tasks.SEP + "% Story structure constraints start." + tasks.SEP
+    + tasks.fr("structure")
+    + tasks.SEP + "% Story structure constraints end." + tasks.SEP
+    )
     try:
       program, setup = tasks.setup_story([], scaffolding)
       story.extend(setup)
