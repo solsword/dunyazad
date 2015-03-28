@@ -7,4 +7,7 @@ initial mention adjectives
 story viewer
 item ownership & referral
 
-no option to buy medicine chest when party member is injured!
+- General mechanism for action capability to make "trap option" errors less
+  pernicious.
+- General mechanism for getting rid of problems/opportunities under certain
+  circumstances (like when a threatening actor is injured).

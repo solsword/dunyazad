@@ -18,7 +18,12 @@ vignette(N, PrV) :-
 resolves_vignette(N, option(O)) :-
   story_node(N),
   at(N, option(O)),
-  0 = { unresolved_potential(N, option(O), Pt) },
+  0 = {
+    unresolved_potential(N, option(O), Pt)
+      : unresolved_potential(N, option(O), Pt),
+        not at(N, hidden(Pt)),
+        not at(N, category(Pt, persistent))
+  },
   not at(N, action(option(O), travel_onwards)),
   story_op(N, build_options).
 
