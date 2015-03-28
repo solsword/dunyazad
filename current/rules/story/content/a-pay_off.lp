@@ -27,7 +27,7 @@ error(m("Pay off without price.", N, X)) :-
   at(N, action(X, pay_off)),
   at(N, arg(X, asking, Asking)),
   at(N, arg(X, price, Price)),
-  not st(N, relation(has_item, Asking, Price)),
+  not at(N, can_trade(Asking, Price)),
   story_op(N, build_options).
 
 error(m("Price is not a treasure.", N, X)) :-

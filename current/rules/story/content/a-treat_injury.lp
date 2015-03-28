@@ -1,6 +1,8 @@
 % treat_injury
 action(treat_injury).
 
+reflexive(treat_injury).
+injured_can_initiate(treat_injury). % TODO: really this?
 chaotic(treat_injury).
 
 % arguments

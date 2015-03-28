@@ -30,3 +30,15 @@ at(N, has_tool_for(Actor, Skill)) :-
   is_instance(N, Item, Category),
   tool_for(Category, Skill),
   story_op(N, initialize_node).
+
+% communal property and the concept of "can trade"
+
+at(N, can_trade(Person, Thing)) :-
+  st(N, relation(has_item, Person, Thing)),
+  story_op(N, initialize_node).
+
+at(N, can_trade(Person, Thing)) :-
+  st(N, state(party_member, Person)),
+  st(N, state(party_member, OtherMember)),
+  st(N, relation(has_item, OtherMember, Thing)),
+  story_op(N, initialize_node).

@@ -36,6 +36,15 @@ error(m("Exclusive outcome values.", N, X)) :-
 } :-
   at(N, action(X, Action)),
   argument(Action, Arg, Class),
+  Class != action,
+  story_op(N, build_options).
+
+1 = {
+  at(N, arg(X, Arg, ActType)) : action(ActType);
+  error(m("Unbound action argument.", N, Action, Arg, action))
+} :-
+  at(N, action(X, Action)),
+  argument(Action, Arg, action),
   story_op(N, build_options).
 
 % Actual consequences depend on which outcome variables have which values:

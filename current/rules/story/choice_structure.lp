@@ -309,20 +309,22 @@ error(m("Boring vignette setup", N)) :-
 
 % every vignette ends with one of the special actions "travel onwards" or
 % "reach destination:"
-1 = {
-  node_type(N, event);
-  node_type(N, ending);
-  error(m("Vignette resolution has wrong node type.", End, Opt, N))
-} :-
-  resolves_vignette(End, Opt),
-  successor(End, Opt, N),
-  story_op(N, build_options).
+% TODO: This!?!?
 
-at(N, action(option(1), travel_onwards)) :-
-  node_type(N, event),
-  resolves_vignette(End, Opt),
-  successor(End, Opt, N),
-  story_op(N, build_options).
+%1 = {
+%  node_type(N, event);
+%  node_type(N, ending);
+%  error(m("Vignette resolution has wrong node type.", End, Opt, N))
+%} :-
+%  resolves_vignette(End, Opt),
+%  successor(End, Opt, N),
+%  story_op(N, build_options).
+%
+%at(N, action(option(1), travel_onwards)) :-
+%  node_type(N, event),
+%  resolves_vignette(End, Opt),
+%  successor(End, Opt, N),
+%  story_op(N, build_options).
 
 at(N, action(option(1), reach_destination)) :-
   node_type(N, ending),

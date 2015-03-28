@@ -35,26 +35,18 @@ error(m("Unintelligent seller.", N, X, Seller)) :-
   st(N, property(has_skill, Seller, unintelligent)),
   story_op(N, build_options).
 
-can_trade(N, Person, Thing) :-
-  st(N, relation(has_item, Person, Thing)).
-
-can_trade(N, Person, Thing) :-
-  st(N, state(party_member, Person)),
-  st(N, state(party_member, OtherMember)),
-  st(N, relation(has_item, OtherMember, Thing)).
-
 error(m("Buyer can't trade price.", N, X, Buyer, Price)) :-
   at(N, action(X, trade)),
   at(N, arg(X, buyer, Buyer)),
   at(N, arg(X, price, Price)),
-  not can_trade(N, Buyer, Price),
+  not at(N, can_trade(Buyer, Price)),
   story_op(N, build_options).
 
 error(m("Seller can't trade goods.", N, X, Seller, Goods)) :-
   at(N, action(X, trade)),
   at(N, arg(X, seller, Seller)),
   at(N, arg(X, goods, Goods)),
-  not can_trade(N, Seller, Goods),
+  not at(N, can_trade(Seller, Goods)),
   story_op(N, build_options).
 
 at(N, consequence_of(X, o(deal, deal), relation(has_item, Buyer, Goods))) :-
