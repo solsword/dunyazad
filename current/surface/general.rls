@@ -49,3 +49,67 @@ as N#you/they V#crest/prs/you a hill
 as N#you/they V#fight/prs/you N#you/their way through the underbrush
 as N#you/they V#walk/prs/you among a stand of massive trees
 as N#you/they V#pass/prs/you an outcropping of gray stone
+
+:misc/is_skilled/?
+N#?who/they V#be/prs/?who [[misc/skill/?_]]
+
+:misc/skilled
+skilled
+competent
+capable
+
+:misc/skill/tinkering
+good at making things
+good at repairing things
+a [[misc/skilled]] engineer
+
+:misc/skill/fighting
+skilled at fighting
+a [[misc/skilled]] warrior
+a veteran warrior
+
+:misc/skill/wilderness_lore
+knowledgeable about plants and animals
+good at surviving in the wild
+capable of surviving in the wilderness
+
+:misc/skill/music
+a [[misc/skilled]] musician
+[[misc/skilled]] with an instrument
+
+:misc/skill/elocution
+skilled at rhetoric
+a [[misc/skilled]] public speaker
+notoriously persuasive
+
+:misc/skill/healing
+knowledgeable about the healing arts
+a [[misc/skilled]] doctor
+
+:misc/skill/thievery
+a [[misc/skilled]] thief
+% TODO: More here
+
+:misc/skill/literacy
+literate
+able to read and write
+
+:misc/skill/prayer
+devout
+% TODO: More here
+
+:misc/skill/acrobatics
+a [[misc/skilled]] acrobat
+good at running and jumping
+
+:misc/skill/storytelling
+a [[misc/skilled]] storyteller
+good at telling stories
+
+:misc/skill/monstrous
+monstrous
+a monster
+
+:misc/skill/unintelligent
+unintelligent
+not sentient

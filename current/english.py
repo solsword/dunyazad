@@ -179,6 +179,26 @@ STRUCTURE_SCHEMAS = {
       Vr("Node"),
       Pr("arg", Pr("option", Vr("Option")), Vr("Arg"), SbT("Value"))
     ),
+  "relevant_skill":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr("relevant_skill",
+        Pr("option", Vr("Option")),
+        PVr("actor", "inst", Vr("Type"), Vr("Key")),
+        Vr("Skill")
+      )
+    ),
+  "relevant_tool":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr("relevant_tool",
+        Pr("option", Vr("Option")),
+        PVr("actor", "inst", Vr("Type"), Vr("Key")),
+        PVr("item", "inst", Vr("Type"), Vr("Key")),
+      )
+    ),
   "potential_state":
     Pr(
       "at",
@@ -460,6 +480,8 @@ def glean_context_variables(story):
     '_action' - the name of the action
     '_outcome_*' - the values of each outcome variable for the action
     '_initiator' -  the initiator of the action
+    '_relevant_skills' - a mapping from actors to lists of relevant skills
+    '_relevant_tools' - a mapping from actors to lists of relevant tools
     - all action arguments by name
 
   Setups also get their own entries under node/'setup' for nodes that have a
@@ -539,6 +561,38 @@ def glean_context_variables(story):
       else:
         v = vpr.unquoted()
       result[n][o][a] = v
+
+    elif sc == "relevant_skill":
+      n = binding["at.Node"].unquoted()
+      o = binding["at.relevant_skill.option.Option"].unquoted()
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+
+      a = binding["at.relevant_skill.actor.Key"].unquoted()
+      s = binding["at.relevant_skill.Skill"].unquoted()
+      if "_relevant_skills" not in result[n][o]:
+        result[n][o]["_relevant_skills"] = {}
+      if a not in result[n][o]["_relevant_skills"]:
+        result[n][o]["_relevant_skills"][a] = []
+      result[n][o]["_relevant_skills"][a].append(s)
+
+    elif sc == "relevant_tool":
+      n = binding["at.Node"].unquoted()
+      o = binding["at.relevant_tool.option.Option"].unquoted()
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+
+      a = binding["at.relevant_tool.actor.Key"].unquoted()
+      t = binding["at.relevant_tool.item.Key"].unquoted()
+      if "_relevant_tools" not in result[n][o]:
+        result[n][o]["_relevant_tools"] = {}
+      if a not in result[n][o]["_relevant_tools"]:
+        result[n][o]["_relevant_tools"][a] = []
+      result[n][o]["_relevant_tools"][a].append(t)
 
     elif sc == "potential_state":
       n = binding["at.Node"].unquoted()
@@ -1390,6 +1444,7 @@ def build_story_text(story, timeshift=None):
       nts = node_templates[node]
       # If a party member is the initiator of an option at a choice...
       initiator = cvrs[node][option]["_initiator"]
+
       if (
         initiator != "unknown"
        and nouns[initiator].is_party_member
@@ -1400,6 +1455,36 @@ def build_story_text(story, timeshift=None):
             "[[misc/you_ask_for@statement=[[action/?_action/option]]]]"
       else:
         nts["options"][option] = "[[action/?_action/option]]"
+
+      if (
+        "_relevant_skills" in cvrs[node][option]
+      or
+        "_relevant_tools" in cvrs[node][option]
+      ):
+        sklist = []
+        for actor in cvrs[node][option]["_relevant_skills"]:
+          alist = []
+          for skill in cvrs[node][option]["_relevant_skills"][actor]:
+            alist.append(
+              "[[misc/is_skilled/{}@who={}]]".format(skill, actor)
+            )
+          sklist.append(", and ".join(alist))
+        tllist = []
+        for actor in cvrs[node][option]["_relevant_tools"]:
+          tllist.append(
+            "N#{}/they have ".format(actor) + " and ".join(
+              "N#{}/them".format(tool)
+                for tool in cvrs[node][option]["_relevant_tools"][actor],
+            )
+          )
+        nts["options"][option] += " (no skills)"
+        #nts["options"][option] += " ({}{})".format(
+        #  ". ".join(sklist),
+        #  ". ".join(tllist)
+        #)
+      else:
+        nts["options"][option] += " (no skills)"
+
       nts["outcomes"][option] = "[[S|action/?_action/outcome]]"
       # TODO: Filter grammar expansions based on combinations of variable
       # values!

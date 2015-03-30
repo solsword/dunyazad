@@ -167,69 +167,7 @@ N#you/they V#be/prs/you not entirely without resources. @CAP@N#you/they V#manage
 [[special/and_list@list=your_items@tmpl_prefix=nref/them]]
 
 :prologue/your_skills
-[[special/and_list@list=your_skills@tmpl_prefix=prologue/is_skilled@who=you]]
-
-:prologue/is_skilled/?
-N#?who/they V#be/prs/?who [[prologue/skill/?_]]
-
-:prologue/skilled
-skilled
-competent
-capable
-
-:prologue/skill/tinkering
-good at making things
-good at repairing things
-a [[prologue/skilled]] engineer
-
-:prologue/skill/fighting
-skilled at fighting
-a [[prologue/skilled]] warrior
-a veteran warrior
-
-:prologue/skill/wilderness_lore
-knowledgeable about plants and animals
-good at surviving in the wild
-capable of surviving in the wilderness
-
-:prologue/skill/music
-a [[prologue/skilled]] musician
-[[prologue/skilled]] with an instrument
-
-:prologue/skill/elocution
-skilled at rhetoric
-a [[prologue/skilled]] public speaker
-notoriously persuasive
-
-:prologue/skill/healing
-knowledgeable about the healing arts
-a [[prologue/skilled]] doctor
-
-:prologue/skill/thievery
-a [[prologue/skilled]] thief
-% TODO: More here
-
-:prologue/skill/literacy
-literate
-able to read and write
-
-:prologue/skill/prayer
-devout
-% TODO: More here
-
-:prologue/skill/acrobatics
-a [[prologue/skilled]] acrobat
-good at running and jumping
-
-:prologue/skill/storytelling
-a [[prologue/skilled]] storyteller
-good at telling stories
-
-:prologue/skill/monstrous
-ERROR: party member is monstrous!
-
-:prologue/skill/unintelligent
-ERROR: party member is unintelligent!
+[[special/and_list@list=your_skills@tmpl_prefix=misc/is_skilled@who=you]]
 
 :prologue/members/two
 Meanwhile, N#you/their ?member_one_relation N#?member_one_tag/_them V#bring/pst/?member_one_tag [[prologue/member_items/?member_one_tag]]. [[S|prologue/member_skills/?member_one_tag]]
@@ -244,10 +182,10 @@ Meanwhile, N#you/their ?member_one_relation N#?member_one_tag/_them V#bring/pst/
 [[special/and_list@list=member_two_items@tmpl_prefix=nref/them]]
 
 :prologue/member_skills/member_one
-[[special/and_list@list=member_one_skills@tmpl_prefix=prologue/is_skilled@who=member_one]]
+[[special/and_list@list=member_one_skills@tmpl_prefix=misc/is_skilled@who=member_one]]
 
 :prologue/member_skills/member_two
-[[special/and_list@list=member_two_skills@tmpl_prefix=prologue/is_skilled@who=member_two]]
+[[special/and_list@list=member_two_skills@tmpl_prefix=misc/is_skilled@who=member_two]]
 
 >prologue/get_started
 Between the ?n_party_members of you, it should V#be/rinf/you possible to

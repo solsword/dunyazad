@@ -107,7 +107,8 @@ at(N, unlikely_outcome(X, Outcome)) :-
 % 'contest' links using between to name two arguments & compare skill levels:
 at(N, likely_outcome(X, Win)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -117,13 +118,14 @@ at(N, likely_outcome(X, Win)) :-
       either(Win, Lose)
     )
   ),
-  st(N, property(has_skill, One, Skill)),
-  not st(N, property(has_skill, Two, Skill)),
+  st(N, property(has_skill, AOne, Skill)),
+  not st(N, property(has_skill, ATwo, Skill)),
   story_op(N, build_options).
 
 at(N, unlikely_outcome(X, Lose)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -133,13 +135,14 @@ at(N, unlikely_outcome(X, Lose)) :-
       either(Win, Lose)
     )
   ),
-  st(N, property(has_skill, One, Skill)),
-  not st(N, property(has_skill, Two, Skill)),
+  st(N, property(has_skill, AOne, Skill)),
+  not st(N, property(has_skill, ATwo, Skill)),
   story_op(N, build_options).
 
 at(N, likely_outcome(X, Lose)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -149,13 +152,14 @@ at(N, likely_outcome(X, Lose)) :-
       either(Win, Lose)
     )
   ),
-  not st(N, property(has_skill, One, Skill)),
-  st(N, property(has_skill, Two, Skill)),
+  not st(N, property(has_skill, AOne, Skill)),
+  st(N, property(has_skill, ATwo, Skill)),
   story_op(N, build_options).
 
 at(N, unlikely_outcome(X, Win)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -165,13 +169,14 @@ at(N, unlikely_outcome(X, Win)) :-
       either(Win, Lose)
     )
   ),
-  not st(N, property(has_skill, One, Skill)),
-  st(N, property(has_skill, Two, Skill)),
+  not st(N, property(has_skill, AOne, Skill)),
+  st(N, property(has_skill, ATwo, Skill)),
   story_op(N, build_options).
 
 at(N, likely_outcome(X, Win)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -181,15 +186,16 @@ at(N, likely_outcome(X, Win)) :-
       either(Win, Lose)
     )
   ),
-  not st(N, property(has_skill, One, Skill)),
-  not st(N, property(has_skill, Two, Skill)),
-  at(N, has_tool_for(One, Skill)),
-  not at(N, has_tool_for(Two, Skill)),
+  not st(N, property(has_skill, AOne, Skill)),
+  not st(N, property(has_skill, ATwo, Skill)),
+  at(N, has_tool_for(AOne, Skill)),
+  not at(N, has_tool_for(ATwo, Skill)),
   story_op(N, build_options).
 
 at(N, unlikely_outcome(X, Lose)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -199,15 +205,16 @@ at(N, unlikely_outcome(X, Lose)) :-
       either(Win, Lose)
     )
   ),
-  not st(N, property(has_skill, One, Skill)),
-  not st(N, property(has_skill, Two, Skill)),
-  at(N, has_tool_for(One, Skill)),
-  not at(N, has_tool_for(Two, Skill)),
+  not st(N, property(has_skill, AOne, Skill)),
+  not st(N, property(has_skill, ATwo, Skill)),
+  at(N, has_tool_for(AOne, Skill)),
+  not at(N, has_tool_for(ATwo, Skill)),
   story_op(N, build_options).
 
 at(N, unlikely_outcome(X, Win)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -217,15 +224,16 @@ at(N, unlikely_outcome(X, Win)) :-
       either(Win, Lose)
     )
   ),
-  not st(N, property(has_skill, One, Skill)),
-  not st(N, property(has_skill, Two, Skill)),
-  not at(N, has_tool_for(One, Skill)),
-  at(N, has_tool_for(Two, Skill)),
+  not st(N, property(has_skill, AOne, Skill)),
+  not st(N, property(has_skill, ATwo, Skill)),
+  not at(N, has_tool_for(AOne, Skill)),
+  at(N, has_tool_for(ATwo, Skill)),
   story_op(N, build_options).
 
 at(N, likely_outcome(X, Lose)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -235,15 +243,16 @@ at(N, likely_outcome(X, Lose)) :-
       either(Win, Lose)
     )
   ),
-  not st(N, property(has_skill, One, Skill)),
-  not st(N, property(has_skill, Two, Skill)),
-  not at(N, has_tool_for(One, Skill)),
-  at(N, has_tool_for(Two, Skill)),
+  not st(N, property(has_skill, AOne, Skill)),
+  not st(N, property(has_skill, ATwo, Skill)),
+  not at(N, has_tool_for(AOne, Skill)),
+  at(N, has_tool_for(ATwo, Skill)),
   story_op(N, build_options).
 
 at(N, likely_outcome(X, Win)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -253,15 +262,16 @@ at(N, likely_outcome(X, Win)) :-
       either(Win, Lose)
     )
   ),
-  st(N, property(has_skill, One, Skill)),
-  st(N, property(has_skill, Two, Skill)),
-  at(N, has_tool_for(One, Skill)),
-  not at(N, has_tool_for(Two, Skill)),
+  st(N, property(has_skill, AOne, Skill)),
+  st(N, property(has_skill, ATwo, Skill)),
+  at(N, has_tool_for(AOne, Skill)),
+  not at(N, has_tool_for(ATwo, Skill)),
   story_op(N, build_options).
 
 at(N, unlikely_outcome(X, Lose)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -271,15 +281,16 @@ at(N, unlikely_outcome(X, Lose)) :-
       either(Win, Lose)
     )
   ),
-  st(N, property(has_skill, One, Skill)),
-  st(N, property(has_skill, Two, Skill)),
-  at(N, has_tool_for(One, Skill)),
-  not at(N, has_tool_for(Two, Skill)),
+  st(N, property(has_skill, AOne, Skill)),
+  st(N, property(has_skill, ATwo, Skill)),
+  at(N, has_tool_for(AOne, Skill)),
+  not at(N, has_tool_for(ATwo, Skill)),
   story_op(N, build_options).
 
 at(N, unlikely_outcome(X, Win)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -289,15 +300,16 @@ at(N, unlikely_outcome(X, Win)) :-
       either(Win, Lose)
     )
   ),
-  st(N, property(has_skill, One, Skill)),
-  st(N, property(has_skill, Two, Skill)),
-  not at(N, has_tool_for(One, Skill)),
-  at(N, has_tool_for(Two, Skill)),
+  st(N, property(has_skill, AOne, Skill)),
+  st(N, property(has_skill, ATwo, Skill)),
+  not at(N, has_tool_for(AOne, Skill)),
+  at(N, has_tool_for(ATwo, Skill)),
   story_op(N, build_options).
 
 at(N, likely_outcome(X, Lose)) :-
   at(N, action(X, Action)),
-  at(N, arg(X, Arg, Actor)),
+  at(N, arg(X, One, AOne)),
+  at(N, arg(X, Two, ATwo)),
   at(
     N,
     skill_link(
@@ -307,8 +319,93 @@ at(N, likely_outcome(X, Lose)) :-
       either(Win, Lose)
     )
   ),
-  st(N, property(has_skill, One, Skill)),
-  st(N, property(has_skill, Two, Skill)),
-  not at(N, has_tool_for(One, Skill)),
-  at(N, has_tool_for(Two, Skill)),
+  st(N, property(has_skill, AOne, Skill)),
+  st(N, property(has_skill, ATwo, Skill)),
+  not at(N, has_tool_for(AOne, Skill)),
+  at(N, has_tool_for(ATwo, Skill)),
+  story_op(N, build_options).
+
+% Some predicates that make gleaning a list of applicable skills/tools easy:
+
+at(N, relevant_skill(X, Actor, Skill)) :-
+  at(N, action(X, Action)),
+  at(N, skill_link(Skill, Link, NeedsTool, Action, Arg, Outcome)),
+  at(N, arg(X, Arg, Actor)),
+  st(N, property(has_skill, Actor, Skill)),
+  story_op(N, build_options).
+
+at(N, relevant_tool(X, Actor, Item)) :-
+  at(N, action(X, Action)),
+  at(N, skill_link(Skill, LinkType, tool, Action, Arg, Outcome)),
+  at(N, arg(X, Arg, Actor)),
+  st(N, property(has_skill, Actor, Skill)),
+  st(N, relation(has_item, Actor, Item)),
+  is_instance(N, Item, Category),
+  tool_for(Category, Skill),
+  story_op(N, build_options).
+
+at(N, relevant_skill(X, Actor, Skill)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, Tool,
+      Action,
+      between(AArg, Other),
+      either(Win, Lose)
+    )
+  ),
+  st(N, property(has_skill, Actor, Skill)),
+  story_op(N, build_options).
+
+at(N, relevant_skill(X, Actor, Skill)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, Tool,
+      Action,
+      between(Other, AArg),
+      either(Win, Lose)
+    )
+  ),
+  st(N, property(has_skill, Actor, Skill)),
+  story_op(N, build_options).
+
+at(N, relevant_tool(X, Actor, Item)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, tool,
+      Action,
+      between(AArg, Other),
+      either(Win, Lose)
+    )
+  ),
+  st(N, property(has_skill, Actor, Skill)),
+  st(N, relation(has_item, Actor, Item)),
+  is_instance(N, Item, Category),
+  tool_for(Category, Skill),
+  story_op(N, build_options).
+
+at(N, relevant_tool(X, Actor, Item)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, tool,
+      Action,
+      between(Other, AArg),
+      either(Win, Lose)
+    )
+  ),
+  st(N, property(has_skill, Actor, Skill)),
+  st(N, relation(has_item, Actor, Item)),
+  is_instance(N, Item, Category),
+  tool_for(Category, Skill),
   story_op(N, build_options).
