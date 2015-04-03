@@ -186,6 +186,18 @@ STRUCTURE_SCHEMAS = {
       Pr("relevant_skill",
         Pr("option", Vr("Option")),
         PVr("actor", "inst", Vr("Type"), Vr("Key")),
+        Pr("has"),
+        Vr("Skill")
+      )
+    ),
+  "relevant_skill_missing":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr("relevant_skill",
+        Pr("option", Vr("Option")),
+        PVr("actor", "inst", Vr("Type"), Vr("Key")),
+        Pr("missing"),
         Vr("Skill")
       )
     ),
@@ -196,7 +208,19 @@ STRUCTURE_SCHEMAS = {
       Pr("relevant_tool",
         Pr("option", Vr("Option")),
         PVr("actor", "inst", Vr("Type"), Vr("Key")),
+        Pr("has"),
         PVr("item", "inst", Vr("Type"), Vr("Key")),
+      )
+    ),
+  "relevant_tool_missing":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr("relevant_tool",
+        Pr("option", Vr("Option")),
+        PVr("actor", "inst", Vr("Type"), Vr("Key")),
+        Pr("missing"),
+        Vr("Skill")
       )
     ),
   "potential_state":
@@ -575,8 +599,24 @@ def glean_context_variables(story):
       if "_relevant_skills" not in result[n][o]:
         result[n][o]["_relevant_skills"] = {}
       if a not in result[n][o]["_relevant_skills"]:
-        result[n][o]["_relevant_skills"][a] = []
-      result[n][o]["_relevant_skills"][a].append(s)
+        result[n][o]["_relevant_skills"][a] = ([], [])
+      result[n][o]["_relevant_skills"][a][0].append(s)
+
+    elif sc == "relevant_skill_missing":
+      n = binding["at.Node"].unquoted()
+      o = binding["at.relevant_skill.option.Option"].unquoted()
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+
+      a = binding["at.relevant_skill.actor.Key"].unquoted()
+      s = binding["at.relevant_skill.Skill"].unquoted()
+      if "_relevant_skills" not in result[n][o]:
+        result[n][o]["_relevant_skills"] = {}
+      if a not in result[n][o]["_relevant_skills"]:
+        result[n][o]["_relevant_skills"][a] = ([], [])
+      result[n][o]["_relevant_skills"][a][1].append(s)
 
     elif sc == "relevant_tool":
       n = binding["at.Node"].unquoted()
@@ -591,8 +631,24 @@ def glean_context_variables(story):
       if "_relevant_tools" not in result[n][o]:
         result[n][o]["_relevant_tools"] = {}
       if a not in result[n][o]["_relevant_tools"]:
-        result[n][o]["_relevant_tools"][a] = []
-      result[n][o]["_relevant_tools"][a].append(t)
+        result[n][o]["_relevant_tools"][a] = ([], [])
+      result[n][o]["_relevant_tools"][a][0].append(t)
+
+    elif sc == "relevant_tool_missing":
+      n = binding["at.Node"].unquoted()
+      o = binding["at.relevant_tool.option.Option"].unquoted()
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+
+      a = binding["at.relevant_tool.actor.Key"].unquoted()
+      s = binding["at.relevant_tool.Skill"].unquoted()
+      if "_relevant_tools" not in result[n][o]:
+        result[n][o]["_relevant_tools"] = {}
+      if a not in result[n][o]["_relevant_tools"]:
+        result[n][o]["_relevant_tools"][a] = ([], [])
+      result[n][o]["_relevant_tools"][a][1].append(s)
 
     elif sc == "potential_state":
       n = binding["at.Node"].unquoted()
@@ -722,7 +778,7 @@ def enhance_vars(vs, nouns):
   variables.
   """
   for key in [k for k in vs.keys() if not k.startswith("_type_of_")]:
-    if vs[key] in nouns:
+    if type(vs[key]) == str and vs[key] in nouns:
       n = nouns[vs[key]]
       vs["_type_of_" + key] = n.cls
 
@@ -851,8 +907,12 @@ def subst_vars(text, vs):
       if var in vs:
         if type(vs[var]) == list:
           add = ' '.join(vs[var])
-        else:
+        elif type(vs[var]) == str:
           add = vs[var]
+        elif isinstance(vs[var], ans.Predicate):
+          add = str(vs[var])
+        else:
+          add = "ERROR: variable '{}' has weird type {}".format(var, type(var))
       else:
         add = "ERROR: unknown variable '{}'".format(var)
     result += add
@@ -1134,8 +1194,15 @@ def build_text(
   template = run_grammar(template, rules, cvars, story)
   # Next, fill in any tags:
   result = template
+  prev_result = ""
   while ANYTAG.search(result):
+    if result == prev_result:
+      print("ERROR: nothing changed despite presence of a tag.")
+      print("Stuck at:")
+      print(result)
+      exit(1)
     bits = re.split(ANYTAG, result)
+    prev_result = result
     result = ""
     for b in bits:
       add = b
@@ -1442,8 +1509,9 @@ def build_story_text(story, timeshift=None):
     options = [o for o in cvrs[node] if o != "setup" and o != "potentials"]
     for option in options:
       nts = node_templates[node]
+      ovrs = cvrs[node][option]
       # If a party member is the initiator of an option at a choice...
-      initiator = cvrs[node][option]["_initiator"]
+      initiator = ovrs["_initiator"]
 
       if (
         initiator != "unknown"
@@ -1456,32 +1524,46 @@ def build_story_text(story, timeshift=None):
       else:
         nts["options"][option] = "[[action/?_action/option]]"
 
-      if (
-        "_relevant_skills" in cvrs[node][option]
-      or
-        "_relevant_tools" in cvrs[node][option]
-      ):
-        sklist = []
-        for actor in cvrs[node][option]["_relevant_skills"]:
+      rlist = []
+      if "_relevant_skills" in ovrs:
+        rsks = ovrs["_relevant_skills"]
+        for actor in rsks:
           alist = []
-          for skill in cvrs[node][option]["_relevant_skills"][actor]:
+          for skill in rsks[actor][0]:
             alist.append(
               "[[misc/is_skilled/{}@who={}]]".format(skill, actor)
             )
-          sklist.append(", and ".join(alist))
-        tllist = []
-        for actor in cvrs[node][option]["_relevant_tools"]:
-          tllist.append(
-            "N#{}/they have ".format(actor) + " and ".join(
-              "N#{}/them".format(tool)
-                for tool in cvrs[node][option]["_relevant_tools"][actor],
+          for skill in rsks[actor][1]:
+            alist.append(
+              "[[misc/is_unskilled/{}@who={}]]".format(skill, actor)
             )
-          )
-        nts["options"][option] += " (no skills)"
-        #nts["options"][option] += " ({}{})".format(
-        #  ". ".join(sklist),
-        #  ". ".join(tllist)
-        #)
+          rlist.append(", and ".join(alist))
+
+      if "_relevant_tools" in ovrs:
+        rtls = ovrs["_relevant_tools"]
+        for actor in rtls:
+          relevant = ""
+          if rtls[actor][0]:
+            relevant += "N#{}/they V#have/prs/{} ".format(
+              actor,
+              actor
+            ) + ", and ".join(
+              "N#{}/them".format(tool) for tool in rtls[actor][0],
+            )
+            if rtls[actor][1]:
+              relevant += " but "
+          if rtls[actor][1]:
+            relevant += "N#{}/they V#have/prs/{} no ".format(
+              actor,
+              actor
+            ) + ", nor any ".join(
+              "tool for {}".format(skill) for skill in rtls[actor][1],
+            )
+
+      if rlist:
+        nts["options"][option] += " (@CAP@{})".format(
+          ". @CAP@".join(rlist)
+        )
       else:
         nts["options"][option] += " (no skills)"
 
@@ -1531,6 +1613,7 @@ def build_story_text(story, timeshift=None):
   results = [intro_text]
   while olist:
     target, pnslots, introduced = olist.pop(0)
+    print("Building text for node '{}'".format(target))
     # build node text:
     txt, outgoing = build_node_text(
       node_templates[target],

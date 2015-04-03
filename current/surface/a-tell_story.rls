@@ -3,6 +3,9 @@
 :action/tell_story/option
 N#?teller/they V#tell/prs/?teller N#?audience/them a story
 
+:action/tell_story/infinitive
+V#tell/inf/?subject a story
+
 :action/tell_story/outcome
 {at(Now,outcome(option(Opt),o(quality,entertaining)))}
 N#?audience/they V#listen/prs/?audience closely, V#laugh/prp/?audience and V#gasp/prp/?audience as the story unfolds

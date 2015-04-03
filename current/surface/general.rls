@@ -50,66 +50,142 @@ as N#you/they V#fight/prs/you N#you/their way through the underbrush
 as N#you/they V#walk/prs/you among a stand of massive trees
 as N#you/they V#pass/prs/you an outcropping of gray stone
 
+:misc/is_unskilled/?
+N#?who/they V#be/prs/?who [[misc/unskilled/?_]]
+
 :misc/is_skilled/?
-N#?who/they V#be/prs/?who [[misc/skill/?_]]
+N#?who/they V#be/prs/?who [[misc/skilled/?_]]
 
 :misc/skilled
 skilled
 competent
 capable
+great
+good
 
-:misc/skill/tinkering
-good at making things
-good at repairing things
+:misc/unskilled
+unskilled
+incompetent
+awful
+
+:misc/good_at
+good at
+great at
+
+:misc/bad_at
+bad at
+awful at
+terrible at
+incapable of
+
+:misc/skilled/tinkering
+[[misc/good_at]] making things
+[[misc/good_at]] repairing things
 a [[misc/skilled]] engineer
 
-:misc/skill/fighting
+:misc/unskilled/tinkering
+[[misc/bad_at]] making things
+an [[misc/unskilled]] engineer
+
+:misc/skilled/fighting
 skilled at fighting
+[[misc/good_at]] fighting
 a [[misc/skilled]] warrior
 a veteran warrior
 
-:misc/skill/wilderness_lore
+:misc/unskilled/fighting
+[[misc/bad_at]] fighting
+a [[misc/unskilled]] warrior
+a completely inexperienced warrior
+
+:misc/skilled/wilderness_lore
 knowledgeable about plants and animals
-good at surviving in the wild
+[[misc/good_at]] surviving in the wild
 capable of surviving in the wilderness
 
-:misc/skill/music
+:misc/unskilled/wilderness_lore
+ignorant about plants and animals
+[[misc/bad_at]] surviving in the wild
+incapable of surviving in the wilderness
+
+:misc/skilled/music
 a [[misc/skilled]] musician
 [[misc/skilled]] with an instrument
 
-:misc/skill/elocution
+:misc/unskilled/music
+an [[misc/unskilled]] musician
+[[misc/unskilled]] with an instrument
+
+:misc/skilled/elocution
 skilled at rhetoric
 a [[misc/skilled]] public speaker
 notoriously persuasive
 
-:misc/skill/healing
+:misc/unskilled/elocution
+prone to gaffes
+an [[misc/unskilled]] public speaker
+
+:misc/skilled/healing
 knowledgeable about the healing arts
 a [[misc/skilled]] doctor
 
-:misc/skill/thievery
-a [[misc/skilled]] thief
-% TODO: More here
+:misc/unskilled/healing
+ignorant of the healing arts
+an [[misc/unskilled]] doctor
 
-:misc/skill/literacy
+:misc/skilled/thievery
+[[misc/good_at]] stealing things
+a [[misc/skilled]] thief
+
+:misc/unskilled/thievery
+[[misc/bad_at]] stealing things
+an [[misc/unskilled]] thief
+
+:misc/skilled/literacy
 literate
 able to read and write
 
-:misc/skill/prayer
+:misc/unskilled/literacy
+illiterate
+unable to read or write
+
+:misc/skilled/prayer
 devout
+spiritual
 % TODO: More here
 
-:misc/skill/acrobatics
+:misc/unskilled/prayer
+unskilled at prayer
+% TODO: More here
+
+:misc/skilled/acrobatics
 a [[misc/skilled]] acrobat
-good at running and jumping
+[[misc/good_at]] running and jumping
 
-:misc/skill/storytelling
+:misc/unskilled/acrobatics
+an [[misc/unskilled]] acrobat
+[[misc/bad_at]] running and jumping
+
+:misc/skilled/storytelling
 a [[misc/skilled]] storyteller
-good at telling stories
+[[misc/good_at]] telling stories
 
-:misc/skill/monstrous
+:misc/unskilled/storytelling
+an [[misc/unskilled]] storyteller
+[[misc/bad_at]] telling stories
+
+:misc/skilled/monstrous
 monstrous
 a monster
 
-:misc/skill/unintelligent
+:misc/unskilled/monstrous
+not monstrous
+not a monster
+
+:misc/skilled/unintelligent
 unintelligent
 not sentient
+
+:misc/unskilled/unintelligent
+intelligent
+sentient

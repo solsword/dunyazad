@@ -327,14 +327,21 @@ at(N, likely_outcome(X, Lose)) :-
 
 % Some predicates that make gleaning a list of applicable skills/tools easy:
 
-at(N, relevant_skill(X, Actor, Skill)) :-
+at(N, relevant_skill(X, Actor, has, Skill)) :-
   at(N, action(X, Action)),
   at(N, skill_link(Skill, Link, NeedsTool, Action, Arg, Outcome)),
   at(N, arg(X, Arg, Actor)),
   st(N, property(has_skill, Actor, Skill)),
   story_op(N, build_options).
 
-at(N, relevant_tool(X, Actor, Item)) :-
+at(N, relevant_skill(X, Actor, missing, Skill)) :-
+  at(N, action(X, Action)),
+  at(N, skill_link(Skill, Link, NeedsTool, Action, Arg, Outcome)),
+  at(N, arg(X, Arg, Actor)),
+  not st(N, property(has_skill, Actor, Skill)),
+  story_op(N, build_options).
+
+at(N, relevant_tool(X, Actor, has, Item)) :-
   at(N, action(X, Action)),
   at(N, skill_link(Skill, LinkType, tool, Action, Arg, Outcome)),
   at(N, arg(X, Arg, Actor)),
@@ -344,7 +351,15 @@ at(N, relevant_tool(X, Actor, Item)) :-
   tool_for(Category, Skill),
   story_op(N, build_options).
 
-at(N, relevant_skill(X, Actor, Skill)) :-
+at(N, relevant_tool(X, Actor, missing, Skill)) :-
+  at(N, action(X, Action)),
+  at(N, skill_link(Skill, LinkType, tool, Action, Arg, Outcome)),
+  at(N, arg(X, Arg, Actor)),
+  st(N, property(has_skill, Actor, Skill)),
+  not at(N, has_tool_for(Actor, Skill)),
+  story_op(N, build_options).
+
+at(N, relevant_skill(X, Actor, has, Skill)) :-
   at(N, action(X, Action)),
   at(N, arg(X, AArg, Actor)),
   at(
@@ -359,7 +374,22 @@ at(N, relevant_skill(X, Actor, Skill)) :-
   st(N, property(has_skill, Actor, Skill)),
   story_op(N, build_options).
 
-at(N, relevant_skill(X, Actor, Skill)) :-
+at(N, relevant_skill(X, Actor, missing, Skill)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, Tool,
+      Action,
+      between(AArg, Other),
+      either(Win, Lose)
+    )
+  ),
+  not st(N, property(has_skill, Actor, Skill)),
+  story_op(N, build_options).
+
+at(N, relevant_skill(X, Actor, has, Skill)) :-
   at(N, action(X, Action)),
   at(N, arg(X, AArg, Actor)),
   at(
@@ -374,7 +404,22 @@ at(N, relevant_skill(X, Actor, Skill)) :-
   st(N, property(has_skill, Actor, Skill)),
   story_op(N, build_options).
 
-at(N, relevant_tool(X, Actor, Item)) :-
+at(N, relevant_skill(X, Actor, missing, Skill)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, Tool,
+      Action,
+      between(Other, AArg),
+      either(Win, Lose)
+    )
+  ),
+  not st(N, property(has_skill, Actor, Skill)),
+  story_op(N, build_options).
+
+at(N, relevant_tool(X, Actor, has, Item)) :-
   at(N, action(X, Action)),
   at(N, arg(X, AArg, Actor)),
   at(
@@ -392,7 +437,23 @@ at(N, relevant_tool(X, Actor, Item)) :-
   tool_for(Category, Skill),
   story_op(N, build_options).
 
-at(N, relevant_tool(X, Actor, Item)) :-
+at(N, relevant_tool(X, Actor, missing, Skill)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, tool,
+      Action,
+      between(AArg, Other),
+      either(Win, Lose)
+    )
+  ),
+  st(N, property(has_skill, Actor, Skill)),
+  not at(N, has_tool_for(Actor, Skill)),
+  story_op(N, build_options).
+
+at(N, relevant_tool(X, Actor, has, Item)) :-
   at(N, action(X, Action)),
   at(N, arg(X, AArg, Actor)),
   at(
@@ -408,4 +469,20 @@ at(N, relevant_tool(X, Actor, Item)) :-
   st(N, relation(has_item, Actor, Item)),
   is_instance(N, Item, Category),
   tool_for(Category, Skill),
+  story_op(N, build_options).
+
+at(N, relevant_tool(X, Actor, missing, Skill)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, tool,
+      Action,
+      between(Other, AArg),
+      either(Win, Lose)
+    )
+  ),
+  st(N, property(has_skill, Actor, Skill)),
+  not at(N, has_tool_for(Actor, Skill)),
   story_op(N, build_options).

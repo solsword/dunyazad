@@ -1,0 +1,58 @@
+% Setup - healer
+
+:setup/healer/intro
+[[misc/as_you]], N#you/they V#come/prs/you across a house [[setup/healer/doctor_sign]]. @CAP@N#?doctor/they V#step/prs/?doctor out, V#look/prs/?doctor over N#you/their ragged [[setup/healer/group]], and V#say/prs/?doctor “[[S|setup/healer/quote]]”
+
+:setup/healer/doctor_sign
+[[setup/healer/with_sign]] the sign of [[setup/healer/a_doctor]]
+
+:setup/healer/with_sign
+with
+under
+that V#bear/prs/_singular
+V#mark/pst/_singular by
+
+:setup/healer/a_doctor
+an apothecary
+a doctor
+a healer
+
+:setup/healer/group
+band
+group
+party
+
+:setup/healer/quote
+[[S|setup/healer/quote/you_need_help]] [[S|setup/healer/quote/offer_service]]
+
+:setup/healer/quote/you_need_help
+[[setup/healer/quote/you_could_use_help]]
+[[setup/healer/quote/you_look_like]] [[setup/healer/quote/you_could_use_help]]
+
+:setup/healer/quote/you_could_use_help
+you could use some help
+you need some help
+you're injured
+you've seen better days
+you've seen some trouble
+you've met some trouble
+you've had some trouble
+you've seen some problems
+you've had some problems
+you could use my help
+you could use a doctor
+you could use a healer
+
+:setup/healer/quote/you_look_like
+you look like
+you look as if
+you seem like
+you seem as if
+
+:setup/healer/quote/offer_service
+if you've got something to offer me, I'll treat your wounds
+I'll treat your wounds for a fair price
+I could fix you up, but I need to make a living. Do you have anything to trade?
+I could fix you up, but I've got to make a living. Do you have something to pay with?
+
+% TODO: Better here

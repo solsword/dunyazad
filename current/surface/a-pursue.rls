@@ -3,6 +3,9 @@
 :action/pursue/option
 N#?subject/they V#attempt/prs/?subject V#pursue/inf/?subject N#?object/them
 
+:action/pursue/infinitive
+V#pursue/inf/?subject
+
 :action/pursue/outcome
 {at(Now,outcome(option(Opt),o(result,caught_up)))}
 N#?subject/they V#pursue/prs/?subject N#?object/them and V#catch/prs/?subject up

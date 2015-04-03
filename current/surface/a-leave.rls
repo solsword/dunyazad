@@ -3,6 +3,9 @@
 :action/leave/option
 N#?subject/they V#leave/prs/?subject
 
+:action/leave/infinitive
+V#leave/inf/?subject
+
 :action/leave/outcome
 {at(Now,outcome(option(Opt),o(result,gone)))}
 N#?subject/they V#leave/prs/?subject

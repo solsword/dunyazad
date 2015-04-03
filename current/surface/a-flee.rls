@@ -3,6 +3,9 @@
 :action/flee/option
 N#?fearful/they V#try/prs/?fearful V#flee/inf/?fearful from N#?from/them
 
+:action/attack/infinitive
+V#flee/inf/?subject
+
 :action/flee/outcome
 {at(Now,outcome(option(Opt),o(success,escape)))}
 N#?fearful/they V#flee/prs/?fearful from N#?from/them and V#escape/prs/?fearful

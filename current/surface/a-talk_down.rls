@@ -3,6 +3,10 @@
 :action/talk_down/option
 N#?asking/they V#talk/prs/?asking N#?listening/them down
 
+:action/talk_down/infinitive
+V#talk/inf/?subject a threat down
+V#calm/inf/?subject down a threat
+
 :action/talk_down/outcome
 {at(Now,outcome(option(Opt),o(attitude,convinced)))}
 N#?asking/they V#calm/prs/?asking N#?listening/them down and N#?listening/they V#agree/prs/?listening to back off

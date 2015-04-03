@@ -3,6 +3,10 @@
 :action/treat_injury/option
 N#?doctor/they V#attempt/prs/?doctor V#treat/inf/?doctor N#?patient/them
 
+:action/treat_injury/infinitive
+V#heal/inf/?subject injuries
+V#heal/inf/?subject wounds
+
 :action/treat_injury/outcome
 {at(Now,outcome(option(Opt),o(success,healed)))}
 N#?doctor/they V#treat/prs/?doctor N#?patient/them and N#?patient/they V#be/prs/?patient healed

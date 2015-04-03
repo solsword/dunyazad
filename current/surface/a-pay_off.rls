@@ -3,6 +3,10 @@
 :action/pay_off/option
 N#?asking/they V#offer/prs/?asking N#?listening/them N#?price/them
 
+:action/pay_off/infinitive
+V#pay/inf/?subject off a threat
+V#appease/inf/?subject a threat
+
 :action/pay_off/outcome
 {at(Now,outcome(option(Opt),o(deal,deal)))}
 N#?asking/they V#bargain/prs/?asking with N#?listening/them and V#reach/prs/?asking a deal

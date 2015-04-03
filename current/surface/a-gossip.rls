@@ -3,6 +3,9 @@
 :action/gossip/option
 N#?interested/they V#gossip/prs/?interested with N#?knowledgeable/them
 
+:action/gossip/infinitive
+V#gossip/inf/?subject
+
 % TODO: This!!
 :action/gossip/outcome
 {at(Now,outcome(option(Opt),o(utility,useful)))}

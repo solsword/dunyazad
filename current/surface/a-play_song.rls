@@ -3,6 +3,12 @@
 :action/play_song/option
 N#?musician/they V#play/prs/?musician a song for N#?audience/them
 
+:action/play_song/infinitive
+V#play/inf/?subject some music
+V#play/inf/?subject a song
+V#perform/inf/?subject some music
+V#perform/inf/?subject a song
+
 :action/play_song/outcome
 {at(Now,outcome(option(Opt),o(quality,harmonious)))}
 N#?musician/their song V#sound/prs/_singular lovely, and N#?audience/they V#be/prs/?audience enraptured

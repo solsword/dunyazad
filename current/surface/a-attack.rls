@@ -3,6 +3,9 @@
 :action/attack/option
 N#?aggressor/they V#attack/prs/?aggressor N#?target/them
 
+:action/attack/infinitive
+V#attack/inf/?subject opponents
+
 :action/attack/outcome
 {at(Now,outcome(option(Opt),o(success,victory)))}
 N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/?]] [[S|combat/?]] [[S|combat/?]] @CAP@N#?target/they V#be/prs/?target defeated

@@ -1,7 +1,10 @@
 % Action - pacify
 
 :action/pacify/option
-N#?pacifier/they V#attempt/prs/?pacifier V#pacify/inf/?pacifier N#?aggressive/them with music.
+N#?pacifier/they V#attempt/prs/?pacifier V#pacify/inf/?pacifier N#?aggressive/them with music
+
+:action/pacify/infinitive
+V#pacify/inf/?subject a beast
 
 :action/pacify/outcome
 {at(Now,outcome(option(Opt),o(mood,relaxed)))}
