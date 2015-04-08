@@ -56,7 +56,10 @@ error(m("Left a non-hidden problem behind.", N, Prb)) :-
   },
   story_op(N, build_options).
 
-at(N, consequence_of(X, o(onwards, onwards), _not, Pot)) :-
+at(
+  N,
+  consequence_of(X, o(onwards, onwards), nullifies, potential(PType, Pot))
+) :-
   at(N, action(X, travel_onwards)),
   at(N, potential(PType, Pot)),
   removed_by(N, X, potential(PType, Pot)),

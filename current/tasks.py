@@ -91,6 +91,7 @@ KEEP = {
   "story_node": PVr("story_node", "story_node", Vr("Node")),
   "story_root": PVr("story_root", "story_root", Vr("Node")),
   "node_type": PVr("node_type", "node_type", Vr("Node"), Vr("Type")),
+  "node_status": PVr("node_status", "node_status", Vr("Node"), Vr("Status")),
   "node_status_reached":
     PVr("node_status_reached", "node_status_reached", Vr("Node"), Vr("Status")),
   "successor":
@@ -122,10 +123,8 @@ KEEP = {
       Pr("option", Vr("Opt")),
     ),
 
-  "intro_text":
-    PVr("intro_text", "intro_text", Vr("Node"), Vr("Setup"), Vr("Text")),
-  "potential_text":
-    PVr("potential_text", "potential_text", Vr("Node"), Vr("Text")),
+  "structural_purpose":
+    PVr("structural_purpose", "structural_purpose", Vr("Node"), Vr("Purpose")),
 }
 
 def runfr(story, name, extra = ""):
@@ -167,12 +166,6 @@ def all_nodes(story):
     b = ans.bind(SC["story_node"], pr)
     if b:
       yield b["story_node.Node"]
-
-def all_polished_nodes(story):
-  for pr in story:
-    b = ans.bind(SC["status_polished"], pr)
-    if b:
-      yield b["status_polished.Node"]
 
 def all_endings(story):
   for pr in story:

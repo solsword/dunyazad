@@ -4,7 +4,14 @@
 %#minimize { 1@0, error(Message) : error(Message) }.
 :- error(Message).
 %:- error(m("Story too short", N)).
+%:- error(m("Skipped transition", N)).
+%:- error(m("Transition is too early", N)).
 %:- error(m("Reached destination before end of story", N, X)).
+%:- error(m("Post-travel node without setup.", N, X, Next)).
+%:- error(m("Unmotivated action", N, X)).
+%:- error(m("Redundant option", N, X)).
+%:- error(m("Left a non-hidden problem behind.", N, P)).
+%:- error(m("Party-initiated event", N, X)).
 %:- error(m("Vignette starts with an event!")).
 %:- error(m("Irrelevant option", Node, Option)).
 %:- error(m("Unbound action argument.", Node, Action, Arg, ArgType)).

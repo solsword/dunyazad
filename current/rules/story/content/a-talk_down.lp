@@ -46,8 +46,8 @@ at(
   consequence_of(
     X,
     o(attitude, convinced),
-    _not,
-    relation(threatening, Listening, Victim)
+    solves,
+    potential(problem, relation(threatening, Listening, Victim))
   )
 ) :-
   at(N, action(X, talk_down)),

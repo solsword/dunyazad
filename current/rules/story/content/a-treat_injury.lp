@@ -40,7 +40,15 @@ error(m("Treated uninjured patient.", N, X)) :-
   story_op(N, build_options).
 
 % Treating injuries gets rid of them
-at(N, consequence_of(X, o(success, healed), _not, state(injured, Patient))) :-
+at(
+  N,
+  consequence_of(
+    X,
+    o(success, healed),
+    solves,
+    potential(problem, state(injured, Patient))
+  )
+) :-
   at(N, action(X, treat_injury)),
   at(N, arg(X, doctor, Doctor)),
   at(N, arg(X, patient, Patient)),

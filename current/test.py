@@ -28,6 +28,7 @@ def test(module):
   passed = 0
   failed = 0
   crashed = 0
+  log = "Summary for module '{}':\n".format(module)
   for tc in m._test_cases:
     print('-'*40)
     try:
@@ -49,9 +50,11 @@ def test(module):
 
       if r == o:
         passed += 1
+        log += "  passed: {}\n".format(tc_str)
         print("Test passed! {}".format(tc_str))
       else:
         failed += 1
+        log += "  FAILED: {}\n".format(tc_str)
         print("""\
 Test case FAILED: {} produced:
 {}
@@ -63,13 +66,15 @@ instead of:
           break
     except Exception as e:
       crashed += 1
+      log += "  CRASHED: {}\n".format(str(tc))
       print("Test case {} CRASHED:\n{}".format(tc, e), file=sys.stderr)
       sys.excepthook(e.__class__, e, e.__traceback__)
       if stop_on_failure:
         break
-  print("""
-Stats: {} passed, {} failed, {} crashed.""".format(passed, failed, crashed)
-       )
+  print(
+    "Stats: {} passed, {} failed, {} crashed.".format(passed, failed, crashed)
+  )
+  print(log)
   if failed == 0 and crashed == 0 and passed > 0:
     print ("===all tests passed===")
     return True

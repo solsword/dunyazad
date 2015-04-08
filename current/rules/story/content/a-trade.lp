@@ -64,7 +64,12 @@ at(N, consequence_of(X, o(deal, deal), relation(has_item, Seller, Price))) :-
 % trading is how you buy stuff:
 at(
   N,
-  consequence_of(X, o(deal, deal), _not, relation(selling, Seller, Goods))
+  consequence_of(
+    X,
+    o(deal, deal),
+    takes_advantage_of,
+    potential(opportunity, relation(selling, Seller, Goods))
+  )
 ) :-
   at(N, action(X, trade)),
   at(N, arg(X, seller, Seller)),

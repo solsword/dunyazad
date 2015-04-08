@@ -1,7 +1,8 @@
 % option constraints:
 % -------------------
 
-% relevance: any action which might cause a potential to dissappear is relevant
+% relevance: any action which might cause a potential to dissappear (via any
+% mechanism) is relevant
 at(N, relevant_to(option(X), potential(PTyp, Something))) :-
   at(N, consequence_of(option(X), Outcome, _not, Something)),
   at(N, potential(PTyp, Something)),
@@ -29,30 +30,67 @@ error(m("Unaddressed important potential", N)) :-
   story_op(N, build_options).
 
 % motivation
+
+% Solving your own problems:
 at(N, motivated(X)) :-
-  at(N, consequence_of(X, Outcome, _not, Problem)),
-  at(N, potential(PTyp, Problem)),
+  at(N, consequence_of(X, Outcome, solves, potential(problem, PState))),
+  at(N, potential(problem, PState)),
   at(N, initiator(X, Initiator)),
-  at(N, problematic_for(potential(PTyp, Problem), Initiator)),
+  at(N, problematic_for(potential(PTyp, PState), Initiator)),
   story_op(N, build_options).
 
 at(N, motivated(X)) :-
+  at(N, consequence_of(X, Outcome, nullifies, potential(problem, PState))),
+  at(N, potential(problem, PState)),
+  at(N, initiator(X, Initiator)),
+  at(N, problematic_for(potential(PTyp, PState), Initiator)),
+  story_op(N, build_options).
+
+at(N, motivated(X)) :-
+  at(
+    N,
+    consequence_of(
+      X,
+      Outcome,
+      takes_advantage_of,
+      potential(opportunity,PState)
+    )
+  ),
+  at(N, potential(opportunity, PState)),
+  at(N, initiator(X, Initiator)),
+  at(N, problematic_for(potential(PTyp, PState), Initiator)),
+  story_op(N, build_options).
+
+% Actions that enable a goal other than "succeed at your actions:"
+at(N, motivated(X)) :-
   at(N, expectation(X, enables, Goal)),
+  Goal != as_intended(Initiator),
   at(N, initiator(X, Initiator)),
   st(N, state(party_member, Initiator)),
   story_op(N, build_options).
 
+% Taking advantage of opportunities (except those you're offering):
 at(N, motivated(X)) :-
-  at(N, consequence_of(X, Outcome, _not, Opportunity)),
+  at(
+    N,
+    consequence_of(
+      X,
+      Outcome,
+      takes_advantage_of,
+      potential(opportunity, Opportunity)
+    )
+  ),
   at(N, potential(opportunity, Opportunity)),
   at(N, initiator(X, Initiator)),
   not at(N, initiated_by(potential(opportunity, Opportunity), Initiator)),
   story_op(N, build_options).
 
+% Let's just keep going, shall we?
 at(N, motivated(X)) :-
   at(N, action(X, travel_onwards)),
   story_op(N, build_options).
 
+% We're almost there!
 at(N, motivated(X)) :-
   at(N, action(X, reach_destination)),
   story_op(N, build_options).
@@ -218,7 +256,7 @@ error(m("Event duplicates previous action", N, Prev, Action)) :-
   story_op(N, build_options).
 
 % failing to deal with a potential twice is enough
-error(m("Repeated failure", Three, option(Z))) :-
+error(m("Persistent potential is getting boring", Three, option(Z))) :-
   story_node(One),
   successor(One, option(X), Two),
   successor(Two, option(Y), Three),

@@ -53,8 +53,8 @@ at(N, consequence(X, Consequence)) :-
   at(N, outcome(X, Outcome)),
   story_op(N, build_options).
 
-at(N, consequence(X, _not, Consequence)) :-
-  at(N, consequence_of(X, Outcome, _not, Consequence)),
+at(N, consequence(X, Modifier, Consequence)) :-
+  at(N, consequence_of(X, Outcome, Modifier, Consequence)),
   at(N, outcome(X, Outcome)),
   story_op(N, build_options).
 

@@ -22,14 +22,14 @@ TEST_FILES = [
 NODELIMIT = re.compile(r"nodelimit\(([0-9]+)\)")
 
 def wholetest(sf):
+  nl = 12
   with open(sf) as fin:
     fl = fin.readline()
-    nl = 12
     nlmatch = re.search(NODELIMIT, fl)
     if nlmatch:
       nl = int(nlmatch.group(1))
   try:
-    success = main.main(scaffoldfile = sf, nodelimit = nl)
+    success = main.main(scaffoldfiles = [sf], nodelimit = nl)
     return success
   except:
     return False

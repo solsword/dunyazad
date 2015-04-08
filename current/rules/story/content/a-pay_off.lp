@@ -55,8 +55,8 @@ at(
   consequence_of(
     X,
     o(deal, deal),
-    _not,
-    relation(threatening, Listening, Victim)
+    solves,
+    potential(problem, relation(threatening, Listening, Victim))
   )
 ) :-
   at(N, action(X, pay_off)),

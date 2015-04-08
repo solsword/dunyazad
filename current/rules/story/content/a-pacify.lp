@@ -45,8 +45,8 @@ at(
   consequence_of(
     X,
     o(mood, relaxed),
-    _not,
-    relation(threatening, Aggressive, Someone)
+    solves,
+    potential(problem, relation(threatening, Aggressive, Someone))
   )
 ) :-
   at(N, action(X, pacify)),
@@ -74,8 +74,8 @@ at(
   consequence_of(
     X,
     o(mood, enraged),
-    _not,
-    relation(threatening, Aggressive, Someone)
+    nullifies,
+    potential(problem, relation(threatening, Aggressive, Someone))
   )
 ) :-
   at(N, action(X, pacify)),

@@ -26,7 +26,12 @@ def write_crashfile(e):
     fout.write('% stderr:\n%' + '\n%'.join(e.stderr.split('\n')))
     fout.write(e.program)
 
-def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
+def main(
+  storyfile = None,
+  scaffoldfiles = None,
+  scaffoldfrags = None,
+  nodelimit = 12
+):
   story = []
   sofar = []
   scaffolding = ""
@@ -36,9 +41,22 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
   if not os.path.isdir(os.path.join("out", "snapshots")):
     os.mkdir(os.path.join("out", "snapshots"))
 
-  if scaffoldfile:
-    with open(scaffoldfile, 'r') as fin:
-      scaffolding = fin.read()
+  if scaffoldfiles:
+    for sf in scaffoldfiles:
+      with open(sf, 'r') as fin:
+        scaffolding += (
+          tasks.SEP + "% Scaffold file '{}' start.".format(sf) + tasks.SEP
+        + fin.read()
+        + tasks.SEP + "% Scaffold file '{}' end.".format(sf) + tasks.SEP
+        )
+
+  if scaffoldfrags:
+    for fr in scaffoldfrags:
+      scaffolding += (
+        tasks.SEP + "% Scaffold fragment '{}' start.".format(fr) + tasks.SEP
+      + tasks.fr(fr)
+      + tasks.SEP + "% Scaffold fragment '{}' end.".format(fr) + tasks.SEP
+      )
 
   target = "unknown"
   if storyfile:
@@ -48,11 +66,6 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
       sofar = list(ans.parse_fans_fast(fin.read()))
     print("  ...done.")
   else:
-    scaffolding += (
-      tasks.SEP + "% Story structure constraints start." + tasks.SEP
-    + tasks.fr("structure")
-    + tasks.SEP + "% Story structure constraints end." + tasks.SEP
-    )
     try:
       program, setup = tasks.setup_story([], scaffolding)
       story.extend(setup)
@@ -180,7 +193,8 @@ def main(storyfile = None, scaffoldfile = None, nodelimit = 12):
 if __name__ == "__main__":
   success = False
   storyfile = None
-  scaffolding = None
+  scfiles = []
+  scfrags = []
   nodelimit = 12
 
   if '-s' in sys.argv:
@@ -189,13 +203,17 @@ if __name__ == "__main__":
 
   if '-f' in sys.argv:
     idx = sys.argv.index('-f')
-    scaffolding = sys.argv[idx+1]
+    scfiles.append(sys.argv[idx+1])
+
+  if '-r' in sys.argv:
+    idx = sys.argv.index('-r')
+    scfrags.append(sys.argv[idx+1])
 
   if '-n' in sys.argv:
     idx = sys.argv.index('-n')
     nodelimit = int(sys.argv[idx+1])
 
-  success = main(storyfile, scaffolding, nodelimit)
+  success = main(storyfile, scfiles, scfrags, nodelimit)
 
   if not success:
     exit(1)

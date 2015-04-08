@@ -57,8 +57,8 @@ at(
   consequence_of(
     X,
     o(success, escape),
-    _not,
-    relation(threatening, From, Fearful)
+    solves,
+    potential(problem, relation(threatening, From, Fearful))
   )
 ) :-
   at(N, action(X, flee)),

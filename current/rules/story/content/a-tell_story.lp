@@ -29,7 +29,26 @@ skill_link(
 
 at(
   N,
-  consequence_of(X, o(quality, entertaining), _not, state(bored, Audience))
+  consequence_of(
+    X,
+    o(quality, entertaining),
+    takes_advantage_of,
+    potential(opportunity, state(bored, Audience))
+  )
+) :-
+  at(N, action(X, tell_story)),
+  at(N, arg(X, audience, Audience)),
+  st(N, state(bored, Audience)),
+  story_op(N, build_options).
+
+at(
+  N,
+  consequence_of(
+    X,
+    o(quality, boring),
+    forfeits,
+    potential(opportunity, state(bored, Audience))
+  )
 ) :-
   at(N, action(X, tell_story)),
   at(N, arg(X, audience, Audience)),

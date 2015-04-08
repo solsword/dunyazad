@@ -83,8 +83,8 @@ at(
   consequence_of(
     X,
     o(success, victory),
-    _not,
-    relation(threatening, Target, Someone)
+    solves,
+    potential(problem, relation(threatening, Target, Someone))
   )
 ) :-
   at(N, action(X, attack)),
@@ -100,8 +100,8 @@ at(
   consequence_of(
     X,
     o(aggressor_state, injured),
-    _not,
-    relation(threatening, Aggressor, Someone)
+    solves,
+    potential(problem, relation(threatening, Aggressor, Someone))
   )
 ) :-
   at(N, action(X, attack)),
@@ -114,8 +114,8 @@ at(
   consequence_of(
     X,
     o(aggressor_state, killed),
-    _not,
-    relation(threatening, Aggressor, Someone)
+    solves,
+    potential(problem, relation(threatening, Aggressor, Someone))
   )
 ) :-
   at(N, action(X, attack)),
@@ -128,8 +128,8 @@ at(
   consequence_of(
     X,
     o(target_state, injured),
-    _not,
-    relation(threatening, Target, Someone)
+    solves,
+    potential(problem, relation(threatening, Target, Someone))
   )
 ) :-
   at(N, action(X, attack)),
@@ -142,8 +142,8 @@ at(
   consequence_of(
     X,
     o(target_state, killed),
-    _not,
-    relation(threatening, Target, Someone)
+    solves,
+    potential(problem, relation(threatening, Target, Someone))
   )
 ) :-
   at(N, action(X, attack)),

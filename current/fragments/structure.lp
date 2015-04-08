@@ -36,7 +36,7 @@ error(m("Too many chances to help", N)) :-
   structural_purpose(N, chance_to_help),
   vignette(N, N),
   story_op(N, build_options),
-  3 >= {
+  3 <= {
     before(B, N) : vignette(B, B), structural_purpose(B, chance_to_help)
   }.
 
@@ -58,7 +58,7 @@ error(m("Repeated chance to rest", N)) :-
   vignette_successor(Prev, N),
   structural_purpose(Prev, chance_to_rest).
 
-error(m("Successive chances to help", N)) :-
+error(m("Three successive chances to help", N)) :-
   vignette(N, N),
   story_op(N, build_options),
   structural_purpose(N, chance_to_help),
@@ -66,6 +66,14 @@ error(m("Successive chances to help", N)) :-
   structural_purpose(Prev, chance_to_help),
   vignette_successor(PPrev, Prev),
   structural_purpose(PPrev, chance_to_help).
+
+error(m("Transition is too early", N)) :-
+  vignette(N, N),
+  story_op(N, build_options),
+  3 > {
+    vignette_before(X, N) : structural_purpose(X, chance_to_help)
+  },
+  structural_purpose(N, transition).
 
 error(m("Missed transition timing", N)) :-
   vignette(N, N),
@@ -201,7 +209,14 @@ error(m("No option to solve persistent problem", N)) :-
     at(N, option(X)) : at(N, consequence(option(X), _not, Problem))
   }.
 
-% Chances to rest shouldn't introduce new problems:
+% Chances not to rest shouldn't introduce new problems:
+
+error(m("Chance to rest setup introduced a problem", N)) :-
+  vignette(N, N),
+  story_op(N, build_options),
+  structural_purpose(N, chance_to_rest),
+  at(N, potential(problem, Problem)),
+  spontaneous(st(N, Problem)).
 
 error(m("Chance to rest introduced a problem", N)) :-
   vignette(N, N),

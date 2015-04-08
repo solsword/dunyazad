@@ -25,7 +25,7 @@ error(m("Reached destination before end of story", N, X)) :-
 
 % reach_destination gets rid of all existing potentials:
 
-at(N, consequence_of(X, o(journey, over), _not, Pt)) :-
+at(N, consequence_of(X, o(journey, over), nullifies, potential(Any, Pt))) :-
   at(N, action(X, reach_destination)),
   at(N, potential(Any, Pt)),
   story_op(N, build_options).

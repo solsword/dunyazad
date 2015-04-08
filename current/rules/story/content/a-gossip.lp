@@ -31,9 +31,9 @@ at(
   N,
   consequence_of(
     X,
-    o(utility, OVal),
-    _not,
-    state(knows_gossip, Knowledgeable)
+    o(utility, useful),
+    solves,
+    potential(opportunity, state(knows_gossip, Knowledgeable))
   )
 ) :-
   at(N, action(X, gossip)),
@@ -41,5 +41,21 @@ at(
   at(N, arg(X, knowledgeable, Knowledgeable)),
   st(N, state(knows_gossip, Knowledgeable)),
   story_op(N, build_options).
+
+at(
+  N,
+  consequence_of(
+    X,
+    o(utility, useless),
+    forfeits,
+    potential(opportunity, state(knows_gossip, Knowledgeable))
+  )
+) :-
+  at(N, action(X, gossip)),
+  outcome_val(gossip, utility, OVal),
+  at(N, arg(X, knowledgeable, Knowledgeable)),
+  st(N, state(knows_gossip, Knowledgeable)),
+  story_op(N, build_options).
+
 
 % TODO: More effects!

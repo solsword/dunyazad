@@ -98,14 +98,28 @@ at(N, consequence_of(X, o(deal, deal), relation(has_item, Offering, Item))) :-
   at(N, arg(X, price, Item)),
   story_op(N, build_options).
 
-% the service offer is withdrawn:
+% the service offer is withdrawn either way:
 at(
   N,
   consequence_of(
     X,
     o(deal, deal),
-    _not,
-    property(offering_service, Offering, Service)
+    takes_advantage_of,
+    potential(opportunity, property(offering_service, Offering, Service))
+  )
+) :-
+  at(N, action(X, buy_service)),
+  at(N, arg(X, offering, Offering)),
+  at(N, arg(X, service, Service)),
+  story_op(N, build_options).
+
+at(
+  N,
+  consequence_of(
+    X,
+    o(deal, deal),
+    forfeits,
+    potential(opportunity, property(offering_service, Offering, Service))
   )
 ) :-
   at(N, action(X, buy_service)),
