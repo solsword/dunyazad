@@ -1,8 +1,8 @@
 % avoid threats to
 
 state_hinders(
-  avoid_threats_to(inst(Type, Key)),
-  relation(threatening, inst(ThreatType, ThreatKey), inst(Type, Key))
+  avoid_threats_to(inst(actor, Key)),
+  relation(threatening, inst(ThreatType, ThreatKey), inst(actor, Key))
 ) :-
-  st(N, inst(Type, Key)),
+  st(N, inst(actor, Key)),
   st(N, inst(ThreatType, ThreatKey)).

@@ -46,7 +46,7 @@ at(
   consequence_of(
     X,
     o(attitude, convinced),
-    solves,
+    resolves,
     potential(problem, relation(threatening, Listening, Victim))
   )
 ) :-

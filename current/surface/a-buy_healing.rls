@@ -1,0 +1,23 @@
+% Action - buy_healing
+
+:action/buy_healing/option
+N#?buyer/they V#offer/prs/?buyer N#?doctor/them N#?price/them [[action/treat_injury/infinitive@subject=?patient]]
+
+:action/buy_healing/infinitive
+V#buy/inf/?_plural healing for N#?subject
+
+:action/buy_healing/outcome
+{at(Now,outcome(option(Opt),o(deal,deal)));at(Now,outcome(option(Opt),o(success,healed)))}
+N#?doctor/they V#agree/prs/?doctor V#treat/inf/?doctor N#?patient/them, and N#?patient/they V#be/prs/?patient healed
+
+{at(Now,outcome(option(Opt),o(deal,deal)));at(Now,outcome(option(Opt),o(success,still_injured)))}
+N#?doctor/they V#agree/prs/?doctor V#treat/inf/?doctor N#?patient/them, but despite N#?doctor/their best efforts, N#?patient/they V#be/prs/?patient not healed
+
+{at(Now,outcome(option(Opt),o(deal,deal)));at(Now,outcome(option(Opt),o(success,killed)))}
+N#?doctor/they V#agree/prs/?doctor V#treat/inf/?doctor N#?patient/them, but during treatment N#?patient/they V#succumb/prs/?patient to N#?patient/their wounds
+
+{at(Now,outcome(option(Opt),o(deal,no_deal)))}
+N#?doctor/they V#don't/prs/?doctor accept N#?price/them
+
+% TODO: More here!
+% TODO: Better way of specifying offer strings for actions

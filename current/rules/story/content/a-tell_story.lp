@@ -16,12 +16,6 @@ outcome_val(tell_story, quality, boring).
 % skills
 
 skill_link(
-  elocution, promotes, no_tool,
-  tell_story, teller,
-  o(quality, entertaining)
-).
-
-skill_link(
   storytelling, promotes, no_tool,
   tell_story, teller,
   o(quality, entertaining)
@@ -32,7 +26,7 @@ at(
   consequence_of(
     X,
     o(quality, entertaining),
-    takes_advantage_of,
+    resolves,
     potential(opportunity, state(bored, Audience))
   )
 ) :-
@@ -46,7 +40,7 @@ at(
   consequence_of(
     X,
     o(quality, boring),
-    forfeits,
+    nullifies,
     potential(opportunity, state(bored, Audience))
   )
 ) :-

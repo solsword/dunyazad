@@ -55,7 +55,7 @@ at(
   consequence_of(
     X,
     o(deal, deal),
-    solves,
+    resolves,
     potential(problem, relation(threatening, Listening, Victim))
   )
 ) :-

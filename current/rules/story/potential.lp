@@ -23,21 +23,17 @@ at(N, potential(PTyp, relation(PRel, I1, I2))) :-
 
 % potentials can be made to dissapear in different ways:
 
-resolution_method(problem, solves).
-resolution_method(problem, realizes).
-resolution_method(problem, nullifies).
-
-resolution_method(opportunity, takes_advantage_of).
-resolution_method(opportunity, forfeits).
-resolution_method(problem, nullifies).
+resolution_method(resolves).
+resolution_method(manifests).
+resolution_method(nullifies).
 
 at(N, consequence(Option, _not, PState)) :-
   at(N, consequence(Option, RM, potential(PType, PState))),
-  resolution_method(PType, RM).
+  resolution_method(RM).
 
 at(N, consequence_of(Option, Outcome, _not, PState)) :-
   at(N, consequence_of(Option, Outcome, RM, potential(PType, PState))),
-  resolution_method(PType, RM).
+  resolution_method(RM).
 
 % certain parties are the initiators of and/or are troubled by different
 % potentials.

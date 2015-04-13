@@ -32,7 +32,7 @@ at(
   consequence_of(
     X,
     o(utility, useful),
-    solves,
+    resolves,
     potential(opportunity, state(knows_gossip, Knowledgeable))
   )
 ) :-
@@ -47,7 +47,7 @@ at(
   consequence_of(
     X,
     o(utility, useless),
-    forfeits,
+    nullifies,
     potential(opportunity, state(knows_gossip, Knowledgeable))
   )
 ) :-

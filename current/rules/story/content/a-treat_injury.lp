@@ -45,7 +45,7 @@ at(
   consequence_of(
     X,
     o(success, healed),
-    solves,
+    resolves,
     potential(problem, state(injured, Patient))
   )
 ) :-

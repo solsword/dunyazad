@@ -45,7 +45,7 @@ at(
   consequence_of(
     X,
     o(mood, relaxed),
-    solves,
+    resolves,
     potential(problem, relation(threatening, Aggressive, Someone))
   )
 ) :-

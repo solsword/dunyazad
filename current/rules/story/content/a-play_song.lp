@@ -30,7 +30,7 @@ at(
   consequence_of(
     X,
     o(quality, harmonious),
-    solves,
+    resolves,
     potential(opportunity, state(bored, Audience))
   )
 ):-
@@ -44,7 +44,7 @@ at(
   consequence_of(
     X,
     o(quality, plain),
-    forfeits,
+    nullifies,
     potential(opportunity, state(bored, Audience))
   )
 ):-

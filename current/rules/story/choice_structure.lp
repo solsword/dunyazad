@@ -31,34 +31,19 @@ error(m("Unaddressed important potential", N)) :-
 
 % motivation
 
-% Solving your own problems:
+% Resolving or nullifying your own problems:
 at(N, motivated(X)) :-
-  at(N, consequence_of(X, Outcome, solves, potential(problem, PState))),
+  at(N, consequence_of(X, Outcome, resolves, potential(PType, PState))),
   at(N, potential(problem, PState)),
   at(N, initiator(X, Initiator)),
-  at(N, problematic_for(potential(PTyp, PState), Initiator)),
+  at(N, problematic_for(potential(PType, PState), Initiator)),
   story_op(N, build_options).
 
 at(N, motivated(X)) :-
-  at(N, consequence_of(X, Outcome, nullifies, potential(problem, PState))),
+  at(N, consequence_of(X, Outcome, nullifies, potential(PType, PState))),
   at(N, potential(problem, PState)),
   at(N, initiator(X, Initiator)),
-  at(N, problematic_for(potential(PTyp, PState), Initiator)),
-  story_op(N, build_options).
-
-at(N, motivated(X)) :-
-  at(
-    N,
-    consequence_of(
-      X,
-      Outcome,
-      takes_advantage_of,
-      potential(opportunity,PState)
-    )
-  ),
-  at(N, potential(opportunity, PState)),
-  at(N, initiator(X, Initiator)),
-  at(N, problematic_for(potential(PTyp, PState), Initiator)),
+  at(N, problematic_for(potential(PType, PState), Initiator)),
   story_op(N, build_options).
 
 % Actions that enable a goal other than "succeed at your actions:"
@@ -76,7 +61,7 @@ at(N, motivated(X)) :-
     consequence_of(
       X,
       Outcome,
-      takes_advantage_of,
+      resolves,
       potential(opportunity, Opportunity)
     )
   ),
@@ -84,6 +69,23 @@ at(N, motivated(X)) :-
   at(N, initiator(X, Initiator)),
   not at(N, initiated_by(potential(opportunity, Opportunity), Initiator)),
   story_op(N, build_options).
+
+% Manifesting opportunities that you initiated:
+at(N, motivated(X)) :-
+  at(
+    N,
+    consequence_of(
+      X,
+      Outcome,
+      manifests,
+      potential(PType, PState)
+    )
+  ),
+  at(N, potential(PType, PState)),
+  at(N, initiator(X, Initiator)),
+  at(N, initiated_by(potential(PType, PState), Initiator)),
+  story_op(N, build_options).
+
 
 % Let's just keep going, shall we?
 at(N, motivated(X)) :-

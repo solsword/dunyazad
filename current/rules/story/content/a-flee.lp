@@ -57,7 +57,7 @@ at(
   consequence_of(
     X,
     o(success, escape),
-    solves,
+    resolves,
     potential(problem, relation(threatening, From, Fearful))
   )
 ) :-

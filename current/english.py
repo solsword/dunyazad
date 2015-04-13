@@ -350,9 +350,9 @@ CITIES = [
 ]
 
 SPECIAL_FILTERING_VARIABLES = {
-  "Now": "_node",
-  "Opt": "_option",
-  "Act": "_action",
+  "_Now": "_node",
+  "_Opt": "_option",
+  "_Act": "_action",
 }
 
 def conjugation_table(verb):
@@ -927,6 +927,54 @@ def subst_all_vars(text, vs):
     text = subst_vars(text, vs)
   return text
 
+
+def decontextualized_binding(binding, vs):
+  result = {}
+  for key in binding:
+    val = binding[key].unquoted()
+    dk = '_' + key.split('.')[-1]
+    if (dk in result and result[dk] != binding[key]):
+      return None
+    if dk in SPECIAL_FILTERING_VARIABLES:
+      if vs[SPECIAL_FILTERING_VARIABLES[dk]] != val:
+        return None
+    result[dk] = val
+  return result
+
+def binding_is_consistent(world, binding):
+  return not any(key in binding and world[key] != binding[key] for key in world)
+
+def precondition_possibilities(story, preconditions, vs):
+  possibilities = [{}]
+
+  for pre in preconditions:
+    hits = []
+    nextworlds = []
+
+    # all possible bindings of this schema:
+    for fact in story:
+      b = ans.bind(pre, fact)
+      if b:
+        db = decontextualized_binding(b, vs)
+        if db:
+          hits.append(db)
+
+    # for each hit, extend each possibility that that hit is consistent with:
+    for h in hits:
+      for p in possibilities:
+        if binding_is_consistent(p, h):
+          merged = {}
+          merged.update(p)
+          merged.update(h)
+          nextworlds.append(merged)
+
+    if not nextworlds:
+      return []
+
+    possibilities = nextworlds
+
+  return possibilities
+
 class Substitution:
   def __init__(self, flags='', key='', vs=None):
     self.flags = flags
@@ -950,38 +998,16 @@ class Substitution:
 
       for precond, expand in ps: # for each possible expansion
         prvars = {'_': u}
-        works = True
-
-        for pre in precond: # for each precondition of an expansion
-          # TODO: Enforce variable matching between preconditions...
-          # TODO: Allow negative preconditions
-          hit = False
-
-          for fact in story: # try to find a matching fact:
-            b = ans.bind(pre, fact)
-            if b:
-              fail = False
-
-              for key in b: # scan our keys to produce extra variables:
-                pk = key.split('.')[-1]
-                if pk in SPECIAL_FILTERING_VARIABLES:
-                  if vs[SPECIAL_FILTERING_VARIABLES[pk]] != b[key].unquoted():
-                    fail = True
-                    break
-                prvars['_' + pk] = b[key].unquoted()
-              if fail:
-                continue # this wasn't a match after all
-              hit = True
-              break # done searching for matching facts (found one)
-
-          if not hit:
-            # if we didn't a matching fact, this precondition rules out this
-            # expansion
-            works = False
-            break
-
-        if works: # if this expansion works, add it to our list:
-          all_possibilities.append((expand, prvars))
+        # for each possible binding over preconditions of this expansion:
+        for possibility in precondition_possibilities(
+          story,
+          precond,
+          vs
+        ):
+          ps = {}
+          ps.update(prvars)
+          ps.update(possibility)
+          all_possibilities.append((expand, ps))
 
     # TODO: better/controllable randomness?
     if (len(all_possibilities) == 0):
@@ -1507,6 +1533,7 @@ def build_story_text(story, timeshift=None):
           "[[potential/{}/{}]]".format(p["_stype"], p["_sname"])
         )
     options = [o for o in cvrs[node] if o != "setup" and o != "potentials"]
+    ocount = len(options)
     for option in options:
       nts = node_templates[node]
       ovrs = cvrs[node][option]
@@ -1524,52 +1551,60 @@ def build_story_text(story, timeshift=None):
       else:
         nts["options"][option] = "[[action/?_action/option]]"
 
-      rlist = []
-      if "_relevant_skills" in ovrs:
-        rsks = ovrs["_relevant_skills"]
-        for actor in rsks:
-          alist = []
-          for skill in rsks[actor][0]:
-            alist.append(
-              "[[misc/is_skilled/{}@who={}]]".format(skill, actor)
-            )
-          for skill in rsks[actor][1]:
-            alist.append(
-              "[[misc/is_unskilled/{}@who={}]]".format(skill, actor)
-            )
-          rlist.append(", and ".join(alist))
-
-      if "_relevant_tools" in ovrs:
-        rtls = ovrs["_relevant_tools"]
-        for actor in rtls:
-          relevant = ""
-          if rtls[actor][0]:
-            relevant += "N#{}/they V#have/prs/{} ".format(
-              actor,
-              actor
-            ) + ", and ".join(
-              "N#{}/them".format(tool) for tool in rtls[actor][0],
-            )
-            if rtls[actor][1]:
-              relevant += " but "
-          if rtls[actor][1]:
-            relevant += "N#{}/they V#have/prs/{} no ".format(
-              actor,
-              actor
-            ) + ", nor any ".join(
-              "tool for {}".format(skill) for skill in rtls[actor][1],
-            )
-
-      if rlist:
-        nts["options"][option] += " (@CAP@{})".format(
-          ". @CAP@".join(rlist)
-        )
-      else:
-        nts["options"][option] += " (no skills)"
-
       nts["outcomes"][option] = "[[S|action/?_action/outcome]]"
-      # TODO: Filter grammar expansions based on combinations of variable
-      # values!
+
+      # If this is a choice, add skill/tool info:
+      if ocount > 1:
+        rlist = []
+        if "_relevant_skills" in ovrs:
+          rsks = ovrs["_relevant_skills"]
+          for actor in rsks:
+            glist = []
+            blist = []
+            for skill in rsks[actor][0]:
+              glist.append(
+                "[[misc/is_skilled/{}@who={}]]".format(skill, actor)
+              )
+            for skill in rsks[actor][1]:
+              blist.append(
+                "[[misc/is_unskilled/{}@who={}]]".format(skill, actor)
+              )
+            if glist and blist:
+              rlist.append(
+                ", and ".join(glist) + ", but " + ", and ".join(blist)
+              )
+            elif glist:
+              rlist.append(", and ".join(glist))
+            elif blist:
+              rlist.append(", and ".join(blist))
+
+        if "_relevant_tools" in ovrs:
+          rtls = ovrs["_relevant_tools"]
+          for actor in rtls:
+            relevant = ""
+            if rtls[actor][0]:
+              relevant += "N#{}/they V#have/prs/{} ".format(
+                actor,
+                actor
+              ) + ", and ".join(
+                "N#{}/them".format(tool) for tool in rtls[actor][0],
+              )
+              if rtls[actor][1]:
+                relevant += " but "
+            if rtls[actor][1]:
+              relevant += "N#{}/they V#have/prs/{} no ".format(
+                actor,
+                actor
+              ) + ", nor any ".join(
+                "tool for {}".format(skill) for skill in rtls[actor][1],
+              )
+
+        if rlist:
+          nts["options"][option] += " (@CAP@{})".format(
+            ". @CAP@".join(rlist)
+          )
+        else:
+          nts["options"][option] += " (no skills)"
 
   # Next, use the node structure to recursively render the story text in
   # ChoiceScript:

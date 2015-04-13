@@ -67,7 +67,7 @@ at(
   consequence_of(
     X,
     o(deal, deal),
-    takes_advantage_of,
+    resolves,
     potential(opportunity, relation(selling, Seller, Goods))
   )
 ) :-

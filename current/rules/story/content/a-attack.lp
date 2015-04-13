@@ -83,7 +83,7 @@ at(
   consequence_of(
     X,
     o(success, victory),
-    solves,
+    resolves,
     potential(problem, relation(threatening, Target, Someone))
   )
 ) :-
@@ -100,7 +100,7 @@ at(
   consequence_of(
     X,
     o(aggressor_state, injured),
-    solves,
+    resolves,
     potential(problem, relation(threatening, Aggressor, Someone))
   )
 ) :-
@@ -114,7 +114,7 @@ at(
   consequence_of(
     X,
     o(aggressor_state, killed),
-    solves,
+    resolves,
     potential(problem, relation(threatening, Aggressor, Someone))
   )
 ) :-
@@ -128,7 +128,7 @@ at(
   consequence_of(
     X,
     o(target_state, injured),
-    solves,
+    resolves,
     potential(problem, relation(threatening, Target, Someone))
   )
 ) :-
@@ -142,13 +142,27 @@ at(
   consequence_of(
     X,
     o(target_state, killed),
-    solves,
+    resolves,
     potential(problem, relation(threatening, Target, Someone))
   )
 ) :-
   at(N, action(X, attack)),
   at(N, arg(X, target, Target)),
   st(N, relation(threatening, Target, Someone)),
+  story_op(N, build_options).
+
+at(
+  N,
+  consequence(
+    X,
+    manifests,
+    potential(problem, relation(threatening, Aggressor, Target))
+  )
+) :-
+  at(N, action(X, attack)),
+  at(N, arg(X, aggressor, Aggressor)),
+  at(N, arg(X, target, Target)),
+  st(N, relation(threatening, Aggressor, Target)),
   story_op(N, build_options).
 
 % fighting is dangerous:
