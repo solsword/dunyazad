@@ -49,14 +49,14 @@ error(m("Lowlife threatening multiple parties.", N)) :-
   story_op(N, initialize_node).
 
 error(m("Merchant one doesn't own their goods", N)) :-
-  setup(N, tavern),
+  setup(N, market),
   at(N, setup_arg(merchant_one, Merchant)),
   at(N, setup_arg(goods_one, Goods)),
   not st(N, relation(has_item, Merchant, Goods)),
   story_op(N, initialize_node).
 
 error(m("Merchant two doesn't own their goods", N)) :-
-  setup(N, tavern),
+  setup(N, market),
   at(N, setup_arg(merchant_two, Merchant)),
   at(N, setup_arg(goods_two, Goods)),
   not st(N, relation(has_item, Merchant, Goods)),

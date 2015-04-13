@@ -48,7 +48,8 @@ vignette_before(Prev, Next) :-
 vignette_successor(Prev, Next) :-
   vignette_before(Prev, Next),
   0 = {
-    before(Next, Between) : vignette(Between, Between), before(Prev, Between)
+    vignette_before(Next, Between) :
+      vignette_before(Between, Prev)
   }.
 
 error(m("Repeated chance to rest", N)) :-
