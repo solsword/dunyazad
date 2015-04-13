@@ -6,6 +6,7 @@ The main file for story generation.
 
 import os
 import os.path
+import subprocess
 
 import sys
 
@@ -30,7 +31,8 @@ def main(
   storyfile = None,
   scaffoldfiles = None,
   scaffoldfrags = None,
-  nodelimit = 12
+  nodelimit = 12,
+  fmt="twee"
 ):
   story = []
   sofar = []
@@ -186,8 +188,17 @@ def main(
       fout.write(str(pr) + '.\n')
 
   print("Building story text...")
-  with open(os.path.join("out", "story.txt"), 'w') as fout:
-    fout.write(english.build_story_text(sofar, timeshift=None))
+  outfile = "story.txt"
+  if fmt == "twee":
+    outfile = "story.tw"
+  with open(os.path.join("out", outfile), 'w') as fout:
+    fout.write(english.build_story_text(sofar, timeshift=None, fmt=fmt))
+  if fmt == "twee":
+    html = subprocess.check_output(
+      ["twee", os.path.join("out", outfile), os.path.join("twine", "*.tw")]
+    )
+    with open(os.path.join("out", "tlottolad.html"), 'w') as fout:
+      fout.write(html.decode())
   return not error
 
 if __name__ == "__main__":
@@ -196,6 +207,7 @@ if __name__ == "__main__":
   scfiles = []
   scfrags = []
   nodelimit = 12
+  fmt = "twee"
 
   if '-s' in sys.argv:
     idx = sys.argv.index('-s')
@@ -213,7 +225,13 @@ if __name__ == "__main__":
     idx = sys.argv.index('-n')
     nodelimit = int(sys.argv[idx+1])
 
-  success = main(storyfile, scfiles, scfrags, nodelimit)
+  if "--twee" in sys.argv:
+    fmt = "twee"
+
+  if "--choicescript" in sys.argv:
+    fmt = "choicescript"
+
+  success = main(storyfile, scfiles, scfrags, nodelimit, fmt)
 
   if not success:
     exit(1)

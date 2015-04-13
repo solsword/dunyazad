@@ -8,13 +8,13 @@ V#attack/inf/?subject opponents
 
 :action/attack/outcome
 {at(Now,outcome(option(Opt),o(success,victory)))}
-N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/?]] [[S|combat/?]] [[S|combat/?]] @CAP@N#?target/they V#be/prs/?target defeated
+N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/?]] @CAP@N#?target/they V#be/prs/?target defeated
 
 {at(Now,outcome(option(Opt),o(success,tie)))}
-N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/winning]] [[S|combat/losing]] [[S|combat/winning]] [[S|combat/winning]] Finally N#?aggressor/they and N#?target/they V#withdraw/prs/_plural from combat, exhausted.
+N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/winning]] [[S|combat/losing]] Finally N#?aggressor/they and N#?target/they V#withdraw/prs/_plural from combat, exhausted.
 
 {at(Now,outcome(option(Opt),o(success,defeat)))}
-N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/?]] [[S|combat/?]] [[S|combat/winning]] Suddenly N#?target/they V#rally/prs/?target and fiercely V#strike/prs/?target back at N#?aggressor/them, and N#?aggressor/they V#be/prs/?aggressor defeated
+N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/winning]] Suddenly N#?target/they V#rally/prs/?target and fiercely V#strike/prs/?target back at N#?aggressor/them, and N#?aggressor/they V#be/prs/?aggressor defeated
 
 :combat/winning
 N#?aggressor/they V#strike/prs/?aggressor at N#?target/them

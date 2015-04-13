@@ -1,0 +1,50 @@
+:: StoryTitle
+The Legend of the Tree of Life and Death
+
+:: StoryAuthor
+Dunyazad
+
+:: Start
+<<set $outcome = "">>\
+<<display Intro>>
+
+:: End
+/% TODO: Improve this! %/
+And so you come to the end of your journey.
+
+:: Style [stylesheet]
+@import url(http://fonts.googleapis.com/css?family=Bree+Serif);
+
+body {
+  max-width: 110em;
+  font-family: "Tex Gyre Pagella", "Palatino", serif;
+  color: #301800;
+  background-color: #fffce0;
+}
+
+#storyTitle {
+  color: #301800;
+}
+
+#storyAuthor {
+  color: #301800;
+}
+
+.passage {
+  font-size: 18pt;
+  line-height: 1.35;
+  text-align: justify;
+}
+
+/* For <<replace>> macros. */
+
+.revision-span-in {
+	opacity: 0;
+}
+.revision-span:not(.revision-span-out) {
+	transition: 1s; -webkit-transition: 1s;
+}
+.revision-span-out {
+	position:absolute;
+	opacity: 0;
+}

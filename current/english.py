@@ -1189,7 +1189,8 @@ def build_text(
   ndict,
   base_pnslots=None,
   introduced=None,
-  timeshift=None
+  timeshift=None,
+  fmt="twee"
 ):
   """
   Takes a text template and builds a filled-in string using the given rules,
@@ -1313,7 +1314,10 @@ def build_text(
   # Finally process capitalization directives:
   result = re.sub(CAP, lambda m: m.group(1).upper(), result)
   #result = re.sub(CAP, lambda m: m.group(1).upper(), result)
-  result = re.sub(PAR, '\n\n', result)
+  if fmt == "choicescript":
+    result = re.sub(PAR, '\n\n', result)
+  elif fmt == "twee":
+    result = re.sub(PAR, '<br/><br/>', result)
   result = re.sub(BREAK, '', result)
   return result, pnslots, introduced
 
@@ -1349,7 +1353,8 @@ def build_node_text(
   nouns,
   pnslots,
   introduced,
-  timeshift=None
+  timeshift=None,
+  fmt="twee"
 ):
   """
   Builds text for the given node (should be a dictionary from the
@@ -1367,7 +1372,8 @@ def build_node_text(
     nouns,
     pnslots,
     introduced,
-    timeshift
+    timeshift,
+    fmt
   )
   intro = sentence(intro)
   situation = ""
@@ -1380,7 +1386,8 @@ def build_node_text(
       nouns,
       _pnslots,
       _introduced,
-      timeshift
+      timeshift,
+      fmt
     )
     if situation:
       situation += " and " + stext
@@ -1388,8 +1395,8 @@ def build_node_text(
       situation = stext
   situation = sentence(situation)
   options = ""
-  if len(node["options"]) == 1:
-    options = ""
+  ocount = len(node["options"])
+  if ocount == 1:
     opt = list(node["options"].keys())[0]
     txt, pnout, intout = build_text(
       node["options"][opt],
@@ -1399,7 +1406,8 @@ def build_node_text(
       nouns,
       _pnslots,
       _introduced,
-      timeshift
+      timeshift,
+      fmt
     )
     options += '\n' + sentence(txt)
     txt, pnout, intout = build_text(
@@ -1410,20 +1418,27 @@ def build_node_text(
       nouns,
       pnout,
       intout,
-      timeshift
+      timeshift,
+      fmt
     )
     options += '\n' + sentence(txt)
     successors = node_structure[node["name"]]["successors"]
     if opt in successors:
       scc = successors[opt]
       outgoing[scc] = (pnout, intout)
-      options += "\n*goto {}\n".format(scc)
+      if fmt == "choicescript":
+        options += "\n*goto {}\n".format(scc)
+      elif fmt == "twee":
+        options += "\n[[Onwards...|{}][$outcome='']]\n".format(scc)
     else:
-      options += "\n*finish\n"
-  elif len(node["options"]) > 1:
-    options = "*choice\n"
+      # TODO: Epilogue here!
+      if fmt == "choicescript":
+        options += "\n*finish\n"
+  elif ocount > 1:
+    if fmt == "choicescript":
+      options = "*choice\n"
     for opt in node["options"]:
-      txt, pnout, intout = build_text(
+      opt_txt, pnout, intout = build_text(
         node["options"][opt],
         grammar_rules,
         context_variables[opt],
@@ -1431,10 +1446,10 @@ def build_node_text(
         nouns,
         _pnslots,
         _introduced,
-        timeshift
+        timeshift,
+        fmt
       )
-      options += "  #{}\n".format(sentence(txt))
-      txt, pnout, intout = build_text(
+      out_txt, pnout, intout = build_text(
         node["outcomes"][opt],
         grammar_rules,
         context_variables[opt],
@@ -1442,20 +1457,51 @@ def build_node_text(
         nouns,
         pnout,
         intout,
-        timeshift
+        timeshift,
+        fmt
       )
-      options += "    {}\n".format(sentence(txt))
       successors = node_structure[node["name"]]["successors"]
+      scc = None
       if opt in successors:
         scc = successors[opt]
         outgoing[scc] = (pnout, intout)
-        options += "    *goto {}\n".format(scc)
-      else:
-        options += "    *finish\n"
+      if fmt == "choicescript":
+        options += "  #{}\n".format(sentence(opt_txt))
+        options += "    {}\n".format(sentence(out_txt))
+        if scc:
+          options += "    *goto {}\n".format(scc)
+        else:
+          options += "    *finish\n"
+      elif fmt == "twee":
+        if scc:
+          options += '[[{opt}|{scc}][$outcome="{out}"]]\n'.format(
+            opt=sentence(opt_txt),
+            out=sentence(out_txt),
+            scc=scc
+          )
+        else:
+          options += '[[{opt}|End][$outcome="{out}"]]\n'.format(
+            opt=sentence(opt_txt),
+            out=sentence(out_txt)
+          )
   else:
-    options = "\n*finish"
-  result = """
+    options = "ERROR: node {} had <= 0 options!"
+  if fmt == "choicescript":
+    result = """
 *label {label}
+{intro}
+{situation}
+{options}
+""".format(
+  label=node["name"],
+  intro=intro,
+  situation=situation,
+  options=options
+)
+  elif fmt == "twee":
+    result = """
+:: {label}
+<<if $outcome neq "">><<print $outcome>> <<endif>>\
 {intro}
 {situation}
 {options}
@@ -1475,7 +1521,8 @@ def build_intro_text(
   nouns,
   pnslots,
   introduced,
-  timeshift=None
+  timeshift=None,
+  fmt="twee"
 ):
   result, _pnslots, introduced = build_text(
     template,
@@ -1485,11 +1532,12 @@ def build_intro_text(
     nouns,
     pnslots,
     introduced,
-    timeshift
+    timeshift,
+    fmt
   )
   return result, introduced
 
-def build_story_text(story, timeshift=None):
+def build_story_text(story, timeshift=None, fmt="twee"):
   node_templates = {}
   gr_rules = collate_rules(story)
 
@@ -1629,8 +1677,17 @@ def build_story_text(story, timeshift=None):
     nouns,
     base_pnslots,
     base_introduced,
-    timeshift
+    timeshift,
+    fmt
   )
+  if fmt == "twee":
+    # TODO: Make title/author/css/etc. parameters!
+    intro_text = """\
+:: Intro
+{}
+
+[[Begin your journey...|root]]
+""".format(intro_text.replace('\n', ' '))
   # Start with all root nodes on our open list:
   olist = [
     (n, base_pnslots, base_introduced) for n in node_templates.keys()
@@ -1659,7 +1716,8 @@ def build_story_text(story, timeshift=None):
       nouns,
       pnslots,
       introduced,
-      timeshift
+      timeshift,
+      fmt=fmt
     )
     results.append(txt)
     # update our readiness information and propagate nodes to the open list as
@@ -1678,7 +1736,10 @@ Readiness is: {}\
         # TODO: Get rid of pnslots merging altogether?
         #olist.append((n, pns, intr))
         olist.append((n, base_pnslots, intr))
-  return ("\n\n*comment " + '-'*72 + "\n\n").join(results)
+  if fmt == "choicescript":
+    return ("\n\n*comment " + '-'*72 + "\n\n").join(results)
+  else:
+    return ("\n\n").join(results)
 
 # Testing:
 
