@@ -15,6 +15,7 @@ class_skill(merchant, tinkering, sometimes).
 class_skill(merchant, music, sometimes).
 class_skill(merchant, elocution, sometimes).
 class_skill(merchant, storytelling, sometimes).
+class_item(merchant, item, 2, 4).
 
 % Skilled workers
 subclass(commoner, skilled).
@@ -22,6 +23,7 @@ class_skill(skilled, literacy, sometimes).
 
 actor_def(healer, skilled, "healer", singular, either).
 class_skill(healer, healing, always).
+class_item(healer, medicine_chest, 1, 1).
 
 
 % Laborers

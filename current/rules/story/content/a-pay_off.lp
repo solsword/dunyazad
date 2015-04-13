@@ -49,6 +49,16 @@ error(m("Unintelligent listener.", N, X)) :-
   st(N, property(has_skill, Listening, unintelligent)),
   story_op(N, build_options).
 
+error(m("Bribe target isn't threatening or accusing the victim.", N, X)) :-
+  at(N, action(X, talk_down)),
+  at(N, arg(X, listening, Listening)),
+  at(N, arg(X, victim, Victim)),
+  0 = {
+    st(N, relation(threatening, Listening, Victim));
+    st(N, relation(accusing, Listening, Victim))
+  },
+  story_op(N, build_options).
+
 % the threat is withdrawn:
 at(
   N,
@@ -62,6 +72,23 @@ at(
   at(N, action(X, pay_off)),
   at(N, arg(X, listening, Listening)),
   at(N, arg(X, victim, Victim)),
+  st(N, relation(threatening, Listening, Victim)),
+  story_op(N, build_options).
+
+% or the accusation is withdrawn:
+at(
+  N,
+  consequence_of(
+    X,
+    o(deal, deal),
+    resolves,
+    potential(problem, relation(accusing, Listening, Victim))
+  )
+) :-
+  at(N, action(X, pay_off)),
+  at(N, arg(X, listening, Listening)),
+  at(N, arg(X, victim, Victim)),
+  st(N, relation(accusing, Listening, Victim)),
   story_op(N, build_options).
 
 % but the price must be paid:

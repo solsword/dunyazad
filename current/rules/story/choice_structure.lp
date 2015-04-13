@@ -389,18 +389,16 @@ error(m("Too few choices before ending", N)) :-
   choices_before(N, L),
   L < min_story_choices.
 
-
 % The first few choices have a set structure:
 %choice_structure_plan(0, relaxed).
 %choice_structure_plan(1, relaxed).
 %choice_structure_plan(2, straightforward).
 %choice_structure_plan(3, mysterious).
 
-error(m("Deviated from initial choices plan", N)) :-
-  node_type(N, choice),
-  story_op(N, build_options),
-  choices_before(N, L),
-  choice_structure_plan(L, CS),
-  not at(N, choice_structure(CS)).
-
-% The midgame is less constrained:
+% TODO: Get rid of this?
+%error(m("Deviated from initial choices plan", N)) :-
+%  node_type(N, choice),
+%  story_op(N, build_options),
+%  choices_before(N, L),
+%  choice_structure_plan(L, CS),
+%  not at(N, choice_structure(CS)).

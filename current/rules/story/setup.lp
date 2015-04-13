@@ -129,78 +129,84 @@ sp_st(N, property(type, inst(Type, @inst(CIClass, K)), CIClass)) :-
 % Rules for argument substitution:
 % --------------------------------
 
+s_st_n(Setup, State, 1) :-
+  s_st(Setup, State).
+
+s_st_n(Setup, State, 0) :-
+  s_o_st(Setup, State).
+
 % States
-sp_st(N, state(State, Const)) :-
-  s_st(Setup, state(c(State), c(Const))),
+L <= { sp_st(N, state(State, Const)) } <= 1 :-
+  s_st_n(Setup, state(c(State), c(Const)), L),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, state(State, Val)) :-
-  s_st(Setup, state(c(State), v(Arg))),
+L <= { sp_st(N, state(State, Val)) } <= 1 :-
+  s_st_n(Setup, state(c(State), v(Arg)), L),
   at(N, setup_arg(Arg, Val)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, state(SVal, Const)) :-
-  s_st(Setup, state(v(SArg), c(Const))),
+L <= { sp_st(N, state(SVal, Const)) } <= 1 :-
+  s_st_n(Setup, state(v(SArg), c(Const)), L),
   at(N, setup_arg(SArg, SVal)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, state(SVal, Val)) :-
-  s_st(Setup, state(v(SArg), v(Arg))),
+L <= { sp_st(N, state(SVal, Val)) } <= 1 :-
+  s_st_n(Setup, state(v(SArg), v(Arg)), L),
   at(N, setup_arg(Arg, Val)),
   at(N, setup_arg(SArg, SVal)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
 % Properties
-sp_st(N, property(Prop, C1, C2)) :-
-  s_st(Setup, property(c(Prop), c(C1), c(C2))),
+L <= { sp_st(N, property(Prop, C1, C2)) } <= 1 :-
+  s_st_n(Setup, property(c(Prop), c(C1), c(C2)), L),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, property(Prop, Val, Const)) :-
-  s_st(Setup, property(c(Prop), v(Arg), c(Const))),
+L <= { sp_st(N, property(Prop, Val, Const)) } <= 1 :-
+  s_st_n(Setup, property(c(Prop), v(Arg), c(Const)), L),
   at(N, setup_arg(Arg, Val)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, property(Prop, Const, Val)) :-
-  s_st(Setup, property(c(Prop), c(Const), v(Arg))),
+L <= { sp_st(N, property(Prop, Const, Val)) } <= 1 :-
+  s_st_n(Setup, property(c(Prop), c(Const), v(Arg)), L),
   at(N, setup_arg(Arg, Val)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, property(Prop, V1, V2)) :-
-  s_st(Setup, property(c(Prop), v(A1), v(A2))),
+L <= { sp_st(N, property(Prop, V1, V2)) } <= 1 :-
+  s_st_n(Setup, property(c(Prop), v(A1), v(A2)), L),
   at(N, setup_arg(A1, V1)),
   at(N, setup_arg(A2, V2)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, property(PVal, C1, C2)) :-
-  s_st(Setup, property(v(PArg), c(C1), c(C2))),
+L <= { sp_st(N, property(PVal, C1, C2)) } <= 1 :-
+  s_st_n(Setup, property(v(PArg), c(C1), c(C2)), L),
   at(N, setup_arg(PArg, PVal)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, property(PVal, Val, Const)) :-
-  s_st(Setup, property(v(PArg), v(Arg), c(Const))),
-  at(N, setup_arg(PArg, PVal)),
-  at(N, setup_arg(Arg, Val)),
-  setup(N, Setup),
-  story_op(N, initialize_node).
-
-sp_st(N, property(PVal, Const, Val)) :-
-  s_st(Setup, property(v(PArg), c(Const), v(Arg))),
+L <= { sp_st(N, property(PVal, Val, Const)) } <= 1 :-
+  s_st_n(Setup, property(v(PArg), v(Arg), c(Const)), L),
   at(N, setup_arg(PArg, PVal)),
   at(N, setup_arg(Arg, Val)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, property(PVal, V1, V2)) :-
-  s_st(Setup, property(v(PArg), v(A1), v(A2))),
+L <= { sp_st(N, property(PVal, Const, Val)) } <= 1 :-
+  s_st_n(Setup, property(v(PArg), c(Const), v(Arg)), L),
+  at(N, setup_arg(PArg, PVal)),
+  at(N, setup_arg(Arg, Val)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+L <= { sp_st(N, property(PVal, V1, V2)) } <= 1 :-
+  s_st_n(Setup, property(v(PArg), v(A1), v(A2)), L),
   at(N, setup_arg(PArg, PVal)),
   at(N, setup_arg(A1, V1)),
   at(N, setup_arg(A2, V2)),
@@ -208,52 +214,52 @@ sp_st(N, property(PVal, V1, V2)) :-
   story_op(N, initialize_node).
 
 % Relations
-sp_st(N, relation(Rel, C1, C2)) :-
-  s_st(Setup, relation(c(Rel), c(C1), c(C2))),
+L <= { sp_st(N, relation(Rel, C1, C2)) } <= 1 :-
+  s_st_n(Setup, relation(c(Rel), c(C1), c(C2)), L),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, relation(Rel, Val, Const)) :-
-  s_st(Setup, relation(c(Rel), v(Arg), c(Const))),
+L <= { sp_st(N, relation(Rel, Val, Const)) } <= 1 :-
+  s_st_n(Setup, relation(c(Rel), v(Arg), c(Const)), L),
   at(N, setup_arg(Arg, Val)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, relation(Rel, Const, Val)) :-
-  s_st(Setup, relation(c(Rel), c(Const), v(Arg))),
+L <= { sp_st(N, relation(Rel, Const, Val)) } <= 1 :-
+  s_st_n(Setup, relation(c(Rel), c(Const), v(Arg)), L),
   at(N, setup_arg(Arg, Val)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, relation(Rel, V1, V2)) :-
-  s_st(Setup, relation(c(Rel), v(A1), v(A2))),
+L <= { sp_st(N, relation(Rel, V1, V2)) } <= 1 :-
+  s_st_n(Setup, relation(c(Rel), v(A1), v(A2)), L),
   at(N, setup_arg(A1, V1)),
   at(N, setup_arg(A2, V2)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, relation(RVal, C1, C2)) :-
-  s_st(Setup, relation(v(RArg), c(C1), c(C2))),
+L <= { sp_st(N, relation(RVal, C1, C2)) } <= 1 :-
+  s_st_n(Setup, relation(v(RArg), c(C1), c(C2)), L),
   at(N, setup_arg(RArg, RVal)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, relation(RVal, Val, Const)) :-
-  s_st(Setup, relation(v(RArg), v(Arg), c(Const))),
-  at(N, setup_arg(RArg, RVal)),
-  at(N, setup_arg(Arg, Val)),
-  setup(N, Setup),
-  story_op(N, initialize_node).
-
-sp_st(N, relation(RVal, Const, Val)) :-
-  s_st(Setup, relation(v(RArg), c(Const), v(Arg))),
+L <= { sp_st(N, relation(RVal, Val, Const)) } <= 1 :-
+  s_st_n(Setup, relation(v(RArg), v(Arg), c(Const)), L),
   at(N, setup_arg(RArg, RVal)),
   at(N, setup_arg(Arg, Val)),
   setup(N, Setup),
   story_op(N, initialize_node).
 
-sp_st(N, relation(RVal, V1, V2)) :-
-  s_st(Setup, relation(v(RArg), v(A1), v(A2))),
+L <= { sp_st(N, relation(RVal, Const, Val)) } <= 1 :-
+  s_st_n(Setup, relation(v(RArg), c(Const), v(Arg)), L),
+  at(N, setup_arg(RArg, RVal)),
+  at(N, setup_arg(Arg, Val)),
+  setup(N, Setup),
+  story_op(N, initialize_node).
+
+L <= { sp_st(N, relation(RVal, V1, V2)) } <= 1 :-
+  s_st_n(Setup, relation(v(RArg), v(A1), v(A2)), L),
   at(N, setup_arg(RArg, RVal)),
   at(N, setup_arg(A1, V1)),
   at(N, setup_arg(A2, V2)),

@@ -153,12 +153,14 @@ at(
 
 at(
   N,
-  consequence(
+  consequence_of(
     X,
+    o(success, Every),
     manifests,
     potential(problem, relation(threatening, Aggressor, Target))
   )
 ) :-
+  outcome_val(attack, success, Every),
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, Aggressor)),
   at(N, arg(X, target, Target)),

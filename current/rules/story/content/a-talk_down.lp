@@ -17,7 +17,13 @@ outcome_val(talk_down, attitude, unconvinced).
 % skills
 
 skill_link(
-  elocution, required, no_tool,
+  elocution, promotes, no_tool,
+  talk_down, asking,
+  o(attitude, convinced)
+).
+
+skill_link(
+  storytelling, promotes, no_tool,
   talk_down, asking,
   o(attitude, convinced)
 ).
@@ -34,11 +40,15 @@ error(m("Unintelligent listener.", N, X)) :-
   st(N, property(has_skill, Listening, unintelligent)),
   story_op(N, build_options).
 
-error(m("Victim not being threatened.", N, X)) :-
+error(m("Victim not being threatened or accused.", N, X)) :-
   at(N, action(X, talk_down)),
   at(N, arg(X, listening, Listening)),
   at(N, arg(X, victim, Victim)),
-  not st(N, relation(threatening, Listening, Victim)).
+  0 = {
+    st(N, relation(threatening, Listening, Victim));
+    st(N, relation(accusing, Listening, Victim))
+  },
+  story_op(N, build_options).
 
 % success convinces the threatener to back down
 at(
@@ -53,4 +63,20 @@ at(
   at(N, action(X, talk_down)),
   at(N, arg(X, listening, Listening)),
   at(N, arg(X, victim, Victim)),
+  st(N, relation(threatening, Listening, Victim)),
+  story_op(N, build_options).
+
+at(
+  N,
+  consequence_of(
+    X,
+    o(attitude, convinced),
+    resolves,
+    potential(problem, relation(accusing, Listening, Victim))
+  )
+) :-
+  at(N, action(X, talk_down)),
+  at(N, arg(X, listening, Listening)),
+  at(N, arg(X, victim, Victim)),
+  st(N, relation(accusing, Listening, Victim)),
   story_op(N, build_options).
