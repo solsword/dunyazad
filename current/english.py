@@ -1537,7 +1537,7 @@ def build_intro_text(
   )
   return result, introduced
 
-def build_story_text(story, timeshift=None, fmt="twee"):
+def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
   node_templates = {}
   gr_rules = collate_rules(story)
 
@@ -1646,6 +1646,8 @@ def build_story_text(story, timeshift=None, fmt="twee"):
               ) + ", nor any ".join(
                 "tool for {}".format(skill) for skill in rtls[actor][1],
               )
+            if relevant:
+              rlist.append(relevant)
 
         if rlist:
           nts["options"][option] += " (@CAP@{})".format(
@@ -1670,7 +1672,7 @@ def build_story_text(story, timeshift=None, fmt="twee"):
   base_introduced = { "you" } | { n for n in nouns if nouns[n].is_party_member }
   # Generate the intro text
   intro_text, base_introduced = build_intro_text(
-    "[[prologue]]",
+    "[[prologue/{}]]".format(mode),
     gr_rules,
     introvars,
     story,
@@ -1682,11 +1684,19 @@ def build_story_text(story, timeshift=None, fmt="twee"):
   )
   if fmt == "twee":
     # TODO: Make title/author/css/etc. parameters!
-    intro_text = """\
+    if mode == "full":
+      intro_text = """\
 :: Intro
 {}
 
 [[Begin your journey...|root]]
+""".format(intro_text.replace('\n', ' '))
+    elif mode == "example":
+      intro_text = """\
+:: Intro
+{}
+
+<<display root>>
 """.format(intro_text.replace('\n', ' '))
   # Start with all root nodes on our open list:
   olist = [

@@ -1,17 +1,25 @@
 % Prologue - rules that define the prologue
 
->prologue
-[[prologue/setting]]
+>prologue/full
+[[prologue/setting/full]]
+@PAR@
+You are not entirely without resources. [[prologue/introductions]]
+@PAR@
+[[prologue/get_started/full]]
+<
+
+>prologue/example
+[[prologue/setting/example]]
 @PAR@
 [[prologue/introductions]]
 @PAR@
-[[S|prologue/get_started]]
+[[prologue/get_started/example]]
 <
 
 :prologue/introductions
 [[S|prologue/you]] [[prologue/members/?n_party_members]]
 
->prologue/setting
+>prologue/setting/full
 You [[prologue/setting/pause]] [[prologue/setting/where]] looking back over
 your shoulder as if you could still see ?city. Your
 [[prologue/setting/journey]] has [[prologue/setting/just]]
@@ -33,6 +41,10 @@ strength of those traditions that even a nation as far away as ?nation had the
 right to send a representative. Of course, the delegation they had chosen to
 send said something different about tradition. No grand procession, no royal
 guard, not even a small caravan: just [[prologue/the_party]].
+<
+
+>prologue/setting/example
+@CAP@N#you/they V#be/prs/you about to set out on an epic journey. [[prologue/companions/?n_party_members]] N#you/they V#be/prs/_plural V#head/prsc/_plural towards towards the distant country of ?destination, hoping to earn fame and fortune.
 <
 
 :prologue/setting/nation
@@ -145,6 +157,15 @@ your mission
 your goals
 the mission you were given
 
+:prologue/companions/one
+Although you are alone,
+
+:prologue/companions/two
+Along with your companion N#?member_one_tag/them,
+
+:prologue/companions/three
+Along with your companions N#?member_one_tag/them and N#?member_two_tag/them,
+
 :prologue/the_party
 you[[prologue/the_rest/?n_party_members]]
 
@@ -161,7 +182,7 @@ you[[prologue/the_rest/?n_party_members]]
 your ?relation N#?tag/_them
 
 :prologue/you
-N#you/they V#be/prs/you not entirely without resources. @CAP@N#you/they V#manage/pst/you to V#bring/rinf/you along [[prologue/your_items]], and [[prologue/your_skills]].
+@CAP@N#you/they V#have/prs/you [[prologue/your_items]], and [[prologue/your_skills]].
 
 :prologue/your_items
 [[special/and_list@list=your_items@tmpl_prefix=nref/them]]
@@ -187,7 +208,7 @@ Meanwhile, N#you/their ?member_one_relation N#?member_one_tag/_them V#bring/pst/
 :prologue/member_skills/member_two
 [[special/and_list@list=member_two_skills@tmpl_prefix=misc/is_skilled@who=member_two]]
 
->prologue/get_started
+>prologue/get_started/full
 Between the ?n_party_members of you, it should V#be/rinf/you possible to
 V#make/prs/you it to ?destination, and once N#you/they V#get/prs/you there,
 N#you/their family's disregard for the importance of the Festival of Life might
@@ -197,6 +218,19 @@ N#you/their head to clear it of thoughts of glory and doom. No matter what
 [[prologue/ahead]], only time V#tell/ftr/_plural if this
 [[prologue/setting/journey]] will be rewarding.
 <
+
+>prologue/get_started/example
+Eager to be on N#you/their way, [[prologue/you_and/?n_party_members]] set off on the road towards ?destination.
+<
+
+:prologue/you_and/one
+N#you/they
+
+:prologue/you_and/two
+N#you/they and N#?member_one_tag/them
+
+:prologue/you_and/three
+N#you/they and N#you/their companions
 
 :prologue/ahead
 V#lie/prs/_singular ahead

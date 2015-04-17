@@ -28,6 +28,7 @@ def write_crashfile(e):
     fout.write(e.program)
 
 def main(
+  mode = "full",
   storyfile = None,
   scaffoldfiles = None,
   scaffoldfrags = None,
@@ -86,6 +87,8 @@ def main(
     n = -1
     sofar = story
     keepgoing = True
+    if mode == "example":
+      nodelimit = 2
     while len(list(tasks.all_nodes(story))) < nodelimit and keepgoing:
       keepgoing = False
       n += 1
@@ -169,11 +172,6 @@ def main(
 
       sofar = story
 
-#  for pr in sofar:
-#    print(str(pr) + '.')
-#  nouns = english.glean_nouns(sofar)
-#  for k in nouns:
-#    print(nouns[k])
   print("Story nodes:")
   for pr in sofar:
     if (pr.name == "story_node"):
@@ -192,8 +190,9 @@ def main(
   if fmt == "twee":
     outfile = "story.tw"
   with open(os.path.join("out", outfile), 'w') as fout:
-    fout.write(english.build_story_text(sofar, timeshift=None, fmt=fmt))
+    fout.write(english.build_story_text(sofar, mode, timeshift=None, fmt=fmt))
   if fmt == "twee":
+    print("Compiling Twine version...")
     html = subprocess.check_output(
       ["twee", os.path.join("out", outfile), os.path.join("twine", "*.tw")]
     )
@@ -206,6 +205,7 @@ if __name__ == "__main__":
   storyfile = None
   scfiles = []
   scfrags = []
+  mode = "full"
   nodelimit = 12
   fmt = "twee"
 
@@ -225,13 +225,19 @@ if __name__ == "__main__":
     idx = sys.argv.index('-n')
     nodelimit = int(sys.argv[idx+1])
 
+  if '-x' in sys.argv:
+    idx = sys.argv.index('-x')
+    mode = "example"
+    scfrags.append(sys.argv[idx+1])
+    scfrags.append("example")
+
   if "--twee" in sys.argv:
     fmt = "twee"
 
   if "--choicescript" in sys.argv:
     fmt = "choicescript"
 
-  success = main(storyfile, scfiles, scfrags, nodelimit, fmt)
+  success = main(mode, storyfile, scfiles, scfrags, nodelimit, fmt)
 
   if not success:
     exit(1)
