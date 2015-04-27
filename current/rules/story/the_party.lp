@@ -13,7 +13,7 @@ starting_skill(wilderness_lore).
 starting_skill(music).
 starting_skill(elocution).
 starting_skill(healing).
-starting_skill(prayer).
+%starting_skill(prayer).
 starting_skill(acrobatics).
 
 st(R, inst(actor, you)) :- _sr(R).
@@ -51,14 +51,14 @@ party_member_rel("beloved").
 
 % Party member selection:
 
-1 = {
-  party_member(member_one, Relation) : party_member_rel(Relation);
-  error(m("Party member of no relation.", member_one))
-} :- _sr(R).
-1 = {
-  party_member(member_two, Relation) : party_member_rel(Relation);
-  error(m("Party member of no relation.", member_two))
-} :- _sr(R).
+%1 = {
+%  party_member(member_one, Relation) : party_member_rel(Relation);
+%  error(m("Party member of no relation.", member_one))
+%} :- _sr(R).
+%1 = {
+%  party_member(member_two, Relation) : party_member_rel(Relation);
+%  error(m("Party member of no relation.", member_two))
+%} :- _sr(R).
 error(m("Multiple party members have the same relation.")) :-
   party_member(M1, Relation),
   party_member(M2, Relation),

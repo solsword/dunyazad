@@ -40,11 +40,11 @@ mean a taste of the fruit of the Tree of Life and Death. It was a sign of the
 strength of those traditions that even a nation as far away as ?nation had the
 right to send a representative. Of course, the delegation they had chosen to
 send said something different about tradition. No grand procession, no royal
-guard, not even a small caravan: just [[prologue/the_party]].
+guard, not even a small caravan: just [[prologue/the_party/?n_party_members]].
 <
 
 >prologue/setting/example
-@CAP@N#you/they V#be/prs/you about to set out on an epic journey. [[prologue/companions/?n_party_members]] N#you/they V#be/prs/_plural V#head/prsc/_plural towards towards the distant country of ?destination, hoping to earn fame and fortune.
+@CAP@N#you/they V#be/prs/you about to set out on an epic journey. @CAP@[[prologue/companions/?n_party_members]]N#you/they V#be/prs/_plural V#head/prsc/_plural towards towards the distant country of ?destination, hoping to earn fame and fortune.
 <
 
 :prologue/setting/nation
@@ -158,13 +158,13 @@ your goals
 the mission you were given
 
 :prologue/companions/one
-Although you are alone,
+@@
 
 :prologue/companions/two
-Along with your companion N#?member_one_tag/them,
+Along with your companion N#?member_one_tag/them, 
 
 :prologue/companions/three
-Along with your companions N#?member_one_tag/them and N#?member_two_tag/them,
+Along with your companions N#?member_one_tag/them and N#?member_two_tag/them, 
 
 :prologue/the_party
 you[[prologue/the_rest/?n_party_members]]
@@ -189,6 +189,9 @@ your ?relation N#?tag/_them
 
 :prologue/your_skills
 [[special/and_list@list=your_skills@tmpl_prefix=misc/is_skilled@who=you]]
+
+:prologue/members/one
+@@
 
 :prologue/members/two
 Meanwhile, N#you/their ?member_one_relation N#?member_one_tag/_them V#bring/pst/?member_one_tag [[prologue/member_items/?member_one_tag]]. [[S|prologue/member_skills/?member_one_tag]]

@@ -38,7 +38,7 @@ ANYTAG = re.compile(r"(\b[A-Z]#[a-zA-Z_0-9/?']+\b)")
 
 CAP = re.compile(r"(?:@CAP@)+(.)")
 PAR = re.compile(r"@PAR@")
-BREAK = re.compile(r"@@")
+BREAK = re.compile(r"@@(?!CAP@)(?!PAR@)")
 
 TAGS = {
   "directive": re.compile(r"\bD#([a-z_][a-z_0-9]*)/(\??[a-z_][a-z_0-9]*)\b"),
@@ -446,7 +446,9 @@ def glean_intro_variables(story, nouns):
   """
   result = {}
   party_members = [nouns[n] for n in nouns if nouns[n].is_party_member]
-  if len(party_members) == 2:
+  if len(party_members) == 1:
+    result["n_party_members"] = "one"
+  elif len(party_members) == 2:
     result["n_party_members"] = "two"
   elif len(party_members) == 3:
     result["n_party_members"] = "three"
@@ -1311,14 +1313,13 @@ def build_text(
           # if we matched a tag, don't bother checking the other tags:
           break
       result += add
-  # Finally process capitalization directives:
-  result = re.sub(CAP, lambda m: m.group(1).upper(), result)
-  #result = re.sub(CAP, lambda m: m.group(1).upper(), result)
+  # Finally process directives:
   if fmt == "choicescript":
     result = re.sub(PAR, '\n\n', result)
   elif fmt == "twee":
     result = re.sub(PAR, '<br/><br/>', result)
   result = re.sub(BREAK, '', result)
+  result = re.sub(CAP, lambda m: m.group(1).upper(), result)
   return result, pnslots, introduced
 
 def find_node_structure(story, nodelist):

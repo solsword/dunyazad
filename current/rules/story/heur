@@ -2,4 +2,4 @@
 echo "%" "vim: syn=gringo nowrap" > out/freq
 echo -n "%" "total lines: " >> out/freq
 wc -l out/grounded | cut -d" " -f1 >> out/freq
-tail -n +2 out/grounded | sort | uniq -w16 -c | sort -r >> out/freq
+tail -n +2 out/grounded | sort | uniq -w32 -c | sort -r >> out/freq
