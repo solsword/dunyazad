@@ -5,7 +5,7 @@ class_skill(monster, monstrous, always).
 
 actor_def(dragon, monster, "dragon", singular, neuter).
 item_def(dragon_scale, treasure, "dragon scale", singular).
-item_def(dragon_claws, weapon, "claws", plural).
+item_def(dragon_claws, natural_weapon, "claws", plural).
 class_item(dragon, dragon_claws, 1, 1).
 class_item(dragon, dragon_scale, 0, 1).
 trophy(dragon, dragon_scale).

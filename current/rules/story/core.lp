@@ -17,7 +17,7 @@
 %:- error(m("Unbound action argument.", Node, Action, Arg, ArgType)).
 %:- error(m("Price is not a treasure.", Node, Option)).
 
-#const max_options=5.
+#const max_options=4.
 #const min_story_length=5.
 #const min_story_choices=3.
 #const max_setup_argument_arity=4.

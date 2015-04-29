@@ -12,7 +12,7 @@ skill(wilderness_lore).
 skill(music).
 skill(elocution).
 skill(healing).
-skill(thievery). %TODO: Make this useful
+%skill(thievery). %TODO: Make this useful
 skill(literacy).
 %skill(prayer). TODO: Make this useful
 skill(acrobatics).
@@ -28,7 +28,7 @@ skill_name(wilderness_lore, "wilderness lore").
 skill_name(music, "music").
 skill_name(elocution, "elocution").
 skill_name(healing, "healing").
-skill_name(thievery, "thievery").
+%skill_name(thievery, "thievery").
 skill_name(literacy, "literacy").
 skill_name(prayer, "prayer").
 skill_name(acrobatics, "acrobatics").
