@@ -1207,8 +1207,7 @@ def build_text(
       "I": [0, set()],
       "we": [0, set()],
       "you": [0, set()],
-      "he": [0, set()],
-      "she": [0, set()],
+      "he/she": [0, set()],
       "it": [0, set()],
       "they": [0, set()],
     }
@@ -1664,8 +1663,7 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
     "I": [0, set()],
     "we": [0, set()],
     "you": [0, { "you" }],
-    "he": [0, set()],
-    "she": [0, set()],
+    "he/she": [0, set()],
     "it": [0, set()],
     "they": [0, set()],
   }

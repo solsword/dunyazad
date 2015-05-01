@@ -99,7 +99,10 @@ def pnslot(thing):
   lookup = (thing.person, thing.number, thing.gender, "any", "any")
   result = table_match(PRONOUNS, lookup)
   if result:
-    return result
+    if result == "he" or result == "she":
+      return "he/she"
+    else:
+      return result
   else:
     raise KeyError(
       "Pronoun lookup failed for '{}'. No match for conditions: {}".format(
