@@ -340,13 +340,9 @@ at(N, choice_structure(obvious)) :-
 at(N, choice_structure(relaxed)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
-  1 <= {
-    at(N, option(X)) : at(N, option_feel(option(X), hopeful));
-    at(N, option(X)) : at(N, option_feel(option(X), safe))
-  },
-  0 = {
-    at(N, player_goal(G1)) : at(N, expectation(option(X), threatens, G1));
-    at(N, player_goal(G2)) : at(N, expectation(option(X), fails, G2))
+  0 = #sum {
+    1,at(N, option(X)) : at(N, option_feel(option(X), safe));
+    -1,at(N, option(X)) : at(N, option(X))
   },
   at(N, stakes(Stakes)),
   higher_stakes(high, Stakes).

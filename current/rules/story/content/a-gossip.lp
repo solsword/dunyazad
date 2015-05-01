@@ -20,11 +20,6 @@ skill_link(
   gossip, interested,
   o(utility, useful)
 ).
-skill_link(
-  storytelling, promotes, no_tool,
-  gossip, interested,
-  o(utility, useful)
-).
 
 % Either way you can't gossip with the same actor again.
 at(
