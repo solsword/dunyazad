@@ -21,10 +21,11 @@
 #const min_story_length=5.
 #const min_story_choices=3.
 #const max_setup_argument_arity=4.
+#const max_party_size=3.
 
 opt_num(1..max_options).
 setup_arg_id(1..max_setup_argument_arity).
-
+party_size_value(1..max_party_size).
 
 % Core node construction:
 % -----------------------
@@ -46,25 +47,6 @@ at(N, option(1)) :-
 at(N, option(1)) :-
   node_type(N, event),
   story_op(N, build_options).
-
-
-% Misc rules:
-% -----------
-
-% The concept of an "initiator:"
-at(N, initiator(X, Initiator)) :-
-  at(N, action(X, Action)),
-  at(N, arg(X, InitArg, Initiator)),
-  initiator(Action, InitArg),
-  story_op(N, build_options).
-
-% An action without an initiator is an error:
-error(m("Action without initiator.", N, X)) :-
-  at(N, option(X)),
-  0 = {
-    at(N, initiator(option(X), Anyone))
-  }.
-
 
 % State and action rules:
 % -----------------------

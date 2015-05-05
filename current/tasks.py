@@ -127,7 +127,7 @@ KEEP = {
     PVr("structural_purpose", "structural_purpose", Vr("Node"), Vr("Purpose")),
 }
 
-def runfr(story, name, extra = ""):
+def runfr(story, name, extra = "", seed=0, rand=0.0):
   program = SEP.join(
     [
       BASE_SRC,
@@ -136,7 +136,7 @@ def runfr(story, name, extra = ""):
       extra
     ]
   )
-  return program, asp.solve(program)
+  return program, asp.solve(program, seed, rand)
 
 def filter_keep(story):
   result = []
@@ -228,31 +228,37 @@ def all_unfinished_options(story):
 
 # Tasks:
 
-def setup_story(story, extra=""):
-  program, solution = runfr(story, "setup", extra)
+def setup_story(story, extra="", seed=0, rand=0.0):
+  program, solution = runfr(story, "setup", extra, seed, rand)
   return program, filter_keep(solution)
 
-def instantiate_node(story, n, extra=""):
+def instantiate_node(story, n, extra="", seed=0, rand=0.0):
   program, solution = runfr(
     story,
     "instantiate",
-    extra + "\ntarget_node({}).".format(n)
+    extra + "\ntarget_node({}).".format(n),
+    seed,
+    rand
   )
   return program, filter_keep(solution)
 
-def branch_node(story, n, extra=""):
+def branch_node(story, n, extra="", seed=0, rand=0.0):
   program, solution = runfr(
     story,
     "branch",
-    extra + "\ntarget_node({}).".format(n)
+    extra + "\ntarget_node({}).".format(n),
+    seed,
+    rand
   )
   return program, filter_keep(solution)
 
-def polish_ending(story, n, extra=""):
+def polish_ending(story, n, extra="", seed=0, rand=0.0):
   program, solution = runfr(
     story,
     "branch",
-    extra + "\ntarget_node({}).".format(n)
+    extra + "\ntarget_node({}).".format(n),
+    seed,
+    rand
   )
   return program, filter_keep(solution)
 

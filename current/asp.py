@@ -72,14 +72,20 @@ ClingoOptOutput = parser.Hook(
   )
 )
 
-def solve(code):
+def solve(code, seed=0, rand=0.0):
   """
   Takes a string containing some answer set code and runs clingo on it,
   returning a set of Predicate objects parsed from clingo's output. Raises an
   ASPError if clingo returns an error code.
   """
   clingo = subprocess.Popen(
-    ["clingo", "--verbose=0", "--quiet=1,1", "--seed=0"],
+    [
+      "clingo",
+      "--verbose=0",
+      "--quiet=1,1",
+      "--seed={}".format(seed),
+      "--rand-freq={:.3f}".format(rand)
+    ],
     stdin=subprocess.PIPE,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,

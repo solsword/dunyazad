@@ -33,8 +33,11 @@ def main(
   scaffoldfiles = None,
   scaffoldfrags = None,
   nodelimit = 12,
-  fmt="twee"
+  fmt="twee",
+  seed=0,
+  rand=0.0
 ):
+  print("Seed: {}".format(seed))
   story = []
   sofar = []
   scaffolding = ""
@@ -70,7 +73,7 @@ def main(
     print("  ...done.")
   else:
     try:
-      program, setup = tasks.setup_story([], scaffolding)
+      program, setup = tasks.setup_story([], scaffolding, seed, rand)
       story.extend(setup)
       with open(os.path.join("out", "snapshots", "prog-setup.lp"), 'w') as fout:
         fout.write(program)
@@ -99,7 +102,13 @@ def main(
         keepgoing = True
         print("Instantiating node '{}'...".format(target))
         try:
-          program, story = tasks.instantiate_node(story, target, scaffolding)
+          program, story = tasks.instantiate_node(
+            story,
+            target,
+            scaffolding,
+            seed,
+            rand
+          )
           with open(
             os.path.join("out", "snapshots", "prog-inst-{}.lp".format(n)),
             'w'
@@ -129,7 +138,13 @@ def main(
         keepgoing = True
         print("Branching node '{}'...".format(target))
         try:
-          program, story = tasks.branch_node(story, target, scaffolding)
+          program, story = tasks.branch_node(
+            story,
+            target,
+            scaffolding,
+            seed,
+            rand
+          )
           with open(
             os.path.join("out", "snapshots", "prog-branch-{}.lp".format(n)),
             'w'
@@ -153,7 +168,13 @@ def main(
         keepgoing = True
         print("Polishing ending node '{}'...".format(target))
         try:
-          program, story = tasks.polish_ending(story, target, scaffolding)
+          program, story = tasks.polish_ending(
+            story,
+            target,
+            scaffolding,
+            seed,
+            rand
+          )
           with open(
             os.path.join("out", "snapshots", "prog-polish-{}.lp".format(n)),
             'w'
@@ -208,6 +229,8 @@ if __name__ == "__main__":
   mode = "full"
   nodelimit = 12
   fmt = "twee"
+  seed = random.randint(1, 100000)
+  rand = 0.05
 
   if '-s' in sys.argv:
     idx = sys.argv.index('-s')
@@ -237,7 +260,7 @@ if __name__ == "__main__":
   if "--choicescript" in sys.argv:
     fmt = "choicescript"
 
-  success = main(mode, storyfile, scfiles, scfrags, nodelimit, fmt)
+  success = main(mode, storyfile, scfiles, scfrags, nodelimit, fmt, seed, rand)
 
   if not success:
     exit(1)

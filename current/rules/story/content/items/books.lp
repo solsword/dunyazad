@@ -19,7 +19,6 @@ teaches_skill(speech_book, elocution).
 
 item_def(music_book, book, "music book", singular).
 teaches_skill(music_book, music).
-tool_for(music_book, music).
 
 item_def(medicine_book, book, "book of medicine", singular).
 teaches_skill(medicine_book, healing).

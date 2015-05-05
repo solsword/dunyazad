@@ -15,6 +15,7 @@ starting_skill(elocution).
 starting_skill(healing).
 %starting_skill(prayer).
 starting_skill(acrobatics).
+starting_skill(storytelling).
 
 st(R, inst(actor, you)) :- _sr(R).
 st(R, state(party_member, inst(actor, you))) :- _sr(R).
@@ -23,15 +24,14 @@ st(R, property(person, inst(actor, you), second)) :- _sr(R).
 st(R, property(gender, inst(actor, you), feminine)) :- _sr(R).
 st(R, property(determined, inst(actor, you), false)) :- _sr(R).
 st(R, property(type, inst(actor, you), person)) :- _sr(R).
-% You start with literacy, storytelling, and one other random skill (from the
-% list of "starting" skills):
-1 = {
+% You start with literacy and two other random skills (from the list of
+% "starting" skills):
+2 = {
   st(R, property(has_skill, inst(actor, you), Skill)) : starting_skill(Skill);
   error(m("Missing starting skill."))
 } :- _sr(R).
 st(R, property(has_skill, inst(actor, you), literacy)) :- _sr(R).
-st(R, property(has_skill, inst(actor, you), storytelling)) :- _sr(R).
-% default number
+%st(R, property(has_skill, inst(actor, you), storytelling)) :- _sr(R).
 
 % Party member parameters:
 
@@ -51,14 +51,27 @@ party_member_rel("beloved").
 
 % Party member selection:
 
-%1 = {
-%  party_member(member_one, Relation) : party_member_rel(Relation);
-%  error(m("Party member of no relation.", member_one))
-%} :- _sr(R).
-%1 = {
-%  party_member(member_two, Relation) : party_member_rel(Relation);
-%  error(m("Party member of no relation.", member_two))
-%} :- _sr(R).
+1 = {
+  party_size(PS) : party_size_value(PS)
+} :- _sr(R).
+
+1 = {
+  party_member(member_one, Relation) : party_member_rel(Relation);
+  error(m("Party member of no relation.", member_one))
+} :-
+  _sr(R),
+  party_size(PS),
+  PS >= 2.
+1 = {
+  party_member(member_two, Relation) : party_member_rel(Relation);
+  error(m("Party member of no relation.", member_two))
+} :-
+  _sr(R),
+  party_size(PS),
+  PS >= 3.
+error(m("Can't handle party sizes larger than 3.")) :-
+  party_size(PS),
+  PS > 3.
 error(m("Multiple party members have the same relation.")) :-
   party_member(M1, Relation),
   party_member(M2, Relation),

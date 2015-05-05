@@ -432,13 +432,6 @@ at(N, choice_structure(negative_alternatives)) :-
       at(N, expectation(option(X), fails, SomeGoal)),
       at(N, stakes(SomeGoal, SomeStakes));
     -1,at(N, option(X)) : at(N, option(X))
-  },
-  at(N, player_goal(Goal1)),
-  at(N, player_goal(Goal2)),
-  Goal1 != Goal2,
-  2 <= {
-    at(N, option(X)) : at(N, expectation(option(X), fails, Goal1));
-    at(N, option(X)) : at(N, expectation(option(X), fails, Goal2))
   }.
 
 at(N, choice_structure(pressured)) :-

@@ -16,7 +16,7 @@ outcome_val(gossip, utility, useless).
 % skills
 
 skill_link(
-  elocution, promotes, no_tool,
+  elocution, required, no_tool,
   gossip, interested,
   o(utility, useful)
 ).

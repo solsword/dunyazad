@@ -47,6 +47,20 @@ error(m("Exclusive outcome values.", N, X)) :-
   argument(Action, Arg, action),
   story_op(N, build_options).
 
+% The concept of an "initiator:"
+at(N, initiator(X, Initiator)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, InitArg, Initiator)),
+  initiator(Action, InitArg),
+  story_op(N, build_options).
+
+% An action without an initiator is an error:
+error(m("Action without initiator.", N, X)) :-
+  at(N, option(X)),
+  0 = {
+    at(N, initiator(option(X), Anyone))
+  }.
+
 % Actual consequences depend on which outcome variables have which values:
 at(N, consequence(X, Consequence)) :-
   at(N, consequence_of(X, Outcome, Consequence)),
@@ -81,3 +95,23 @@ error(m("Interaction with off-stage instance.", N, X)) :-
   st(N, state(off_stage, Inst)),
   not off_stage_okay(Action, Arg),
   story_op(N, build_options).
+
+% Outcomes are surprising if they're unlikely based on skills/tools:
+at(N, surprising(X)) :-
+  at(N, outcome(X, Outcome)),
+  at(N, unlikely_outcome(X, Outcome)),
+  story_op(N, build_options).
+
+% Outcomes are also surprising if there's a likely outcome but something else
+% happens:
+at(N, surprising(X)) :-
+  at(N, likely_outcome(X, o(OutVar, Likely))),
+  at(N, outcome(X, o(OutVar, NotLikely))),
+  NotLikely != Likely,
+  story_op(N, build_options).
+
+% Only chaotic actions may have surprising outcomes:
+error(m("Non-chaotic action had surprising outcome.", N, X)) :-
+  at(N, action(X, Action)),
+  at(N, surprising(X)),
+  not chaotic(Action).

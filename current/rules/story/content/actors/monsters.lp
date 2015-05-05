@@ -2,6 +2,7 @@ subclass(animal, monster).
 powerful(monster).
 class_skill(monster, fighting, always).
 class_skill(monster, monstrous, always).
+class_skill(monster, wilderness_lore, sometimes).
 
 actor_def(dragon, monster, "dragon", singular, neuter).
 item_def(dragon_scale, treasure, "dragon scale", singular).
