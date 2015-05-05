@@ -25,7 +25,7 @@ error(m("Unaddressed important potential", N)) :-
   0 = {
     at(N, option(X)) : at(N, relevant_to(option(X), potential(PTyp, Something)))
   },
-  2 >= { at(N, option(X)) },
+  2 <= { at(N, option(X)) },
   node_type(N, choice),
   story_op(N, build_options).
 

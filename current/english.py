@@ -40,6 +40,8 @@ CAP = re.compile(r"(?:@CAP@)+(.)")
 PAR = re.compile(r"@PAR@")
 BREAK = re.compile(r"@@(?!CAP@)(?!PAR@)")
 
+MAX_PRONOUN_AGE = 1
+
 TAGS = {
   "directive": re.compile(r"\bD#([a-z_][a-z_0-9]*)/(\??[a-z_][a-z_0-9]*)\b"),
   "noun": re.compile(r"\bN#(\??[a-z_A-Z][a-z_A-Z0-9]*)/([a-z_]+)\b"),
@@ -1261,6 +1263,7 @@ def build_text(
             else:
               raise ValueError("Unknown directive '{}'.".format(directive))
             add = ""
+
           elif t == "noun":
             noun = m.group(1)
             if noun not in ndict:
@@ -1272,7 +1275,15 @@ def build_text(
               pro = pro[1:]
             case, position = nouns.casepos(pro)
             slot = pnslots[nouns.pnslot(ndict[noun])]
-            if noun in slot[1] and len(slot[1]) == 1 and not nopro:
+            if (
+              not nopro
+            and
+              slot[0] <= MAX_PRONOUN_AGE
+            and
+              noun in slot[1]
+            and
+              len(slot[1]) == 1
+            ):
               slot[0] = 0
               add = nouns.pronoun(ndict[noun], case, position)
               # TODO: Gender introduction awareness!
@@ -1287,6 +1298,13 @@ def build_text(
               else:
                 introduced.add(noun)
                 add = nouns.indefinite(ndict[noun], case)
+
+            # we saw a noun: increment all third-person pnslots age counters
+            # except for the counter for the noun we saw:
+            for sl in ["he/she", "it", "they"]:
+              if pnslots[sl] != slot:
+                pnslots[sl][0] += 1
+
           elif t == "verb":
             verb = m.group(1)
             tense = TSABR[m.group(2)]

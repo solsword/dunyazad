@@ -14,6 +14,15 @@ default_intent(talk_down, o(attitude, convinced)).
 outcome_val(talk_down, attitude, convinced).
 outcome_val(talk_down, attitude, unconvinced).
 
+outcome_val(talk_down, enraged, enraged).
+outcome_val(talk_down, enraged, not_enraged).
+
+outcome_excludes(
+  talk_down,
+  o(attitude, convinced),
+  o(enraged, enraged)
+).
+
 % skills
 
 skill_link(
@@ -26,6 +35,18 @@ skill_link(
   storytelling, promotes, no_tool,
   talk_down, asking,
   o(attitude, convinced)
+).
+
+skill_link(
+  elocution, promotes, no_tool,
+  talk_down, asking,
+  o(enraged, not_enraged)
+).
+
+skill_link(
+  storytelling, promotes, no_tool,
+  talk_down, asking,
+  o(enraged, not_enraged)
 ).
 
 error(m("Unintelligent asker.", N, X)) :-
@@ -80,3 +101,35 @@ at(
   at(N, arg(X, victim, Victim)),
   st(N, relation(accusing, Listening, Victim)),
   story_op(N, build_options).
+
+% but the the target might become enraged instead
+at(
+  N,
+  consequence_of(
+    X,
+    o(enraged, enraged),
+    relation(threatening, Listening, Asking)
+  )
+) :-
+  at(N, action(X, talk_down)),
+  at(N, arg(X, asking, Asking)),
+  at(N, arg(X, listening, Listening)),
+  at(N, arg(X, victim, Victim)),
+  st(N, relation(threatening, Listening, Victim)),
+  story_op(N, build_options).
+
+at(
+  N,
+  consequence_of(
+    X,
+    o(enraged, enraged),
+    relation(accusing, Listening, Asking)
+  )
+) :-
+  at(N, action(X, talk_down)),
+  at(N, arg(X, asking, Asking)),
+  at(N, arg(X, listening, Listening)),
+  at(N, arg(X, victim, Victim)),
+  st(N, relation(accusing, Listening, Victim)),
+  story_op(N, build_options).
+

@@ -125,6 +125,9 @@ KEEP = {
 
   "structural_purpose":
     PVr("structural_purpose", "structural_purpose", Vr("Node"), Vr("Purpose")),
+
+  "setup_priority":
+    PVr("setup_priority", "setup_priority", Vr("Setup"), Vr("N")),
 }
 
 def runfr(story, name, extra = "", seed=0, rand=0.0):

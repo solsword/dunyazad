@@ -64,7 +64,7 @@ error(m("Merchant two doesn't own their goods", N)) :-
 
 % Potentials:
 s_st(market, relation(c(selling), v(merchant_one), v(goods_one))).
-s_st(market, relation(c(selling), v(merchant_one), v(goods_two))).
+s_st(market, relation(c(selling), v(merchant_two), v(goods_two))).
 s_st(market, property(c(offering_service), v(doctor), c(treat_injury))).
 
 s_o_st(market, state(c(bored), v(merchant_one))).

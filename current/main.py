@@ -230,7 +230,7 @@ if __name__ == "__main__":
   nodelimit = 12
   fmt = "twee"
   seed = random.randint(1, 100000)
-  rand = 0.05
+  rand = 0.15
 
   if '-s' in sys.argv:
     idx = sys.argv.index('-s')
