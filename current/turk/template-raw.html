@@ -1,0 +1,213 @@
+<!-- Bootstrap v3.0.3 -->
+<link href="https://s3.amazonaws.com/mturk-public/bs30/css/bootstrap.min.css" rel="stylesheet" />
+<script src="//uniqueturker.myleott.com/lib.js" type="text/javascript"></script>
+<script type="text/javascript">
+(function(){
+    var ut_id = "dunyazad-single-choice-survey";
+    if (UTWorkerLimitReached(ut_id)) {
+        document.getElementById('mturk_form').style.display = 'none';
+        document.getElementsByTagName('body')[0].innerHTML = "You have already completed the maximum number of HITs allowed by this requester. Please click 'Return HIT' to avoid any impact on your approval rating.";
+    }
+})();
+</script>
+<style type="text/css">
+textarea {
+  width: 80%;
+}
+
+.story {
+  border: 2px solid #dddddd;
+  border-radius: 0.6em;
+  padding: 16px;
+  background: #f4f4f4;
+  margin: 16px 0px 16px 0px;
+}
+
+.panel {
+  margin: 16px 0px 16px 0px;
+}
+
+.question-input {
+  padding-left: 2em;
+}
+
+fieldset {
+  padding: 10px;
+  background:#fbfbfb;
+  border-radius:0.6em;
+  margin-bottom:5px;
+}
+</style>
+<section class="container" id="Survey" style="margin-bottom:15px; padding: 10px 10px; font-family: Verdana, Geneva, sans-serif; color:#333333; font-size:0.9em;">
+<!-- Instructions Box -->
+<div class="panel panel-primary">
+<div class="panel-heading"><strong>Preliminaries</strong></div>
+
+<div class="panel-body">
+<p>To provide useful data for this survey, you must be at least 18 years old and able to read English. To confirm this (and to confirm that you aren&#39;t a bot), please answer the following question.</p>
+</div>
+</div><!-- End Instructions Box -->
+
+<section>
+<fieldset>
+  <label>If you&#39;re at least 18 years old, please don&#39;t write &quot;Age of years eighteen least at am I that confirm I,&quot; as the answer here, instead write that sentence backwards, ended with an exclamation point. If not, please do a different HIT, as I cannot use your data in my results, and thus I will not accept your response.</label>
+  <textarea name="agefluency"></textarea>
+</fieldset>
+
+<!-- Instructions Box -->
+<div class="panel panel-primary">
+<div class="panel-heading"><strong>The Choice</strong></div>
+
+<div class="panel-body">
+<p>Please read the following short story which presents you with a choice, then answer the questions about that choice below.</p>
+</div>
+</div><!-- End Instructions Box -->
+
+<div class="story">
+<p>
+${framing}
+</p>
+<p>
+${assets}
+</p>
+<p>
+${set_off}
+</p>
+<p>
+${setup}
+</p>
+<p>
+${potentials}
+</p>
+<p>
+${prompt}
+</p>
+<ol>
+<li>${opt1}</li>
+<li>${opt2}</li>
+<li>${opt3}</li>
+</ol>
+</div>
+
+<fieldset>
+  <label>1. If you were reading this story, which option would you pick?</label><br/>
+  <div class="question-input">
+    <input type="radio" name="decision" value="1">&nbsp;Option 1<br/>
+    <input type="radio" name="decision" value="2">&nbsp;Option 2<br/>
+    <input type="radio" name="decision" value="3">&nbsp;Option 3<br/>
+  </div>
+</fieldset>
+
+<!-- Instructions Box -->
+<div class="panel panel-primary">
+<div class="panel-heading"><strong>Opinion Questions</strong></div>
+
+<div class="panel-body">
+<p>Please rate your agreement with the following statements, from 1 (strongly disagree) to 5 (strongly agree).</p>
+</div>
+</div><!-- End Instructions Box -->
+
+<fieldset>
+  <label>2. &quot;There are no bad options at this choice.&quot;</label>
+  <div class="question-input">
+    <input type="radio" name="nobad" value="1">&nbsp;1 - strongly disagree<br/>
+    <input type="radio" name="nobad" value="2">&nbsp;2 - somewhat disagree<br/>
+    <input type="radio" name="nobad" value="3">&nbsp;3 - neutral<br/>
+    <input type="radio" name="nobad" value="4">&nbsp;4 - somewhat agree<br/>
+    <input type="radio" name="nobad" value="5">&nbsp;5 - strongly agree<br/>
+  </div>
+</fieldset>
+
+<fieldset>
+  <label>3. &quot;There is a clear best option at this choice.&quot;</label>
+  <div class="question-input">
+    <input type="radio" name="clearbest" value="1">&nbsp;1 - strongly disagree<br/>
+    <input type="radio" name="clearbest" value="2">&nbsp;2 - somewhat disagree<br/>
+    <input type="radio" name="clearbest" value="3">&nbsp;3 - neutral<br/>
+    <input type="radio" name="clearbest" value="4">&nbsp;4 - somewhat agree<br/>
+    <input type="radio" name="clearbest" value="5">&nbsp;5 - strongly agree<br/>
+  </div>
+</fieldset>
+
+<fieldset>
+  <label>4. &quot;The stakes for this choice are low.&quot;</label>
+  <div class="question-input">
+    <input type="radio" name="lowstakes" value="1">&nbsp;1 - strongly disagree<br/>
+    <input type="radio" name="lowstakes" value="2">&nbsp;2 - somewhat disagree<br/>
+    <input type="radio" name="lowstakes" value="3">&nbsp;3 - neutral<br/>
+    <input type="radio" name="lowstakes" value="4">&nbsp;4 - somewhat agree<br/>
+    <input type="radio" name="lowstakes" value="5">&nbsp;5 - strongly agree<br/>
+  </div>
+</fieldset>
+
+<fieldset>
+  <label>5. &quot;There are no good options at this choice.&quot;</label>
+  <div class="question-input">
+    <input type="radio" name="nogood" value="1">&nbsp;1 - strongly disagree<br/>
+    <input type="radio" name="nogood" value="2">&nbsp;2 - somewhat disagree<br/>
+    <input type="radio" name="nogood" value="3">&nbsp;3 - neutral<br/>
+    <input type="radio" name="nogood" value="4">&nbsp;4 - somewhat agree<br/>
+    <input type="radio" name="nogood" value="5">&nbsp;5 - strongly agree<br/>
+  </div>
+</fieldset>
+
+<fieldset>
+  <label>6. &quot;All of the options at this choice are about equally promising..&quot;</label>
+  <div class="question-input">
+    <input type="radio" name="balanced" value="1">&nbsp;1 - strongly disagree<br/>
+    <input type="radio" name="balanced" value="2">&nbsp;2 - somewhat disagree<br/>
+    <input type="radio" name="balanced" value="3">&nbsp;3 - neutral<br/>
+    <input type="radio" name="balanced" value="4">&nbsp;4 - somewhat agree<br/>
+    <input type="radio" name="balanced" value="5">&nbsp;5 - strongly agree<br/>
+  </div>
+</fieldset>
+
+<fieldset>
+  <label>7. &quot;There are options at this choice.&quot; (This is a trick question to test whether you're paying attention. Please simply indicate that you are in complete disagreement.)</label>
+  <div class="question-input">
+    <input type="radio" name="trick" value="1">&nbsp;1 - strongly disagree<br/>
+    <input type="radio" name="trick" value="2">&nbsp;2 - somewhat disagree<br/>
+    <input type="radio" name="trick" value="3">&nbsp;3 - neutral<br/>
+    <input type="radio" name="trick" value="4">&nbsp;4 - somewhat agree<br/>
+    <input type="radio" name="trick" value="5">&nbsp;5 - strongly agree<br/>
+  </div>
+</fieldset>
+
+<fieldset>
+  <label>8. &quot;This is a difficult choice to make.&quot;</label>
+  <div class="question-input">
+    <input type="radio" name="difficult" value="1">&nbsp;1 - strongly disagree<br/>
+    <input type="radio" name="difficult" value="2">&nbsp;2 - somewhat disagree<br/>
+    <input type="radio" name="difficult" value="3">&nbsp;3 - neutral<br/>
+    <input type="radio" name="difficult" value="4">&nbsp;4 - somewhat agree<br/>
+    <input type="radio" name="difficult" value="5">&nbsp;5 - strongly agree<br/>
+  </div>
+</fieldset>
+
+<fieldset>
+  <label>9. &quot;This choice feels like it will have important consequences.&quot;</label>
+  <div class="question-input">
+    <input type="radio" name="consequences" value="1">&nbsp;1 - strongly disagree<br/>
+    <input type="radio" name="consequences" value="2">&nbsp;2 - somewhat disagree<br/>
+    <input type="radio" name="consequences" value="3">&nbsp;3 - neutral<br/>
+    <input type="radio" name="consequences" value="4">&nbsp;4 - somewhat agree<br/>
+    <input type="radio" name="consequences" value="5">&nbsp;5 - strongly agree<br/>
+  </div>
+</fieldset>
+
+<!--fieldset>
+  <label>5. &quot;.&quot;</label>
+  <div class="question-input">
+    <input type="radio" name="clearbest" value="1">&nbsp;1 - strongly disagree<br/>
+    <input type="radio" name="clearbest" value="2">&nbsp;2 - somewhat disagree<br/>
+    <input type="radio" name="clearbest" value="3">&nbsp;3 - neutral<br/>
+    <input type="radio" name="clearbest" value="4">&nbsp;4 - somewhat agree<br/>
+    <input type="radio" name="clearbest" value="5">&nbsp;5 - strongly agree<br/>
+  </div>
+</fieldset-->
+
+</section>
+<!-- End Survey Body -->
+</section>
+<!-- close container -->
+

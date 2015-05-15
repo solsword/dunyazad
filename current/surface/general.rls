@@ -51,19 +51,25 @@ as N#you/they V#walk/prs/you among a stand of massive trees
 as N#you/they V#pass/prs/you an outcropping of gray stone
 
 :misc/is_unskilled/?
+{at(Now,text_mode(normal))}
 N#?who/they V#be/prs/?who [[misc/unskilled/?_]]
+{at(Now,text_mode(example))}
+N#?who/they V#be/prs/?who missing skill: [[misc/skill_name/?_]]
 
 :misc/is_skilled/?
+{at(Now,text_mode(normal))}
 N#?who/they V#be/prs/?who [[misc/skilled/?_]]
+{at(Now,text_mode(example))}
+N#?who/they V#have/prs/?who skill: [[misc/skill_name/?_]]
 
-:misc/skilled
+:misc/skilled_adj
 skilled
 competent
 capable
 great
 good
 
-:misc/unskilled
+:misc/unskilled_adj
 unskilled
 incompetent
 awful
@@ -78,24 +84,63 @@ awful at
 terrible at
 incapable of
 
+:misc/skill_name/tinkering
+tinkering
+
+:misc/skill_name/fighting
+fighting
+
+:misc/skill_name/wilderness_lore
+wilderness lore
+
+:misc/skill_name/music
+musician
+
+:misc/skill_name/elocution
+negotiation
+
+:misc/skill_name/healing
+healing
+
+:misc/skill_name/thievery
+thievery
+
+:misc/skill_name/literacy
+literacy
+
+:misc/skill_name/prayer
+prayer
+
+:misc/skill_name/acrobatics
+acrobatics
+
+:misc/skill_name/storytelling
+storytelling
+
+:misc/skill_name/monstrous
+monstrous
+
+:misc/skill_name/unintelligent
+unintelligent
+
 :misc/skilled/tinkering
 [[misc/good_at]] making things
 [[misc/good_at]] repairing things
-a [[misc/skilled]] engineer
+a [[misc/skilled_adj]] engineer
 
 :misc/unskilled/tinkering
 [[misc/bad_at]] making things
-an [[misc/unskilled]] engineer
+an [[misc/unskilled_adj]] engineer
 
 :misc/skilled/fighting
 skilled at fighting
 [[misc/good_at]] fighting
-a [[misc/skilled]] warrior
+a [[misc/skilled_adj]] warrior
 a veteran warrior
 
 :misc/unskilled/fighting
 [[misc/bad_at]] fighting
-a [[misc/unskilled]] warrior
+a [[misc/unskilled_adj]] warrior
 a completely inexperienced warrior
 
 :misc/skilled/wilderness_lore
@@ -109,37 +154,37 @@ ignorant about plants and animals
 incapable of surviving in the wilderness
 
 :misc/skilled/music
-a [[misc/skilled]] musician
-[[misc/skilled]] with an instrument
+a [[misc/skilled_adj]] musician
+[[misc/skilled_adj]] with an instrument
 
 :misc/unskilled/music
-an [[misc/unskilled]] musician
-[[misc/unskilled]] with an instrument
+an [[misc/unskilled_adj]] musician
+[[misc/unskilled_adj]] with an instrument
 
 :misc/skilled/elocution
 skilled at rhetoric
-a [[misc/skilled]] public speaker
+a [[misc/skilled_adj]] public speaker
 notoriously persuasive
 
 :misc/unskilled/elocution
 prone to gaffes
-an [[misc/unskilled]] public speaker
+an [[misc/unskilled_adj]] public speaker
 
 :misc/skilled/healing
 knowledgeable about the healing arts
-a [[misc/skilled]] doctor
+a [[misc/skilled_adj]] doctor
 
 :misc/unskilled/healing
 ignorant of the healing arts
-an [[misc/unskilled]] doctor
+an [[misc/unskilled_adj]] doctor
 
 :misc/skilled/thievery
 [[misc/good_at]] stealing things
-a [[misc/skilled]] thief
+a [[misc/skilled_adj]] thief
 
 :misc/unskilled/thievery
 [[misc/bad_at]] stealing things
-an [[misc/unskilled]] thief
+an [[misc/unskilled_adj]] thief
 
 :misc/skilled/literacy
 literate
@@ -159,19 +204,19 @@ unskilled at prayer
 % TODO: More here
 
 :misc/skilled/acrobatics
-a [[misc/skilled]] acrobat
+a [[misc/skilled_adj]] acrobat
 [[misc/good_at]] running and jumping
 
 :misc/unskilled/acrobatics
-an [[misc/unskilled]] acrobat
+an [[misc/unskilled_adj]] acrobat
 [[misc/bad_at]] running and jumping
 
 :misc/skilled/storytelling
-a [[misc/skilled]] storyteller
+a [[misc/skilled_adj]] storyteller
 [[misc/good_at]] telling stories
 
 :misc/unskilled/storytelling
-an [[misc/unskilled]] storyteller
+an [[misc/unskilled_adj]] storyteller
 [[misc/bad_at]] telling stories
 
 :misc/skilled/monstrous

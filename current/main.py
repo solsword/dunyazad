@@ -208,10 +208,18 @@ def main(
 
   print("Building story text...")
   outfile = "story.txt"
+  output = english.build_story_text(sofar, mode, timeshift=None, fmt=fmt)
   if fmt == "twee":
     outfile = "story.tw"
+  elif fmt == "example":
+    outfile = "story.html"
+  elif fmt == "turk":
+    outfile = "dunyazad.input"
+    output = """\
+seed\tframing\tassets\tset_off\tsetup\tpotentials\tprompt\topt1\topt2\topt3
+{}\t{}""".format(str(seed), output)
   with open(os.path.join("out", outfile), 'w') as fout:
-    fout.write(english.build_story_text(sofar, mode, timeshift=None, fmt=fmt))
+    fout.write(output)
   if fmt == "twee":
     print("Compiling Twine version...")
     html = subprocess.check_output(
@@ -244,6 +252,11 @@ if __name__ == "__main__":
     idx = sys.argv.index('-r')
     scfrags.append(sys.argv[idx+1])
 
+  if '-e' in sys.argv:
+    # TODO: Seeds don't work at all!
+    idx = sys.argv.index('-e')
+    seed = int(sys.argv[idx+1])
+
   if '-n' in sys.argv:
     idx = sys.argv.index('-n')
     nodelimit = int(sys.argv[idx+1])
@@ -251,6 +264,7 @@ if __name__ == "__main__":
   if '-x' in sys.argv:
     idx = sys.argv.index('-x')
     mode = "example"
+    fmt = "turk"
     scfrags.append(sys.argv[idx+1])
     scfrags.append("example")
 
@@ -259,6 +273,9 @@ if __name__ == "__main__":
 
   if "--choicescript" in sys.argv:
     fmt = "choicescript"
+
+  if "--turk" in sys.argv:
+    fmt = "turk"
 
   success = main(mode, storyfile, scfiles, scfrags, nodelimit, fmt, seed, rand)
 

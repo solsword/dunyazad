@@ -1,0 +1,377 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<QuestionForm xmlns="http://mechanicalturk.amazonaws.com/AWSMechanicalTurkDataSchemas/2005-10-01/QuestionForm.xsd">
+  <Overview>
+    <Title>Preliminaries</Title>
+    <Text>To provide useful data for this survey, you must be at least 18 years old and able to read English. To confirm this (and to confirm that you aren't a bot), please answer the following question.</Text>
+  </Overview>
+  <Question>
+    <QuestionIdentifier>agefluency</QuestionIdentifier>
+    <DisplayName>Confirm your age</DisplayName>
+    <IsRequired>false</IsRequired>
+    <QuestionContent>
+      <Text>If you're at least 18 years old, please don't write "Age of years eighteen least at am I that confirm I," as the answer here, instead write that sentence backwards, ended with an exclamation point. If not, please do a different HIT, as I cannot use your data in my results, and thus I will not accept your response.</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <FreeTextAnswer/>
+    </AnswerSpecification>
+  </Question>
+  <Overview>
+    <Title>An Example Choice</Title>
+    <Text>Please read the following short story which presents you with a choice, then answer the questions about that choice below.</Text>
+    <FormattedContent><![CDATA[
+<hr/>
+<p>
+${framing}
+</p>
+<p>
+${assets}
+</p>
+<p>
+${set_off}
+</p>
+<p>
+${setup}
+</p>
+<p>
+${potentials}
+</p>
+<p>
+${prompt}
+</p>
+<ol>
+<li>${opt1}</li>
+<li>${opt2}</li>
+<li>${opt3}</li>
+</ol>
+]]></FormattedContent>
+  </Overview>
+  <Question>
+    <QuestionIdentifier>decision</QuestionIdentifier>
+    <DisplayName>Your Decision</DisplayName>
+    <IsRequired>true</IsRequired>
+    <QuestionContent>
+      <Text>If you were reading this story, which option would you pick?</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <SelectionAnswer>
+        <MinSelectionCount>1</MinSelectionCount>
+        <MaxSelectionCount>1</MaxSelectionCount>
+        <StyleSuggestion>radiobutton</StyleSuggestion>
+        <Selections>
+          <Selection>
+            <SelectionIdentifier>1</SelectionIdentifier>
+            <Text>Option 1</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>2</SelectionIdentifier>
+            <Text>Option 2</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>3</SelectionIdentifier>
+            <Text>Option 3</Text>
+          </Selection>
+        </Selections>
+      </SelectionAnswer>
+    </AnswerSpecification>
+  </Question>
+  <Overview>
+    <Title>Opinion Questions</Title>
+    <Text>Please rate your agreement with the following statements, from 1 (strongly disagree) to 5 (strongly agree).</Text>
+  </Overview>
+  <Question>
+    <QuestionIdentifier>nobad</QuestionIdentifier>
+    <DisplayName>No Bad Options</DisplayName>
+    <IsRequired>true</IsRequired>
+    <QuestionContent>
+      <Text>There are no bad options at this choice.</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <SelectionAnswer>
+        <MinSelectionCount>1</MinSelectionCount>
+        <MaxSelectionCount>1</MaxSelectionCount>
+        <StyleSuggestion>radiobutton</StyleSuggestion>
+        <Selections>
+          <Selection>
+            <SelectionIdentifier>1</SelectionIdentifier>
+            <Text>1 (strongly disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>2</SelectionIdentifier>
+            <Text>2 (somewhat disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>3</SelectionIdentifier>
+            <Text>3 (neutral)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>4</SelectionIdentifier>
+            <Text>4 (somewhat agree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>5</SelectionIdentifier>
+            <Text>5 (strongly agree)</Text>
+          </Selection>
+        </Selections>
+      </SelectionAnswer>
+    </AnswerSpecification>
+  </Question>
+  <Question>
+    <QuestionIdentifier>clearbest</QuestionIdentifier>
+    <DisplayName>Clear Best Option</DisplayName>
+    <IsRequired>true</IsRequired>
+    <QuestionContent>
+      <Text>There is a clear best option at this choice.</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <SelectionAnswer>
+        <MinSelectionCount>1</MinSelectionCount>
+        <MaxSelectionCount>1</MaxSelectionCount>
+        <StyleSuggestion>radiobutton</StyleSuggestion>
+        <Selections>
+          <Selection>
+            <SelectionIdentifier>1</SelectionIdentifier>
+            <Text>1 (strongly disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>2</SelectionIdentifier>
+            <Text>2 (somewhat disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>3</SelectionIdentifier>
+            <Text>3 (neutral)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>4</SelectionIdentifier>
+            <Text>4 (somewhat agree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>5</SelectionIdentifier>
+            <Text>5 (strongly agree)</Text>
+          </Selection>
+        </Selections>
+      </SelectionAnswer>
+    </AnswerSpecification>
+  </Question>
+  <Question>
+    <QuestionIdentifier>lowstakes</QuestionIdentifier>
+    <DisplayName>Low Stakes</DisplayName>
+    <IsRequired>true</IsRequired>
+    <QuestionContent>
+      <Text>The stakes for this choice are low.</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <SelectionAnswer>
+        <MinSelectionCount>1</MinSelectionCount>
+        <MaxSelectionCount>1</MaxSelectionCount>
+        <StyleSuggestion>radiobutton</StyleSuggestion>
+        <Selections>
+          <Selection>
+            <SelectionIdentifier>1</SelectionIdentifier>
+            <Text>1 (strongly disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>2</SelectionIdentifier>
+            <Text>2 (somewhat disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>3</SelectionIdentifier>
+            <Text>3 (neutral)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>4</SelectionIdentifier>
+            <Text>4 (somewhat agree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>5</SelectionIdentifier>
+            <Text>5 (strongly agree)</Text>
+          </Selection>
+        </Selections>
+      </SelectionAnswer>
+    </AnswerSpecification>
+  </Question>
+  <Question>
+    <QuestionIdentifier>nogood</QuestionIdentifier>
+    <DisplayName>No Good Options</DisplayName>
+    <IsRequired>true</IsRequired>
+    <QuestionContent>
+      <Text>There are no good options at this choice.</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <SelectionAnswer>
+        <MinSelectionCount>1</MinSelectionCount>
+        <MaxSelectionCount>1</MaxSelectionCount>
+        <StyleSuggestion>radiobutton</StyleSuggestion>
+        <Selections>
+          <Selection>
+            <SelectionIdentifier>1</SelectionIdentifier>
+            <Text>1 (strongly disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>2</SelectionIdentifier>
+            <Text>2 (somewhat disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>3</SelectionIdentifier>
+            <Text>3 (neutral)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>4</SelectionIdentifier>
+            <Text>4 (somewhat agree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>5</SelectionIdentifier>
+            <Text>5 (strongly agree)</Text>
+          </Selection>
+        </Selections>
+      </SelectionAnswer>
+    </AnswerSpecification>
+  </Question>
+  <Question>
+    <QuestionIdentifier>equallypromising</QuestionIdentifier>
+    <DisplayName>Balanced Options</DisplayName>
+    <IsRequired>true</IsRequired>
+    <QuestionContent>
+      <Text>All of the options at this choice are about equally promising.</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <SelectionAnswer>
+        <MinSelectionCount>1</MinSelectionCount>
+        <MaxSelectionCount>1</MaxSelectionCount>
+        <StyleSuggestion>radiobutton</StyleSuggestion>
+        <Selections>
+          <Selection>
+            <SelectionIdentifier>1</SelectionIdentifier>
+            <Text>1 (strongly disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>2</SelectionIdentifier>
+            <Text>2 (somewhat disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>3</SelectionIdentifier>
+            <Text>3 (neutral)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>4</SelectionIdentifier>
+            <Text>4 (somewhat agree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>5</SelectionIdentifier>
+            <Text>5 (strongly agree)</Text>
+          </Selection>
+        </Selections>
+      </SelectionAnswer>
+    </AnswerSpecification>
+  </Question>
+  <Question>
+    <QuestionIdentifier>payingattention</QuestionIdentifier>
+    <DisplayName>There are Options</DisplayName>
+    <IsRequired>true</IsRequired>
+    <QuestionContent>
+      <Text>There are options at this choice. This is a trick question to test whether you're paying attention (I'm sorry to do this to you, but bots are a problem). Please simply indicate that you are in complete disagreement.</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <SelectionAnswer>
+        <MinSelectionCount>1</MinSelectionCount>
+        <MaxSelectionCount>1</MaxSelectionCount>
+        <StyleSuggestion>radiobutton</StyleSuggestion>
+        <Selections>
+          <Selection>
+            <SelectionIdentifier>1</SelectionIdentifier>
+            <Text>1 (strongly disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>2</SelectionIdentifier>
+            <Text>2 (somewhat disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>3</SelectionIdentifier>
+            <Text>3 (neutral)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>4</SelectionIdentifier>
+            <Text>4 (somewhat agree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>5</SelectionIdentifier>
+            <Text>5 (strongly agree)</Text>
+          </Selection>
+        </Selections>
+      </SelectionAnswer>
+    </AnswerSpecification>
+  </Question>
+  <Question>
+    <QuestionIdentifier>harddecision</QuestionIdentifier>
+    <DisplayName>Choice Difficulty</DisplayName>
+    <IsRequired>true</IsRequired>
+    <QuestionContent>
+      <Text>It is difficult to choose an option at this choice.</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <SelectionAnswer>
+        <MinSelectionCount>1</MinSelectionCount>
+        <MaxSelectionCount>1</MaxSelectionCount>
+        <StyleSuggestion>radiobutton</StyleSuggestion>
+        <Selections>
+          <Selection>
+            <SelectionIdentifier>1</SelectionIdentifier>
+            <Text>1 (strongly disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>2</SelectionIdentifier>
+            <Text>2 (somewhat disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>3</SelectionIdentifier>
+            <Text>3 (neutral)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>4</SelectionIdentifier>
+            <Text>4 (somewhat agree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>5</SelectionIdentifier>
+            <Text>5 (strongly agree)</Text>
+          </Selection>
+        </Selections>
+      </SelectionAnswer>
+    </AnswerSpecification>
+  </Question>
+  <Question>
+    <QuestionIdentifier>consequences</QuestionIdentifier>
+    <DisplayName>Choice Impact</DisplayName>
+    <IsRequired>true</IsRequired>
+    <QuestionContent>
+      <Text>This choice feels like it will have important consequences.</Text>
+    </QuestionContent>
+    <AnswerSpecification>
+      <SelectionAnswer>
+        <MinSelectionCount>1</MinSelectionCount>
+        <MaxSelectionCount>1</MaxSelectionCount>
+        <StyleSuggestion>radiobutton</StyleSuggestion>
+        <Selections>
+          <Selection>
+            <SelectionIdentifier>1</SelectionIdentifier>
+            <Text>1 (strongly disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>2</SelectionIdentifier>
+            <Text>2 (somewhat disagree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>3</SelectionIdentifier>
+            <Text>3 (neutral)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>4</SelectionIdentifier>
+            <Text>4 (somewhat agree)</Text>
+          </Selection>
+          <Selection>
+            <SelectionIdentifier>5</SelectionIdentifier>
+            <Text>5 (strongly agree)</Text>
+          </Selection>
+        </Selections>
+      </SelectionAnswer>
+    </AnswerSpecification>
+  </Question>
+</QuestionForm>

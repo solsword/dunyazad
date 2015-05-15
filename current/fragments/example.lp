@@ -7,3 +7,5 @@ error(m("Party not simplified.")) :-
     setup(root, Setup),
     setup_priority(Setup, N)
 }.
+
+at(N, text_mode(example)) :- story_node(N).

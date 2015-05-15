@@ -33,6 +33,12 @@ skill_name(literacy, "literacy").
 skill_name(prayer, "prayer").
 skill_name(acrobatics, "acrobatics").
 
+% Skill link types:
+skill_link_type(required, positive, strong).
+skill_link_type(promotes, positive, weak).
+skill_link_type(avoids, negative, weak).
+skill_link_type(contest, complicated).
+
 % Universal skill links:
 
 at(N, skill_link(Skill, Link, NeedsTool, Action, Arg, Outcome)) :-
@@ -56,21 +62,6 @@ at(N, unlikely_outcome(X, Outcome)) :-
   st(N, property(has_skill, Actor, Skill)),
   not at(N, has_tool_for(Actor, Skill)),
   story_op(N, build_options).
-
-% An outcome value is "likely" if all other possibilities are unlikely:
-at(N, likely_outcome(X, o(OutVar, OutVal))) :-
-  at(N, action(X, Action)),
-  outcome_val(Action, OutVar, OutVal),
-  PossibleOutcomes = { outcome_val(Action, OutVar, PossibleVal) },
-  PossibleOutcomes - 1 = { at(N, unlikely_outcome(X, o(OutVar, UnlikelyVal))) },
-  not at(N, unlikely_outcome(X, o(OutVar, OutVal))),
-  story_op(N, build_options).
-
-% An outcome is unlikely if it is excluded by a likely outcome:
-at(N, unlikely_outcome(X, Excluded)) :-
-  at(N, action(X, Action)),
-  outcome_excludes(Action, Likely, Excluded),
-  at(N, likely_outcome(X, Likely)).
 
 % 'promotes' as opposed to 'required' links directly increase expectations:
 at(N, likely_outcome(X, Outcome)) :-
@@ -325,11 +316,27 @@ at(N, likely_outcome(X, Lose)) :-
   at(N, has_tool_for(ATwo, Skill)),
   story_op(N, build_options).
 
+% An outcome value is "likely" if all other possibilities are unlikely:
+at(N, likely_outcome(X, o(OutVar, OutVal))) :-
+  at(N, action(X, Action)),
+  outcome_val(Action, OutVar, OutVal),
+  PossibleOutcomes = { outcome_val(Action, OutVar, PossibleVal) },
+  PossibleOutcomes - 1 = { at(N, unlikely_outcome(X, o(OutVar, UnlikelyVal))) },
+  not at(N, unlikely_outcome(X, o(OutVar, OutVal))),
+  story_op(N, build_options).
+
+% An outcome is unlikely if it is excluded by a likely outcome:
+at(N, unlikely_outcome(X, Excluded)) :-
+  at(N, action(X, Action)),
+  outcome_excludes(Action, Likely, Excluded),
+  at(N, likely_outcome(X, Likely)).
+
 % Some predicates that make gleaning a list of applicable skills/tools easy:
 
 at(N, relevant_skill(X, Actor, has, Skill)) :-
   at(N, action(X, Action)),
   at(N, skill_link(Skill, Link, NeedsTool, Action, Arg, Outcome)),
+  skill_link_type(Link, AnyValence, AnyStrength),
   at(N, arg(X, Arg, Actor)),
   st(N, property(has_skill, Actor, Skill)),
   story_op(N, build_options).
@@ -337,12 +344,14 @@ at(N, relevant_skill(X, Actor, has, Skill)) :-
 at(N, relevant_skill(X, Actor, missing, Skill)) :-
   at(N, action(X, Action)),
   at(N, skill_link(Skill, Link, NeedsTool, Action, Arg, Outcome)),
+  skill_link_type(Link, AnyValence, strong),
   at(N, arg(X, Arg, Actor)),
   not st(N, property(has_skill, Actor, Skill)),
   story_op(N, build_options).
 
 at(N, relevant_tool(X, Actor, has, Item)) :-
   at(N, action(X, Action)),
+  at(N, relevant_skill(X, Actor, has, Skill)),
   at(N, skill_link(Skill, LinkType, tool, Action, Arg, Outcome)),
   at(N, arg(X, Arg, Actor)),
   st(N, property(has_skill, Actor, Skill)),
@@ -353,6 +362,7 @@ at(N, relevant_tool(X, Actor, has, Item)) :-
 
 at(N, relevant_tool(X, Actor, missing, Skill)) :-
   at(N, action(X, Action)),
+  at(N, relevant_skill(X, Actor, has, Skill)),
   at(N, skill_link(Skill, LinkType, tool, Action, Arg, Outcome)),
   at(N, arg(X, Arg, Actor)),
   st(N, property(has_skill, Actor, Skill)),
@@ -431,6 +441,7 @@ at(N, relevant_tool(X, Actor, has, Item)) :-
       either(Win, Lose)
     )
   ),
+  at(N, relevant_skill(X, Actor, has, Skill)),
   st(N, property(has_skill, Actor, Skill)),
   st(N, relation(has_item, Actor, Item)),
   is_instance(N, Item, Category),
@@ -449,6 +460,7 @@ at(N, relevant_tool(X, Actor, missing, Skill)) :-
       either(Win, Lose)
     )
   ),
+  at(N, relevant_skill(X, Actor, has, Skill)),
   st(N, property(has_skill, Actor, Skill)),
   not at(N, has_tool_for(Actor, Skill)),
   story_op(N, build_options).
@@ -465,6 +477,7 @@ at(N, relevant_tool(X, Actor, has, Item)) :-
       either(Win, Lose)
     )
   ),
+  at(N, relevant_skill(X, Actor, has, Skill)),
   st(N, property(has_skill, Actor, Skill)),
   st(N, relation(has_item, Actor, Item)),
   is_instance(N, Item, Category),
@@ -483,6 +496,7 @@ at(N, relevant_tool(X, Actor, missing, Skill)) :-
       either(Win, Lose)
     )
   ),
+  at(N, relevant_skill(X, Actor, has, Skill)),
   st(N, property(has_skill, Actor, Skill)),
   not at(N, has_tool_for(Actor, Skill)),
   story_op(N, build_options).

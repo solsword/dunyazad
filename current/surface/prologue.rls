@@ -3,7 +3,7 @@
 >prologue/full
 [[prologue/setting/full]]
 @PAR@
-You are not entirely without resources. [[prologue/introductions]]
+You are not entirely without resources. [[prologue/assets]]
 @PAR@
 [[prologue/get_started/full]]
 <
@@ -11,12 +11,12 @@ You are not entirely without resources. [[prologue/introductions]]
 >prologue/example
 [[prologue/setting/example]]
 @PAR@
-[[prologue/introductions]]
+[[prologue/assets]]
 @PAR@
 [[prologue/get_started/example]]
 <
 
-:prologue/introductions
+:prologue/assets
 [[S|prologue/you]] [[prologue/members/?n_party_members]]
 
 >prologue/setting/full

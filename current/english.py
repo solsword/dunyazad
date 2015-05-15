@@ -430,6 +430,7 @@ def glean_intro_variables(story, nouns):
   Takes a story and builds a variables dictionary used for rendering the
   prologue. The following variables are defined:
 
+      '_node' - set to "root"
       'nation' - the nation that you come from
       'city' - the city that you come from
       'destination' - the country that is your destination
@@ -446,7 +447,7 @@ def glean_intro_variables(story, nouns):
 
       '*' here is 'one' or 'two'
   """
-  result = {}
+  result = { "_node": "root" }
   party_members = [nouns[n] for n in nouns if nouns[n].is_party_member]
   if len(party_members) == 1:
     result["n_party_members"] = "one"
@@ -1333,6 +1334,11 @@ def build_text(
   # Finally process directives:
   if fmt == "choicescript":
     result = re.sub(PAR, '\n\n', result)
+  elif fmt == "turk":
+    result = re.sub(PAR, ' ', result)
+  elif fmt == "example":
+    result = re.sub(PAR, '\n\n', result)
+    result = re.sub('\n\n', '<br/>', result)
   elif fmt == "twee":
     result = re.sub(PAR, '<br/><br/>', result)
   result = re.sub(BREAK, '', result)
@@ -1413,6 +1419,8 @@ def build_node_text(
       situation = stext
   situation = sentence(situation)
   options = ""
+  if fmt == "example":
+    options += "<ol>"
   ocount = len(node["options"])
   if ocount == 1:
     opt = list(node["options"].keys())[0]
@@ -1427,31 +1435,44 @@ def build_node_text(
       timeshift,
       fmt
     )
-    options += '\n' + sentence(txt)
-    txt, pnout, intout = build_text(
-      node["outcomes"][opt],
-      grammar_rules,
-      context_variables[opt],
-      story,
-      nouns,
-      pnout,
-      intout,
-      timeshift,
-      fmt
-    )
-    options += '\n' + sentence(txt)
-    successors = node_structure[node["name"]]["successors"]
-    if opt in successors:
-      scc = successors[opt]
-      outgoing[scc] = (pnout, intout)
-      if fmt == "choicescript":
-        options += "\n*goto {}\n".format(scc)
-      elif fmt == "twee":
-        options += "\n[[Onwards...|{}][$outcome='']]\n".format(scc)
+    if fmt == "example":
+      options += "\n  <li>{}</li>".format(sentence(txt))
+      # In the "example" format we're just concerned with formatting the
+      # options for a single node, ignoring successors and outcomes.
+    elif fmt == "turk":
+      options += "{}<snop>".format(sentence(txt))
+      # The same is true of the "turk" format...
     else:
-      # TODO: Epilogue here!
-      if fmt == "choicescript":
-        options += "\n*finish\n"
+      options += '\n' + sentence(txt)
+      txt, pnout, intout = build_text(
+        node["outcomes"][opt],
+        grammar_rules,
+        context_variables[opt],
+        story,
+        nouns,
+        pnout,
+        intout,
+        timeshift,
+        fmt
+      )
+      options += '\n' + sentence(txt)
+      successors = node_structure[node["name"]]["successors"]
+      if opt in successors:
+        scc = successors[opt]
+        outgoing[scc] = (pnout, intout)
+        if fmt == "choicescript":
+          options += "\n*goto {}\n".format(scc)
+        elif fmt == "twee":
+          options += "\n[[Onwards...|{}][$outcome='']]\n".format(scc)
+        elif fmt == "example":
+          options += "\nOnwards...\n"
+        elif fmt == "turk":
+          # we don't care about this
+          pass
+      else:
+        # TODO: Epilogue here!
+        if fmt == "choicescript":
+          options += "\n*finish\n"
   elif ocount > 1:
     if fmt == "choicescript":
       options = "*choice\n"
@@ -1502,6 +1523,10 @@ def build_node_text(
             opt=sentence(opt_txt),
             out=sentence(out_txt)
           )
+      elif fmt == "example":
+        options += "\n  <li>{}</li>".format(sentence(opt_txt))
+      elif fmt == "turk":
+        options += "{}<snop>".format(sentence(opt_txt))
   else:
     options = "ERROR: node {} had <= 0 options!"
   if fmt == "choicescript":
@@ -1522,6 +1547,35 @@ def build_node_text(
 <<if $outcome neq "">><<print $outcome>> <<endif>>\
 {intro}
 {situation}
+{options}
+""".format(
+  label=node["name"],
+  intro=intro,
+  situation=situation,
+  options=options
+)
+  elif fmt == "example":
+    options += "\n</ol>"
+    result = """
+<p>
+{intro}
+</p>
+<p>
+{situation}
+</p>
+{options}
+""".format(
+  label=node["name"],
+  intro=intro,
+  situation=situation,
+  options=options
+)
+  elif fmt == "turk":
+    result = """
+{intro}
+<snip>
+{situation}
+<snip>
 {options}
 """.format(
   label=node["name"],
@@ -1558,6 +1612,16 @@ def build_intro_text(
 def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
   node_templates = {}
   gr_rules = collate_rules(story)
+  story_parts = {
+    "framing": "ERROR: missing story part",
+    "assets": "ERROR: missing story part",
+    "set_off": "ERROR: missing story part",
+  }
+  if mode == "example":
+    story_parts["setup"] = "ERROR: missing story part"
+    story_parts["potentials"] = "ERROR: missing story part"
+    story_parts["prompt"] = "ERROR: missing story part"
+    story_parts["optlist"] = "ERROR: missing story part"
 
   # First, build the dictionary of templates for all polished nodes:
   for sc, bnd in ans.bindings(
@@ -1688,33 +1752,99 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
   # You and your party members start as 'introduced'
   base_introduced = { "you" } | { n for n in nouns if nouns[n].is_party_member }
   # Generate the intro text
-  intro_text, base_introduced = build_intro_text(
-    "[[prologue/{}]]".format(mode),
-    gr_rules,
-    introvars,
-    story,
-    nouns,
-    base_pnslots,
-    base_introduced,
-    timeshift,
-    fmt
-  )
-  if fmt == "twee":
-    # TODO: Make title/author/css/etc. parameters!
-    if mode == "full":
+  if mode == "full":
+    intro_text, base_introduced = build_intro_text(
+      "[[prologue/{}]]".format(mode),
+      gr_rules,
+      introvars,
+      story,
+      nouns,
+      base_pnslots,
+      base_introduced,
+      timeshift,
+      fmt
+    )
+    if fmt == "twee":
+      # TODO: Make title/author/css/etc. parameters!
       intro_text = """\
 :: Intro
 {}
 
 [[Begin your journey...|root]]
 """.format(intro_text.replace('\n', ' '))
-    elif mode == "example":
+    elif fmt == "example":
+      intro_text = intro_text.replace('\n', '<br/>\n')
+    elif fmt == "turk":
+      intro_text = re.sub(PAR, '\n', intro_text)
+      framing, assets, set_off = intro_text.split('\n')
+  elif mode == "example":
+    story_parts["framing"], base_introduced = build_intro_text(
+      "[[prologue/setting/{}]]".format(mode),
+      gr_rules,
+      introvars,
+      story,
+      nouns,
+      base_pnslots,
+      base_introduced,
+      timeshift,
+      fmt
+    )
+    story_parts["assets"], base_introduced = build_intro_text(
+      "[[prologue/assets]]",
+      gr_rules,
+      introvars,
+      story,
+      nouns,
+      base_pnslots,
+      base_introduced,
+      timeshift,
+      fmt
+    )
+    story_parts["set_off"], base_introduced = build_intro_text(
+      "[[prologue/get_started/{}]]".format(mode),
+      gr_rules,
+      introvars,
+      story,
+      nouns,
+      base_pnslots,
+      base_introduced,
+      timeshift,
+      fmt
+    )
+    if fmt == "twee":
       intro_text = """\
 :: Intro
-{}
+{framing}
+{assets}
+{set_off}
 
 <<display root>>
-""".format(intro_text.replace('\n', ' '))
+""".format(
+  framing=story_parts["framing"].replace('\n', ' '),
+  assets=story_parts["assets"].replace('\n', ' '),
+  set_off=story_parts["set_off"].replace('\n', ' '),
+)
+    elif fmt == "example":
+      story_parts["framing"] = story_parts["framing"].replace('\n', '<br/>\n')
+      story_parts["assets"] = story_parts["assets"].replace('\n', '<br/>\n')
+      story_parts["set_off"] = story_parts["set_off"].replace('\n', '<br/>\n')
+      intro_text = """\
+<p>{framing}</p>
+<p>{assets}</p>
+<p>{set_off}</p>
+""".format(
+  framing=story_parts["framing"].replace('\n', ' '),
+  assets=story_parts["assets"].replace('\n', ' '),
+  set_off=story_parts["set_off"].replace('\n', ' '),
+)
+    else:
+      intro_text = '\n\n'.join(
+        [
+          story_parts["framing"],
+          story_parts["assets"],
+          story_parts["set_off"]
+        ]
+      )
   # Start with all root nodes on our open list:
   olist = [
     (n, base_pnslots, base_introduced) for n in node_templates.keys()
@@ -1746,6 +1876,18 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
       timeshift,
       fmt=fmt
     )
+    if mode == "example" and story_parts["setup"]=="ERROR: missing story part":
+      if fmt == "example":
+        spliton = '</p>'
+      elif fmt == "turk":
+        spliton = '<snip>'
+      else:
+        spliton = '  '
+      bits = txt.replace('\n', ' ').split(spliton)
+      story_parts["setup"] = bits[0]
+      story_parts["potentials"] = bits[1]
+      story_parts["prompt"] = "What do you do?"
+      story_parts["optlist"] = bits[2]
     results.append(txt)
     # update our readiness information and propagate nodes to the open list as
     # they're fully ready:
@@ -1765,6 +1907,39 @@ Readiness is: {}\
         olist.append((n, base_pnslots, intr))
   if fmt == "choicescript":
     return ("\n\n*comment " + '-'*72 + "\n\n").join(results)
+  elif fmt == "example":
+    body = "\n\n".join(results)
+    return """
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Example Story Choice</title>
+<style id="baseCSS">
+</style>
+</head>
+<body>
+<h1>Example Story Choice</h1>
+{body}
+</body>
+</html>
+""".format(body=body)
+  elif fmt == "turk":
+    # a tab-delimited input row:
+    opts = story_parts["optlist"].split("<snop>")
+    return """\
+{framing}	{assets}	{set_off}	{setup}	{potentials}	{prompt}	{opt1}	{opt2}	{opt3}
+""".format(
+  framing=story_parts["framing"],
+  assets=story_parts["assets"],
+  set_off=story_parts["set_off"],
+  setup=story_parts["setup"],
+  potentials=story_parts["potentials"],
+  prompt=story_parts["prompt"],
+  opt1=opts[0],
+  opt2=opts[1],
+  opt3=opts[2],
+)
   else:
     return ("\n\n").join(results)
 
