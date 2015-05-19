@@ -1,0 +1,73 @@
+The questions asked are as follows:
+
+(decision) If you were reading this story, which option would you pick?
+
+The rest of the questions are likert-scale agree/disagree responses:
+
+(nobad) There are no bad options at this choice.
+
+(clearbest) There is a clear best option at this choice.
+
+(lowstakes) The stakes for this choice are low.
+
+(nogood) There are no good options at this choice.
+
+(balanced) All of the options at this choice are about equally promising.
+
+(trick) There are options at this choice.
+
+(difficult) This is a difficult choice to make.
+
+(consequences) This choice feels like it will have important consequences.
+
+
+Note that the "trick" question is only for verification purposes.
+
+
+Hypotheses for this experiment:
+
+Based on the "constraint" type, each question is expected to elicit agreement or disagreement, or some questions might have no expectation. For each question expected to elicit agreement, it is hypothesized that a Mann-Witney-Wilcoxon U test will show that the distribution of answers for that test is significantly biased towards agreement relative to a completely uniform distribution. Likewise, expected disagreements are hypothesized to be biased towards disagreement relative to a uniform distribution. The expectations for each constraint type and question are as follows:
+
+Constraint: Dilemma
+         nobad - disagree
+     clearbest - disagree
+     lowstakes - no expectation
+        nogood - agree
+      balanced - agree
+     difficult - agree
+  consequences - agree
+
+Constraint: Obvious
+         nobad - no expectation
+     clearbest - agree
+     lowstakes - no expectation
+        nogood - disagree
+      balanced - disagree
+     difficult - disagree
+  consequences - no expectation
+
+Constraint: Relaxed
+         nobad - agree
+     clearbest - no expectation
+     lowstakes - agree
+        nogood - disagree
+      balanced - no expectation
+     difficult - no expectation
+  consequences - no expectation
+
+Additionally, on a per-choice basis, for choices where the system thinks the stakes are low, the "lowstakes" question is expected to garner agreement.
+
+As a secondary hypothesis, for questions where pairs of constraint conditions have opposite expectations, those paired conditions will be tested using a Mann-Whitney-Wilcoxon U test to test whether the "agree" condition leans significantly more toward agreement than the "disagree" condition. Those pairs are as follows:
+
+"nobad" agreement should be higher for relaxed than for dilemma choices.
+"clearbest" agreement should be higher for obvious than for dilemma choices.
+"nogood" agreement should be higher for dilemma than for obvious choices.
+"nogood" agreement should be higher for dilemma than for relaxed choices.
+"balanced"  agreement should be higher for dilemma than for obvious choices.
+"difficult" agreement should be higher for dilemma than for obvious choices.
+
+Some secondary pairwise hypotheses:
+
+"difficult" agreement might be higher for dilemma than for relaxed choices.
+"consequences" agreement might be higher for dilemma than for obvious choices.
+"consequences" agreement might be higher for dilemma than for relaxed choices.
