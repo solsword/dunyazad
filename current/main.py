@@ -216,8 +216,9 @@ def main(
   elif fmt == "turk":
     outfile = "dunyazad.input"
     output = """\
-seed\tframing\tassets\tset_off\tsetup\tpotentials\tprompt\topt1\topt2\topt3
-{}\t{}""".format(str(seed), output)
+"seed","framing","assets","set_off","setup","potentials","prompt","opt1","opt2","opt3"
+"{}","{}"\
+""".format(str(seed), output)
   with open(os.path.join("out", outfile), 'w') as fout:
     fout.write(output)
   if fmt == "twee":

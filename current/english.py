@@ -1736,7 +1736,7 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
             ". @CAP@".join(rlist)
           )
         else:
-          nts["options"][option] += " (no skills)"
+          nts["options"][option] += " (no relevant skills)"
 
   # Next, use the node structure to recursively render the story text in
   # ChoiceScript:
@@ -1928,7 +1928,7 @@ Readiness is: {}\
     # a tab-delimited input row:
     opts = story_parts["optlist"].split("<snop>")
     return """\
-{framing}	{assets}	{set_off}	{setup}	{potentials}	{prompt}	{opt1}	{opt2}	{opt3}
+"{framing}","{assets}","{set_off}","{setup}","{potentials}","{prompt}","{opt1}","{opt2}","{opt3}"
 """.format(
   framing=story_parts["framing"],
   assets=story_parts["assets"],
