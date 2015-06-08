@@ -128,6 +128,8 @@ testhypothesis <- function(hyp, data) {
     compcol <- "constraints"
   } else if (hyp[["compare"]] %in% data[["seed"]]) {
     compcol <- "seed"
+  } else if (hyp[["compare"]] %in% data[["stakes"]]) {
+    compcol <- "stakes"
   } else {
     print(hyp[["compare"]])
   }
@@ -135,6 +137,8 @@ testhypothesis <- function(hyp, data) {
     agcol <- "constraints"
   } else if (hyp[["against"]] %in% data[["seed"]]) {
     agcol <- "seed"
+  } else if (hyp[["against"]] %in% data[["stakes"]]) {
+    agcol <- "stakes"
   } else {
     print(hyp[["against"]])
   }
@@ -201,6 +205,7 @@ testhypothesis <- function(hyp, data) {
 
   #raweffect <- result@statistic@linearstatistic
   effect <- abs(statistic(result, "test")[["FALSE"]] / sqrt(length(testcol)))
+  commoneffect <- 0.5 + effect / 2.0
   conf.low <- confint(result)[["conf.int"]][[1]]
   conf.high <- confint(result)[["conf.int"]][[2]]
   return(
@@ -210,6 +215,7 @@ testhypothesis <- function(hyp, data) {
       "mr.compare"=mr.compare,
       "mr.against"=mr.against,
       "effectsize"=effect,
+      "commoneffect"=commoneffect,
       "conf.low"=conf.low,
       "conf.high"=conf.high
     )
@@ -291,12 +297,39 @@ cat("\n---\n")
 
 cat("Total responses:", nrow(responses), "\n")
 cat("Acceptable responses:", nrow(filtered), "\n")
-cat("  obvious:", nrow(filtered[filtered$constraints == "obvious",]), "\n")
-cat("  relaxed:", nrow(filtered[filtered$constraints == "relaxed",]), "\n")
-cat("  dilemma:", nrow(filtered[filtered$constraints == "dilemma",]), "\n")
-cat("  uniform:", nrow(filtered[filtered$constraints == "uniform",]), "\n")
-cat("  normal:", nrow(filtered[filtered$constraints == "normal",]), "\n")
+cat("     obvious:", nrow(filtered[filtered$constraints == "obvious",]), "\n")
+cat("     relaxed:", nrow(filtered[filtered$constraints == "relaxed",]), "\n")
+cat("     dilemma:", nrow(filtered[filtered$constraints == "dilemma",]), "\n")
+cat("\n")
+cat("  low-stakes:", nrow(filtered[filtered$stakes == "low",]), "\n")
+cat(" high-stakes:", nrow(filtered[filtered$stakes == "high",]), "\n")
+cat("\n")
+cat(
+  " obvious by stakes:",
+  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "obvious",]),
+  "/",
+  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "obvious",]),
+  "\n"
+)
+cat(
+  " relaxed by stakes:",
+  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "relaxed",]),
+  "/",
+  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "relaxed",]),
+  "\n"
+)
+cat(
+  " dilemma by stakes:",
+  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "dilemma",]),
+  "/",
+  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "dilemma",]),
+  "\n"
+)
+cat("\n")
+cat("     uniform:", nrow(filtered[filtered$constraints == "uniform",]), "\n")
+cat("     normal:", nrow(filtered[filtered$constraints == "normal",]), "\n")
 cat("Real responses:", nrow(real), "\n")
+
 
 cat("\n---\n")
 
@@ -358,7 +391,7 @@ cat("\n---\n")
 
 cat("Hypotheses:\n")
 cat(
-"Question                                          Compare:  Pred:     Pass:  P:       r:\n"
+"Question                                          Compare:  Pred:     Pass:  P:             r:     effect:\n"
 )
 for (hidx in 1:nrow(hypotheses)) {
   hyp <- as.list(hypotheses[hidx,])
@@ -387,10 +420,12 @@ for (hidx in 1:nrow(hypotheses)) {
       width=6,
       justify="left"
     ),
-    format(sprintf("%0.4f", result[["pvalue"]]), width=8, justify="left"),
-    format(sprintf("%0.3f", result[["effectsize"]]), width=6, justify="left"),
-    format(result[["conf.low"]], width=4, justify="left"),
-    format(result[["conf.high"]], width=4, justify="left"),
+    format(result[["pvalue"]], width=12, justify="left"),
+    " ",
+    format(sprintf("%0.3f", result[["effectsize"]]), width=7, justify="left"),
+    format(sprintf("%0.3f", result[["commoneffect"]]), width=7, justify="left"),
+#    format(result[["conf.low"]], width=4, justify="left"),
+#    format(result[["conf.high"]], width=4, justify="left"),
     "\n"
   )
 }
@@ -467,6 +502,21 @@ lk = likert(
 #plot(lk, group.order=c("uniform", "obvious", "relaxed", "dilemma"))
 plot(lk, group.order=c("obvious", "relaxed", "dilemma"))
 dev.off()
+
+
+# By Stakes
+# ---------
+
+pdf(file="report-by-stakes.pdf",title="dunyazad-stakes-report")
+report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
+report <- report[,snames]
+lk = likert(
+  report,
+  grouping = factor(filtered[["stakes"]])
+)
+plot(lk, group.order=c("low", "high"))
+dev.off()
+
 
 # Ungrouped
 # --------

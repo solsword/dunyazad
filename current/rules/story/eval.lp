@@ -218,7 +218,13 @@ at(N, option_feel(option(X), hopeful)) :-
   at_least_as_high(HopeStakes, ThreatStakes),
   higher_stakes(ThreatStakes, none),
   0 = {
-    at(N, player_goal(G3)) : at(N, expectation(option(X), fails, G3))
+    at(N, player_goal(G3)) :
+      at(N, expectation(option(X), threatens, G3)), 
+      at(N, stakes(G3, S3)),
+      higher_stakes(S3, ThreatStakes)
+  },
+  0 = {
+    at(N, player_goal(G4)) : at(N, expectation(option(X), fails, G4))
   }.
 
 at(N, option_feel(option(X), risky)) :-

@@ -33,3 +33,11 @@ pairwise,difficult,dilemma,obvious,greater
 secondary,difficult,dilemma,relaxed,greater
 secondary,consequences,dilemma,obvious,greater
 secondary,consequences,dilemma,relaxed,greater
+tertiary,lowstakes,relaxed,dilemma,greater
+stakes,lowstakes,low,uniform,greater
+stakes,lowstakes,high,uniform,less
+stakes,lowstakes,low,high,greater
+stakesextra,consequences,high,uniform,greater
+stakesextra,consequences,low,uniform,less
+stakesextra,difficult,low,uniform,less
+stakesextra,difficult,high,uniform,greater
