@@ -14,6 +14,8 @@ import parser
 
 FASTPARSE = True
 
+CLINGO_EXE = "clingo"
+
 class ASPError(Exception):
   def __init__(
     self,
@@ -80,7 +82,7 @@ def solve(code, seed=0, rand=0.0):
   """
   clingo = subprocess.Popen(
     [
-      "clingo",
+      CLINGO_EXE,
       "--verbose=0",
       "--quiet=1,1",
       "--seed={}".format(seed),

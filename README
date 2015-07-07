@@ -1,1 +1,21 @@
 A story generation system (with choices(!)).
+
+At some point we'll have a real README :P
+
+Run "main.py" in "current/". Look at the bottom of that file for the options
+that are available. If you're on Windows, you'll probably need to pass the
+--*-exe options to specify where to find external programs, unless you've put
+things like clingo on your path.
+
+Required external programs:
+
+  clingo - used to solve answer sets! This is absolutely required.
+
+  twine (twee compiler) - needed if you used the "twine" format. Unfortunately
+    there aren't any other nice output formats at the moment unless you happen
+    to have Choicescript around and know how to set that up. You could use the
+    "example" format ('-x' flag; see main.py for how it works) to get html for
+    the options of a single choice, but that won't give you a whole story.
+
+  graphviz - needed for visualizing the story graph. You can just pass --no-viz
+    to skip this step if you don't have graphviz.

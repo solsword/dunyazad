@@ -8,6 +8,7 @@ import ans
 
 from ans import Pr, Vr, PVr, SbT
 
+VIZ_EXE = "dot"
 VIZ_GV = os.path.join("out", "viz.gv")
 VIZ_SVG = os.path.join("out", "viz.svg")
 
@@ -175,4 +176,4 @@ digraph "story" {
   gv += "}"
   with open(VIZ_GV, 'w') as fout:
     fout.write(gv)
-  subprocess.call(["dot", VIZ_GV, "-Tsvg", "-o", VIZ_SVG])
+  subprocess.call([VIZ_EXE, VIZ_GV, "-Tsvg", "-o", VIZ_SVG])

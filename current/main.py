@@ -21,6 +21,10 @@ from utils import *
 
 CRASHFILE = os.path.join("out", "crash.lp")
 
+CLINGO_EXE = "clingo"
+TWEE_EXE = "twee"
+VIZ_EXE = "dot"
+
 def write_crashfile(e):
   with open(CRASHFILE, 'w') as fout:
     fout.write('% stdout:\n%' + '\n%'.join(e.stdout.split('\n')))
@@ -34,6 +38,7 @@ def main(
   scaffoldfrags = None,
   nodelimit = 12,
   fmt="twee",
+  do_viz = True,
   seed=0,
   rand=0.0
 ):
@@ -198,8 +203,9 @@ def main(
     if (pr.name == "story_node"):
       print("  " + pr.args[0].name)
 
-  print("Drawing story graph...")
-  viz.viz(sofar, error, str(target))
+  if (do_viz):
+    print("Drawing story graph...")
+    viz.viz(sofar, error, str(target))
 
   print("Writing out story facts...")
   with open(os.path.join("out", "facts.lp"), 'w') as fout:
@@ -224,7 +230,7 @@ def main(
   if fmt == "twee":
     print("Compiling Twine version...")
     html = subprocess.check_output(
-      ["twee", os.path.join("out", outfile), os.path.join("twine", "*.tw")]
+      [TWEE_EXE, os.path.join("out", outfile), os.path.join("twine", "*.tw")]
     )
     with open(os.path.join("out", "tlottolad.html"), 'w') as fout:
       fout.write(html.decode())
@@ -238,6 +244,7 @@ if __name__ == "__main__":
   mode = "full"
   nodelimit = 12
   fmt = "twee"
+  do_viz = True
   seed = random.randint(1, 100000)
   rand = 0.15
 
@@ -265,7 +272,7 @@ if __name__ == "__main__":
   if '-x' in sys.argv:
     idx = sys.argv.index('-x')
     mode = "example"
-    fmt = "turk"
+    fmt = "example"
     scfrags.append(sys.argv[idx+1])
     scfrags.append("example")
 
@@ -278,7 +285,34 @@ if __name__ == "__main__":
   if "--turk" in sys.argv:
     fmt = "turk"
 
-  success = main(mode, storyfile, scfiles, scfrags, nodelimit, fmt, seed, rand)
+  if '--clingo-exe' in sys.argv:
+    idx = sys.argv.index('--clingo-exe')
+    CLINGO_EXE = sys.argv[idx+1]
+
+  if '--twee-exe' in sys.argv:
+    idx = sys.argv.index('--twee-exe')
+    TWEE_EXE = sys.argv[idx+1]
+
+  if '--graphviz-exe' in sys.argv:
+    idx = sys.argv.index('--graphviz-exe')
+    VIZ_EXE = sys.argv[idx+1]
+
+  if '--no-viz' in sys.argv:
+    do_viz = False
+
+  asp.CLINGO_EXE = CLINGO_EXE
+  viz.VIZ_EXE = VIZ_EXE
+  success = main(
+    mode,
+    storyfile,
+    scfiles,
+    scfrags,
+    nodelimit,
+    fmt,
+    do_viz,
+    seed,
+    rand
+  )
 
   if not success:
     exit(1)
