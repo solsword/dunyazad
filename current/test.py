@@ -13,7 +13,7 @@ import types
 default_tests = [
   "ans",
   "english",
-  "parser",
+  "packrat",
   "utils",
   "wholeunit",
 ]

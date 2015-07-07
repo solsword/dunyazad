@@ -8,117 +8,117 @@ from utils import *
 import re
 import string
 
-import parser
+import packrat
 
 @instance
 class Tokens:
   """
   An object containing regular expressions for various tokens.
   """
-  QUERY_MARK = parser.Token(re.compile(r"\?"))
-  CONS = parser.Token(re.compile(r":-"))
-  WCONS = parser.Token(re.compile(r":~"))
-  DOT = parser.Token(re.compile(r"\.((?=[^.])|$)"))
+  QUERY_MARK = packrat.Token(re.compile(r"\?"))
+  CONS = packrat.Token(re.compile(r":-"))
+  WCONS = packrat.Token(re.compile(r":~"))
+  DOT = packrat.Token(re.compile(r"\.((?=[^.])|$)"))
     # Matches a period NOT followed by another, but doesn't eat the following
     # character.
-  AT = parser.Token(re.compile(r"@"))
-  OR = parser.Token(re.compile(r"\|"))
-  NAF = parser.Token(re.compile(r"not"))
+  AT = packrat.Token(re.compile(r"@"))
+  OR = packrat.Token(re.compile(r"\|"))
+  NAF = packrat.Token(re.compile(r"not"))
 
-  COMMA = parser.Token(re.compile(r","))
-  COLON = parser.Token(re.compile(r":"))
-  SEMICOLON = parser.Token(re.compile(r";"))
+  COMMA = packrat.Token(re.compile(r","))
+  COLON = packrat.Token(re.compile(r":"))
+  SEMICOLON = packrat.Token(re.compile(r";"))
 
-  OP_PLUS = parser.Token(re.compile(r"\+"))
-  OP_MINUS = parser.Token(re.compile(r"-"))
-  OP_TIMES = parser.Token(re.compile(r"\*((?=[^*])|$)"))
-  OP_DIV = parser.Token(re.compile(r"/"))
-  OP_MOD = parser.Token(re.compile(r"\\"))
-  OP_POW = parser.Token(re.compile(r"\*\*"))
-  OP_BITWISE_AND = parser.Token(re.compile(r"&"))
-  OP_BITWISE_OR = parser.Token(re.compile(r"\?"))
-  OP_BITWISE_XOR = parser.Token(re.compile(r"\^"))
-  OP_BITWISE_NEG = parser.Token(re.compile(r"~"))
+  OP_PLUS = packrat.Token(re.compile(r"\+"))
+  OP_MINUS = packrat.Token(re.compile(r"-"))
+  OP_TIMES = packrat.Token(re.compile(r"\*((?=[^*])|$)"))
+  OP_DIV = packrat.Token(re.compile(r"/"))
+  OP_MOD = packrat.Token(re.compile(r"\\"))
+  OP_POW = packrat.Token(re.compile(r"\*\*"))
+  OP_BITWISE_AND = packrat.Token(re.compile(r"&"))
+  OP_BITWISE_OR = packrat.Token(re.compile(r"\?"))
+  OP_BITWISE_XOR = packrat.Token(re.compile(r"\^"))
+  OP_BITWISE_NEG = packrat.Token(re.compile(r"~"))
 
-  CMP_EQ = parser.Token(re.compile(r"="))
-  CMP_NEQ = parser.Token(re.compile(r"(<>)|(!=)"))
-  CMP_GT = parser.Token(re.compile(r">((?=[^=])|$)"))
-  CMP_LT = parser.Token(re.compile(r"<((?=[^=])|$)"))
-  CMP_GE = parser.Token(re.compile(r">="))
-  CMP_LE = parser.Token(re.compile(r"<="))
+  CMP_EQ = packrat.Token(re.compile(r"="))
+  CMP_NEQ = packrat.Token(re.compile(r"(<>)|(!=)"))
+  CMP_GT = packrat.Token(re.compile(r">((?=[^=])|$)"))
+  CMP_LT = packrat.Token(re.compile(r"<((?=[^=])|$)"))
+  CMP_GE = packrat.Token(re.compile(r">="))
+  CMP_LE = packrat.Token(re.compile(r"<="))
 
-  INTERVAL = parser.Token(re.compile(r"\.\."))
+  INTERVAL = packrat.Token(re.compile(r"\.\."))
 
-  ANONYMOUS = parser.Token(re.compile(r"_((?=[^a-zA-Z0-9_])|$)"))
+  ANONYMOUS = packrat.Token(re.compile(r"_((?=[^a-zA-Z0-9_])|$)"))
     # Matches an underscore NOT followed any further word characters, but
     # doesn't eat the following character.
 
-  NUMBER = parser.Token(re.compile(r"0|([1-9][0-9]*)"))
+  NUMBER = packrat.Token(re.compile(r"0|([1-9][0-9]*)"))
 
-  ID = parser.Token(re.compile(r"[a-z_][A-Za-z0-9_]*"))
-  VARIABLE = parser.Token(re.compile(r"[A-Z][A-Za-z0-9_]*"))
+  ID = packrat.Token(re.compile(r"[a-z_][A-Za-z0-9_]*"))
+  VARIABLE = packrat.Token(re.compile(r"[A-Z][A-Za-z0-9_]*"))
 
-  STRING = parser.Token(re.compile(r'"([^\\"]|(\\.))*"'))
+  STRING = packrat.Token(re.compile(r'"([^\\"]|(\\.))*"'))
     # Matches a starting quote, followed by any number of tokens which are
     # either non-backslash, non-quote characters or which are escape codes ('\'
     # plus any character), finished by an ending quote.
 
-  SCRIPT_TYPE_LUA = parser.Token(re.compile(r"lua"))
-  SCRIPT_TYPE_PYTHON = parser.Token(re.compile(r"python"))
+  SCRIPT_TYPE_LUA = packrat.Token(re.compile(r"lua"))
+  SCRIPT_TYPE_PYTHON = packrat.Token(re.compile(r"python"))
 
-  SCRIPT_BODY = parser.Token(re.compile(r"(.|\n)*#end(?=\.)", re.MULTILINE))
+  SCRIPT_BODY = packrat.Token(re.compile(r"(.|\n)*#end(?=\.)", re.MULTILINE))
     # Matches any number of characters until the string "#end." and doesn't eat
     # the final period in "#end."
 
-  DIR_HIDE = parser.Token(re.compile(r"#hide"))
-  DIR_SHOW = parser.Token(re.compile(r"#show"))
-  DIR_CONST = parser.Token(re.compile(r"#const"))
-  DIR_DOMAIN = parser.Token(re.compile(r"#domain"))
-  DIR_EXTERNAL = parser.Token(re.compile(r"#external"))
-  DIR_SCRIPT = parser.Token(re.compile(r"#script"))
+  DIR_HIDE = packrat.Token(re.compile(r"#hide"))
+  DIR_SHOW = packrat.Token(re.compile(r"#show"))
+  DIR_CONST = packrat.Token(re.compile(r"#const"))
+  DIR_DOMAIN = packrat.Token(re.compile(r"#domain"))
+  DIR_EXTERNAL = packrat.Token(re.compile(r"#external"))
+  DIR_SCRIPT = packrat.Token(re.compile(r"#script"))
 
-  DIRECTIVE_BODY = parser.Token(re.compile(r"[^.]*(?=\.)"))
+  DIRECTIVE_BODY = packrat.Token(re.compile(r"[^.]*(?=\.)"))
     # Matches any number of non-period characters followed by a period, but
     # doesn't eat the period.
 
-  ABS = parser.Token(re.compile(r"\|"))
-  PAREN_OPEN = parser.Token(re.compile(r"\("))
-  PAREN_CLOSE = parser.Token(re.compile(r"\)"))
-  CURLY_OPEN = parser.Token(re.compile(r"\{"))
-  CURLY_CLOSE = parser.Token(re.compile(r"\}"))
-  SQUARE_OPEN = parser.Token(re.compile(r"\["))
-  SQUARE_CLOSE = parser.Token(re.compile(r"\]"))
+  ABS = packrat.Token(re.compile(r"\|"))
+  PAREN_OPEN = packrat.Token(re.compile(r"\("))
+  PAREN_CLOSE = packrat.Token(re.compile(r"\)"))
+  CURLY_OPEN = packrat.Token(re.compile(r"\{"))
+  CURLY_CLOSE = packrat.Token(re.compile(r"\}"))
+  SQUARE_OPEN = packrat.Token(re.compile(r"\["))
+  SQUARE_CLOSE = packrat.Token(re.compile(r"\]"))
 
-  KW_AGGREGATE_COUNT = parser.Token(re.compile(r"#count"))
-  KW_AGGREGATE_MIN = parser.Token(re.compile(r"#min"))
-  KW_AGGREGATE_MAX = parser.Token(re.compile(r"#max"))
-  KW_AGGREGATE_SUM = parser.Token(re.compile(r"#sum"))
+  KW_AGGREGATE_COUNT = packrat.Token(re.compile(r"#count"))
+  KW_AGGREGATE_MIN = packrat.Token(re.compile(r"#min"))
+  KW_AGGREGATE_MAX = packrat.Token(re.compile(r"#max"))
+  KW_AGGREGATE_SUM = packrat.Token(re.compile(r"#sum"))
 
-  KW_MAXIMIZE = parser.Token(re.compile(r"#maximi[sz]e"))
-  KW_MINIMIZE = parser.Token(re.compile(r"#minimi[sz]e"))
+  KW_MAXIMIZE = packrat.Token(re.compile(r"#maximi[sz]e"))
+  KW_MINIMIZE = packrat.Token(re.compile(r"#minimi[sz]e"))
 
-  LOOSE_CONSTANT = parser.Token(re.compile(r"_*[a-z][a-zA-Z0-9_]*"))
-  LOOSE_VARIABLE = parser.Token(re.compile(r"_*[A-Z][a-zA-Z0-9_]*"))
+  LOOSE_CONSTANT = packrat.Token(re.compile(r"_*[a-z][a-zA-Z0-9_]*"))
+  LOOSE_VARIABLE = packrat.Token(re.compile(r"_*[A-Z][a-zA-Z0-9_]*"))
     # Matches some number of optional starting underscores, a first-position
     # alphabetic character, and then any number of alphanumerics and/or
     # underscores.
 
-  LOOSE_INTEGER = parser.Token(re.compile(r"-?[0-9]+"))
+  LOOSE_INTEGER = packrat.Token(re.compile(r"-?[0-9]+"))
 
-  KW_INFIMUM = parser.Token(re.compile(r"#infimum"))
-  KW_SUPREMUM = parser.Token(re.compile(r"#supremum"))
+  KW_INFIMUM = packrat.Token(re.compile(r"#infimum"))
+  KW_SUPREMUM = packrat.Token(re.compile(r"#supremum"))
 
-  COMMENT = parser.Token(re.compile(r"%([^*\n][^\n]*)?\n"))
+  COMMENT = packrat.Token(re.compile(r"%([^*\n][^\n]*)?\n"))
     # Matches a percent possibly followed by some junk and then a newline.
     # The junk doesn't begin with either a * or a newline and it doesn't
     # contain any newlines.
 
-  MULTI_LINE_COMMENT = parser.Token(re.compile(r"%\*([^*]|(\*[^%]))*\*%"))
+  MULTI_LINE_COMMENT = packrat.Token(re.compile(r"%\*([^*]|(\*[^%]))*\*%"))
     # Matches %* followed by some junk which is composed entirely of either
     # non-asterisk characters or pairs of characters that begin with an
     # asterisk and end with a non-% character. All of this ends with *%.
 
-  BLANK = parser.Token(re.compile(r"[ \t\n]+"))
+  BLANK = packrat.Token(re.compile(r"[ \t\n]+"))
 
   @instance
   class Ignore:
@@ -130,12 +130,12 @@ class Tokens:
 for attr in Tokens.__dict__:
   if not attr.startswith("__") and not attr.endswith("__") and attr != "Ignore":
     val = Tokens.__dict__[attr]
-    if isinstance(val, parser.StrToken):
-      setattr(Tokens.Ignore, attr, parser.StrToken(val.string, preserve=False))
-    elif isinstance(val, parser.REToken):
-      setattr(Tokens.Ignore, attr, parser.REToken(val.expression, omit=True))
+    if isinstance(val, packrat.StrToken):
+      setattr(Tokens.Ignore, attr, packrat.StrToken(val.string, preserve=False))
+    elif isinstance(val, packrat.REToken):
+      setattr(Tokens.Ignore, attr, packrat.REToken(val.expression, omit=True))
     else:
-      setattr(Tokens.Ignore, attr, parser.Omit(val))
+      setattr(Tokens.Ignore, attr, packrat.Omit(val))
 
 class Predicate:
   """
@@ -201,36 +201,36 @@ class Predicate:
   def _polish(self):
     self.args = tuple(self.args)
 
-Predicate.grammar = parser.Package(
+Predicate.grammar = packrat.Package(
   Predicate,
-  parser.OneOf(
-    parser.Seq(
-      parser.Attr(
+  packrat.OneOf(
+    packrat.Seq(
+      packrat.Attr(
         "name",
-        parser.Munge(
+        packrat.Munge(
           lambda x: ''.join(x),
-          parser.Seq(
-            parser.Opt( Tokens.AT ),
-            parser.OneOf( Tokens.STRING, Tokens.LOOSE_CONSTANT )
+          packrat.Seq(
+            packrat.Opt( Tokens.AT ),
+            packrat.OneOf( Tokens.STRING, Tokens.LOOSE_CONSTANT )
           )
         )
       ),
-      parser.Opt(
-        parser.Seq(
+      packrat.Opt(
+        packrat.Seq(
           Tokens.Ignore.PAREN_OPEN,
-          parser.Attr(
+          packrat.Attr(
             "args",
-            parser.SepList( Predicate, sep=Tokens.Ignore.COMMA )
+            packrat.SepList( Predicate, sep=Tokens.Ignore.COMMA )
           ),
           Tokens.Ignore.PAREN_CLOSE,
         )
       )
     ),
-    parser.Attr(
+    packrat.Attr(
       "name",
-      parser.OneOf(
+      packrat.OneOf(
         Tokens.ANONYMOUS,
-        parser.Munge(
+        packrat.Munge(
           int,
           Tokens.LOOSE_INTEGER,
         ),
@@ -242,9 +242,9 @@ Predicate.grammar = parser.Package(
   "_polish"
 )
 
-PredicateStatement = parser.Munge(
+PredicateStatement = packrat.Munge(
   lambda r: r[0],
-  parser.Seq(
+  packrat.Seq(
     Predicate,
     Tokens.Ignore.DOT
   )
@@ -678,7 +678,7 @@ class Program:
 
 # Grammar definitions for answer set elements:
 
-ArithOp = parser.OneOf(
+ArithOp = packrat.OneOf(
   Tokens.OP_PLUS,
   Tokens.OP_MINUS,
   Tokens.OP_TIMES,
@@ -691,7 +691,7 @@ ArithOp = parser.OneOf(
   Tokens.OP_BITWISE_NEG,
 )
 
-Comparator = parser.OneOf(
+Comparator = packrat.OneOf(
   Tokens.CMP_EQ,
   Tokens.CMP_NEQ,
   Tokens.CMP_LT,
@@ -700,7 +700,7 @@ Comparator = parser.OneOf(
   Tokens.CMP_GE,
 )
 
-Term = parser.OneOf(
+Term = packrat.OneOf(
   Interval,
   Expression,
   SimpleTerm,
@@ -711,42 +711,42 @@ Term = parser.OneOf(
 # initial definition of Term, so we have to hack it in like this:
 Term.elements = tuple_with(
   Term.elements,
-  parser.Seq(
+  packrat.Seq(
     Tokens.Ignore.PAREN_OPEN,
     Term,
     Tokens.Ignore.PAREN_CLOSE,
   )
 )
 
-Terms = parser.SepList(Term, sep=Tokens.Ignore.COMMA)
+Terms = packrat.SepList(Term, sep=Tokens.Ignore.COMMA)
 
-Interval.grammar = parser.Package(
+Interval.grammar = packrat.Package(
   Interval,
-  parser.Seq(
-    parser.Attr("lower", SimpleTerm),
+  packrat.Seq(
+    packrat.Attr("lower", SimpleTerm),
     Tokens.INTERVAL,
-    parser.Attr("upper", SimpleTerm),
+    packrat.Attr("upper", SimpleTerm),
   ),
 )
 
-SimpleTerm.grammar = parser.Package(
+SimpleTerm.grammar = packrat.Package(
   SimpleTerm,
-  parser.OneOf(
-    parser.Seq(
-      parser.Attr("id", Tokens.ID),
-      parser.Opt(
-        parser.Seq(
+  packrat.OneOf(
+    packrat.Seq(
+      packrat.Attr("id", Tokens.ID),
+      packrat.Opt(
+        packrat.Seq(
           Tokens.Ignore.PAREN_OPEN,
-          parser.Opt(
-            parser.Attr("terms", Terms),
+          packrat.Opt(
+            packrat.Attr("terms", Terms),
           ),
           Tokens.Ignore.PAREN_CLOSE,
         )
       )
     ),
-    parser.Attr(
+    packrat.Attr(
       "id",
-      parser.OneOf(
+      packrat.OneOf(
         Tokens.NUMBER,
         Tokens.STRING,
         Tokens.VARIABLE,
@@ -756,61 +756,61 @@ SimpleTerm.grammar = parser.Package(
   ),
 )
 
-Expression.grammar = parser.Package(
+Expression.grammar = packrat.Package(
   Expression,
-  parser.OneOf(
-    parser.Seq(
-      parser.Flag("negated", Tokens.OP_MINUS),
-      parser.OneOf(
-        parser.Seq(
-          parser.Seq(
+  packrat.OneOf(
+    packrat.Seq(
+      packrat.Flag("negated", Tokens.OP_MINUS),
+      packrat.OneOf(
+        packrat.Seq(
+          packrat.Seq(
             Tokens.Ignore.PAREN_OPEN,
-            parser.Attr(
+            packrat.Attr(
               "lhs",
               Term,
             ),
             Tokens.Ignore.PAREN_CLOSE,
           ),
-          parser.Attr("op", ArithOp),
-          parser.Attr("rhs", Term)
+          packrat.Attr("op", ArithOp),
+          packrat.Attr("rhs", Term)
         ),
-        parser.Seq(
-          parser.Attr("lhs", SimpleTerm),
-          parser.Attr("op", ArithOp),
-          parser.Attr("rhs", Term)
+        packrat.Seq(
+          packrat.Attr("lhs", SimpleTerm),
+          packrat.Attr("op", ArithOp),
+          packrat.Attr("rhs", Term)
         ),
       )
     ),
-    parser.Seq(
-      parser.RequiredFlag("negated", Tokens.OP_MINUS),
-      parser.Attr("lhs", SimpleTerm),
+    packrat.Seq(
+      packrat.RequiredFlag("negated", Tokens.OP_MINUS),
+      packrat.Attr("lhs", SimpleTerm),
     ),
   )
 )
 
-ScriptCall.grammar = parser.Package(
+ScriptCall.grammar = packrat.Package(
   ScriptCall,
-  parser.Seq(
+  packrat.Seq(
     Tokens.Ignore.AT,
-    parser.Attr("function", Tokens.ID),
+    packrat.Attr("function", Tokens.ID),
     Tokens.Ignore.PAREN_OPEN,
-    parser.Opt(
-      parser.Attr("args", Terms),
+    packrat.Opt(
+      packrat.Attr("args", Terms),
     ),
     Tokens.Ignore.PAREN_CLOSE,
   )
 )
 
-ClassicalLiteral.grammar = parser.Package(
+ClassicalLiteral.grammar = packrat.Package(
   ClassicalLiteral,
-  parser.Seq(
-    parser.Flag("negated", Tokens.OP_MINUS),
-    parser.Attr("id", Tokens.ID),
-    parser.Opt(
-      parser.Seq(
+  packrat.Seq(
+    packrat.Flag("negated", Tokens.OP_MINUS),
+    packrat.Attr("id", Tokens.ID),
+    packrat.Opt(
+      packrat.Seq(
         Tokens.Ignore.PAREN_OPEN,
-        parser.Opt(
-          parser.Attr("terms", Terms),
+        packrat.Opt(
+          packrat.Attr("terms", Terms),
         ),
         Tokens.Ignore.PAREN_CLOSE,
       )
@@ -818,22 +818,22 @@ ClassicalLiteral.grammar = parser.Package(
   )
 )
 
-BuiltinAtom.grammar = parser.Package(
+BuiltinAtom.grammar = packrat.Package(
   BuiltinAtom,
-  parser.Seq(
-    parser.Attr("lhs", Term),
-    parser.Attr("op", Comparator),
-    parser.Attr("rhs", Term),
+  packrat.Seq(
+    packrat.Attr("lhs", Term),
+    packrat.Attr("op", Comparator),
+    packrat.Attr("rhs", Term),
   )
 )
 
-NafLiteral.grammar = parser.Package(
+NafLiteral.grammar = packrat.Package(
   NafLiteral,
-  parser.Seq(
-    parser.Flag("negated", Tokens.NAF),
-    parser.Attr(
+  packrat.Seq(
+    packrat.Flag("negated", Tokens.NAF),
+    packrat.Attr(
       "contents",
-      parser.OneOf(
+      packrat.OneOf(
         BuiltinAtom,
         ScriptCall,
         ClassicalLiteral,
@@ -842,219 +842,219 @@ NafLiteral.grammar = parser.Package(
   )
 )
 
-WeightAtLevel.grammar = parser.Package(
+WeightAtLevel.grammar = packrat.Package(
   WeightAtLevel,
-  parser.Seq(
-    parser.Attr("weight", Term),
-    parser.Opt(
-      parser.Seq(
+  packrat.Seq(
+    packrat.Attr("weight", Term),
+    packrat.Opt(
+      packrat.Seq(
         Tokens.Ignore.AT,
-        parser.Attr("level", Term),
+        packrat.Attr("level", Term),
       )
     ),
-    parser.Opt(
-      parser.Seq(
+    packrat.Opt(
+      packrat.Seq(
         Tokens.Ignore.COMMA,
-        parser.Attr("terms", Terms)
+        packrat.Attr("terms", Terms)
       )
     )
   )
 )
 
-AggregateElement.grammar = parser.Package(
+AggregateElement.grammar = packrat.Package(
   AggregateElement,
-  parser.Seq(
-    parser.Attr(
+  packrat.Seq(
+    packrat.Attr(
       "terms",
-      parser.SepList(parser.OneOf(NafLiteral, Term), sep=Tokens.Ignore.COMMA)
+      packrat.SepList(packrat.OneOf(NafLiteral, Term), sep=Tokens.Ignore.COMMA)
     ),
-    parser.Opt(
-      parser.Seq(
+    packrat.Opt(
+      packrat.Seq(
         Tokens.Ignore.COLON,
-        parser.Attr(
+        packrat.Attr(
           "constraints",
-          parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
+          packrat.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
         )
       )
     )
   )
 )
 
-Aggregate.grammar = parser.Package(
+Aggregate.grammar = packrat.Package(
   Aggregate,
-  parser.Seq(
-    parser.Flag("negated", Tokens.NAF),
-    parser.Opt(
-      parser.Seq(
-        parser.Attr("l", Term),
-        parser.Attr("lop", Comparator),
+  packrat.Seq(
+    packrat.Flag("negated", Tokens.NAF),
+    packrat.Opt(
+      packrat.Seq(
+        packrat.Attr("l", Term),
+        packrat.Attr("lop", Comparator),
       )
     ),
-    parser.OneOf(
-      parser.Attr(
+    packrat.OneOf(
+      packrat.Attr(
         "function",
-        parser.OneOf(
+        packrat.OneOf(
           Tokens.KW_AGGREGATE_COUNT,
           Tokens.KW_AGGREGATE_MAX,
           Tokens.KW_AGGREGATE_MIN,
           Tokens.KW_AGGREGATE_SUM,
         )
       ),
-      parser.Attr(
+      packrat.Attr(
         "function",
-        parser.Omit(),
+        packrat.Omit(),
         value="#count"
       )
     ),
     Tokens.Ignore.CURLY_OPEN,
-    parser.Opt(
-      parser.Attr(
+    packrat.Opt(
+      packrat.Attr(
         "elements",
-        parser.SepList(AggregateElement, sep=Tokens.Ignore.SEMICOLON),
+        packrat.SepList(AggregateElement, sep=Tokens.Ignore.SEMICOLON),
       )
     ),
     Tokens.Ignore.CURLY_CLOSE,
-    parser.Opt(
-      parser.Seq(
-        parser.Attr("uop", Comparator),
-        parser.Attr("u", Term),
+    packrat.Opt(
+      packrat.Seq(
+        packrat.Attr("uop", Comparator),
+        packrat.Attr("u", Term),
       )
     ),
   )
 )
 
-ChoiceElement.grammar = parser.Package(
+ChoiceElement.grammar = packrat.Package(
   ChoiceElement,
-  parser.Seq(
-    parser.Attr(
+  packrat.Seq(
+    packrat.Attr(
       "literal",
-      parser.OneOf( ClassicalLiteral, ScriptCall )
+      packrat.OneOf( ClassicalLiteral, ScriptCall )
     ),
-    parser.Opt(
-      parser.Seq(
+    packrat.Opt(
+      packrat.Seq(
         Tokens.Ignore.COLON,
-        parser.Attr(
+        packrat.Attr(
           "constraints",
-          parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
+          packrat.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
         )
       )
     )
   )
 )
 
-Choice.grammar = parser.Package(
+Choice.grammar = packrat.Package(
   Choice,
-  parser.Seq(
-    parser.Opt(
-      parser.Seq(
-        parser.Attr("l", Term),
-        parser.Attr("lop", Comparator),
+  packrat.Seq(
+    packrat.Opt(
+      packrat.Seq(
+        packrat.Attr("l", Term),
+        packrat.Attr("lop", Comparator),
       )
     ),
     Tokens.Ignore.CURLY_OPEN,
-    parser.Opt(
-      parser.Attr(
+    packrat.Opt(
+      packrat.Attr(
         "elements",
-        parser.SepList(ChoiceElement, sep=Tokens.Ignore.SEMICOLON)
+        packrat.SepList(ChoiceElement, sep=Tokens.Ignore.SEMICOLON)
       )
     ),
     Tokens.Ignore.CURLY_CLOSE,
-    parser.Opt(
-      parser.Seq(
-        parser.Attr("uop", Comparator),
-        parser.Attr("u", Term),
+    packrat.Opt(
+      packrat.Seq(
+        packrat.Attr("uop", Comparator),
+        packrat.Attr("u", Term),
       )
     ),
   )
 )
 
-Disjunction.grammar = parser.Package(
+Disjunction.grammar = packrat.Package(
   Disjunction,
-  parser.Attr(
+  packrat.Attr(
     "elements",
-    parser.SepList(
-      parser.OneOf( ClassicalLiteral, ScriptCall ),
+    packrat.SepList(
+      packrat.OneOf( ClassicalLiteral, ScriptCall ),
       sep=Tokens.Ignore.OR,
       require_multiple=True,
     )
   )
 )
 
-Head = parser.OneOf(
+Head = packrat.OneOf(
   Disjunction,
   Choice,
   ClassicalLiteral,
   ScriptCall,
 )
 
-Body = parser.SepList(
-  parser.OneOf(
+Body = packrat.SepList(
+  packrat.OneOf(
     NafLiteral,
     Aggregate
   ),
   sep=Tokens.Ignore.COMMA
 )
 
-OptimizeElement.grammar = parser.Package(
+OptimizeElement.grammar = packrat.Package(
   OptimizeElement,
-  parser.Seq(
-    parser.Attr("weightlevel", WeightAtLevel),
-    parser.Opt(
-      parser.Seq(
+  packrat.Seq(
+    packrat.Attr("weightlevel", WeightAtLevel),
+    packrat.Opt(
+      packrat.Seq(
         Tokens.Ignore.COLON,
-        parser.Attr(
+        packrat.Attr(
           "literals",
-          parser.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
+          packrat.SepList(NafLiteral, sep=Tokens.Ignore.COMMA)
         )
       )
     )
   )
 )
 
-OptimizeFunction = parser.OneOf( Tokens.KW_MAXIMIZE, Tokens.KW_MINIMIZE )
+OptimizeFunction = packrat.OneOf( Tokens.KW_MAXIMIZE, Tokens.KW_MINIMIZE )
 
-Optimization.grammar = parser.Package(
+Optimization.grammar = packrat.Package(
   Optimization,
-  parser.Seq(
-    parser.Attr("function", OptimizeFunction),
+  packrat.Seq(
+    packrat.Attr("function", OptimizeFunction),
     Tokens.Ignore.CURLY_OPEN,
-    parser.Attr(
+    packrat.Attr(
       "elements",
-      parser.SepList(OptimizeElement, sep=Tokens.Ignore.SEMICOLON)
+      packrat.SepList(OptimizeElement, sep=Tokens.Ignore.SEMICOLON)
     ),
     Tokens.Ignore.CURLY_CLOSE,
     Tokens.Ignore.DOT,
   )
 )
 
-WeakConstraint.grammar = parser.Package(
+WeakConstraint.grammar = packrat.Package(
   WeakConstraint,
-  parser.Seq(
+  packrat.Seq(
     Tokens.Ignore.WCONS,
-    parser.Opt(
-      parser.Attr("body", Body),
+    packrat.Opt(
+      packrat.Attr("body", Body),
     ),
     Tokens.Ignore.DOT,
     Tokens.Ignore.SQUARE_OPEN,
-    parser.Attr("weightlevel", WeightAtLevel),
+    packrat.Attr("weightlevel", WeightAtLevel),
     Tokens.Ignore.SQUARE_CLOSE,
   )
 )
 
-Rule.grammar = parser.Package(
+Rule.grammar = packrat.Package(
   Rule,
-  parser.OneOf(
-    parser.Seq(
+  packrat.OneOf(
+    packrat.Seq(
       Tokens.Ignore.CONS,
-      parser.Attr("body", Body),
+      packrat.Attr("body", Body),
       Tokens.Ignore.DOT
     ),
-    parser.Seq(
-      parser.Attr("head", Head),
-      parser.Opt(
-        parser.Seq(
+    packrat.Seq(
+      packrat.Attr("head", Head),
+      packrat.Opt(
+        packrat.Seq(
           Tokens.Ignore.CONS,
-          parser.Attr("body", Body),
+          packrat.Attr("body", Body),
         )
       ),
       Tokens.Ignore.DOT
@@ -1062,30 +1062,30 @@ Rule.grammar = parser.Package(
   )
 )
 
-Script.grammar = parser.Package(
+Script.grammar = packrat.Package(
   Script,
-  parser.Seq(
+  packrat.Seq(
     Tokens.Ignore.DIR_SCRIPT,
     Tokens.Ignore.PAREN_OPEN,
-    parser.Attr(
+    packrat.Attr(
       "language",
-      parser.OneOf(
+      packrat.OneOf(
         Tokens.SCRIPT_TYPE_LUA,
         Tokens.SCRIPT_TYPE_PYTHON
       )
     ),
     Tokens.Ignore.PAREN_CLOSE,
-    parser.Attr("contents", Tokens.SCRIPT_BODY),
+    packrat.Attr("contents", Tokens.SCRIPT_BODY),
     Tokens.Ignore.DOT
   )
 )
 
-Directive.grammar = parser.Package(
+Directive.grammar = packrat.Package(
   Directive,
-  parser.Seq(
-    parser.Attr(
+  packrat.Seq(
+    packrat.Attr(
       "directive",
-      parser.OneOf(
+      packrat.OneOf(
         Tokens.DIR_HIDE,
         Tokens.DIR_SHOW,
         Tokens.DIR_CONST,
@@ -1093,7 +1093,7 @@ Directive.grammar = parser.Package(
         Tokens.DIR_EXTERNAL,
       )
     ),
-    parser.Attr(
+    packrat.Attr(
       "contents",
       Tokens.DIRECTIVE_BODY
     ),
@@ -1101,7 +1101,7 @@ Directive.grammar = parser.Package(
   ),
 )
 
-Statement = parser.OneOf(
+Statement = packrat.OneOf(
   Rule,
   WeakConstraint,
   Optimization,
@@ -1109,21 +1109,21 @@ Statement = parser.OneOf(
   Script,
 )
 
-Query.grammar = parser.Package(
+Query.grammar = packrat.Package(
   Query,
-  parser.Seq(
-    parser.Attr("literal", parser.OneOf( ClassicalLiteral, ScriptCall )),
+  packrat.Seq(
+    packrat.Attr("literal", packrat.OneOf( ClassicalLiteral, ScriptCall )),
     Tokens.Ignore.QUERY_MARK
   )
 )
 
 Comment.grammar = None
 
-Program.grammar = parser.Package(
+Program.grammar = packrat.Package(
   Program,
-  parser.Seq(
-    parser.Attr("statements", parser.Rep( Statement )),
-    parser.Opt( parser.Attr("query", Query) ),
+  packrat.Seq(
+    packrat.Attr("statements", packrat.Rep( Statement )),
+    packrat.Opt( packrat.Attr("query", Query) ),
   )
 )
 
@@ -1152,9 +1152,9 @@ def parse_ans(text):
   Parses the given text as an answer set, i.e., a sequence of predicate
   statements. Returns a (possibly empty) tuple of Predicate objects.
   """
-  return parser.parse_completely(
+  return packrat.parse_completely(
     text,
-    parser.Rep(PredicateStatement),
+    packrat.Rep(PredicateStatement),
     devour=devour_asp
   )
 
@@ -1180,7 +1180,7 @@ def parse_ans_fast(text):
   # Now parse each predicate string individually:
   predicates = []
   for p in prstrings:
-    predicates.append(parser.parse_completely(p, Predicate, devour=devour_asp))
+    predicates.append(packrat.parse_completely(p, Predicate, devour=devour_asp))
   return predicates
 
 def parse_fans_fast(text):
@@ -1196,9 +1196,9 @@ def parse_fans_fast(text):
     if not l:
       continue
     if l[-1] != '.':
-      raise parser.ParseError("Line lacks trailing '.':\n{}".format(l))
+      raise packrat.ParseError("Line lacks trailing '.':\n{}".format(l))
     predicates.append(
-      parser.parse_completely(l[:-1], Predicate, devour=devour_asp)
+      packrat.parse_completely(l[:-1], Predicate, devour=devour_asp)
     )
   return predicates
 
@@ -1207,7 +1207,7 @@ def parse_asp(text):
   Parses the given text as an answer set program, i.e., a Program (see above).
   Returns a Program object.
   """
-  return parser.parse_completely(
+  return packrat.parse_completely(
     text,
     Program,
     devour=devour_asp
@@ -1267,41 +1267,41 @@ def load_logic_dir(dir):
 # Testing:
 
 def _test_parse_as_predicate(text):
-  return parser.parse(text, Predicate)
+  return packrat.parse(text, Predicate)
 
 def _test_parse_as_predicate_statement(text):
-  return parser.parse(text, PredicateStatement)
+  return packrat.parse(text, PredicateStatement)
 
 def _test_parse_completely_as_term(text):
-  return parser.parse_completely(text, Term)
+  return packrat.parse_completely(text, Term)
 
 def _test_parse_completely_as_builtinatom(text):
-  return parser.parse_completely(text, BuiltinAtom)
+  return packrat.parse_completely(text, BuiltinAtom)
 
 def _test_parse_completely_as_nafliteral(text):
-  return parser.parse_completely(text, NafLiteral)
+  return packrat.parse_completely(text, NafLiteral)
 
 def _test_parse_completely_as_statement(text):
-  return parser.parse_completely(text, Statement)
+  return packrat.parse_completely(text, Statement)
 
 
 def _test_restring_predicate(text):
-  return str(parser.parse_completely(text, Predicate))
+  return str(packrat.parse_completely(text, Predicate))
 
 def _test_restring_term(text):
-  return str(parser.parse_completely(text, Term))
+  return str(packrat.parse_completely(text, Term))
 
 def _test_restring_statement(text):
-  return str(parser.parse_completely(text, Statement))
+  return str(packrat.parse_completely(text, Statement))
 
 def _test_restring_program(text):
-  return str(parser.parse_completely(text, Program))
+  return str(packrat.parse_completely(text, Program))
 
 
 def _test_bad_fact(text):
   try:
-    parser.parse_completely(text, Predicate)
-  except parser.ParseError:
+    packrat.parse_completely(text, Predicate)
+  except packrat.ParseError:
     return True
   return False
 
@@ -1878,7 +1878,7 @@ _test_cases = [
     ),
   ),
   (
-    parser._test_parse(ClassicalLiteral),
+    packrat._test_parse(ClassicalLiteral),
     "-xyzzy", 
     ClassicalLiteral(
       True,
@@ -1886,7 +1886,7 @@ _test_cases = [
     ),
   ),
   (
-    parser._test_parse(Disjunction, leftovers=''),
+    packrat._test_parse(Disjunction, leftovers=''),
     "foo(bar, baz) | -xyzzy", 
     Disjunction(
       (
@@ -1944,7 +1944,7 @@ _test_cases = [
     ),
   ),
   (
-    parser._test_parse(Choice),
+    packrat._test_parse(Choice),
     "1 <= { x(T) : not T < 3 ; y(T) }",
     Choice(
       SimpleTerm("1"),
@@ -2222,7 +2222,7 @@ a. %comment b.
     ),
   ),
   (
-    parser._test_parse(Interval),
+    packrat._test_parse(Interval),
     "1..X",
     Interval(
       SimpleTerm("1"),
@@ -2512,7 +2512,7 @@ bar(3, 5)?""",
     )
   ),
   (
-    parser._test_parse(ScriptCall, leftovers=''),
+    packrat._test_parse(ScriptCall, leftovers=''),
     "@call(function)",
     ScriptCall("call", ( SimpleTerm("function"), )),
   ),
@@ -2530,7 +2530,7 @@ bar(3, 5)?""",
     "#script (python)\n#end.",
   ),
   (
-    parser._test_parse(
+    packrat._test_parse(
       Script,
       leftovers='\n    '
     ),
@@ -2561,7 +2561,7 @@ def join(x, y):
 a(@join(foo, bar)).""",
   ),
   (
-    parser._test_parse(Choice, leftovers=''),
+    packrat._test_parse(Choice, leftovers=''),
     "1 = { l_selected(P) : provocation(P) } = 1",
     Choice(
       SimpleTerm("1"),

@@ -8,7 +8,7 @@ import io
 import re
 
 import ans
-import parser
+import packrat
 
 #TODO: Seed clingo!
 
@@ -48,24 +48,24 @@ def clean_clingo_opt_parse(r, b, l):
   """
   return list(r[0][-2]), b, l
 
-ClingoOutput = parser.Hook(
+ClingoOutput = packrat.Hook(
   clean_clingo_parse,
-  parser.Seq(
-    parser.Rep(
+  packrat.Seq(
+    packrat.Rep(
       ans.Predicate
     ),
     "SATISFIABLE",
   )
 )
 
-ClingoOptOutput = parser.Hook(
+ClingoOptOutput = packrat.Hook(
   clean_clingo_opt_parse,
-  parser.Seq(
-    parser.SepList(
-      parser.Rep(
+  packrat.Seq(
+    packrat.SepList(
+      packrat.Rep(
         ans.Predicate
       ),
-      parser.Seq(
+      packrat.Seq(
         "Optimization:",
         re.compile("-?[0-9]+"),
       )

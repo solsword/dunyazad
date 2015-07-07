@@ -10,7 +10,7 @@ import os
 
 from utils import *
 
-import parser
+import packrat
 
 import ans
 
@@ -813,9 +813,9 @@ def collate_rules(story):
             if line[-2] != '}':
               raise ValueError("Invalid predicate filter:\n{}".format(line))
             fltr = line[1:-2]
-            pcs = parser.parse_completely(
+            pcs = packrat.parse_completely(
               fltr,
-              parser.SepList(ans.SimpleTerm, sep=';')
+              packrat.SepList(ans.SimpleTerm, sep=';')
             )
             preconditions = tuple(ans.build_fancy_schema(p) for p in pcs)
           elif line[0] == ">":
