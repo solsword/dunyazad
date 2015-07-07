@@ -2,10 +2,19 @@ A story generation system (with choices(!)).
 
 At some point we'll have a real README :P
 
-Run "main.py" in "current/". Look at the bottom of that file for the options
+Run main.py in current/. Look at the bottom of that file for the options
 that are available. If you're on Windows, you'll probably need to pass the
 --*-exe options to specify where to find external programs, unless you've put
 things like clingo on your path.
+
+Note: don't worry if it takes a while to run. You should see "Instantiating
+node 'root'..." appear and then it will grind for a while (maybe 20-40 seconds)
+solving that first node. Subsequent nodes should be faster.
+
+If main.py isn't working, try running test.py (still in "current"). This will
+run the unit tests and hopefully help zero in on what's wrong. For example if
+you're just missing clingo, the "wholeunit" suite should fail (those tests ask
+the system to generate stories) but all of the other tests should pass.
 
 Required external programs:
 
