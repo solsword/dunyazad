@@ -14,7 +14,7 @@ import packrat
 
 FASTPARSE = True
 
-CLINGO_EXE = "clingo"
+CLINGO_EXE = ["clingo"]
 
 class ASPError(Exception):
   def __init__(
@@ -81,8 +81,7 @@ def solve(code, seed=0, rand=0.0):
   ASPError if clingo returns an error code.
   """
   clingo = subprocess.Popen(
-    [
-      CLINGO_EXE,
+    CLINGO_EXE + [
       "--verbose=0",
       "--quiet=1,1",
       "--seed={}".format(seed),

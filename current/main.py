@@ -20,9 +20,9 @@ from utils import *
 
 CRASHFILE = os.path.join("out", "crash.lp")
 
-CLINGO_EXE = "clingo"
-TWEE_EXE = "twee"
-VIZ_EXE = "dot"
+CLINGO_EXE = ["clingo"]
+TWEE_EXE = ["twee"]
+VIZ_EXE = ["dot"]
 
 def write_crashfile(e):
   with open(CRASHFILE, 'w') as fout:
@@ -229,7 +229,7 @@ def main(
   if fmt == "twee":
     print("Compiling Twine version...")
     html = subprocess.check_output(
-      [TWEE_EXE, os.path.join("out", outfile), os.path.join("twine", "*.tw")]
+      TWEE_EXE + [os.path.join("out", outfile), os.path.join("twine", "*.tw")]
     )
     with open(os.path.join("out", "tlottolad.html"), 'w') as fout:
       fout.write(html.decode())
@@ -286,15 +286,15 @@ if __name__ == "__main__":
 
   if '--clingo-exe' in sys.argv:
     idx = sys.argv.index('--clingo-exe')
-    CLINGO_EXE = sys.argv[idx+1]
+    CLINGO_EXE = '&'.split(sys.argv[idx+1])
 
   if '--twee-exe' in sys.argv:
     idx = sys.argv.index('--twee-exe')
-    TWEE_EXE = sys.argv[idx+1]
+    TWEE_EXE = '&'.split(sys.argv[idx+1])
 
   if '--graphviz-exe' in sys.argv:
     idx = sys.argv.index('--graphviz-exe')
-    VIZ_EXE = sys.argv[idx+1]
+    VIZ_EXE = '&'.split(sys.argv[idx+1])
 
   if '--no-viz' in sys.argv:
     do_viz = False
