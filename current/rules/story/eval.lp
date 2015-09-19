@@ -68,23 +68,40 @@ at(N, expectation(X, enables, Goal)) :-
 
 % Stakes are based on the goals that are threatened:
 at(N, stakes(high)) :-
+  story_op(N, build_options),
   at(N, expectation(X, Exp, Goal)),
   at(N, stakes(Goal, high)),
-  at(N, player_goal(Goal)),
-  story_op(N, build_options).
+  at(N, player_goal(Goal)).
 
 at(N, stakes(low)) :-
+  story_op(N, build_options),
   at(N, expectation(X, Exp, Goal)),
   at(N, stakes(Goal, low)),
   at(N, player_goal(Goal)),
-  not at(N, stakes(high)),
-  story_op(N, build_options).
+  not at(N, stakes(high)).
 
 at(N, stakes(none)) :-
-  story_node(N),
+  story_op(N, build_options),
   not at(N, stakes(high)),
-  not at(N, stakes(low)),
-  story_op(N, build_options).
+  not at(N, stakes(low)).
+
+at(N, option_stakes(X, high)) :-
+  story_op(N, build_options),
+  at(N, expectation(X, Exp, Goal)),
+  at(N, stakes(Goal, high)),
+  at(N, player_goal(Goal)).
+
+at(N, option_stakes(X, low)) :-
+  story_op(N, build_options),
+  at(N, expectation(X, Exp, Goal)),
+  at(N, stakes(Goal, low)),
+  at(N, player_goal(Goal))
+  not at(N, option_stakes(X, high)).
+
+at(N, option_stakes(X, none)) :-
+  story_op(N, build_options),
+  not at(N, option_stakes(X, high)),
+  not at(N, option_stakes(X, low)).
 
 % Fails and achieves based on 'likely' outcomes:
 
@@ -127,52 +144,6 @@ at(N, expectation(X, achieves, Goal)) :-
   at(N, consequence_of(X, Outcome, _not, State)),
   state_fails(Goal, State),
   at(N, likely_outcome(X, Outcome)).
-
-
-% Outcomes:
-%----------
-
-outcome_perception(irrelevant).
-outcome_perception(hinders).
-outcome_perception(advances).
-outcome_perception(fails).
-outcome_perception(achieves).
-
-% hinders and advances
-
-at(N, outcome_perception(X, hinders, Goal)) :-
-  at(N, consequence(X, State)),
-  state_hinders(Goal, State).
-
-at(N, outcome_perception(X, hinders, Goal)) :-
-  at(N, consequence(X, _not, State)),
-  state_advances(Goal, State).
-
-at(N, outcome_perception(X, advances, Goal)) :-
-  at(N, consequence(X, State)),
-  state_advances(Goal, State).
-
-at(N, outcome_perception(X, advances, Goal)) :-
-  at(N, consequence(X, _not, State)),
-  state_hinders(Goal, State).
-
-at(N, outcome_perception(X, hinders, Goal)) :-
-  at(N, consequence(X, _not, State)),
-  state_achieves(Goal, State).
-
-at(N, outcome_perception(X, advances, Goal)) :-
-  at(N, consequence(X, _not, State)),
-  state_fails(Goal, State).
-
-% fails and achieves
-
-at(N, outcome_perception(X, fails, Goal)) :-
-  at(N, consequence(X, State)),
-  state_fails(Goal, State).
-
-at(N, outcome_perception(X, achieves, Goal)) :-
-  at(N, consequence(X, State)),
-  state_achieves(Goal, State).
 
 % different types of option feels:
 
@@ -321,9 +292,9 @@ at(N, option_feel(option(X), doomed)) :-
     at(N, player_goal(G3)) : at(N, expectation(option(X), achieves, G3))
   }.
 
-% choice structures:
+% option-based choice structures:
 
-at(N, choice_structure(mysterious)) :-
+at(N, option_structure(mysterious)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   0 = #sum {
@@ -331,7 +302,7 @@ at(N, choice_structure(mysterious)) :-
     -1,at(N, option(X)) : at(N, option(X))
   }.
 
-at(N, choice_structure(obvious)) :-
+at(N, option_structure(obvious)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   1 = {
@@ -343,7 +314,7 @@ at(N, choice_structure(obvious)) :-
     at(N, option(X)) : at(N, option_feel(option(X), irrelevant))
   }.
 
-at(N, choice_structure(relaxed)) :-
+at(N, option_structure(relaxed)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   0 = #sum {
@@ -353,7 +324,7 @@ at(N, choice_structure(relaxed)) :-
   at(N, stakes(Stakes)),
   higher_stakes(high, Stakes).
 
-at(N, choice_structure(powerful)) :-
+at(N, option_structure(powerful)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   1 <= {
@@ -366,7 +337,7 @@ at(N, choice_structure(powerful)) :-
   },
   at(N, stakes(high)).
 
-at(N, choice_structure(uncomfortable)) :-
+at(N, option_structure(uncomfortable)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   1 <= {
@@ -382,7 +353,7 @@ at(N, choice_structure(uncomfortable)) :-
   at(N, stakes(Stakes)),
   higher_stakes(Stakes, none).
 
-at(N, choice_structure(tradeoffs)) :-
+at(N, option_structure(tradeoffs)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   0 = #sum {
@@ -399,7 +370,7 @@ at(N, choice_structure(tradeoffs)) :-
   at(N, stakes(Stakes)),
   higher_stakes(Stakes, none).
 
-at(N, choice_structure(positive_alternatives)) :-
+at(N, option_structure(positive_alternatives)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   at(N, stakes(SomeStakes)),
@@ -422,7 +393,7 @@ at(N, choice_structure(positive_alternatives)) :-
     at(N, option(X)) : at(N, expectation(option(X), achieves, Goal2))
   }.
 
-at(N, choice_structure(negative_alternatives)) :-
+at(N, option_structure(negative_alternatives)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   at(N, stakes(SomeStakes)),
@@ -440,7 +411,7 @@ at(N, choice_structure(negative_alternatives)) :-
     -1,at(N, option(X)) : at(N, option(X))
   }.
 
-at(N, choice_structure(pressured)) :-
+at(N, option_structure(pressured)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   0 = {
@@ -454,7 +425,7 @@ at(N, choice_structure(pressured)) :-
   at(N, stakes(Stakes)),
   higher_stakes(Stakes, none).
 
-at(N, choice_structure(dangerous)) :-
+at(N, option_structure(dangerous)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   0 = {
@@ -468,7 +439,7 @@ at(N, choice_structure(dangerous)) :-
   },
   at(N, stakes(high)).
 
-at(N, choice_structure(unfortunate)) :-
+at(N, option_structure(unfortunate)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   0 = {
@@ -483,7 +454,7 @@ at(N, choice_structure(unfortunate)) :-
   at(N, stakes(Stakes)),
   higher_stakes(high, Stakes).
 
-at(N, choice_structure(bleak)) :-
+at(N, option_structure(bleak)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   0 = #sum {
@@ -495,7 +466,7 @@ at(N, choice_structure(bleak)) :-
   at(N, stakes(Stakes)),
   higher_stakes(Stakes, none).
 
-at(N, choice_structure(depressing)) :-
+at(N, option_structure(depressing)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   0 = #sum {
@@ -509,7 +480,7 @@ at(N, choice_structure(depressing)) :-
   at(N, stakes(Stakes)),
   higher_stakes(high, Stakes).
 
-at(N, choice_structure(doomed)) :-
+at(N, option_structure(doomed)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   0 = #sum {
@@ -523,3 +494,310 @@ at(N, choice_structure(doomed)) :-
   at(N, stakes(high)).
 
 % TODO: Worry about options without any assigned feel?
+
+
+% Outcomes:
+%----------
+
+outcome_perception(irrelevant).
+outcome_perception(hinders).
+outcome_perception(advances).
+outcome_perception(fails).
+outcome_perception(achieves).
+
+% hinders and advances
+
+at(N, outcome_perception(X, O, hinders, Goal)) :-
+  at(N, consequence_of(X, O, State)),
+  state_hinders(Goal, State).
+
+at(N, outcome_perception(X, O, hinders, Goal)) :-
+  at(N, consequence_of(X, O, _not, State)),
+  state_advances(Goal, State).
+
+at(N, outcome_perception(X, O, advances, Goal)) :-
+  at(N, consequence_of(X, O, State)),
+  state_advances(Goal, State).
+
+at(N, outcome_perception(X, O, advances, Goal)) :-
+  at(N, consequence_of(X, O, _not, State)),
+  state_hinders(Goal, State).
+
+at(N, outcome_perception(X, O, hinders, Goal)) :-
+  at(N, consequence_of(X, O, _not, State)),
+  state_achieves(Goal, State).
+
+at(N, outcome_perception(X, O, advances, Goal)) :-
+  at(N, consequence_of(X, O, _not, State)),
+  state_fails(Goal, State).
+
+% fails and achieves
+
+at(N, outcome_perception(X, O, fails, Goal)) :-
+  at(N, consequence_of(X, O, State)),
+  state_fails(Goal, State).
+
+at(N, outcome_perception(X, O, achieves, Goal)) :-
+  at(N, consequence_of(X, O, State)),
+  state_achieves(Goal, State).
+
+% Mixed outcome perceptions:
+
+% When we achieve a goal with no drawbacks:
+at(N, outcome_overall(X, great)) :-
+  at(N, outcome_perception(X, O, achieves, Goal)),
+  at(N, player_goal(Goal)),
+  at(N, option_stakes(X, Stakes)),
+  at(N, stakes(Goal, Stakes)),
+  0 = {
+    at(N, outcome_perception(X, AnyOutcome, fails, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, fails, AnyGoal)),
+      at(N, player_goal(AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes));
+    at(N, outcome_perception(X, AnyOutcome, hinders, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, hinders, AnyGoal)),
+      at(N, player_goal(AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes))
+  }.
+
+% When we advance a goal with no drawbacks:
+at(N, outcome_overall(X, good)) :-
+  at(N, outcome_perception(X, O, advances, Goal)),
+  at(N, player_goal(Goal)),
+  at(N, option_stakes(X, Stakes)),
+  at(N, stakes(Goal, Stakes)),
+  0 = {
+    at(N, outcome_perception(X, AnyOutcome, achieves, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, achieves, AnyGoal)),
+      at(N, player_goal(AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes));
+    at(N, outcome_perception(X, AnyOutcome, fails, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, fails, AnyGoal)),
+      at(N, player_goal(AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes));
+    at(N, outcome_perception(X, AnyOutcome, hinders, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, hinders, AnyGoal)),
+      at(N, player_goal(AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes))
+  }.
+
+% When we achieve at least one goal but fail at least one other goal, or
+% advance one goal while hindering another:
+at(N, outcome_overall(X, tradeoff)) :-
+  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_perception(X, O1, achieves, Goal)),
+  at(N, stakes(Goal, Stakes)),
+  at(N, outcome_perception(X, O2, fails, FailedGoal)),
+  at(N, stakes(FailedGoal, Stakes)).
+
+at(N, outcome_overall(X, tradeoff)) :-
+  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_perception(X, O1, advances, Goal)),
+  at(N, stakes(Goal, Stakes)),
+  at(N, outcome_perception(X, O2, hinders, HinderedGoal)),
+  at(N, stakes(HinderedGoal, Stakes)),
+  0 = {
+    at(N, outcome_perception(X, AnyOutcome, achieves, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, achieves, AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes)),
+      at(N, player_goal(AnyGoal));
+    at(N, outcome_perception(X, AnyOutcome, fails, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, fails, AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes)),
+      at(N, player_goal(AnyGoal))
+  }.
+
+% When we achieve at least one goal but hinder at least one other:
+at(N, outcome_overall(X, worth_it)) :-
+  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_perception(X, O1, achieves, Goal)),
+  at(N, stakes(Goal, Stakes)),
+  at(N, outcome_perception(X, O2, hinders, HinderedGoal)),
+  at(N, stakes(HinderedGoal, Stakes)),
+  0 = {
+    at(N, outcome_perception(X, AnyOutcome, fails, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, fails, AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes)),
+      at(N, player_goal(AnyGoal))
+  }.
+
+% When we advance at least one goal but fail at least one other:
+at(N, outcome_overall(X, not_worth_it)) :-
+  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_perception(X, O1, advances, Goal)),
+  at(N, stakes(Goal, Stakes)),
+  at(N, outcome_perception(X, O2, fails, FailedGoal)),
+  at(N, stakes(FailedGoal, Stakes)),
+  0 = {
+    at(N, outcome_perception(X, AnyOutcome, achieves, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, achieves, AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes)),
+      at(N, player_goal(AnyGoal))
+  }.
+
+% When we hinder a goal and make no progress otherwise:
+at(N, outcome_overall(X, bad)) :-
+  at(N, outcome_perception(X, O, hinders, Goal)),
+  at(N, player_goal(Goal)),
+  at(N, option_stakes(X, Stakes)),
+  at(N, stakes(Goal, Stakes)),
+  0 = {
+    at(N, outcome_perception(X, AnyOutcome, achieves, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, achieves, AnyGoal)),
+      at(N, player_goal(AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes));
+    at(N, outcome_perception(X, AnyOutcome, advances, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, advances, AnyGoal)),
+      at(N, player_goal(AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes));
+    at(N, outcome_perception(X, AnyOutcome, fails, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, fails, AnyGoal)),
+      at(N, player_goal(AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes))
+  }.
+
+% When we fail a goal and make no progress otherwise:
+at(N, outcome_overall(X, awful)) :-
+  at(N, outcome_perception(X, O, fails, Goal)),
+  at(N, player_goal(Goal)),
+  at(N, option_stakes(X, Stakes)),
+  at(N, stakes(Goal, Stakes)),
+  0 = {
+    at(N, outcome_perception(X, AnyOutcome, achieves, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, achieves, AnyGoal)),
+      at(N, player_goal(AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes));
+    at(N, outcome_perception(X, AnyOutcome, advances, AnyGoal)) :
+      at(N, outcome_perception(X, AnyOutcome, advances, AnyGoal)),
+      at(N, player_goal(AnyGoal)),
+      at(N, stakes(AnyGoal, Stakes))
+  }.
+
+
+% Outcomes which are neither likely nor unlikely are labeled as "neutral:"
+
+at(N, neutral_outcome(X, o(OutVar, OutVal))) :-
+  at(N, action(X, Action)),
+  outcome_val(Action, OutVar, OutVal),
+  not at(N, likely_outcome(X, o(OutVar, OutVal))),
+  not at(N, unlikely_outcome(X, o(OutVar, OutVal))).
+
+% Outcome predictabilities:
+
+at(N, outcome_predictability(X, o(OutVar, OutVal), predictable)) :-
+  story_op(N, build_options),
+  at(N, outcome(X, o(OutVar, OutVal)),
+  at(N, likely_outcome(X, o(OutVar, OutVal))),
+  1 = {
+    at(N, likely_outcome(X, o(OutVar, AnyVal))) :
+      at(N, likely_outcome(X, o(OutVar, AnyVal)))
+  }.
+
+at(N, outcome_predictability(X, o(OutVar, OutVal), expected)) :-
+  story_op(N, build_options),
+  at(N, outcome(X, o(OutVar, OutVal)),
+  at(N, likely_outcome(X, o(OutVar, OutVal))),
+  2 <= {
+    at(N, likely_outcome(X, o(OutVar, AnyVal))) :
+      at(N, likely_outcome(X, o(OutVar, AnyVal)))
+  }.
+
+at(N, outcome_predictability(X, o(OutVar, OutVal), average)) :-
+  story_op(N, build_options),
+  at(N, outcome(X, o(OutVar, OutVal)),
+  not at(N, unlikely_outcome(X, o(OutVar, OutVal))),
+  0 = {
+    at(N, likely_outcome(X, o(OutVar, AnyVal))) :
+      at(N, likely_outcome(X, o(OutVar, AnyVal)))
+  },
+  1 <= {
+    at(N, unlikely_outcome(X, o(OutVar, AnyVal))) :
+      at(N, unlikely_outcome(X, o(OutVar, AnyVal)))
+  }.
+
+at(N, outcome_predictability(X, o(OutVar, OutVal), unpredictable)) :-
+  story_op(N, build_options),
+  at(N, outcome(X, o(OutVar, OutVal)),
+  0 = {
+    at(N, likely_outcome(X, o(OutVar, AnyVal))) :
+      at(N, likely_outcome(X, o(OutVar, AnyVal)));
+    at(N, unlikely_outcome(X, o(OutVar, AnyVal))) :
+      at(N, unlikely_outcome(X, o(OutVar, AnyVal)))
+  }.
+
+at(N, outcome_predictability(X, o(OutVar, OutVal), unpredictable)) :-
+  story_op(N, build_options),
+  at(N, action(X, Action)),
+  at(N, outcome(X, o(OutVar, OutVal)),
+  X = {
+    outcome_val(Action, OutVar, AnyVal) :
+      outcome_val(Action, OutVar, AnyVal)
+  },
+  X = { % All possible outcome values for this variable are "unlikely"
+    at(N, unlikely_outcome(X, o(OutVar, AnyVal))) :
+      at(N, unlikely_outcome(X, o(OutVar, AnyVal)))
+  }.
+
+at(N, outcome_predictability(X, o(OutVar, OutVal), unexpected)) :-
+  story_op(N, build_options),
+  at(N, outcome(X, o(OutVar, OutVal)),
+  at(N, neutral_outcome(X, o(OutVar, OutVal))),
+  1 <= {
+    at(N, likely_outcome(X, o(OutVar, AnyVal))) :
+      at(N, likely_outcome(X, o(OutVar, AnyVal)))
+  }.
+
+at(N, outcome_predictability(X, o(OutVar, OutVal), unexpected)) :-
+  story_op(N, build_options),
+  at(N, outcome(X, o(OutVar, OutVal)),
+  at(N, unlikely_outcome(X, o(OutVar, OutVal))),
+  0 = {
+    at(N, likely_outcome(X, o(OutVar, AnyVal))) :
+      at(N, likely_outcome(X, o(OutVar, AnyVal)))
+  },
+  1 <= {
+    at(N, neutral_outcome(X, o(OutVar, AnyVal))) :
+      at(N, neutral_outcome(X, o(OutVar, AnyVal)))
+  }.
+
+at(N, outcome_predictability(X, o(OutVar, OutVal), unfair)) :-
+  story_op(N, build_options),
+  at(N, outcome(X, o(OutVar, OutVal)),
+  at(N, unlikely_outcome(X, o(OutVar, OutVal))),
+  at(N, likely_outcome(X, o(OutVar, OtherVal))),
+  OutVal != OtherVal.
+
+error(
+  m("Outcome has multiple predictabilities:", N, X, o(OutVar, OutVal), P1, P2)l
+) :-
+  at(N, outcome_predictability(X, o(OutVar, OutVal), P1)),
+  at(N, outcome_predictability(X, o(OutVar, OutVal), P2)),
+  P1 != P2.
+
+% Outcome feels:
+
+at(N, outcome_feel(X, o(OutVar, OutVal), expected_success)) :-
+  at(N, outcome(X, o(OutVar, OutVal))),
+  1 = {
+    at(N, outcome_predictability(X, o(OutVar, OutVal), predictable));
+    at(N, outcome_predictability(X, o(OutVar, OutVal), expected));
+    at(N, outcome_predictability(X, o(OutVar, OutVal), average));
+  },
+  1 <= {
+    at(N, outcome_overall(X, great)) :
+      at(N, outcome_overall(X, great));
+    at(N, outcome_overall(X, good)) :
+      at(N, outcome_overall(X, good))
+  },
+  0 = {
+    at(N, outcome_perception(X, o(OutVar, OutVal), hinders, SomeGoal)) :
+      at(N, outcome_perception(X, o(OutVar, OutVal), hinders, SomeGoal));
+    at(N, outcome_perception(X, o(OutVar, OutVal), fails, SomeGoal)) :
+      at(N, outcome_perception(X, o(OutVar, OutVal), fails, SomeGoal))
+  },
+  1 <= {
+    at(N, option_feel(X, sure_thing)) :
+      at(N, option_feel(X, sure_thing))
+    at(N, option_feel(X, safe)) :
+      at(N, option_feel(X, safe))
+  }.

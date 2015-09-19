@@ -16,4 +16,4 @@ story_op(root, add_surface).
 
 error(m("Wrong initial choice structure.")) :-
   node_status_reached(root, built),
-  not at(root, choice_structure(pressured)).
+  not at(root, option_structure(pressured)).
