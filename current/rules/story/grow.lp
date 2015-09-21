@@ -235,21 +235,17 @@ error(m("New node picked up extra state", New, State)) :-
   new_node(New),
   successor(Old, Opt, New),
   st(New, State),
-  0 = {
-    st(Old, State);
-    at(Old, consequence(Opt, State));
-    spontaneous(st(New, State))
-  }.
+  not st(Old, State),
+  not at(Old, consequence(Opt, State)),
+  not spontaneous(st(New, State)).
 
 error(m("New node lost a state", New, State)) :-
   new_node(New),
   successor(Old, Opt, New),
   st(Old, State),
-  0 = {
-    st(New, State);
-    at(Old, consequence(Opt, _not, State));
-    spontaneous(_not, st(New, State))
-  }.
+  not st(New, State),
+  not at(Old, consequence(Opt, _not, State)),
+  not spontaneous(_not, st(New, State)).
 
 error(m("New node violated negative consequence", New, State)) :-
   new_node(New),

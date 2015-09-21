@@ -18,13 +18,13 @@ story_op(root, add_surface).
 %:- not st(root, relation(has_item, inst(actor, member_1), inst(item, Instrument).
 st(root, property(has_skill, inst(actor, member_1), music)).
 :- not at(root, action(option(1), trade)).
-:- not at(root, outcome(option(1), deal)).
+:- not at(root, outcome(option(1), o(deal, deal))).
 %:- not at(root, action(option(2), flee)).
 %:- not at(root, initiator(option(1), inst(actor, member_1))).
 
-:- not successor(root, option(1), root_1).
-story_op(root_1, initialize_node).
-story_op(root_1, build_options).
+%:- not successor(root, option(1), root_1).
+%story_op(root_1, initialize_node).
+%story_op(root_1, build_options).
 %story_op(root_1, add_branch_nodes).
 
 %:- not successor(root, option(2), root_2).
