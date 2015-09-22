@@ -14,11 +14,11 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-:- not setup(root, on_sale).
+%:- not setup(root, on_sale).
 %:- not st(root, relation(has_item, inst(actor, member_1), inst(item, Instrument).
-st(root, property(has_skill, inst(actor, member_1), music)).
-:- not at(root, action(option(1), trade)).
-:- not at(root, outcome(option(1), o(deal, deal))).
+%st(root, property(has_skill, inst(actor, member_1), music)).
+%:- not at(root, action(option(1), trade)).
+%:- not at(root, outcome(option(1), o(deal, deal))).
 %:- not at(root, action(option(2), flee)).
 %:- not at(root, initiator(option(1), inst(actor, member_1))).
 

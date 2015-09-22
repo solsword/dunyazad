@@ -1,8 +1,8 @@
 % core rules:
 % -----------
 
-%#minimize { 1@0, error(Message) : error(Message) }.
-:- error(Message).
+#minimize { 1@0, error(Message) : error(Message) }.
+%:- error(Message).
 %:- error(m("Story too short", N)).
 %:- error(m("Skipped transition", N)).
 %:- error(m("Transition is too early", N)).
@@ -18,6 +18,7 @@
 %:- error(m("Price is not a treasure.", Node, Option)).
 
 #const max_options=4.
+#const max_outcome_variables=5.
 #const min_story_length=5.
 #const min_story_choices=3.
 #const max_setup_argument_arity=4.
@@ -26,6 +27,14 @@
 opt_num(1..max_options).
 setup_arg_id(1..max_setup_argument_arity).
 party_size_value(1..max_party_size).
+
+error(m("Action has too many outcome variables.", Action)) :-
+  action(Action),
+  Count = {
+    outcome_val(Action, OutcomeVar, AnyVal) :
+      outcome_val(Action, OutcomeVar, AnyVal)
+  },
+  Count > max_outcome_variables.
 
 % Core node construction:
 % -----------------------
