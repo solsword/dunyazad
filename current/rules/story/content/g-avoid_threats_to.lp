@@ -1,8 +1,7 @@
 % avoid threats to
 
-at(N, stakes(avoid_threats_to(Actor), high)) :-
-  at(N, expectation(X, AnyExp, avoid_threats_to(Actor))),
-  AnyExp != irrelevant.
+at(N, goal_stakes(avoid_threats_to(inst(actor, ID)), high)) :-
+  st(N, inst(actor, ID)).
 
 state_hinders(
   avoid_threats_to(inst(actor, Key)),

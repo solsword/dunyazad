@@ -1,8 +1,7 @@
 % as intended
 
-at(N, stakes(as_intended(Actor), low)) :-
-  at(N, expectation(X, AnyExp, as_intended(Actor))),
-  AnyExp != irrelevant.
+at(N, goal_stakes(as_intended(Actor), low)) :-
+  at(N, initiator(X, Actor)).
 
 at(N, expectation(X, achieves, as_intended(Actor))) :-
   at(N, initiator(X, Actor)),

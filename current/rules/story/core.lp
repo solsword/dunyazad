@@ -3,6 +3,8 @@
 
 #minimize { 1@0, error(Message) : error(Message) }.
 %:- error(Message).
+:- error(m("Choice node missing option 1.", N)).
+:- error(m("Choice node missing option 2.", N)).
 %:- error(m("Story too short", N)).
 %:- error(m("Skipped transition", N)).
 %:- error(m("Transition is too early", N)).
@@ -28,11 +30,14 @@ opt_num(1..max_options).
 setup_arg_id(1..max_setup_argument_arity).
 party_size_value(1..max_party_size).
 
+outcome_variable(Action, Variable) :-
+  outcome_val(Action, Variable, AnyVal).
+
 error(m("Action has too many outcome variables.", Action)) :-
   action(Action),
   Count = {
-    outcome_val(Action, OutcomeVar, AnyVal) :
-      outcome_val(Action, OutcomeVar, AnyVal)
+    outcome_variable(Action, Var) :
+      outcome_variable(Action, Var)
   },
   Count > max_outcome_variables.
 

@@ -2,9 +2,9 @@
 
 % Note this is probably the most opaque goal...
 
-at(N, stakes(have_tool_for(Actor, Skill), low)) :-
-  at(N, expectation(X, AnyExp, have_tool_for(Actor, Skill))),
-  AnyExp != irrelevant.
+at(N, goal_stakes(have_tool_for(inst(actor, ID), Skill), low)) :-
+  st(N, inst(actor, ID)),
+  st(N, property(has_skill, inst(actor, ID), Skill)).
 
 state_achieves(
   have_tool_for(inst(actor, Actor), Skill),

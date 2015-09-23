@@ -1,8 +1,7 @@
 % preserve health
 
-at(N, stakes(preserve_health(Actor), high)) :-
-  at(N, expectation(X, AnyExp, preserve_health(Actor))),
-  AnyExp != irrelevant.
+at(N, goal_stakes(preserve_health(inst(actor, ID)), high)) :-
+  st(N, inst(actor, ID)).
 
 state_fails(
   preserve_health(inst(actor, Key)),
