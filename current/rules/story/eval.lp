@@ -93,14 +93,14 @@ at(N, actual_stakes(high)) :-
   at(N, outcome_perception(X, O, Any, Goal)),
   Any != irrelevant,
   at(N, player_goal(Goal)),
-  at(N, goal_stakes(Goal, high).
+  at(N, goal_stakes(Goal, high)).
 
 at(N, actual_stakes(low)) :-
   story_op(N, build_options),
   at(N, outcome_perception(X, O, Any, Goal)),
   Any != irrelevant,
   at(N, player_goal(Goal)),
-  at(N, goal_stakes(Goal, low),
+  at(N, goal_stakes(Goal, low)),
   not at(N, actual_stakes(high)).
 
 at(N, actual_stakes(none)) :-
@@ -698,8 +698,17 @@ at(N, outcome_overall(X, awful)) :-
       at(N, goal_stakes(AnyGoal, Stakes))
   }.
 
-% When an outcome doesn't matter:
-% TODO: HERE
+% When an outcome doesn't affect max-stakes goals in the end:
+at(N, outcome_overall(option(X), neutral)) :-
+  at(N, option(X)),
+  at(N, option_stakes(X, Stakes)),
+  0 = {
+    at(N, outcome_perception(option(X), AnyOutcome, NotIrrelevant, AnyGoal)) :
+      at(N, outcome_perception(option(X), AnyOutcome, NotIrrelevant, AnyGoal)),
+      at(N, player_goal(AnyGoal)),
+      at(N, goal_stakes(AnyGoal, Stakes)),
+      NotIrrelevant != irrelevant
+  }.
 
 
 % Outcomes affecting non-max-stakes or non-player goals are not considered

@@ -1,6 +1,6 @@
 #!/bin/sh
 seed=`head -c 2 /dev/urandom | hexdump -e '"%u"'`
-timelimit="--time-limit=10"
+timelimit="--time-limit=60"
 #timelimit=""
 mkdir -p out
 . ./sources
@@ -23,20 +23,21 @@ time --format="%E, %K KB" gringo -t $sources >> out/grounded
 echo "  ...done."
 
 
-#echo "% vim"": syn=lua" > out/stats
-#echo "---"
-#echo "Running: \"clingo --stats $timelimit $args $sources\""
-#time --format="%E, %K KB" \
-#  clingo --stats $timelimit $args $sources |\
-#  tail -n 29 | head -n -1 >> out/stats
-#echo "  ...done."
+echo "% vim"": syn=lua" > out/stats
+echo "---"
+echo "Running: \"gringo --verbose=0 $sources | clasp --quiet=1,1 --stats $args $timelimit\""
+time --format="%E, %K KB" \
+  gringo --verbose=0 $sources |\
+  clasp --quiet=1,1 --stats $args $timelimit >> out/stats
+echo "  ...done."
 
 
 echo "% vim"": syn=gringo" > out/events
 echo "---"
-echo "Running: \"clingo --verbose=0 --quiet=1,1 $args $sources\""
+echo "Running: \"gringo --verbose=0 $sources | clasp --verbose=0 --quiet=1,1 $args\""
 time --format="%E, %K KB" \
-  clingo --verbose=0 --quiet=1,1 $args $sources |\
+  gringo --verbose=0 $sources |\
+  clasp --verbose=0 --quiet=1,1 $args |\
     cat | head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\
     sed "s/^\([a-zA-Z0-9_]\+\)$/\1./" | sort >> out/events
 echo "  ...done."

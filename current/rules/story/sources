@@ -1,23 +1,29 @@
 #!/bin/sh
 core="
-choice_structure.lp
 core.lp
-eval.lp
-goals.lp
-grow.lp
 actions.lp
-actors.lp
-items.lp
-potential.lp
-settings.lp
-setup.lp
-skills.lp
 the_party.lp
+actors.lp
+setup.lp
+grow.lp
+items.lp
+settings.lp
+eval.lp
 vignettes.lp
+skills.lp
+potential.lp
+goals.lp
+choice_structure.lp
 "
 core=`echo $core | tr "\n" " "`
 content="content/*.lp content/*/*.lp"
+#content="content/a-testfour.lp content/p-* content/g-* content/s-* content/*/*.lp"
+#content="content/a-testfour.lp"
+utils="../utils.lp"
+#utils=""
 surface="surface.lp"
+#surface=""
 constraints="test.lpt"
-sources="../utils.lp $core $surface $content"
+sources="$utils $core $surface $content"
 args="--seed=$seed --rand-freq=0.05"
+#args="--seed=$seed --rand-freq=0"

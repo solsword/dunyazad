@@ -15,10 +15,9 @@ class_skill(merchant, tinkering, sometimes).
 class_skill(merchant, music, sometimes).
 class_skill(merchant, elocution, sometimes).
 class_skill(merchant, storytelling, sometimes).
-class_item(merchant, tool, 0, 1).
 class_item(merchant, treasure, 0, 1).
 class_item(merchant, book, 0, 1).
-class_item(merchant, item, 1, 1).
+class_item(merchant, artificial_weapon, 1, 1).
 
 % Skilled workers
 subclass(commoner, skilled).

@@ -19,11 +19,13 @@ starting_skill(storytelling).
 
 st(R, inst(actor, you)) :- _sr(R).
 st(R, state(party_member, inst(actor, you))) :- _sr(R).
-st(R, property(name, inst(actor, you), "Dunyazad")) :- _sr(R).
-st(R, property(person, inst(actor, you), second)) :- _sr(R).
-st(R, property(gender, inst(actor, you), feminine)) :- _sr(R).
-st(R, property(determined, inst(actor, you), false)) :- _sr(R).
 st(R, property(type, inst(actor, you), person)) :- _sr(R).
+
+surface_property(name, inst(actor, you), "Dunyazad").
+surface_property(person, inst(actor, you), second).
+surface_property(gender, inst(actor, you), feminine).
+surface_property(number, inst(actor, you), singular).
+surface_property(determined, inst(actor, you), false).
 % You start with literacy and two other random skills (from the list of
 % "starting" skills):
 2 = {
@@ -91,29 +93,28 @@ st(R, state(party_member, inst(actor, Member))) :-
   _sr(R).
 
 1 = {
-  st(R, property(name, inst(actor, Member), Name))
+  surface_property(name, inst(actor, Member), Name)
     : party_member_name(Name);
   error(m("Party member without name.", Member))
-} :- party_member(Member, Relation), _sr(R).
+} :- party_member(Member, Relation).
 
 error(m("Multiple party members have the same name.")) :-
-  st(R, property(name, inst(actor, M1), Name)),
-  st(R, property(name, inst(actor, M2), Name)),
+  surface_property(name, inst(actor, M1), Name),
+  surface_property(name, inst(actor, M2), Name),
   M1 != M2,
   _sr(R).
 
 1 = {
-  st(R, property(gender, inst(actor, Member), masculine));
-  st(R, property(gender, inst(actor, Member), feminine));
+  surface_property(gender, inst(actor, Member), masculine);
+  surface_property(gender, inst(actor, Member), feminine);
   error(m("Party member without gender.", Member))
 } :- party_member(Member, Relation), _sr(R).
 
+surface_property(determined, inst(actor, Member), false) :-
+  party_member(Member, Relation).
+
 st(R, property(relationship, inst(actor, Member), Relation)) :-
   party_member(Member, Relation), _sr(R).
-
-st(R, property(determined, inst(actor, Member), false)) :-
-  party_member(Member, Relation),
-  _sr(R).
 
 st(R, property(type, inst(actor, Member), person)) :-
   party_member(Member, Relation),
@@ -148,10 +149,10 @@ st(R, Inst) :-
   supply_inst(R, Owner, Inst, Type).
 st(R, property(type, Inst, Type)) :-
   supply_inst(R, Owner, Inst, Type).
-st(R, property(name, Inst, Name)) :-
+surface_property(name, Inst, Name) :-
   supply_inst(R, Owner, Inst, Type),
   item_def(Type, GType, Name, Number).
-st(R, property(number, Inst, Number)) :-
+surface_property(number, Inst, Number) :-
   supply_inst(R, Owner, Inst, Type),
   item_def(Type, GType, Name, Number).
 st(R, relation(has_item, inst(actor, Owner), Inst)) :-

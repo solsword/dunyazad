@@ -1,10 +1,18 @@
 % core rules:
 % -----------
 
-#minimize { 1@0, error(Message) : error(Message) }.
-%:- error(Message).
-:- error(m("Choice node missing option 1.", N)).
-:- error(m("Choice node missing option 2.", N)).
+%#minimize { 1@0, error(Message) : error(Message) }.
+:- error(Message).
+%:- error(m("Choice node missing option 1.", N)).
+%:- error(m("Choice node missing option 2.", N)).
+%:- error(m("Error with instance number.", Inst)).
+
+%:- error(m("Action without initiator.",N,X)).
+%:- error(m("Non-party-initiated option",N,X)).
+%:- error(m("Irrelevant option",N,X)).
+%:- error(m("Unaddressed important potential",N)).
+%:- error(m("Unmotivated action",N,X)).
+
 %:- error(m("Story too short", N)).
 %:- error(m("Skipped transition", N)).
 %:- error(m("Transition is too early", N)).
@@ -19,7 +27,7 @@
 %:- error(m("Unbound action argument.", Node, Action, Arg, ArgType)).
 %:- error(m("Price is not a treasure.", Node, Option)).
 
-#const max_options=4.
+#const max_options=3.
 #const max_outcome_variables=5.
 #const min_story_length=5.
 #const min_story_choices=3.
@@ -105,7 +113,7 @@ category_for(Class, Category) :-
   subclass(Category, Class),
   general_category(Category).
 
-error(m("Instance doesn't belong to a genereal category.", N, I)) :-
+error(m("Instance doesn't belong to a general category.", N, I)) :-
   st(N, inst(Type, I)),
   0 = {
     category(N, inst(Type, I), Category)

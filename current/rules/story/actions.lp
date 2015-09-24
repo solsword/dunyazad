@@ -59,7 +59,8 @@ error(m("Action without initiator.", N, X)) :-
   at(N, option(X)),
   0 = {
     at(N, initiator(option(X), Anyone))
-  }.
+  },
+  story_op(N, build_options).
 
 % Actual consequences depend on which outcome variables have which values:
 at(N, consequence(X, Consequence)) :-

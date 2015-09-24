@@ -82,53 +82,38 @@ NOUN_SCHEMAS = {
     ),
   "name":
     Pr(
-      "st",
-      Vr("Node"),
-      Pr("property",
-        Pr("name"),
-        Pr("inst", Vr("Type"), Vr("Key")),
-        Vr("Name")
-      )
+      "surface_property",
+      Pr("name"),
+      Pr("inst", Vr("Type"), Vr("Key")),
+      Vr("Name")
     ),
   "number":
     Pr(
-      "st",
-      Vr("Node"),
-      Pr("property",
-        Pr("number"),
-        Pr("inst", Vr("Type"), Vr("Key")),
-        Vr("Number")
-      )
+      "surface_property",
+      Pr("number"),
+      Pr("inst", Vr("Type"), Vr("Key")),
+      Vr("Number")
     ),
   "gender":
     Pr(
-      "st",
-      Vr("Node"),
-      Pr("property",
-        Pr("gender"),
-        Pr("inst", Vr("Type"), Vr("Key")),
-        Vr("Gender")
-      )
+      "surface_property",
+      Pr("gender"),
+      Pr("inst", Vr("Type"), Vr("Key")),
+      Vr("Gender")
     ),
   "person":
     Pr(
-      "st",
-      Vr("Node"),
-      Pr("property",
-        Pr("person"),
-        Pr("inst", Vr("Type"), Vr("Key")),
-        Vr("Person")
-      )
+      "surface_property",
+      Pr("person"),
+      Pr("inst", Vr("Type"), Vr("Key")),
+      Vr("Person")
     ),
   "determined":
     Pr(
-      "st",
-      Vr("Node"),
-      Pr("property",
-        Pr("determined"),
-        Pr("inst", Vr("Type"), Vr("Key")),
-        Vr("Determination")
-      )
+      "surface_property",
+      Pr("determined"),
+      Pr("inst", Vr("Type"), Vr("Key")),
+      Vr("Determination")
     ),
   "has_item": 
     Pr(
@@ -397,6 +382,8 @@ def glean_nouns(story):
       n = binding["st.state.inst.Key"].unquoted()
     elif "st.relation.item.Key" in binding:
       n = binding["st.relation.item.Key"].unquoted()
+    elif "surface_property.inst.Key" in binding:
+      n = binding["surface_property.inst.Key"].unquoted()
     else:
       raise ValueError(
         "Unknown binding structure for noun schema:\n{}".format(binding)
@@ -406,15 +393,15 @@ def glean_nouns(story):
     if sc == "class":
       result[n].cls = binding["st.property.Class"].unquoted()
     elif sc == "name":
-      result[n].name = binding["st.property.Name"].unquoted()
+      result[n].name = binding["surface_property.Name"].unquoted()
     elif sc == "number":
-      result[n].number = binding["st.property.Number"].unquoted()
+      result[n].number = binding["surface_property.Number"].unquoted()
     elif sc == "gender":
-      result[n].gender = binding["st.property.Gender"].unquoted()
+      result[n].gender = binding["surface_property.Gender"].unquoted()
     elif sc == "person":
-      result[n].person = binding["st.property.Person"].unquoted()
+      result[n].person = binding["surface_property.Person"].unquoted()
     elif sc == "determined":
-      d = binding["st.property.Determination"].unquoted()
+      d = binding["surface_property.Determination"].unquoted()
       result[n].determined = d == "true"
     elif sc == "has_item":
       o = binding["st.relation.owner.Key"].unquoted()
