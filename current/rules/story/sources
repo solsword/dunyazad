@@ -8,12 +8,12 @@ setup.lp
 grow.lp
 items.lp
 settings.lp
-eval.lp
 vignettes.lp
 skills.lp
 potential.lp
 goals.lp
 choice_structure.lp
+eval.lp
 "
 core=`echo $core | tr "\n" " "`
 content="content/*.lp content/*/*.lp"

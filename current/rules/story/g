@@ -34,12 +34,15 @@ echo "  ...done."
 
 echo "% vim"": syn=gringo" > out/events
 echo "---"
-echo "Running: \"gringo --verbose=0 $sources | clasp --verbose=0 --quiet=1,1 $args\""
+#echo "Running: \"gringo --verbose=0 $sources | clasp --verbose=0 --quiet=1,1 $args\""
+echo "Running: \"clingo --verbose=0 --quiet=1,1 $args $sources\""
 time --format="%E, %K KB" \
-  gringo --verbose=0 $sources |\
-  clasp --verbose=0 --quiet=1,1 $args |\
+  clingo --verbose=0 --quiet=1,1 $args $sources |\
     cat | head -n 1 | sed "s/)$/)./" | sed "s/) /).\n/g" |\
     sed "s/^\([a-zA-Z0-9_]\+\)$/\1./" | sort >> out/events
+#  gringo --verbose=0 $sources |\
+#  clasp --verbose=0 --quiet=1,1 $args |\
+#  /home/pmawhorter/src/abs/potassco/clingo/src/clingo-4.5.3-source/build/release/clingo --verbose=0 --quiet=1,1 $args $sources |\
 echo "  ...done."
 
 
