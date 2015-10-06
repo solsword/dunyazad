@@ -12,23 +12,26 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-error(m(1)) :- not setup(root, monster_attack).
+#minimize { 1@0, bad(Message) : bad(Message) }.
+
+bad(m(1)) :- not setup(root, monster_attack).
 %:- not at(root, initiator(option(1), inst(actor, you))).
-error(m(2)) :- not at(root, action(option(1), attack)).
-error(m(3)) :- not at(root, outcome(option(1), o(success, victory))).
-error(m(4)) :- not at(root, action(option(2), pacify)).
-error(m(4)) :- not at(root, outcome(option(2), o(mood, enraged))).
-error(m(5)) :- not at(root, action(option(3), flee)).
-error(m(6)) :- not at(root, outcome(option(3), o(success, failure))).
+bad(m(2)) :- not at(root, action(option(1), attack)).
+bad(m(3)) :- not at(root, outcome(option(1), o(success, victory))).
+bad(m(4)) :- not at(root, action(option(2), pacify)).
+bad(m(5)) :- not at(root, outcome(option(2), o(mood, enraged))).
+bad(m(6)) :- not at(root, action(option(3), flee)).
+bad(m(7)) :- not at(root, outcome(option(3), o(success, failure))).
 
-error(m(7)) :- not successor(root, option(2), root_2).
-error(m(8)) :- not successor(root, option(3), root_2).
+bad(m(8)) :- not successor(root, option(2), root_2).
+bad(m(9)) :- not successor(root, option(3), root_2).
 
-:- error(m(1)).
-:- error(m(2)).
-:- error(m(3)).
-:- error(m(4)).
-:- error(m(5)).
-:- error(m(6)).
-:- error(m(7)).
-:- error(m(8)).
+:- bad(m(1)).
+:- bad(m(2)).
+:- bad(m(3)).
+:- bad(m(4)).
+:- bad(m(5)).
+:- bad(m(6)).
+:- bad(m(7)).
+:- bad(m(8)).
+:- bad(m(9)).

@@ -1,0 +1,95 @@
+% vim: syn=gringo
+% setup:
+% ------
+
+max_unique(0).
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+%error(m("No outcome with desired feel.")) :-
+%  node_status_reached(root, built),
+%  0 = {
+%    at(N, outcome_feel(X, expected_success)) :
+%      at(N, outcome_feel(X, expected_success))
+%  }.
+
+error("setup") :-
+  story_node(root),
+  not setup(root, monster_attack).
+
+error(0) :-
+  story_node(root),
+  not at(root, option(1)).
+
+error(1) :-
+  at(root, option(1)),
+  not at(root, action(option(1), attack)).
+
+%error(2) :-
+%  at(root, option(1)),
+%  at(root, action(option(1), attack)).
+%  not at(root, outcome(option(1), o(success, victory))).
+
+%#minimize { N@0, bad(N, Message) : bad(N, Message) }.
+%
+%bad(50, "wrong feel") :-
+%  story_op(N, build_options),
+%  0 = {
+%    at(N, option_feel(X, sure_thing)) :
+%      at(N, option_feel(X, sure_thing));
+%    at(N, option_feel(X, safe)) :
+%      at(N, option_feel(X, safe))
+%  }.
+%
+%bad(50, "no goal expectation") :-
+%  story_op(N, build_options),
+%  0 = {
+%    at(N, expectation(X, achieves, Goal)) :
+%      at(N, expectation(X, achieves, Goal)),
+%      at(N, player_goal(Goal));
+%    at(N, expectation(X, advances, Goal)) :
+%      at(N, expectation(X, advances, Goal)),
+%      at(N, player_goal(Goal))
+%  }.
+%
+%bad(50, "no goal achieved") :-
+%  story_op(N, build_options),
+%  0 = {
+%    at(N, outcome_perception(X, achieves, Goal)) :
+%      at(N, outcome_perception(X, achieves, Goal)),
+%      at(N, expectation(X, achieves, Goal)),
+%      at(N, player_goal(Goal));
+%    at(N, outcome_perception(X, achieves, Goal)) :
+%      at(N, outcome_perception(X, achieves, Goal)),
+%      at(N, expectation(X, advances, Goal)),
+%      at(N, player_goal(Goal));
+%    at(N, outcome_perception(X, advances, Goal)) :
+%      at(N, outcome_perception(X, advances, Goal)),
+%      at(N, expectation(X, advances, Goal)),
+%      at(N, player_goal(Goal))
+%  }.
+%
+%bad(50, "wrong predictability") :-
+%  story_op(N, build_options),
+%  0 = {
+%    at(N, overall_predictability(X, predictable));
+%    at(N, overall_predictability(X, expected));
+%    at(N, overall_predictability(X, average))
+%  }.
+%
+%bad(10, "wrong overall outcome valence") :-
+%  story_op(N, build_options),
+%  0 = {
+%    at(N, outcome_overall(X, great)) :
+%      at(N, outcome_overall(X, great));
+%    at(N, outcome_overall(X, good)) :
+%      at(N, outcome_overall(X, good))
+%  }.

@@ -24,5 +24,5 @@ at(N, outcome_perception(X, achieves, as_intended(Actor))) :-
 at(N, outcome_perception(X, fails, as_intended(Actor))) :-
   at(N, initiator(X, Actor)),
   at(N, action(X, Action)),
-  default_intent(Action, Outcome),
-  not at(N, outcome(X, Outcome)).
+  default_intent(Action, o(OutVar, OutVal)),
+  not at(N, outcome(X, o(OutVar, OutVal))).

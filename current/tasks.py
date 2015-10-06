@@ -87,6 +87,13 @@ SC = {
 KEEP = {
   "at": PVr("at", "at", Vr("Node"), SbT("Fluent")),
   "st": PVr("st", "st", Vr("Node"), SbT("Fluent")),
+  "surface_property":
+    PVr(
+      "surface_property", "surface_property",
+      Vr("Property"),
+      SbT("Inst"),
+      Vr("Value")
+    ),
 
   "story_node": PVr("story_node", "story_node", Vr("Node")),
   "story_root": PVr("story_root", "story_root", Vr("Node")),
