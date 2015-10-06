@@ -889,7 +889,7 @@ at(N, overall_predictability(X, average)) :-
   },
   Count <= max_options * max_outcome_variables.
 
-at(N, overall_predictabilityy(X, foobar)) :-
+at(N, overall_predictability(X, unpredictable)) :-
   story_op(N, build_options),
   at(N, important_outcome(X, SomeOutcome)),
   at(N, outcome_predictability(X, SomeOutcome, unpredictable)),

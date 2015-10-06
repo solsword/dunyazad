@@ -14,6 +14,23 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-error(m("Wrong initial choice structure.")) :-
+#minimize { 1@20, bad(Message) : bad(Message) }.
+
+%:- bad("Wrong initial choice structure.").
+%
+%bad("Wrong initial choice structure.") :-
+%  node_status_reached(root, built),
+%  not at(root, option_structure(relaxed)).
+
+bad(1) :-
   node_status_reached(root, built),
-  not at(root, option_structure(relaxed)).
+  0 = {
+    at(root, option_feel(X, safe)) :
+      at(root, option_feel(X, safe))
+  }.
+
+bad(2) :-
+  node_status_reached(root, built),
+  not at(root, perceived_stakes(low)).
+
+:- bad(2).
