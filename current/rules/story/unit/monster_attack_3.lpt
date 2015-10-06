@@ -21,10 +21,10 @@ error(m(6)) :- not at(root, action(option(3), pacify)).
 error(m(7)) :- not at(root, outcome(option(3), o(mood, relaxed))).
 
 story_op(root_1, initialize_node).
-story_op(root_1, build_options).
+%story_op(root_1, build_options).
 
 story_op(root_2, initialize_node).
-story_op(root_2, build_options).
+%story_op(root_2, build_options).
 
 story_op(root_3, initialize_node).
-story_op(root_3, build_options).
+%story_op(root_3, build_options).

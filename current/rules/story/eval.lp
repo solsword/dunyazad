@@ -830,7 +830,7 @@ error(
 ) :-
   at(N, outcome_predictability(X, o(OutVar, OutVal), P1)),
   at(N, outcome_predictability(X, o(OutVar, OutVal), P2)),
-  P1 != P2.
+  P1 < P2.
 
 error(m("Individual outcome has no predictability:", N, X, o(OutVar, OutVal))):-
   at(N, outcome(X, o(OutVar, OutVal))),
@@ -855,6 +855,7 @@ at(N, overall_predictability(X, predictable)) :-
 at(N, overall_predictability(X, expected)) :-
   story_op(N, build_options),
   at(N, outcome(X, SomeOutcome)),
+  not at(N, overall_predictability(X, predictable)),
   Count = { at(N, outcome(X, Outcome)) : at(N, important_outcome(X, Outcome)) },
   Count = {
     at(N, outcome(X, Outcome)) :
@@ -888,10 +889,10 @@ at(N, overall_predictability(X, average)) :-
   },
   Count <= max_options * max_outcome_variables.
 
-at(N, overall_predictability(X, unpredictable)) :-
+at(N, overall_predictabilityy(X, foobar)) :-
   story_op(N, build_options),
   at(N, important_outcome(X, SomeOutcome)),
-  at(N, outcome_predictability(X, SomeOutcome, unpredictable)).
+  at(N, outcome_predictability(X, SomeOutcome, unpredictable)),
   0 = {
     at(N, outcome(X, Outcome)) :
       at(N, outcome_predictability(X, Outcome, unexpected)),
@@ -927,7 +928,7 @@ at(N, overall_predictability(option(X), irrelevant)) :-
 error(m("Outcome has multiple overall predictabilities:", N, X, P1, P2)) :-
   at(N, overall_predictability(X, P1)),
   at(N, overall_predictability(X, P2)),
-  P1 != P2.
+  P1 < P2.
 
 error(m("Outcome has no overall predictability:", N, option(X))) :-
   at(N, option(X)),

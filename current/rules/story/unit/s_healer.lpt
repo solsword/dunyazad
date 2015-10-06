@@ -15,13 +15,15 @@ story_op(root, add_surface).
 % make sure we've got a patient:
 st(root, state(injured, inst(actor, member_one))).
 
-:- not setup(root, healer).
-:- not at(root, action(option(1), buy_service)).
-:- not at(root, outcome(option(1), o(deal, deal))).
-%:- not optcount(root, 2).
-%:- not at(root, action(option(2), treat_injury)).
+#minimize { 1@0, bad(Message) : bad(Message) }.
+
+bad(1) :- not setup(root, healer).
+bad(2) :- not at(root, action(option(1), buy_healing)).
+bad(3) :- not at(root, outcome(option(1), o(deal, deal))).
+%error(4) :- not optcount(root, 2).
+%error(5) :- not at(root, action(option(2), treat_injury)).
 
 :- not successor(root, option(1), root_1).
 
 story_op(root_1, initialize_node).
-story_op(root_1, build_options).
+%story_op(root_1, build_options).
