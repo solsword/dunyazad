@@ -32,5 +32,3 @@ bad(1) :-
 bad(2) :-
   node_status_reached(root, built),
   not at(root, perceived_stakes(low)).
-
-:- bad(2).
