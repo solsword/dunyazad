@@ -2,6 +2,10 @@
 % setup:
 % ------
 
+% Note: this is currenlty impossible, because there's no way to create enough
+% valid actions which have zero possibility of advancing a high-stakes player
+% goal while at the same time being expected to fail a high-stakes goal.
+
 max_unique(0).
 story_root(root).
 story_node(root).
@@ -14,6 +18,18 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-error(m("Wrong initial choice structure.")) :-
+#minimize { 1@20, bad(Message) : bad(Message) }.
+
+%:- bad(Message).
+
+%bad(1) :-
+%  node_status_reached(root, built),
+%  not setup(root, monster_attack).
+
+%bad(2) :- not at(root, action(option(1), attack)).
+%bad(3) :- not at(root, action(option(2), flee)).
+%bad(4) :- not at(root, action(option(3), pacify)).
+
+bad("Wrong initial choice structure.") :-
   node_status_reached(root, built),
   not at(root, option_structure(doomed)).

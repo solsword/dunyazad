@@ -16,20 +16,20 @@ echo "% vim"": syn=gringo" > out/source
 cat $sources >> out/source
 
 
-echo "% vim"": syn=gringo" > out/grounded
-echo "---"
-echo "Running: \"gringo -t $sources\""
-time --format="%E, %K KB" gringo -t $sources >> out/grounded
-echo "  ...done."
+#echo "% vim"": syn=gringo" > out/grounded
+#echo "---"
+#echo "Running: \"gringo -t $sources\""
+#time --format="%E, %K KB" gringo -t $sources >> out/grounded
+#echo "  ...done."
 
 
-echo "% vim"": syn=lua" > out/stats
-echo "---"
-echo "Running: \"gringo --verbose=0 $sources | clasp --quiet=1,1 --stats $args $timelimit\""
-time --format="%E, %K KB" \
-  gringo --verbose=0 $sources |\
-  clasp --quiet=1,1 --stats $args $timelimit >> out/stats
-echo "  ...done."
+#echo "% vim"": syn=lua" > out/stats
+#echo "---"
+#echo "Running: \"gringo --verbose=0 $sources | clasp --quiet=1,1 --stats $args $timelimit\""
+#time --format="%E, %K KB" \
+#  gringo --verbose=0 $sources |\
+#  clasp --quiet=1,1 --stats $args $timelimit >> out/stats
+#echo "  ...done."
 
 
 echo "% vim"": syn=gringo" > out/events

@@ -1,8 +1,8 @@
 % core rules:
 % -----------
 
-#minimize { 1@10, error(Message) : error(Message) }.
-%:- error(Message).
+%#minimize { 1@10, error(Message) : error(Message) }.
+:- error(Message).
 %:- error(m("Choice node missing option 1.", N)).
 %:- error(m("Choice node missing option 2.", N)).
 %:- error(m("Error with instance number.", Inst)).

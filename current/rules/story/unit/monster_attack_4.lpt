@@ -1,0 +1,62 @@
+% vim: syn=gringo
+
+max_unique(0).
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+#minimize { 1@1, bad(Message) : bad(Message) }.
+
+bad(1) :- not setup(root, monster_attack).
+bad(2) :- not at(root, arg(option(1), aggressor, inst(actor, you))).
+bad(3) :-
+  0 = {
+    at(
+      root,
+      consequence_of(
+        option(1),
+        Out,
+        _not,
+        relation(threatening, Monster, inst(actor,you))
+      )
+    ) :
+      at(
+        root,
+        consequence_of(
+          option(1),
+          Out,
+          _not,
+          relation(threatening, Monster, inst(actor,you))
+        )
+      )
+  }.
+bad(4) :- not at(root, action(option(1), attack)).
+bad(5) :- not at(root, outcome(option(1), o(success, victory))).
+%bad(5) :- not at(root, outcome(option(1), o(success, tie))).
+%bad(5) :- not at(root, outcome(option(1), o(success, defeat))).
+bad(6) :- not at(root, action(option(2), pacify)).
+bad(7) :- not at(root, outcome(option(2), o(mood, enraged))).
+bad(8) :- not at(root, action(option(3), flee)).
+bad(9) :- not at(root, outcome(option(3), o(success, failure))).
+
+bad(10) :- not successor(root, option(2), root_2).
+bad(11) :- not successor(root, option(3), root_2).
+
+%:- bad(1).
+%:- bad(2).
+%:- bad(3).
+%:- bad(4).
+%:- bad(5).
+%:- bad(6).
+%:- bad(7).
+%:- bad(8).
+%:- bad(9).
+%:- bad(10).
+%:- bad(11).

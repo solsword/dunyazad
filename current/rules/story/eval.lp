@@ -72,12 +72,14 @@ at(N, expectation(X, enables, Goal)) :-
 at(N, perceived_stakes(high)) :-
   story_op(N, build_options),
   at(N, expectation(X, Exp, Goal)),
+  Exp != irrelevant,
   at(N, goal_stakes(Goal, high)),
   at(N, player_goal(Goal)).
 
 at(N, perceived_stakes(low)) :-
   story_op(N, build_options),
   at(N, expectation(X, Exp, Goal)),
+  Exp != irrelevant,
   at(N, goal_stakes(Goal, low)),
   at(N, player_goal(Goal)),
   not at(N, perceived_stakes(high)).
@@ -175,6 +177,7 @@ at(N, expectation(X, achieves, Goal)) :-
 at(N, option_feel(option(X), sure_thing)) :-
   story_op(N, build_options),
   at(N, option(X)),
+  at(N, player_goal(Goal)),
   at(N, expectation(option(X), achieves, Goal)),
   at(N, goal_stakes(Goal, Stakes)),
   Stakes != none,
@@ -407,7 +410,8 @@ at(N, option_structure(positive_alternatives)) :-
   0 = #sum {
     1,at(N, option(X)) :
       at(N, expectation(option(X), achieves, SomeGoal)),
-      at(N, goal_stakes(SomeGoal, SomeStakes));
+      at(N, goal_stakes(SomeGoal, SomeStakes)),
+      at(N, player_goal(SomeGoal));
     -1,at(N, option(X)) : at(N, option(X))
   },
   at(N, player_goal(Goal1)),
@@ -432,7 +436,8 @@ at(N, option_structure(negative_alternatives)) :-
   0 = #sum {
     1,at(N, option(X)) :
       at(N, expectation(option(X), fails, SomeGoal)),
-      at(N, goal_stakes(SomeGoal, SomeStakes));
+      at(N, goal_stakes(SomeGoal, SomeStakes)),
+      at(N, player_goal(Goal));
     -1,at(N, option(X)) : at(N, option(X))
   }.
 
@@ -495,12 +500,18 @@ at(N, option_structure(depressing)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   0 = #sum {
-    1,at(N, option(X)) : at(N, expectation(option(X), fails, Goal));
+    1,at(N, option(X)) :
+      at(N, expectation(option(X), fails, Goal)),
+      at(N, player_goal(Goal));
     -1,at(N, option(X)) : at(N, option(X))
   },
   0 = {
-    at(N, option(X)) : at(N, expectation(option(X), achieves, Goal));
-    at(N, option(X)) : at(N, expectation(option(X), enables, Goal))
+    at(N, option(X)) :
+      at(N, expectation(option(X), achieves, Goal)),
+      at(N, player_goal(Goal));
+    at(N, option(X)) :
+      at(N, expectation(option(X), enables, Goal)),
+      at(N, player_goal(Goal))
   },
   at(N, perceived_stakes(Stakes)),
   higher_stakes(high, Stakes).
@@ -509,12 +520,18 @@ at(N, option_structure(doomed)) :-
   story_op(N, build_options),
   1 < { at(N, option(X)) },
   0 = #sum {
-    1,at(N, option(X)) : at(N, expectation(option(X), fails, Goal));
+    1,at(N, option(X)) :
+      at(N, expectation(option(X), fails, Goal)),
+      at(N, player_goal(Goal));
     -1,at(N, option(X)) : at(N, option(X))
   },
   0 = {
-    at(N, option(X)) : at(N, expectation(option(X), achieves, Goal));
-    at(N, option(X)) : at(N, expectation(option(X), enables, Goal))
+    at(N, option(X)) :
+      at(N, expectation(option(X), achieves, Goal)),
+      at(N, player_goal(Goal));
+    at(N, option(X)) :
+      at(N, expectation(option(X), enables, Goal)),
+      at(N, player_goal(Goal))
   },
   at(N, perceived_stakes(high)).
 
