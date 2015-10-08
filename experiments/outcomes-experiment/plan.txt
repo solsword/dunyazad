@@ -1,0 +1,149 @@
+Preface:
+--------
+
+In terms of outcomes, the most obvious range of variation is the space between
+positive and negative outcomes. There's also low-stakes vs. high-stakes
+outcomes, completing the valence/intensity space, but here I'm going to focus
+only on high-stakes outcomes. The other part of the space that I'm interested
+in is the triangle between expected, unexpected, and unknown outcomes. At the
+same time, I also want to learn something about how option distributions affect
+outcome perceptions. So here I'm going to stake out all three sides of the
+expected/unexpected/unknown triangle (3 conditions) and also use both positive
+and negative outcomes (now 6 conditions) plus two extra conditions to see how
+an all-positive option set differs from an "obvious" option set in terms of
+outcome perceptions (here assuming that subjects choose the "best" option from
+the "obvious" choice). That makes a total of 8 conditions (detailed below).
+
+For each condition, I'll try to measure several perceived properties: fairness,
+valence, and expectedness, as well as whether participants thought that a
+result was simply implausible (the disbelief reaction to an unfair situation).
+
+I hope to generate 5 choices per condition, although that might be optimistic
+in terms of the amount of variability that my system can create, especially
+restricting it to high-stakes choices with exactly 3 options (I might have to
+stick to 3 like last time). Assuming I can do 5, and shooting for 10 subjects
+per choice again, with 8 cases we're hoping for 400 subjects. At at least
+$1/subject, that's $400. We can play with the numbers a bit (more than 10
+subjects per choice would be nice, 20 or 30 might let me do real per-choice
+statistics) but I think the total cost will be something in that range.
+$1/subject also assumes a similar survey length as last time, which would mean
+~1 question per item to measure, which is what I did last time and I think
+that's fine. If I do 2 questions per item to measure, I can control for
+positive/negative response bias, which I think is good, and should bit into the
+~$1/subject constraint.
+
+(Remaining question: can you think of any good things to measure and/or
+hypotheses that distinguish the unknown from the unexpected cases more strongly
+than what I've got so far?)
+
+
+Experimental conditions:
+------------------------
+
+Format: Users are presented with a single choice, and once they select an
+option, are allowed to see a single outcome (they can't go back and explore
+other outcomes, although the choice they made remains visible).
+
+Experimental conditions:
+------------------------
+
+(Stakes in all cases are high)
+
+1. Positive alternatives choice (every option indicates success) with expected
+   success outcomes.
+
+2. Positive alternatives choice with unexpected failure outcomes.
+
+3. Obvious choice (one option indicates success, the rest indicate failure)
+   with expected success (best) and expected failure (other) outcomes.
+
+4. Obvious choice with unexpected failure (best) and unexpected success (other)
+   outcomes.
+
+5. Negative alternatives choice with expected failure outcomes.
+
+6. Negative alternatives choice with unexpected success outcomes.
+
+7. Mysterious choice (no options indicate either success or failure) with
+   success outcomes.
+
+8. Mysterious choice with failure outcomes.
+
+
+Things to measure:
+------------------
+
+1. Perceived fairness (given the option selected & the options available).
+2. Perceived inconsistency/unrealisticness. (Ask if they think it's a bug?)
+3. Perceived value (bad or good outcome).
+4. Perceived expectedness.
+
+
+Main hypotheses:
+----------------
+
+-- "Unexpected failure is more acceptable when a choice seems free vs. forced."
+
+Condition 2 relative to condition 4 (subjects who picked best option only):
+- More fair (but both unfair).
+- More consistent (but both perhaps a little inconsistent).
+- (weak) Less bad (but both bad).
+- More expected (but both unexpected).
+
+
+-- "Expected success seems better when the choice seemed to involve skill."
+
+Condition 1 relative to condition 3 (subjects who picked best option only):
+- Less good (but both good).
+* Not sure if more (didn't raise the spectre of failure) or less (seemed too
+  good to be true) expected.
+
+
+-- "Good things are more fair when unexpected than bad things:"
+
+Condition 2 relative to condition 6:
+- Less fair.
+- Less consistent.
+
+
+-- "Unexpected bad things are worse than expected bad things:"
+
+Condition 2 relative to condition 5:
+- More bad.
+
+Condition 4 relative to condition 5:
+- More bad.
+
+Condition 8 relative to condition 5:
+- More bad.
+
+
+-- "Unexpected good things are better than expected good things:"
+
+Condition 1 relative to condition 6:
+- Less good.
+
+Condition 3 (best option) relative to condition 6:
+- Less good.
+
+Condition 1 relative to condition 7:
+- Less good.
+
+Condition 3 (best option) relative to condition 7:
+- Less good.
+
+
+Basic hypotheses:
+-----------------
+
+- All unexpected negative outcomes should be perceived as unfair.
+
+- All good outcomes should be perceived as good. 
+
+- All bad outcomes should be perceived as bad. 
+
+- All expected outcomes should be perceived as expected.
+
+- All unexpected outcomes should be perceived as unexpected.
+
+- All mysterious outcomes should be perceived as slightly unexpected.
