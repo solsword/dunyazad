@@ -14,22 +14,22 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-%error(m("No outcome with desired feel.")) :-
-%  node_status_reached(root, built),
-%  0 = {
-%    at(N, outcome_feel(X, expected_success)) :
-%      at(N, outcome_feel(X, expected_success))
-%  }.
+bad(X) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  not at(root, outcome_feel(option(X), expected_success)).
 
-error("setup") :-
+#minimize { 1@1, bad(Message) : bad(Message) }.
+
+bad("setup") :-
   story_node(root),
   not setup(root, monster_attack).
 
-error(0) :-
+bad(10) :-
   story_node(root),
   not at(root, option(1)).
 
-error(1) :-
+bad(20) :-
   at(root, option(1)),
   not at(root, action(option(1), attack)).
 

@@ -43,10 +43,14 @@ at(N, expectation(X, threatens, Goal)) :-
   state_fails(Goal, State).
 
 at(N, expectation(X, threatens, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
   at(N, consequence_of(X, Outcome, _not, State)),
   state_advances(Goal, State).
 
 at(N, expectation(X, threatens, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
   at(N, consequence_of(X, Outcome, _not, State)),
   state_achieves(Goal, State).
 
@@ -59,12 +63,113 @@ at(N, expectation(X, enables, Goal)) :-
   state_achieves(Goal, State).
 
 at(N, expectation(X, enables, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
   at(N, consequence_of(X, Outcome, _not, State)),
   state_hinders(Goal, State).
 
 at(N, expectation(X, enables, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
   at(N, consequence_of(X, Outcome, _not, State)),
   state_fails(Goal, State).
+
+% Fails and achieves based on 'likely' outcomes:
+
+at(N, expectation(X, fails, Goal)) :-
+  at(N, consequence_of(X, Outcome, State)),
+  state_hinders(Goal, State),
+  at(N, likely_outcome(X, Outcome)).
+
+at(N, expectation(X, fails, Goal)) :-
+  at(N, consequence_of(X, Outcome, State)),
+  state_fails(Goal, State),
+  at(N, likely_outcome(X, Outcome)).
+
+at(N, expectation(X, fails, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
+  at(N, consequence_of(X, Outcome, _not, State)),
+  state_advances(Goal, State),
+  at(N, likely_outcome(X, Outcome)).
+
+at(N, expectation(X, fails, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
+  at(N, consequence_of(X, Outcome, _not, State)),
+  state_achieves(Goal, State),
+  at(N, likely_outcome(X, Outcome)).
+
+at(N, expectation(X, achieves, Goal)) :-
+  at(N, consequence_of(X, Outcome, State)),
+  state_advances(Goal, State),
+  at(N, likely_outcome(X, Outcome)).
+
+at(N, expectation(X, achieves, Goal)) :-
+  at(N, consequence_of(X, Outcome, State)),
+  state_achieves(Goal, State),
+  at(N, likely_outcome(X, Outcome)).
+
+at(N, expectation(X, achieves, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
+  at(N, consequence_of(X, Outcome, _not, State)),
+  state_hinders(Goal, State),
+  at(N, likely_outcome(X, Outcome)).
+
+at(N, expectation(X, achieves, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
+  at(N, consequence_of(X, Outcome, _not, State)),
+  state_fails(Goal, State),
+  at(N, likely_outcome(X, Outcome)).
+
+% Special expectations for travel_onwards and reach_destination.
+% Basically, if there's a state that would be removed by one of these actions,
+% we know that we're actually leaving it behind, so if that statie *either*
+% hinders/fails *or* advances/achieves any goal, we expect to fail that goal by
+% leaving the state behind, because either we're leaving a problem behind which
+% will now never get solved (in the case that the state is hindering/failing a
+% goal) or we're moving out of a situaiton in which our goal is
+% advanced/achieved.
+
+at(N, expectation(option(X), fails, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence_of(option(X), Outcome, _not, State)),
+  state_fails(Goal, State).
+
+at(N, expectation(option(X), fails, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence_of(option(X), Outcome, _not, State)),
+  state_hinders(Goal, State).
+
+% This one is threatens instead of fails.
+at(N, expectation(option(X), threatens, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence_of(option(X), Outcome, _not, State)),
+  state_advances(Goal, State).
+
+at(N, expectation(option(X), fails, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence_of(option(X), Outcome, _not, State)),
+  state_achieves(Goal, State).
+
 
 % Stakes are based on the goals that are threatened:
 
@@ -129,48 +234,6 @@ at(N, option_stakes(option(X), none)) :-
   at(N, option(X)),
   not at(N, option_stakes(option(X), high)),
   not at(N, option_stakes(option(X), low)).
-
-% Fails and achieves based on 'likely' outcomes:
-
-at(N, expectation(X, fails, Goal)) :-
-  at(N, consequence_of(X, Outcome, State)),
-  state_hinders(Goal, State),
-  at(N, likely_outcome(X, Outcome)).
-
-at(N, expectation(X, fails, Goal)) :-
-  at(N, consequence_of(X, Outcome, State)),
-  state_fails(Goal, State),
-  at(N, likely_outcome(X, Outcome)).
-
-at(N, expectation(X, fails, Goal)) :-
-  at(N, consequence_of(X, Outcome, _not, State)),
-  state_advances(Goal, State),
-  at(N, likely_outcome(X, Outcome)).
-
-at(N, expectation(X, fails, Goal)) :-
-  at(N, consequence_of(X, Outcome, _not, State)),
-  state_achieves(Goal, State),
-  at(N, likely_outcome(X, Outcome)).
-
-at(N, expectation(X, achieves, Goal)) :-
-  at(N, consequence_of(X, Outcome, State)),
-  state_advances(Goal, State),
-  at(N, likely_outcome(X, Outcome)).
-
-at(N, expectation(X, achieves, Goal)) :-
-  at(N, consequence_of(X, Outcome, State)),
-  state_achieves(Goal, State),
-  at(N, likely_outcome(X, Outcome)).
-
-at(N, expectation(X, achieves, Goal)) :-
-  at(N, consequence_of(X, Outcome, _not, State)),
-  state_hinders(Goal, State),
-  at(N, likely_outcome(X, Outcome)).
-
-at(N, expectation(X, achieves, Goal)) :-
-  at(N, consequence_of(X, Outcome, _not, State)),
-  state_fails(Goal, State),
-  at(N, likely_outcome(X, Outcome)).
 
 % different types of option feels:
 
@@ -553,23 +616,31 @@ at(N, outcome_perception(X, hinders, Goal)) :-
   at(N, consequence(X, State)),
   state_hinders(Goal, State).
 
-at(N, outcome_perception(X, hinders, Goal)) :-
-  at(N, consequence(X, _not, State)),
-  state_advances(Goal, State).
-
 at(N, outcome_perception(X, advances, Goal)) :-
   at(N, consequence(X, State)),
   state_advances(Goal, State).
 
+at(N, outcome_perception(X, hinders, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
+  at(N, consequence(X, _not, State)),
+  state_advances(Goal, State).
+
 at(N, outcome_perception(X, advances, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
   at(N, consequence(X, _not, State)),
   state_hinders(Goal, State).
 
 at(N, outcome_perception(X, hinders, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
   at(N, consequence(X, _not, State)),
   state_achieves(Goal, State).
 
 at(N, outcome_perception(X, advances, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
   at(N, consequence(X, _not, State)),
   state_fails(Goal, State).
 
@@ -582,6 +653,44 @@ at(N, outcome_perception(X, fails, Goal)) :-
 at(N, outcome_perception(X, achieves, Goal)) :-
   at(N, consequence(X, State)),
   state_achieves(Goal, State).
+
+% outcome perceptions for travel_onwards and reach_destination:
+
+at(N, outcome_perception(option(X), fails, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence(option(X), _not, State)),
+  state_achieves(Goal, State).
+
+at(N, outcome_perception(option(X), hinders, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence(option(X), _not, State)),
+  state_advances(Goal, State).
+
+at(N, outcome_perception(option(X), fails, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence(option(X), _not, State)),
+  state_hinders(Goal, State).
+
+at(N, outcome_perception(option(X), fails, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence(option(X), _not, State)),
+  state_fails(Goal, State).
 
 % Mixed outcome perceptions:
 
