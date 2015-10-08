@@ -20,6 +20,18 @@ error(m("Irrelevant option", N, option(X))) :-
   not at(N, action(option(X), reach_destination)),
   story_op(N, build_options).
 
+error(m("Option relevant but only to unimportant potential.", N, option(X))) :-
+  at(N, option(X)),
+  at(N, relevant_to(option(X), Potential)),
+  0 = {
+    at(N, relevant_to(option(X), ImportantPotential)) :
+      at(N, relevant_to(option(X), ImportantPotential)),
+      at(N, most_important(ImportantPotential))
+  },
+  not at(N, action(option(X), travel_onwards)),
+  not at(N, action(option(X), reach_destination)),
+  story_op(N, build_options).
+
 error(m("Unaddressed important potential", N)) :-
   at(N, most_important(potential(PTyp, Something))),
   0 = {

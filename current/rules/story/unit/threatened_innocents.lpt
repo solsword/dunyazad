@@ -12,13 +12,18 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-:- not setup(root, threatened_innocents).
-:- not at(root, action(option(1), attack)).
-:- not at(root, outcome(option(1), o(success, victory))).
+%#minimize { 1@1, bad(Message) : bad(Message) }.
 
-:- not at(root, action(option(2), pay_off)).
+:- bad(M).
 
-:- not successor(root, option(1), root_1).
+bad(1) :- not setup(root, threatened_innocents).
+bad(2) :- not at(root, action(option(1), attack)).
+bad(3) :- not at(root, outcome(option(1), o(success, victory))).
+
+bad(4) :- not at(root, action(option(2), pay_off)).
+
+bad(5) :- not successor(root, option(1), root_1).
+
 story_op(root_1, initialize_node).
 story_op(root_1, build_options).
 story_op(root_1, add_branch_nodes).

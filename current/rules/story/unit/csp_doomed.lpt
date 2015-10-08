@@ -18,9 +18,9 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-#minimize { 1@20, bad(Message) : bad(Message) }.
+%#minimize { 1@20, bad(Message) : bad(Message) }.
 
-%:- bad(Message).
+:- bad(Message).
 
 %bad(1) :-
 %  node_status_reached(root, built),

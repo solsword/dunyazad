@@ -15,7 +15,9 @@ story_op(root, add_surface).
 % make sure we've got a patient:
 st(root, state(injured, inst(actor, member_one))).
 
-#minimize { 1@0, bad(Message) : bad(Message) }.
+%#minimize { 1@0, bad(Message) : bad(Message) }.
+
+:- bad(M).
 
 bad(1) :- not setup(root, healer).
 bad(2) :- not at(root, action(option(1), buy_healing)).

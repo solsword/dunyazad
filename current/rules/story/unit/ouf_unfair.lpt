@@ -1,0 +1,73 @@
+% vim: syn=gringo
+% setup:
+% ------
+
+max_unique(0).
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+%#minimize { 1@1, bad(Message) : bad(Message) }.
+
+:- bad(M).
+
+bad(zz) :- not at(root, perceived_stakes(high)).
+
+bad(X) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  not at(root, outcome_feel(option(X), unfair)).
+
+:- at(root, option(X)), bad(m(X, a)).
+
+bad(m(X, a)) :-
+  at(root, option(X)),
+  0 = {
+    at(root, option_feel(option(X), sure_thing)) :
+      at(root, option_feel(option(X), sure_thing));
+    at(root, option_feel(option(X), safe)) :
+      at(root, option_feel(option(X), safe))
+  }.
+
+bad(m(X, b)) :-
+  at(root, option(X)),
+  0 = {
+    at(root, expectation(option(X), achieves, Goal)) :
+      at(root, expectation(option(X), achieves, Goal)),
+      at(root, player_goal(Goal))
+  }.
+
+bad(m(X, c)) :-
+  at(root, option(X)),
+  0 = {
+    at(root, outcome_perception(option(X), fails, Goal)) :
+      at(root, outcome_perception(option(X), fails, Goal)),
+      at(root, player_goal(Goal)),
+      at(root, expectation(option(X), achieves, Goal));
+    at(root, outcome_perception(option(X), hinders, Goal)) :
+      at(root, outcome_perception(option(X), hinders, Goal)),
+      at(root, player_goal(Goal)),
+      at(root, expectation(option(X), achieves, Goal))
+  }.
+
+
+bad(m(X, d)) :-
+  at(root, option(X)),
+  0 = {
+    at(root, overall_predictability(option(X), unexpected));
+    at(root, overall_predictability(option(X), unfair))
+  }.
+
+bad(m(X, e)) :-
+  at(root, option(X)),
+  0 < {
+    at(root, outcome_overall(option(X), great));
+    at(root, outcome_overall(option(X), good))
+  }.

@@ -112,7 +112,10 @@ at(N, surprising(X)) :-
   story_op(N, build_options).
 
 % Only chaotic actions may have surprising outcomes:
-error(m("Non-chaotic action had surprising outcome.", N, X)) :-
-  at(N, action(X, Action)),
-  at(N, surprising(X)),
-  not chaotic(Action).
+% Note: now any outcome may be surprising because outcome feel constraints can
+% be used to constrain surprise if desired.
+
+%error(m("Non-chaotic action had surprising outcome.", N, X)) :-
+%  at(N, action(X, Action)),
+%  at(N, surprising(X)),
+%  not chaotic(Action).

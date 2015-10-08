@@ -1,6 +1,4 @@
 % vim: syn=gringo
-% setup:
-% ------
 
 max_unique(0).
 story_root(root).
@@ -14,10 +12,12 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-%#minimize { 1@20, bad(Message) : bad(Message) }.
+%#minimize { 1@1, bad(Message) : bad(Message) }.
 
 :- bad(M).
 
-bad("Wrong initial choice structure.") :-
-  node_status_reached(root, built),
-  not at(root, option_structure(depressing)).
+bad(1) :- not setup(root, threatened_innocents).
+bad(2) :- not at(root, action(option(1), attack)).
+bad(3) :- not at(root, outcome(option(1), o(success, victory))).
+
+bad(4) :- not at(root, action(option(2), trade)).

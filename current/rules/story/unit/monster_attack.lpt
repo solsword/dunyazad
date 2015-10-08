@@ -12,7 +12,9 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-#minimize { 1@0, bad(Message) : bad(Message) }.
+%#minimize { 1@0, bad(Message) : bad(Message) }.
+
+:- bad(M).
 
 bad(m(1)) :- not setup(root, monster_attack).
 %:- not at(root, initiator(option(1), inst(actor, you))).

@@ -1094,4 +1094,28 @@ at(N, outcome_feel(option(X), expected_success)) :-
       at(N, outcome_overall(option(X), good))
   }.
 
+at(N, outcome_feel(option(X), unfair)) :-
+  story_op(N, build_options),
+  at(N, option(X)),
+  1 <= {
+    at(N, option_feel(option(X), sure_thing)) :
+      at(N, option_feel(option(X), sure_thing));
+    at(N, option_feel(option(X), safe)) :
+      at(N, option_feel(option(X), safe))
+  },
+  at(N, player_goal(Goal)),
+  at(N, expectation(option(X), achieves, Goal)),
+  1 <= {
+    at(N, outcome_perception(option(X), fails, Goal));
+    at(N, outcome_perception(option(X), hinders, Goal))
+  },
+  1 = {
+    at(N, overall_predictability(option(X), unexpected));
+    at(N, overall_predictability(option(X), unfair))
+  },
+  0 = {
+    at(N, outcome_overall(option(X), great));
+    at(N, outcome_overall(option(X), good))
+  }.
+
 % TODO: More outcome feels!
