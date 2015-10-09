@@ -16,6 +16,7 @@ starting_skill(healing).
 %starting_skill(prayer).
 starting_skill(acrobatics).
 starting_skill(storytelling).
+starting_skill(fighting).
 
 st(R, inst(actor, you)) :- _sr(R).
 st(R, state(party_member, inst(actor, you))) :- _sr(R).
@@ -175,6 +176,14 @@ st(R, relation(has_item, inst(actor, Owner), Inst)) :-
     item_def(Book, book, Name, Number);
   error(m("No starting book."))
 } :- _sr(R).
+
+% You can start with a tool for one of your skills:
+0 <= {
+  supplies(you, Tool) :
+    nonbook_tool(Tool, Skill),
+    st(R, property(has_skill, inst(actor, you), Skill)),
+    _sr(R)
+} <= 2.
 
 % Your party members start with non-book tools for their skills:
 1 = {

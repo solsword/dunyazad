@@ -29,7 +29,7 @@ statistics) but I think the total cost will be something in that range.
 $1/subject also assumes a similar survey length as last time, which would mean
 ~1 question per item to measure, which is what I did last time and I think
 that's fine. If I do 2 questions per item to measure, I can control for
-positive/negative response bias, which I think is good, and should bit into the
+positive/negative response bias, which I think is good, and should fit into the
 ~$1/subject constraint.
 
 (Remaining question: can you think of any good things to measure and/or

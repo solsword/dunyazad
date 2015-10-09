@@ -25,15 +25,14 @@ bad(X) :-
   at(root, option(X)),
   not at(root, outcome_feel(option(X), unfair)).
 
-:- at(root, option(X)), bad(m(X, a)).
+%:- at(root, option(X)), bad(m(X, a)).
 
 bad(m(X, a)) :-
   at(root, option(X)),
   0 = {
-    at(root, option_feel(option(X), sure_thing)) :
-      at(root, option_feel(option(X), sure_thing));
-    at(root, option_feel(option(X), safe)) :
-      at(root, option_feel(option(X), safe))
+    at(root, option_feel(option(X), sure_thing));
+    at(root, option_feel(option(X), safe));
+    at(root, option_feel(option(X), hopeful))
   }.
 
 bad(m(X, b)) :-

@@ -10,28 +10,58 @@ state_hinders(
   st(N, inst(actor, Key)),
   st(N, inst(actor, ThreatKey)).
 
-at(N, expectation(X, fails, avoid_threats_to(Actor))) :-
-  at(N, initiator(X, Actor)),
+% If there's a threat, it being likely to persist seems dangerous:
+at(N, expectation(X, fails, avoid_threats_to(inst(actor, Victim)))) :-
+  at(N, initiator(X, inst(actor, Victim))),
   at(N, action(X, Action)),
-  at(N, unlikely_outcome(X, Unlikely)),
-  at(N, likely_outcome(X, Likely)),
-  at(
-    N,
-    consequence_of(
-      X,
-      Unlikely,
-      _not,
-      relation(threatening, SomeThreat, Actor)
-    )
-  ),
-  0 = {
-    at(
-      N,
-      consequence_of(
-        X,
-        Likely,
-        _not,
-        relation(threatening, AnyThreat, Actor)
+  st(N, relation(threatening, Threat, inst(actor, Victim))),
+  0 = { % There's no likely or neutral outcome which will resolve the threat:
+    at(N, likely_outcome(X, Likely)) :
+      at(N, likely_outcome(X, Likely)),
+      at(
+        N,
+        consequence_of(
+          X,
+          Likely,
+          _not,
+          relation(threatening, Threat, inst(actor, Victim))
+        )
+      );
+    at(N, neutral_outcome(X, Neutral)) :
+      at(N, neutral_outcome(X, Neutral)),
+      at(
+        N,
+        consequence_of(
+          X,
+          Neutral,
+          _not,
+          relation(threatening, Threat, inst(actor, Victim))
+        )
       )
-    )
+  }.
+
+% If there's a threat, just letting it persist is enough to hinder the goal of
+% avoiding it:
+at(
+  N,
+  outcome_perception(
+    option(X),
+    hinders,
+    avoid_threats_to(inst(actor, Key))
+  )
+) :-
+  at(N, option(X)),
+  st(N, relation(threatening, Threat, inst(actor, Key))),
+  0 = {
+    at(N, outcome(option(X), Happened)) :
+      at(N, outcome(option(X), Happened)),
+      at(
+        N,
+        consequence_of(
+          option(X),
+          Happened,
+          _not,
+          relation(threatening, Threat, inst(actor, Key))
+        )
+      )
   }.
