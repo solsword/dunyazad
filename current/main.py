@@ -221,7 +221,7 @@ def main(
   elif fmt == "turk":
     outfile = "dunyazad.input"
     output = """\
-"seed","framing","assets","set_off","setup","potentials","prompt","opt1","opt2","opt3"
+"seed","framing","assets","set_off","setup","potentials","prompt","opt1","opt2","opt3","out1","out2","out3"
 "{}","{}"\
 """.format(str(seed), output)
   with open(os.path.join("out", outfile), 'w') as fout:

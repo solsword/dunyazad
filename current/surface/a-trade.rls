@@ -8,7 +8,7 @@ V#trade/inf/?subject some goods
 
 :action/trade/outcome
 {at(Now,outcome(option(Opt),o(deal,deal)))}
-N#?buyer/they and N#?seller/them V#agree/prs/_plural to V#trade/inf/_plural N#?price/them for N#?goods/them
+N#?seller/they V#agree/prs/?seller to V#trade/prs/_plural N#?goods/them for N#?price/them.
 
 {at(Now,outcome(option(Opt),o(deal,no_deal)))}
 N#?buyer/they and N#?seller/them V#haggle/prs/_plural over N#?price/them and N#?goods/them, but V#can/prs/_plural not V#agree/rinf/_plural to the trade

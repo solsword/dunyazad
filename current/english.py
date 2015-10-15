@@ -1406,9 +1406,11 @@ def build_node_text(
       situation = stext
   situation = sentence(situation)
   options = ""
+  outcomes = ""
   if fmt == "example":
     options += "<ol>"
   ocount = len(node["options"])
+  # Options (single-option case):
   if ocount == 1:
     opt = list(node["options"].keys())[0]
     txt, pnout, intout = build_text(
@@ -1460,6 +1462,7 @@ def build_node_text(
         # TODO: Epilogue here!
         if fmt == "choicescript":
           options += "\n*finish\n"
+  # Options (multi-option case):
   elif ocount > 1:
     if fmt == "choicescript":
       options = "*choice\n"
@@ -1511,11 +1514,17 @@ def build_node_text(
             out=sentence(out_txt)
           )
       elif fmt == "example":
-        options += "\n  <li>{}</li>".format(sentence(opt_txt))
+        options += "\n  <li>{}<br>&rarr;&nbsp;{}</li>".format(
+          sentence(opt_txt),
+          sentence(out_txt)
+        )
       elif fmt == "turk":
         options += "{}<snop>".format(sentence(opt_txt))
+        outcomes += "{}<snop>".format(sentence(out_txt))
   else:
     options = "ERROR: node {} had <= 0 options!"
+
+  # Putting everything together:
   if fmt == "choicescript":
     result = """
 *label {label}
@@ -1564,11 +1573,14 @@ def build_node_text(
 {situation}
 <snip>
 {options}
+<snip>
+{outcomes}
 """.format(
   label=node["name"],
   intro=intro,
   situation=situation,
-  options=options
+  options=options,
+  outcomes=outcomes,
 )
   return result, outgoing
 
@@ -1609,6 +1621,7 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
     story_parts["potentials"] = "ERROR: missing story part"
     story_parts["prompt"] = "ERROR: missing story part"
     story_parts["optlist"] = "ERROR: missing story part"
+    story_parts["outlist"] = "ERROR: missing story part"
 
   # First, build the dictionary of templates for all polished nodes:
   for sc, bnd in ans.bindings(
@@ -1875,6 +1888,8 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
       story_parts["potentials"] = bits[1]
       story_parts["prompt"] = "What do you do?"
       story_parts["optlist"] = bits[2]
+      if bits[3:]:
+        story_parts["outlist"] = bits[3]
     results.append(txt)
     # update our readiness information and propagate nodes to the open list as
     # they're fully ready:
@@ -1914,8 +1929,9 @@ Readiness is: {}\
   elif fmt == "turk":
     # a tab-delimited input row:
     opts = story_parts["optlist"].split("<snop>")
+    outs = story_parts["outlist"].split("<snop>")
     return """\
-"{framing}","{assets}","{set_off}","{setup}","{potentials}","{prompt}","{opt1}","{opt2}","{opt3}"
+"{framing}","{assets}","{set_off}","{setup}","{potentials}","{prompt}","{opt1}","{opt2}","{opt3}","{out1}","{out2}","{out3}"
 """.format(
   framing=story_parts["framing"],
   assets=story_parts["assets"],
@@ -1926,6 +1942,9 @@ Readiness is: {}\
   opt1=opts[0],
   opt2=opts[1],
   opt3=opts[2],
+  out1=outs[0],
+  out2=outs[1],
+  out3=outs[2],
 )
   else:
     return ("\n\n").join(results)
