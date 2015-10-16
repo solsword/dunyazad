@@ -11,5 +11,6 @@ class_item(tough, artificial_weapon, 0, 1).
 
 
 actor_def(bandits, tough, "bandits", plural, neuter).
+class_skill(bandits, thievery, sometimes).
 
 actor_def(thief, stealer, "thief", singular, either).

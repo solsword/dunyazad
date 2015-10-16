@@ -23,6 +23,18 @@ skill_link(
   o(quality, harmonious)
 ).
 
+error(m("Unintelligent musician.", N, X)) :-
+  at(N, action(X, play_song)),
+  at(N, arg(X, musician, Unintelligent)),
+  st(N, property(has_skill, Unintelligent, unintelligent)),
+  story_op(N, build_options).
+
+error(m("Unintelligent audience.", N, X)) :-
+  at(N, action(X, play_song)),
+  at(N, arg(X, audience, Unintelligent)),
+  st(N, property(has_skill, Unintelligent, unintelligent)),
+  story_op(N, build_options).
+
 % effects
 
 at(

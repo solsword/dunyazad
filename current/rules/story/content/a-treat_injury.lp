@@ -39,6 +39,12 @@ error(m("Treated uninjured patient.", N, X)) :-
   not st(N, state(injured, Patient)),
   story_op(N, build_options).
 
+error(m("Unintelligent doctor.", N, X)) :-
+  at(N, action(X, treat_injury)),
+  at(N, arg(X, doctor, Unintelligent)),
+  st(N, property(has_skill, Unintelligent, unintelligent)),
+  story_op(N, build_options).
+
 % Treating injuries gets rid of them
 at(
   N,

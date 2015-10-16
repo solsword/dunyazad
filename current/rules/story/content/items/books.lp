@@ -10,6 +10,10 @@ tool_for(plants_book, wilderness_lore).
 teaches_skill(plants_book, healing).
 tool_for(plants_book, healing).
 
+item_def(ancient_grimoire, book, "ancient grimoire", singular).
+teaches_skill(ancient_grimoire, sorcery).
+tool_for(ancient_grimoire, sorcery).
+
 %item_def(animals_book, book, "guide to wild beasts", singular).
 %teaches_skill(animals_book, wilderness_lore).
 %tool_for(animals_book, wilderness_lore).

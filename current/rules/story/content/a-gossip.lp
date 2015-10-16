@@ -21,6 +21,18 @@ skill_link(
   o(utility, useful)
 ).
 
+error(m("Unintelligent gossip.", N, X)) :-
+  at(N, action(X, gossip)),
+  at(N, arg(X, interested, Unintelligent)),
+  st(N, property(has_skill, Unintelligent, unintelligent)),
+  story_op(N, build_options).
+
+error(m("Unintelligent gossip.", N, X)) :-
+  at(N, action(X, gossip)),
+  at(N, arg(X, knowledgeable, Unintelligent)),
+  st(N, property(has_skill, Unintelligent, unintelligent)),
+  story_op(N, build_options).
+
 % Either way you can't gossip with the same actor again.
 at(
   N,

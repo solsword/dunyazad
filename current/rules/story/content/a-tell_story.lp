@@ -21,6 +21,18 @@ skill_link(
   o(quality, entertaining)
 ).
 
+error(m("Unintelligent storyteller.", N, X)) :-
+  at(N, action(X, tell_story)),
+  at(N, arg(X, teller, Unintelligent)),
+  st(N, property(has_skill, Unintelligent, unintelligent)),
+  story_op(N, build_options).
+
+error(m("Unintelligent audience.", N, X)) :-
+  at(N, action(X, tell_story)),
+  at(N, arg(X, audience, Unintelligent)),
+  st(N, property(has_skill, Unintelligent, unintelligent)),
+  story_op(N, build_options).
+
 at(
   N,
   consequence_of(

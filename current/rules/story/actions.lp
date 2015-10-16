@@ -73,8 +73,8 @@ at(N, consequence(X, Modifier, Consequence)) :-
   at(N, outcome(X, Outcome)),
   story_op(N, build_options).
 
-% Being injured, dead, or off-stage limits what actions you can take and which
-% actions can be taken on you:
+% Being injured, polymorphed, dead, or off-stage limits what actions you can
+% take and which actions can be taken on you:
 
 error(m("Injured actor initiated an action.", N, X)) :-
   at(N, action(X, Action)),

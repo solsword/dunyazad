@@ -13,10 +13,12 @@ starting_skill(wilderness_lore).
 starting_skill(music).
 starting_skill(elocution).
 starting_skill(healing).
+starting_skill(thievery).
 %starting_skill(prayer).
 starting_skill(acrobatics).
 starting_skill(storytelling).
 starting_skill(fighting).
+starting_skill(sorcery).
 
 st(R, inst(actor, you)) :- _sr(R).
 st(R, state(party_member, inst(actor, you))) :- _sr(R).

@@ -73,8 +73,23 @@ at(N, option(1)) :-
 % State and action rules:
 % -----------------------
 
-% Exclusive relationships:
+% Exclusive properties and relationships:
 exclusive(has_item).
+exclusive(type).
+
+at(N, consequence_of(X, O, _not, property(Prop, Obj, Old))) :-
+  at(N, consequence_of(X, O, property(Prop, Obj, New))),
+  exclusive(Prop),
+  st(N, property(Prop, Obj, Old)),
+  Old != New,
+  story_op(N, build_options).
+
+at(N, consequence_of(X, O, _not, relation(Rel, Old, Obj))) :-
+  at(N, consequence_of(X, O, relation(Rel, New, Obj))),
+  exclusive(Rel),
+  st(N, relation(Rel, Old, Obj)),
+  Old != New,
+  story_op(N, build_options).
 
 at(N, consequence_of(X, O, _not, relation(Rel, Old, Obj))) :-
   at(N, consequence_of(X, O, relation(Rel, New, Obj))),
@@ -112,6 +127,8 @@ category_for(Category, Category) :-
 category_for(Class, Category) :-
   subclass(Category, Class),
   general_category(Category).
+
+any_class(Class) :- category_for(Class, SomeCategory).
 
 error(m("Instance doesn't belong to a general category.", N, I)) :-
   st(N, inst(Type, I)),

@@ -28,12 +28,12 @@ bad(m(7)) :- not at(root, outcome(option(3), o(success, failure))).
 bad(m(8)) :- not successor(root, option(2), root_2).
 bad(m(9)) :- not successor(root, option(3), root_2).
 
-:- bad(m(1)).
-:- bad(m(2)).
-:- bad(m(3)).
-:- bad(m(4)).
-:- bad(m(5)).
-:- bad(m(6)).
-:- bad(m(7)).
-:- bad(m(8)).
-:- bad(m(9)).
+%:- bad(m(1)).
+%:- bad(m(2)).
+%:- bad(m(3)).
+%:- bad(m(4)).
+%:- bad(m(5)).
+%:- bad(m(6)).
+%:- bad(m(7)).
+%:- bad(m(8)).
+%:- bad(m(9)).

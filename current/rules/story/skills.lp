@@ -12,11 +12,12 @@ skill(wilderness_lore).
 skill(music).
 skill(elocution).
 skill(healing).
-%skill(thievery). %TODO: Make this useful
+skill(thievery).
 skill(literacy).
 %skill(prayer). TODO: Make this useful
 skill(acrobatics).
 skill(storytelling).
+skill(sorcery).
 % TODO: sailing?
 % TODO: More skills!
 
@@ -28,10 +29,11 @@ skill_name(wilderness_lore, "wilderness lore").
 skill_name(music, "music").
 skill_name(elocution, "elocution").
 skill_name(healing, "healing").
-%skill_name(thievery, "thievery").
+skill_name(thievery, "thievery").
 skill_name(literacy, "literacy").
 skill_name(prayer, "prayer").
 skill_name(acrobatics, "acrobatics").
+skill_name(sorcery, "sorcery").
 
 % Skill link types:
 skill_link_type(required, positive, strong).
