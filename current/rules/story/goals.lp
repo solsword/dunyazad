@@ -9,6 +9,15 @@ at(N, player_goal(avoid_threats_to(Member))) :-
   st(N, state(party_member, Member)),
   story_op(N, initialize_node).
 
+at(N, player_goal(preserve_original_form(Member))) :-
+  st(N, state(party_member, Member)),
+  story_op(N, initialize_node).
+
+at(N, player_goal(reclaim_property(Member, StolenItem))) :-
+  st(N, state(party_member, Member)),
+  st(N, relation(stolen_from, Member, StolenItem)),
+  story_op(N, initialize_node).
+
 at(N, player_goal(as_intended(Member))) :-
   st(N, state(party_member, Member)),
   story_op(N, initialize_node).
