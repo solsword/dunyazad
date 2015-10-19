@@ -1,0 +1,20 @@
+% Action - steal
+
+:action/steal/option
+N#?thief/they V#steal/prs/?thief N#?target/them from N#?victim/them
+
+:action/steal/infinitive
+V#steal/inf/?subject
+
+:action/steal/outcome
+{at(Now,outcome(option(Opt),o(get_item,get)));at(Now,outcome(option(Opt),o(get_caught,caught)))}
+N#?thief/they V#steal/prs/?thief N#?target/them from N#?victim/them, but N#?victim/they V#notice/prs/?victim the theft
+
+{at(Now,outcome(option(Opt),o(get_item,get)));at(Now,outcome(option(Opt),o(get_caught,safe)))}
+N#?thief/they V#steal/prs/?thief N#?target/them from N#?victim/them, and N#?victim/they V#don't/prs/?victim even notice
+
+{at(Now,outcome(option(Opt),o(get_item,dont_get)));at(Now,outcome(option(Opt),o(get_caught,caught)))}
+N#?thief/they V#try/prs/?thief V#steal/inf/?thief N#?target/them from N#?victim/them, but N#?victim/they V#catch/prs/?victim N#?thief/them in the act and V#defend/prs/?victim N#?victim/themselves
+
+{at(Now,outcome(option(Opt),o(get_item,dont_get)));at(Now,outcome(option(Opt),o(get_caught,safe)))}
+N#?thief/they V#try/prs/?thief V#steal/inf/?thief N#?target/them from N#?victim/them, but V#can't/prs/?thief V#find/rinf/?thief a good opportunity to make a move

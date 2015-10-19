@@ -14,11 +14,18 @@ story_op(root, build_options).
 story_op(root, add_branch_nodes).
 story_op(root, add_surface).
 
-%#minimize { 1@1, bad(Message) : bad(Message) }.
-
+%#minimize { 1@0, bad(Message) : bad(Message) }.
 :- bad(M).
 
 bad(X) :-
   node_status_reached(root, built),
   at(root, option(X)),
   not at(root, outcome_feel(option(X), expected_success)).
+
+bad(nopt) :-
+  node_status_reached(root, built),
+  3 != { at(root, option(X)) }.
+
+bad(stakes) :-
+  node_status_reached(root, built),
+  not at(root, perceived_stakes(high)).

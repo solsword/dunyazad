@@ -117,6 +117,9 @@ acrobatics
 :misc/skill_name/storytelling
 storytelling
 
+:misc/skill_name/sorcery
+sorcery
+
 :misc/skill_name/monstrous
 monstrous
 
@@ -218,6 +221,15 @@ a [[misc/skilled_adj]] storyteller
 :misc/unskilled/storytelling
 an [[misc/unskilled_adj]] storyteller
 [[misc/bad_at]] telling stories
+
+:misc/skilled/sorcery
+a [[misc/skilled_adj]] magician
+a [[misc/skilled_adj]] sorcerer
+[[misc/good_at]] casting spells
+
+:misc/unskilled/sorcery
+an [[misc/unskilled_adj]] magician
+[[misc/bad_at]] magic
 
 :misc/skilled/monstrous
 monstrous

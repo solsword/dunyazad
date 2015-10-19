@@ -7,45 +7,53 @@ from utils import *
 from eng_base import *
 
 PRONOUNS = [
-  ("first",   "singular",  "any",        "subjective",  "any",        "I"),
-  ("first",   "singular",  "any",        "objective",   "any",        "me"),
-  ("first",   "singular",  "any",        "possessive",   "modifier",  "my"),
-  ("first",   "singular",  "any",        "possessive",   "object",    "mine"),
-                                         
-  ("first",   "plural",    "any",        "subjective",   "any",       "we"),
-  ("first",   "plural",    "any",        "objective",    "any",       "us"),
-  ("first",   "plural",    "any",        "possessive",   "modifier",  "our"),
-  ("first",   "plural",    "any",        "possessive",   "object",    "ours"),
-                                         
-  ("second",  "singular",  "any",        "subjective",  "any",        "you"),
-  ("second",  "singular",  "any",        "objective",   "any",        "you"),
-  ("second",  "singular",  "any",        "possessive",   "modifier",  "your"),
-  ("second",  "singular",  "any",        "possessive",   "object",    "yours"),
-                                         
-  ("second",  "plural",    "any",        "subjective",   "any",       "you"),
-  ("second",  "plural",    "any",        "objective",    "any",       "you"),
-  ("second",  "plural",    "any",        "possessive",   "modifier",  "your"),
-  ("second",  "plural",    "any",        "possessive",   "object",    "yours"),
+  ("first",   "singular",  "any",       "subjective", "any",      "I"),
+  ("first",   "singular",  "any",       "objective",  "any",      "me"),
+  ("first",   "singular",  "any",       "possessive", "modifier", "my"),
+  ("first",   "singular",  "any",       "possessive", "object",   "mine"),
+  ("first",   "singular",  "any",       "reflexive",  "any",      "myself"),
+                                        
+  ("first",   "plural",    "any",       "subjective", "any",      "we"),
+  ("first",   "plural",    "any",       "objective",  "any",      "us"),
+  ("first",   "plural",    "any",       "possessive", "modifier", "our"),
+  ("first",   "plural",    "any",       "possessive", "object",   "ours"),
+  ("first",   "plural",    "any",       "reflexive",  "any",      "ourselves"),
+                                        
+  ("second",  "singular",  "any",       "subjective", "any",      "you"),
+  ("second",  "singular",  "any",       "objective",  "any",      "you"),
+  ("second",  "singular",  "any",       "possessive", "modifier", "your"),
+  ("second",  "singular",  "any",       "possessive", "object",   "yours"),
+  ("second",  "singular",  "any",       "reflexive",  "any",      "yourself"),
+                                        
+  ("second",  "plural",    "any",       "subjective", "any",      "you"),
+  ("second",  "plural",    "any",       "objective",  "any",      "you"),
+  ("second",  "plural",    "any",       "possessive", "modifier", "your"),
+  ("second",  "plural",    "any",       "possessive", "object",   "yours"),
+  ("second",  "plural",    "any",       "reflexive",  "any",      "yourselves"),
 
-  ("third",   "singular",  "masculine",  "subjective",   "any",       "he"),
-  ("third",   "singular",  "masculine",  "objective",    "any",       "him"),
-  ("third",   "singular",  "masculine",  "possessive",   "modifier",  "his"),
-  ("third",   "singular",  "masculine",  "possessive",   "object",    "his"),
+  ("third",   "singular",  "masculine", "subjective", "any",      "he"),
+  ("third",   "singular",  "masculine", "objective",  "any",      "him"),
+  ("third",   "singular",  "masculine", "possessive", "modifier", "his"),
+  ("third",   "singular",  "masculine", "possessive", "object",   "his"),
+  ("third",   "singular",  "masculine", "reflexive",  "any",      "himself"),
 
-  ("third",   "singular",  "feminine",   "subjective",   "any",       "she"),
-  ("third",   "singular",  "feminine",   "objective",    "any",       "her"),
-  ("third",   "singular",  "feminine",   "possessive",   "modifier",  "her"),
-  ("third",   "singular",  "feminine",   "possessive",   "object",    "hers"),
+  ("third",   "singular",  "feminine",  "subjective", "any",      "she"),
+  ("third",   "singular",  "feminine",  "objective",  "any",      "her"),
+  ("third",   "singular",  "feminine",  "possessive", "modifier", "her"),
+  ("third",   "singular",  "feminine",  "possessive", "object",   "hers"),
+  ("third",   "singular",  "feminine",  "reflexive",  "any",      "herself"),
 
-  ("third",   "singular",  "neuter",     "subjective",   "any",       "it"),
-  ("third",   "singular",  "neuter",     "objective",    "any",       "it"),
-  ("third",   "singular",  "neuter",     "possessive",   "modifier",  "its"),
-  ("third",   "singular",  "neuter",     "possessive",   "object",    "its"),
+  ("third",   "singular",  "neuter",    "subjective", "any",      "it"),
+  ("third",   "singular",  "neuter",    "objective",  "any",      "it"),
+  ("third",   "singular",  "neuter",    "possessive", "modifier", "its"),
+  ("third",   "singular",  "neuter",    "possessive", "object",   "its"),
+  ("third",   "singular",  "neuter",    "reflexive",  "any",      "itself"),
 
-  ("third",   "plural",    "any",        "subjective",   "any",       "they"),
-  ("third",   "plural",    "any",        "objective",    "any",       "them"),
-  ("third",   "plural",    "any",        "possessive",   "modifier",  "their"),
-  ("third",   "plural",    "any",        "possessive",   "object",    "theirs"),
+  ("third",   "plural",    "any",       "subjective", "any",      "they"),
+  ("third",   "plural",    "any",       "objective",  "any",      "them"),
+  ("third",   "plural",    "any",       "possessive", "modifier", "their"),
+  ("third",   "plural",    "any",       "possessive", "object",   "theirs"),
+  ("third",   "plural",    "any",       "reflexive",  "any",      "themselves"),
 ]
 
 class Noun:

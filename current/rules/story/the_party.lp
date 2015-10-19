@@ -29,9 +29,9 @@ surface_property(person, inst(actor, you), second).
 surface_property(gender, inst(actor, you), feminine).
 surface_property(number, inst(actor, you), singular).
 surface_property(determined, inst(actor, you), false).
-% You start with literacy and two other random skills (from the list of
+% You start with literacy and three other random skills (from the list of
 % "starting" skills):
-2 = {
+3 = {
   st(R, property(has_skill, inst(actor, you), Skill)) : starting_skill(Skill);
   error(m("Missing starting skill."))
 } :- _sr(R).

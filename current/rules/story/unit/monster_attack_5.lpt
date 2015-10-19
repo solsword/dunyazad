@@ -23,3 +23,28 @@ bad(4) :- not at(root, action(option(2), pacify)).
 bad(5) :- not at(root, outcome(option(2), o(mood, relaxed))).
 bad(6) :- not at(root, action(option(3), flee)).
 bad(7) :- not at(root, outcome(option(3), o(success, escape))).
+
+%bad(m(X, option_feel)) :-
+%  story_op(N, build_options),
+%  at(N, option(X)),
+%  0 = {
+%    at(N, option_feel(option(X), sure_thing));
+%    at(N, option_feel(option(X), safe));
+%    at(N, option_feel(option(X), hopeful))
+%  }.
+%
+%bad(m(X, predictability)) :-
+%  story_op(N, build_options),
+%  at(N, option(X)),
+%  1 != {
+%    at(N, overall_predictability(option(X), predictable));
+%    at(N, overall_predictability(option(X), expected))
+%  }.
+%
+%bad(m(X, outcome)) :-
+%  story_op(N, build_options),
+%  at(N, option(X)),
+%  0 = {
+%    at(N, outcome_overall(option(X), great));
+%    at(N, outcome_overall(option(X), good))
+%  }.

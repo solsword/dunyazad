@@ -1,0 +1,14 @@
+% Action - polymorph
+
+:action/polymorph/option
+N#?caster/they V#transform/prs/?caster N#?target/them into a chicken
+
+:action/polymorph/infinitive
+V#polymorph/inf/?subject
+
+:action/polymorph/outcome
+{at(Now,outcome(option(Opt),o(success,cursed)))}
+N#?caster/they V#cast/prs/?caster a spell on N#?target/them, and N#?target/they V#be/prs/?target cursed with the form of a chicken
+
+{at(Now,outcome(option(Opt),o(success,no_effect)))}
+N#?caster/they V#try/prs/?caster V#cast/inf/?caster a spell on N#?target/them, but nothing happens

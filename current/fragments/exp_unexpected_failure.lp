@@ -8,7 +8,7 @@ error(m("Root choice has a non-hopeful, non-safe option.", X)) :-
 
 error(m("Root choice option has wrong outcome feel.", X)) :-
   at(root, option(X)),
-  not at(root, outcome_feel(option(X), expected_success)).
+  not at(root, outcome_feel(option(X), unfair)).
 
 error(m("Root choice doesn't have three options.")) :-
   node_status_reached(root, built),

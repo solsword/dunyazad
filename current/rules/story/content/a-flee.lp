@@ -39,10 +39,40 @@ at(
 at(
   N,
   skill_link(
+    acrobatics, contest, no_tool,
+    flee,
+    between(fearful, from),
+    either(o(get_injured, safe), o(get_injured, injured))
+  )
+) :-
+  1 <= {
+    setting(N, city);
+    setting(N, town)
+  },
+  story_node(N).
+
+at(
+  N,
+  skill_link(
     wilderness_lore, contest, no_tool,
     flee,
     between(fearful, from),
     either(o(success, escape), o(success, failure))
+  )
+) :-
+  1 <= {
+    setting(N, road);
+    setting(N, wilderness)
+  },
+  story_node(N).
+
+at(
+  N,
+  skill_link(
+    wilderness_lore, contest, no_tool,
+    flee,
+    between(fearful, from),
+    either(o(get_injured, safe), o(get_injured, injured))
   )
 ) :-
   1 <= {

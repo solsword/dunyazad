@@ -502,3 +502,83 @@ at(N, relevant_tool(X, Actor, missing, Skill)) :-
   st(N, property(has_skill, Actor, Skill)),
   not at(N, has_tool_for(Actor, Skill)),
   story_op(N, build_options).
+
+at(N, relevant_tool(X, Actor, has, Item)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(N, arg(X, OArg, Other)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, tool,
+      Action,
+      between(AArg, OArg),
+      either(Win, Lose)
+    )
+  ),
+  at(N, relevant_skill(X, Actor, has, Skill)),
+  not st(N, property(has_skill, Actor, Skill)),
+  not st(N, property(has_skill, Other, Skill)),
+  st(N, relation(has_item, Actor, Item)),
+  is_instance(N, Item, Category),
+  tool_for(Category, Skill),
+  story_op(N, build_options).
+
+at(N, relevant_tool(X, Actor, missing, Skill)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(N, arg(X, OArg, Other)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, tool,
+      Action,
+      between(AArg, OArg),
+      either(Win, Lose)
+    )
+  ),
+  at(N, relevant_skill(X, Actor, has, Skill)),
+  not st(N, property(has_skill, Actor, Skill)),
+  not st(N, property(has_skill, Other, Skill)),
+  not at(N, has_tool_for(Actor, Skill)),
+  story_op(N, build_options).
+
+at(N, relevant_tool(X, Actor, has, Item)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(N, arg(X, OArg, Other)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, tool,
+      Action,
+      between(OArg, AArg),
+      either(Win, Lose)
+    )
+  ),
+  at(N, relevant_skill(X, Actor, has, Skill)),
+  not st(N, property(has_skill, Actor, Skill)),
+  not st(N, property(has_skill, Other, Skill)),
+  st(N, relation(has_item, Actor, Item)),
+  is_instance(N, Item, Category),
+  tool_for(Category, Skill),
+  story_op(N, build_options).
+
+at(N, relevant_tool(X, Actor, missing, Skill)) :-
+  at(N, action(X, Action)),
+  at(N, arg(X, AArg, Actor)),
+  at(N, arg(X, OArg, Other)),
+  at(
+    N,
+    skill_link(
+      Skill, contest, tool,
+      Action,
+      between(OArg, AArg),
+      either(Win, Lose)
+    )
+  ),
+  at(N, relevant_skill(X, Actor, has, Skill)),
+  not st(N, property(has_skill, Actor, Skill)),
+  not st(N, property(has_skill, Other, Skill)),
+  not at(N, has_tool_for(Actor, Skill)),
+  story_op(N, build_options).

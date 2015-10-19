@@ -26,6 +26,12 @@ skill_link(
   o(mood, relaxed)
 ).
 
+skill_link(
+  music, promotes, tool,
+  pacify, pacifier,
+  o(mood, relaxed)
+).
+
 % TODO: Should we really have such high expectations?
 %skill_link(
 %  music, promotes, tool,

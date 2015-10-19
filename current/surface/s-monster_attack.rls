@@ -22,6 +22,10 @@ thunderously
 [[setup/monster_attack/adverbs/large]]
 fiercely
 
+:setup/monster_attack/adverbs/ogre
+slowly
+menacingly
+
 :setup/monster_attack/adverbs/chimera
 [[setup/monster_attack/adverbs/fast]]
 fiercely
@@ -54,6 +58,12 @@ breathing gouts of flame
 scales glinting in the sun
 wings flapping
 
+:setup/monster_attack/activities/ogre
+bellowing
+waving its arms
+gnashing its teeth
+stomping its feet
+
 :setup/monster_attack/activities/leviathan
 groaning
 spouting water
@@ -73,6 +83,12 @@ flailing their claws
 N#?monster/they ?adverb V#approach/prs/?monster N#you/them
 N#?monster/they V#approach/prs/?monster N#you/them, ?activity
 N#?monster/they ?adverb V#approach/prs/?monster N#you/them, ?activity
+
+:setup/monster_attack/approach/ogre
+N#?monster/they V#approach/prs/?monster N#you/them, ?activity
+N#?monster/they V#approach/prs/?monster N#you/them ?adverb, ?activity
+N#?monster/they V#walk/prs/?monster towards N#you/them ?adverb
+N#?monster/they V#walk/prs/?monster towards N#you/them ?adverb, ?activity
 
 :setup/monster_attack/approach/dragon
 N#?monster/they V#swoop/prs/?monster ?adverb down from the skies

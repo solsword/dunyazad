@@ -1,0 +1,14 @@
+% Action - dispel
+
+:action/dispel/option
+N#?caster/they V#dispel/prs/?caster N#?target/their curse
+
+:action/dispel/infinitive
+V#dispel/inf/?subject
+
+:action/dispel/outcome
+{at(Now,outcome(option(Opt),o(success,dispelled)))}
+N#?caster/they V#dispel/prs/?caster N#?target/their curse, returning them to their original form
+
+{at(Now,outcome(option(Opt),o(success,no_effect)))}
+N#?caster/they V#try/prs/?caster V#dispel/inf/?caster N#?target/their curse, but nothing happens

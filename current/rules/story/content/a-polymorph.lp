@@ -18,10 +18,15 @@ outcome_val(polymorph, success, no_effect).
 % skills:
 
 skill_link(
-  sorcery, contest, tool,
-  polymorph,
-  between(caster, target),
-  either(o(success, cursed), o(success, no_effect))
+  sorcery, required, tool,
+  polymorph, caster,
+  o(success, cursed)
+).
+
+skill_link(
+  sorcery, promotes, tool,
+  polymorph, caster,
+  o(success, cursed)
 ).
 
 error(m("Unintelligent caster.", N, X)) :-

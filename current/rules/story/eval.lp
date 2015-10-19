@@ -1067,29 +1067,17 @@ at(N, outcome_feel(option(X), expected_success)) :-
   story_op(N, build_options),
   at(N, option(X)),
   1 <= {
-    at(N, option_feel(option(X), sure_thing)) :
-      at(N, option_feel(option(X), sure_thing));
-    at(N, option_feel(option(X), safe)) :
-      at(N, option_feel(option(X), safe))
-  },
-  at(N, player_goal(Goal)),
-  at(N, expectation(option(X), achieves, Goal)),
-  1 <= {
-    at(N, outcome_perception(option(X), achieves, Goal)) :
-      at(N, outcome_perception(option(X), achieves, Goal));
-    at(N, outcome_perception(option(X), advances, Goal)) :
-      at(N, outcome_perception(option(X), advances, Goal))
+    at(N, option_feel(option(X), sure_thing));
+    at(N, option_feel(option(X), safe));
+    at(N, option_feel(option(X), hopeful))
   },
   1 = {
     at(N, overall_predictability(option(X), predictable));
-    at(N, overall_predictability(option(X), expected));
-    at(N, overall_predictability(option(X), average))
+    at(N, overall_predictability(option(X), expected))
   },
   1 <= {
-    at(N, outcome_overall(option(X), great)) :
-      at(N, outcome_overall(option(X), great));
-    at(N, outcome_overall(option(X), good)) :
-      at(N, outcome_overall(option(X), good))
+    at(N, outcome_overall(option(X), great));
+    at(N, outcome_overall(option(X), good))
   }.
 
 at(N, outcome_feel(option(X), unfair)) :-
@@ -1099,14 +1087,6 @@ at(N, outcome_feel(option(X), unfair)) :-
     at(N, option_feel(option(X), sure_thing));
     at(N, option_feel(option(X), safe));
     at(N, option_feel(option(X), hopeful))
-  },
-  at(N, option_stakes(option(X), Stakes)),
-  at(N, player_goal(Goal)),
-  at(N, goal_stakes(Goal, Stakes)),
-  at(N, expectation(option(X), achieves, Goal)),
-  1 <= {
-    at(N, outcome_perception(option(X), fails, Goal));
-    at(N, outcome_perception(option(X), hinders, Goal))
   },
   1 = {
     at(N, overall_predictability(option(X), unexpected));
@@ -1118,63 +1098,77 @@ at(N, outcome_feel(option(X), unfair)) :-
     at(N, outcome_overall(option(X), awful))
   }.
 
-at(N, outcome_feel(option(X), nice_surprise)) :-
+at(N, outcome_feel(option(X), nice_gamble)) :-
   story_op(N, build_options),
   at(N, option(X)),
-  0 = {
-    at(N, expectation(option(X), achieves, AnyGoal));
-    at(N, expectation(option(X), fails, AnyGoal))
-  },
-  at(N, expectation(option(X), enables, SomeGoal)),
-  at(N, expectation(option(X), threatens, SomeOtherGoal)),
-  at(N, option_stakes(option(X), Stakes)),
-  at(N, player_goal(SomeGoal)),
-  at(N, goal_stakes(SomeGoal, Stakes)),
-  at(N, player_goal(SomeOtherGoal)),
-  at(N, goal_stakes(SomeOtherGoal, Stakes)),
-  at(N, player_goal(Goal)),
-  at(N, goal_stakes(Goal, Stakes)),
   1 <= {
-    at(N, outcome_perception(option(X), achieves, Goal));
-    at(N, outcome_perception(option(X), advances, Goal))
+    at(N, option_feel(option(X), risky));
+    at(N, option_feel(option(X), tradeoff));
+    at(N, option_feel(option(X), irrelevant))
   },
   1 = {
     at(N, overall_predictability(option(X), average));
     at(N, overall_predictability(option(X), unpredictable))
   },
-  0 = {
+  1 = {
     at(N, outcome_overall(option(X), great));
-    at(N, outcome_overall(option(X), good))
+    at(N, outcome_overall(option(X), good));
+    at(N, outcome_overall(option(X), worth_it))
   }.
 
-at(N, outcome_feel(option(X), bad_surprise)) :-
+at(N, outcome_feel(option(X), bad_gamble)) :-
   story_op(N, build_options),
   at(N, option(X)),
-  0 = {
-    at(N, expectation(option(X), achieves, AnyGoal));
-    at(N, expectation(option(X), fails, AnyGoal))
-  },
-  at(N, expectation(option(X), enables, SomeGoal)),
-  at(N, expectation(option(X), threatens, SomeOtherGoal)),
-  at(N, option_stakes(option(X), Stakes)),
-  at(N, player_goal(SomeGoal)),
-  at(N, goal_stakes(SomeGoal, Stakes)),
-  at(N, player_goal(SomeOtherGoal)),
-  at(N, goal_stakes(SomeOtherGoal, Stakes)),
-  at(N, player_goal(Goal)),
-  at(N, goal_stakes(Goal, Stakes)),
   1 <= {
-    at(N, outcome_perception(option(X), fails, Goal));
-    at(N, outcome_perception(option(X), hinders, Goal))
+    at(N, option_feel(option(X), risky));
+    at(N, option_feel(option(X), tradeoff));
+    at(N, option_feel(option(X), irrelevant))
   },
   1 = {
     at(N, overall_predictability(option(X), average));
     at(N, overall_predictability(option(X), unpredictable))
   },
-  0 = {
+  1 = {
     at(N, outcome_overall(option(X), not_worth_it));
     at(N, outcome_overall(option(X), bad));
     at(N, outcome_overall(option(X), awful))
+  }.
+
+at(N, outcome_feel(option(X), expected_failure)) :-
+  story_op(N, build_options),
+  at(N, option(X)),
+  1 <= {
+    at(N, option_feel(option(X), long_shot));
+    at(N, option_feel(option(X), bad));
+    at(N, option_feel(option(X), doomed))
+  },
+  1 = {
+    at(N, overall_predictability(option(X), predictable));
+    at(N, overall_predictability(option(X), expected));
+    at(N, overall_predictability(option(X), average))
+  },
+  1 <= {
+    at(N, outcome_overall(option(X), not_worth_it));
+    at(N, outcome_overall(option(X), bad));
+    at(N, outcome_overall(option(X), awful))
+  }.
+
+at(N, outcome_feel(option(X), miracle)) :-
+  story_op(N, build_options),
+  at(N, option(X)),
+  1 <= {
+    at(N, option_feel(option(X), long_shot));
+    at(N, option_feel(option(X), bad));
+    at(N, option_feel(option(X), doomed))
+  },
+  1 = {
+    at(N, overall_predictability(option(X), unexpected));
+    at(N, overall_predictability(option(X), unfair))
+  },
+  1 = {
+    at(N, outcome_overall(option(X), great));
+    at(N, outcome_overall(option(X), good));
+    at(N, outcome_overall(option(X), worth_it))
   }.
 
 % TODO: More outcome feels!
