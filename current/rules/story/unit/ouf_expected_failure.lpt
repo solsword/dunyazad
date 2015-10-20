@@ -1,0 +1,63 @@
+% vim: syn=gringo
+% setup:
+% ------
+
+max_unique(0).
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+%#minimize { 1@0, bad(Message) : bad(Message) }.
+:- bad(M).
+
+bad(X) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  not at(root, outcome_feel(option(X), expected_failure)).
+
+bad(nopt) :-
+  node_status_reached(root, built),
+  3 != { at(root, option(X)) }.
+
+bad(stakes) :-
+  node_status_reached(root, built),
+  not at(root, perceived_stakes(high)).
+
+
+:- bad(c).
+
+bad(c) :- not setup(root, monster_attack).
+bad(c) :- not at(root, action(option(1), attack)).
+bad(c) :- not at(root, action(option(2), pacify)).
+bad(c) :- not at(root, action(option(3), flee)).
+
+bad(a(X)) :-
+  at(root, option(X)),
+  0 = {
+    at(root, option_feel(option(X), longshot));
+    at(root, option_feel(option(X), bad));
+    at(root, option_feel(option(X), doomed))
+  }.
+
+bad(b(X)) :-
+  at(root, option(X)),
+  0 = {
+    at(root, overall_predictability(option(X), predictable));
+    at(root, overall_predictability(option(X), expected));
+    at(root, overall_predictability(option(X), average))
+  }.
+
+bad(c(X)) :-
+  at(root, option(X)),
+  0 = {
+    at(root, outcome_overall(option(X), not_worth_it));
+    at(root, outcome_overall(option(X), bad));
+    at(root, outcome_overall(option(X), awful))
+  }.

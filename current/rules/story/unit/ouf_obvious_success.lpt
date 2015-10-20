@@ -1,0 +1,48 @@
+% vim: syn=gringo
+% setup:
+% ------
+
+max_unique(0).
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+%#minimize { 1@0, bad(Message) : bad(Message) }.
+:- bad(M).
+
+bad(struct) :-
+  node_status_reached(root, built),
+  not at(root, option_structure(obvious)).
+
+bad(m(good_feel, X)) :-
+  at(root, option(X)),
+  1 <= {
+    at(root, option_feel(option(X), hopeful));
+    at(root, option_feel(option(X), safe))
+  },
+  not at(root, outcome_feel(option(X), expected_success)).
+
+bad(m(bad_feel, X)) :-
+  at(root, option(X)),
+  0 = {
+    at(root, option_feel(option(X), hopeful));
+    at(root, option_feel(option(X), safe))
+  },
+  not at(root, outcome_feel(option(X), expected_failure)).
+
+:- bad(nopt).
+bad(nopt) :-
+  node_status_reached(root, built),
+  optcount(root, N),
+  N != 3.
+
+bad(stakes) :-
+  node_status_reached(root, built),
+  not at(root, perceived_stakes(high)).

@@ -216,24 +216,24 @@ at(N, actual_stakes(none)) :-
   not at(N, actual_stakes(low)).
 
 % Per-option actual stakes:
-at(N, option_stakes(X, high)) :-
+at(N, outcome_stakes(X, high)) :-
   story_op(N, build_options),
   at(N, outcome_perception(X, Any, Goal)),
   at(N, goal_stakes(Goal, high)),
   at(N, player_goal(Goal)).
 
-at(N, option_stakes(X, low)) :-
+at(N, outcome_stakes(X, low)) :-
   story_op(N, build_options),
   at(N, outcome_perception(X, Any, Goal)),
   at(N, goal_stakes(Goal, low)),
   at(N, player_goal(Goal)),
-  not at(N, option_stakes(X, high)).
+  not at(N, outcome_stakes(X, high)).
 
-at(N, option_stakes(option(X), none)) :-
+at(N, outcome_stakes(option(X), none)) :-
   story_op(N, build_options),
   at(N, option(X)),
-  not at(N, option_stakes(option(X), high)),
-  not at(N, option_stakes(option(X), low)).
+  not at(N, outcome_stakes(option(X), high)),
+  not at(N, outcome_stakes(option(X), low)).
 
 % different types of option feels:
 
@@ -435,7 +435,7 @@ at(N, option_structure(uncomfortable)) :-
     at(N, option(X)) : at(N, option_feel(option(X), longshot));
     at(N, option(X)) : at(N, option_feel(option(X), risky))
   },
-  0 <= {
+  0 = {
     at(N, option(X)) : at(N, option_feel(option(X), tradeoff));
     at(N, option(X)) : at(N, option_feel(option(X), irrelevant));
     at(N, option(X)) : at(N, option_feel(option(X), hopeful));
@@ -698,7 +698,7 @@ at(N, outcome_perception(option(X), fails, Goal)) :-
 at(N, outcome_overall(X, great)) :-
   at(N, outcome_perception(X, achieves, Goal)),
   at(N, player_goal(Goal)),
-  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_stakes(X, Stakes)),
   at(N, goal_stakes(Goal, Stakes)),
   0 = {
     at(N, outcome_perception(X, fails, AnyGoal)) :
@@ -715,7 +715,7 @@ at(N, outcome_overall(X, great)) :-
 at(N, outcome_overall(X, good)) :-
   at(N, outcome_perception(X, advances, Goal)),
   at(N, player_goal(Goal)),
-  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_stakes(X, Stakes)),
   at(N, goal_stakes(Goal, Stakes)),
   0 = {
     at(N, outcome_perception(X, achieves, AnyGoal)) :
@@ -735,7 +735,7 @@ at(N, outcome_overall(X, good)) :-
 % When we achieve at least one goal but fail at least one other goal, or
 % advance one goal while hindering another:
 at(N, outcome_overall(X, tradeoff)) :-
-  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_stakes(X, Stakes)),
   at(N, outcome_perception(X, achieves, Goal)),
   at(N, player_goal(Goal)),
   at(N, goal_stakes(Goal, Stakes)),
@@ -744,7 +744,7 @@ at(N, outcome_overall(X, tradeoff)) :-
   at(N, goal_stakes(FailedGoal, Stakes)).
 
 at(N, outcome_overall(X, tradeoff)) :-
-  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_stakes(X, Stakes)),
   at(N, outcome_perception(X, advances, Goal)),
   at(N, player_goal(Goal)),
   at(N, goal_stakes(Goal, Stakes)),
@@ -764,7 +764,7 @@ at(N, outcome_overall(X, tradeoff)) :-
 
 % When we achieve at least one goal but hinder at least one other:
 at(N, outcome_overall(X, worth_it)) :-
-  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_stakes(X, Stakes)),
   at(N, outcome_perception(X, achieves, Goal)),
   at(N, player_goal(Goal)),
   at(N, goal_stakes(Goal, Stakes)),
@@ -780,7 +780,7 @@ at(N, outcome_overall(X, worth_it)) :-
 
 % When we advance at least one goal but fail at least one other:
 at(N, outcome_overall(X, not_worth_it)) :-
-  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_stakes(X, Stakes)),
   at(N, outcome_perception(X, advances, Goal)),
   at(N, player_goal(Goal)),
   at(N, goal_stakes(Goal, Stakes)),
@@ -798,7 +798,7 @@ at(N, outcome_overall(X, not_worth_it)) :-
 at(N, outcome_overall(X, bad)) :-
   at(N, outcome_perception(X, hinders, Goal)),
   at(N, player_goal(Goal)),
-  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_stakes(X, Stakes)),
   at(N, goal_stakes(Goal, Stakes)),
   0 = {
     at(N, outcome_perception(X, achieves, AnyGoal)) :
@@ -819,7 +819,7 @@ at(N, outcome_overall(X, bad)) :-
 at(N, outcome_overall(X, awful)) :-
   at(N, outcome_perception(X, fails, Goal)),
   at(N, player_goal(Goal)),
-  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_stakes(X, Stakes)),
   at(N, goal_stakes(Goal, Stakes)),
   0 = {
     at(N, outcome_perception(X, achieves, AnyGoal)) :
@@ -835,7 +835,7 @@ at(N, outcome_overall(X, awful)) :-
 % When an outcome doesn't affect max-stakes goals in the end:
 at(N, outcome_overall(option(X), neutral)) :-
   at(N, option(X)),
-  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_stakes(X, Stakes)),
   0 = {
     at(N, outcome_perception(option(X), NotIrrelevant, AnyGoal)) :
       at(N, outcome_perception(option(X), NotIrrelevant, AnyGoal)),
@@ -849,7 +849,7 @@ at(N, outcome_overall(option(X), neutral)) :-
 % important:
 at(N, important_outcome(X, Outcome)) :-
   at(N, outcome(X, Outcome)),
-  at(N, option_stakes(X, Stakes)),
+  at(N, outcome_stakes(X, Stakes)),
   at(N, goal_stakes(Goal, Stakes)),
   at(N, player_goal(Goal)),
   at(N, outcome_perception(X, Any, Goal)).
@@ -1138,7 +1138,7 @@ at(N, outcome_feel(option(X), expected_failure)) :-
   story_op(N, build_options),
   at(N, option(X)),
   1 <= {
-    at(N, option_feel(option(X), long_shot));
+    at(N, option_feel(option(X), longshot));
     at(N, option_feel(option(X), bad));
     at(N, option_feel(option(X), doomed))
   },
@@ -1157,7 +1157,7 @@ at(N, outcome_feel(option(X), miracle)) :-
   story_op(N, build_options),
   at(N, option(X)),
   1 <= {
-    at(N, option_feel(option(X), long_shot));
+    at(N, option_feel(option(X), longshot));
     at(N, option_feel(option(X), bad));
     at(N, option_feel(option(X), doomed))
   },
