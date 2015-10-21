@@ -2,8 +2,7 @@
 
 possible_setup(threatened_innocents).
 
-setup_argument_create(threatened_innocents, attacker, tough).
-  % might have a weapon
+setup_argument_create(threatened_innocents, attacker, tough). % might be armed
 setup_argument_create(threatened_innocents, victim, businessperson).
 setup_argument_create(threatened_innocents, goods, treasure).
 setup_argument_create_n(threatened_innocents, goods, item, 0, 1).

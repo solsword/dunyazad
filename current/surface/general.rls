@@ -50,6 +50,11 @@ as N#you/they V#fight/prs/you N#you/their way through the underbrush
 as N#you/they V#walk/prs/you among a stand of massive trees
 as N#you/they V#pass/prs/you an outcropping of gray stone
 
+:misc/guilty
+the culprit
+guilty
+to blame
+
 :misc/is_unskilled/?
 {at(Now,text_mode(normal))}
 N#?who/they V#be/prs/?who [[misc/unskilled/?_]]
@@ -129,22 +134,16 @@ unintelligent
 :misc/skilled/tinkering
 [[misc/good_at]] making things
 [[misc/good_at]] repairing things
-a [[misc/skilled_adj]] engineer
 
 :misc/unskilled/tinkering
 [[misc/bad_at]] making things
-an [[misc/unskilled_adj]] engineer
 
 :misc/skilled/fighting
 skilled at fighting
 [[misc/good_at]] fighting
-a [[misc/skilled_adj]] warrior
-a veteran warrior
 
 :misc/unskilled/fighting
 [[misc/bad_at]] fighting
-a [[misc/unskilled_adj]] warrior
-a completely inexperienced warrior
 
 :misc/skilled/wilderness_lore
 knowledgeable about plants and animals
@@ -157,37 +156,36 @@ ignorant about plants and animals
 incapable of surviving in the wilderness
 
 :misc/skilled/music
-a [[misc/skilled_adj]] musician
 [[misc/skilled_adj]] with an instrument
 
 :misc/unskilled/music
-an [[misc/unskilled_adj]] musician
 [[misc/unskilled_adj]] with an instrument
 
 :misc/skilled/elocution
-skilled at rhetoric
-a [[misc/skilled_adj]] public speaker
+[[misc/good_at]] rhetoric
+[[misc/good_at]] persuasion
 notoriously persuasive
 
 :misc/unskilled/elocution
-prone to gaffes
-an [[misc/unskilled_adj]] public speaker
+not [[misc/good_at]] rhetoric
+not [[misc/good_at]] persuasion
+[[misc/bad_at]] rhetoric
+[[misc/bad_at]] persuasion
 
 :misc/skilled/healing
 knowledgeable about the healing arts
-a [[misc/skilled_adj]] doctor
+[[misc/good_at]] healing
 
 :misc/unskilled/healing
 ignorant of the healing arts
-an [[misc/unskilled_adj]] doctor
+[[misc/bad_at]] healing
 
 :misc/skilled/thievery
 [[misc/good_at]] stealing things
-a [[misc/skilled_adj]] thief
 
 :misc/unskilled/thievery
 [[misc/bad_at]] stealing things
-an [[misc/unskilled_adj]] thief
+not [[misc/good_at]] stealing things
 
 :misc/skilled/literacy
 literate
@@ -207,37 +205,28 @@ unskilled at prayer
 % TODO: More here
 
 :misc/skilled/acrobatics
-a [[misc/skilled_adj]] acrobat
 [[misc/good_at]] running and jumping
 
 :misc/unskilled/acrobatics
-an [[misc/unskilled_adj]] acrobat
 [[misc/bad_at]] running and jumping
 
 :misc/skilled/storytelling
-a [[misc/skilled_adj]] storyteller
 [[misc/good_at]] telling stories
 
 :misc/unskilled/storytelling
-an [[misc/unskilled_adj]] storyteller
 [[misc/bad_at]] telling stories
 
 :misc/skilled/sorcery
-a [[misc/skilled_adj]] magician
-a [[misc/skilled_adj]] sorcerer
 [[misc/good_at]] casting spells
 
 :misc/unskilled/sorcery
-an [[misc/unskilled_adj]] magician
 [[misc/bad_at]] magic
 
 :misc/skilled/monstrous
 monstrous
-a monster
 
 :misc/unskilled/monstrous
 not monstrous
-not a monster
 
 :misc/skilled/unintelligent
 unintelligent

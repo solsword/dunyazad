@@ -1,0 +1,17 @@
+% Action - shift_blame
+
+:action/shift_blame/option
+N#?shifter/they V#tell/prs/?shifter N#?accuser/them that N#?new_victim/they V#be/prs/?new_victim [[misc/guilty]] instead of N#?old_victim/them
+
+:action/shift_blame/infinitive
+V#shift/inf/?subject blame
+
+:action/shift_blame/outcome
+{at(Now,outcome(option(Opt),o(success,shifted)))}
+N#?shifter/they V#convince/prs/?shifter N#?accuser/them that N#?new_victim/they V#be/prs/?new_victim actually [[misc/guilty]] instead of N#?old_victim/them, and N#?accuser/they begin accusing N#?new_victim/them
+
+{at(Now,outcome(option(Opt),o(success,suspected)))}
+N#?shifter/they V#try/prs/?shifter V#convince/inf/?shifter N#?accuser/them that N#?new_victim/they V#be/prs/?new_victim actually [[misc/guilty]] instead of N#?old_victim/them, but N#?accuser/they V#grow/prs/?accuser suspicious of N#?shifter/them, and V#start/prs/?accuser accusing N#?shifter/they instead of N#?old_victim/them
+
+{at(Now,outcome(option(Opt),o(success,ignored)))}
+N#?shifter/they V#try/prs/?shifter V#convince/inf/?shifter N#?accuser/them that N#?new_victim/they V#be/prs/?new_victim actually [[misc/guilty]] instead of N#?old_victim/them, but N#?accuser/they V#ignore/prs/?accuser N#?shifter/their arguments

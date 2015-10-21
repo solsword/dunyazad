@@ -2972,4 +2972,62 @@ caused_by(changed(T, status(Subj, Status)), Act) :-
       )
     )
   ),
+  (
+    lambda x: packrat.parse_completely(x, packrat.SepList(SimpleTerm, sep=';')),
+    "st(Now,relation(has_item,inst(actor,monster_57),inst(item,Item)));st(Now,relation(stolen_from,inst(actor,Victim),inst(item,Item)))",
+    (
+      SimpleTerm(
+        'st',
+        (
+          SimpleTerm('Now', None),
+          SimpleTerm(
+            'relation',
+            (
+              SimpleTerm('has_item', None),
+              SimpleTerm(
+                'inst',
+                (
+                  SimpleTerm('actor', None),
+                  SimpleTerm('monster_57', None)
+                )
+              ),
+              SimpleTerm(
+                'inst',
+                (
+                  SimpleTerm('item', None),
+                  SimpleTerm('Item', None)
+                )
+              ),
+            )
+          ),
+        )
+      ),
+      SimpleTerm(
+        'st',
+        (
+          SimpleTerm('Now', None),
+          SimpleTerm(
+            'relation',
+            (
+              SimpleTerm('stolen_from', None),
+              SimpleTerm(
+                'inst',
+                (
+                  SimpleTerm('actor', None),
+                  SimpleTerm('Victim', None)
+                )
+              ),
+              SimpleTerm(
+                'inst',
+                (
+                  SimpleTerm('item', None),
+                  SimpleTerm('Item', None)
+                )
+              ),
+            ),
+          )
+        )
+      )
+    )
+  )
 ]

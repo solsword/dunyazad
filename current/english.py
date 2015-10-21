@@ -210,6 +210,17 @@ STRUCTURE_SCHEMAS = {
         Vr("Skill")
       )
     ),
+  "relevant_factor":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr("relevant_factor",
+        Pr("option", Vr("Option")),
+        PVr("actor", "inst", Vr("Type"), Vr("Key")),
+        Vr("Factor"),
+        PVr("other", "inst", Vr("Type"), Vr("Key")),
+      )
+    ),
   "potential_state":
     Pr(
       "at",
@@ -337,6 +348,8 @@ CITIES = [
 ]
 
 SPECIAL_FILTERING_VARIABLES = {
+  "_From": "_from",
+  "_To": "_to",
   "_Now": "_node",
   "_Opt": "_option",
   "_Act": "_action",
@@ -498,6 +511,7 @@ def glean_context_variables(story):
     '_initiator' -  the initiator of the action
     '_relevant_skills' - a mapping from actors to lists of relevant skills
     '_relevant_tools' - a mapping from actors to lists of relevant tools
+    '_relevant_factors' - a mapping from actors to lists of misc. factors
     - all action arguments by name
 
   Setups also get their own entries under node/'setup' for nodes that have a
@@ -509,6 +523,7 @@ def glean_context_variables(story):
   Finally, each potential for a node gets put into the list node/'potentials'
   as a dictionary with the following keys:
 
+    '_node' - the id of the current node
     '_ptype' - the type of potential ('problem' or 'opportunity')
     '_stype' - the type of state ('state', 'property', or 'relation')
     '_sname' - the name of the state (e.g. 'threatening')
@@ -642,6 +657,23 @@ def glean_context_variables(story):
         result[n][o]["_relevant_tools"][a] = ([], [])
       result[n][o]["_relevant_tools"][a][1].append(s)
 
+    elif sc == "relevant_factor":
+      n = binding["at.Node"].unquoted()
+      o = binding["at.relevant_factor.option.Option"].unquoted()
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+
+      a = binding["at.relevant_factor.actor.Key"].unquoted()
+      f = binding["at.relevant_factor.Factor"].unquoted()
+      t = binding["at.relevant_factor.other.Key"].unquoted()
+      if "_relevant_factors" not in result[n][o]:
+        result[n][o]["_relevant_factors"] = {}
+      if a not in result[n][o]["_relevant_factors"]:
+        result[n][o]["_relevant_factors"][a] = []
+      result[n][o]["_relevant_factors"][a].append((f, t))
+
     elif sc == "potential_state":
       n = binding["at.Node"].unquoted()
       if n not in result:
@@ -659,6 +691,7 @@ def glean_context_variables(story):
         v = si.unquoted()
       result[n]["potentials"].append(
         {
+          "_node": n,
           "_ptype": pt,
           "_stype": "state",
           "_sname": sn,
@@ -684,6 +717,7 @@ def glean_context_variables(story):
         v = pi.unquoted()
       result[n]["potentials"].append(
         {
+          "_node": n,
           "_ptype": pt,
           "_stype": "property",
           "_sname": pn,
@@ -715,6 +749,7 @@ def glean_context_variables(story):
         vt = rt.unquoted()
       result[n]["potentials"].append(
         {
+          "_node": n,
           "_ptype": pt,
           "_stype": "relation",
           "_sname": rn,
@@ -1730,6 +1765,21 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
               )
             if relevant:
               rlist.append(relevant)
+
+        if "_relevant_factors" in ovrs:
+          rtls = ovrs["_relevant_factors"]
+          for actor in rtls:
+            for factor, other in rtls[actor]:
+              if factor == "has_stolen_item":
+                rlist.append(
+                  "N#{}/they V#do/pst/{} steal N#{}/them".format(
+                    actor,
+                    actor,
+                    other
+                  )
+                )
+              elif factor == "shift_blame_via_confession":
+                rlist.append("it would be a confession")
 
         if rlist:
           nts["options"][option] += " (@CAP@{})".format(

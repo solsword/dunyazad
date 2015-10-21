@@ -1,6 +1,11 @@
 % Potential - accusing
 
 :potential/relation/accusing
-N#?_from/they V#accuse/prsc/?_from N#?_to/them of insolence
-N#?_from/they V#accuse/prsc/?_from N#?_to/them of obstruction
 N#?_from/they V#accuse/prsc/?_from N#?_to/them of disrespect
+N#?_from/they V#accuse/prsc/?_from N#?_to/them of insolence
+N#?_from/they V#accuse/prsc/?_from N#?_to/them of a crime
+
+% TODO: Test this!!
+%{st(Now,relation(has_item,inst(actor,To),inst(item,Item)))}
+{st(Now,relation(has_item,inst(actor,To),inst(item,Item)));st(Now,relation(stolen_from,inst(actor,Victim),inst(item,Item)))}
+N#?_from/they V#accuse/prsc/?_from N#?_to/them of V#steal/prp/?_to N#?_Item/they from N#?_Victim/them

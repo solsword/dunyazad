@@ -97,6 +97,23 @@ at(
   st(N, relation(threatening, From, Fearful)),
   story_op(N, build_options).
 
+% Fleeing gets rid of accusations
+% TODO: Complicate this somewhat!!
+at(
+  N,
+  consequence_of(
+    X,
+    o(success, escape),
+    resolves,
+    potential(problem, relation(accusing, From, Fearful))
+  )
+) :-
+  at(N, action(X, flee)),
+  at(N, arg(X, fearful, Fearful)),
+  at(N, arg(X, from, From)),
+  st(N, relation(threatening, From, Fearful)),
+  story_op(N, build_options).
+
 % Fleeing puts things off-stage, unless they're a party member, in which case
 % it puts everything not in your party or belonging to it off-stage:
 

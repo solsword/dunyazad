@@ -8,21 +8,40 @@ V#attack/inf/?subject opponents
 
 :action/attack/outcome
 {at(Now,outcome(option(Opt),o(success,victory)))}
-N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/?]] @CAP@N#?target/they V#be/prs/?target defeated
+N#?aggressor/they V#attack/prs/?aggressor N#?target/them. @CAP@[[combat/losing]][[combat/connect/reverse]] [[combat/winning]][[combat/connect/through]] [[combat/winning]]. @CAP@N#?target/they V#be/prs/?target defeated
 
 {at(Now,outcome(option(Opt),o(success,tie)))}
-N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/winning]] [[S|combat/losing]] Finally N#?aggressor/they and N#?target/they V#withdraw/prs/_plural from combat, exhausted.
+N#?aggressor/they V#attack/prs/?aggressor N#?target/them. @CAP@[[combat/winning]][[combat/connect/?]] [[combat/losing]]. Finally N#?aggressor/they and N#?target/they V#withdraw/prs/_plural from combat, exhausted.
 
 {at(Now,outcome(option(Opt),o(success,defeat)))}
-N#?aggressor/they V#attack/prs/?aggressor N#?target/them. [[S|combat/winning]] Suddenly N#?target/they V#rally/prs/?target and fiercely V#strike/prs/?target back at N#?aggressor/them, and N#?aggressor/they V#be/prs/?aggressor defeated
+N#?aggressor/they V#attack/prs/?aggressor N#?target/them. @CAP@[[combat/winning]][[combat/connect/reverse]] [[combat/losing]][[combat/connect/through]] [[combat/losing]]. Suddenly N#?target/they V#rally/prs/?target and fiercely V#strike/prs/?target back at N#?aggressor/them, and N#?aggressor/they V#be/prs/?aggressor defeated
 
 :combat/winning
 N#?aggressor/they V#strike/prs/?aggressor at N#?target/them
-N#?aggressor/they V#attack/prs/?aggressor N#?target/them
+N#?aggressor/they V#thrust/prs/?aggressor at N#?target/them
+N#?aggressor/they V#dodge/prs/?aggressor N#?target/their attack
+N#?aggressor/they V#avoid/prs/?aggressor N#?target/their attack
+N#?target/they V#be/prs/?target hit by N#?aggressor/their attack
 
 :combat/losing
 N#?target/they V#fight/prs/?target back
-N#?target/they V#attack/prs/?target N#?aggressor/them
+N#?target/they V#strike/prs/?target at N#?aggressor/them
+N#?target/they V#thrust/prs/?target at N#?aggressor/them
+N#?target/they V#dodge/prs/?target N#?aggressor/their attack
+N#?target/they V#avoid/prs/?target N#?aggressor/their attack
+N#?aggressor/they V#be/prs/?aggressor hit by N#?target/their attack
+
+:combat/connect/through
+ and
+, and
+ and then
+, then
+
+:combat/connect/reverse
+ but
+, but
+ but then
+, but then
 
 %:combat/neutral
 %[[aspects/?aggressor/active]]

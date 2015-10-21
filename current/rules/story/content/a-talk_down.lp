@@ -132,4 +132,3 @@ at(
   at(N, arg(X, victim, Victim)),
   st(N, relation(accusing, Listening, Victim)),
   story_op(N, build_options).
-
