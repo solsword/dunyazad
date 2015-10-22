@@ -173,28 +173,66 @@ at(N, expectation(option(X), fails, Goal)) :-
 
 % Stakes are based on the goals that are threatened:
 
-% Percieved stakes:
-at(N, perceived_stakes(high)) :-
+% Percieved stakes (per-option):
+at(N, perceived_option_stakes(X, high)) :-
   story_op(N, build_options),
   at(N, expectation(X, Exp, Goal)),
   Exp != irrelevant,
   at(N, goal_stakes(Goal, high)),
   at(N, player_goal(Goal)).
 
-at(N, perceived_stakes(low)) :-
+at(N, perceived_option_stakes(X, low)) :-
   story_op(N, build_options),
   at(N, expectation(X, Exp, Goal)),
   Exp != irrelevant,
   at(N, goal_stakes(Goal, low)),
   at(N, player_goal(Goal)),
-  not at(N, perceived_stakes(high)).
+  not at(N, perceived_option_stakes(X, high)).
+
+at(N, perceived_option_stakes(option(X), none)) :-
+  story_op(N, build_options),
+  at(N, option(X)),
+  not at(N, perceived_option_stakes(option(X), high)),
+  not at(N, perceived_option_stakes(option(X), low)).
+
+% Percieved stakes (overall):
+at(N, perceived_stakes(high)) :-
+  at(N, perceived_option_stakes(X, high)).
+
+at(N, perceived_stakes(low)) :-
+  at(N, perceived_option_stakes(X, low)),
+  0 = {
+    at(N, perceived_option_stakes(Any, high))
+  }.
 
 at(N, perceived_stakes(none)) :-
-  story_op(N, build_options),
-  not at(N, perceived_stakes(high)),
-  not at(N, perceived_stakes(low)).
+  story_node(N),
+  0 = {
+    at(N, perceived_option_stakes(Any, high));
+    at(N, perceived_option_stakes(Any, low))
+  }.
 
-% Actual stakes:
+% Actual stakes (per outcome):
+at(N, outcome_stakes(X, high)) :-
+  story_op(N, build_options),
+  at(N, outcome_perception(X, Any, Goal)),
+  at(N, goal_stakes(Goal, high)),
+  at(N, player_goal(Goal)).
+
+at(N, outcome_stakes(X, low)) :-
+  story_op(N, build_options),
+  at(N, outcome_perception(X, Any, Goal)),
+  at(N, goal_stakes(Goal, low)),
+  at(N, player_goal(Goal)),
+  not at(N, outcome_stakes(X, high)).
+
+at(N, outcome_stakes(option(X), none)) :-
+  story_op(N, build_options),
+  at(N, option(X)),
+  not at(N, outcome_stakes(option(X), high)),
+  not at(N, outcome_stakes(option(X), low)).
+
+% Actual stakes (overall):
 at(N, actual_stakes(high)) :-
   story_op(N, build_options),
   at(N, outcome_perception(X, Any, Goal)),
@@ -214,26 +252,6 @@ at(N, actual_stakes(none)) :-
   story_op(N, build_options),
   not at(N, actual_stakes(high)),
   not at(N, actual_stakes(low)).
-
-% Per-option actual stakes:
-at(N, outcome_stakes(X, high)) :-
-  story_op(N, build_options),
-  at(N, outcome_perception(X, Any, Goal)),
-  at(N, goal_stakes(Goal, high)),
-  at(N, player_goal(Goal)).
-
-at(N, outcome_stakes(X, low)) :-
-  story_op(N, build_options),
-  at(N, outcome_perception(X, Any, Goal)),
-  at(N, goal_stakes(Goal, low)),
-  at(N, player_goal(Goal)),
-  not at(N, outcome_stakes(X, high)).
-
-at(N, outcome_stakes(option(X), none)) :-
-  story_op(N, build_options),
-  at(N, option(X)),
-  not at(N, outcome_stakes(option(X), high)),
-  not at(N, outcome_stakes(option(X), low)).
 
 % different types of option feels:
 
@@ -390,6 +408,14 @@ at(N, option_structure(mysterious)) :-
   1 < { at(N, option(X)) },
   0 = #sum {
     1,at(N, option(X)) : at(N, option_feel(option(X), irrelevant));
+    -1,at(N, option(X)) : at(N, option(X))
+  }.
+
+at(N, option_structure(uncertain)) :-
+  story_op(N, build_options),
+  1 < { at(N, option(X)) },
+  0 = #sum {
+    1,at(N, option(X)) : at(N, option_feel(option(X), risky));
     -1,at(N, option(X)) : at(N, option(X))
   }.
 

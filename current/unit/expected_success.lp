@@ -15,4 +15,4 @@ error(m("Wrong outcome feel.")) :-
 
 %error(m("Wrong stakes.")) :-
 %  node_status_reached(root, built),
-%  not at(root, percieved_stakes(high)).
+%  not at(root, perceived_stakes(high)).

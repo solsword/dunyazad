@@ -1,10 +1,6 @@
-error(m("Root choice has a non-hopeful, non-safe option.", X)) :-
+error(m("Root choice has wrong option structure.")) :-
   node_status_reached(root, built),
-  at(root, option(X)),
-  0 = {
-    at(root, option_feel(option(X), safe));
-    at(root, option_feel(option(X), hopeful))
-  }.
+  not at(root, option_structure(positive_alternatives)).
 
 error(m("Root choice option has wrong outcome feel.", X)) :-
   at(root, option(X)),
@@ -18,3 +14,9 @@ error(m("Root choice doesn't have three options.")) :-
 error(m("Root choice doesn't have high stakes.")) :-
   node_status_reached(root, built),
   not at(root, perceived_stakes(high)).
+
+error(m("Root option stakes are inconsistent.")) :-
+  node_status_reached(root, built),
+  at(root, perceived_option_stakes(A, SomeLevel)),
+  at(root, perceived_option_stakes(B, SomeOtherLevel)),
+  SomeLevel != SomeOtherLevel.

@@ -1,10 +1,10 @@
 error(m("Root choice has wrong option structure.")) :-
   node_status_reached(root, built),
-  not at(root, option_structure(positive_alternatives)).
+  not at(root, option_structure(uncertain)).
 
 error(m("Root choice option has wrong outcome feel.", X)) :-
   at(root, option(X)),
-  not at(root, outcome_feel(option(X), unfair)).
+  not at(root, outcome_feel(option(X), bad_gamble)).
 
 error(m("Root choice doesn't have three options.")) :-
   node_status_reached(root, built),

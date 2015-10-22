@@ -26,3 +26,9 @@ error(m("Root choice doesn't have three options.")) :-
 error(m("Root choice doesn't have high stakes.")) :-
   node_status_reached(root, built),
   not at(root, perceived_stakes(high)).
+
+error(m("Root option stakes are inconsistent.")) :-
+  node_status_reached(root, built),
+  at(root, perceived_option_stakes(A, SomeLevel)),
+  at(root, perceived_option_stakes(B, SomeOtherLevel)),
+  SomeLevel != SomeOtherLevel.

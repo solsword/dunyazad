@@ -135,7 +135,16 @@ error(m("Redundant option", N, X)) :-
   X < Y,
   story_op(N, build_options).
 
-% boredom
+% boredom (at a single node)
+
+error(m("Boring options", N)) :-
+  at(N, action(X, Same)),
+  at(N, action(Y, Same)),
+  at(N, action(Z, Same)),
+  X < Y, Y < Z,
+  story_op(N, build_options).
+
+% boredom (over time)
 error(m("Boring action", N, X)) :-
   at(Prev, action(X, Action)),
   successor(Prev, POpt, N),
