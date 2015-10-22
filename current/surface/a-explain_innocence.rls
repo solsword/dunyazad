@@ -1,14 +1,14 @@
 % Action - explain_innocence
 
 :action/explain_innocence/option
-N#?explainer/they V#explain/prs/?explainer to N#?accuser/them why N#?victim/they is actually innocent
+N#?explainer/they V#explain/prs/?explainer to N#?accuser/them why N#?victim/they V#be/prs/?victim actually innocent
 
 :action/explain_innocence/infinitive
 V#explain/inf/?subject innocence
 
 :action/explain_innocence/outcome
 {at(Now,outcome(option(Opt),o(success,exonerated)))}
-N#?explainer/they V#explain/prs/?explainer to N#?accuser/them why N#?victim/they are innocent and N#?accuser/they V#concede/prs/?accuser the point
+N#?explainer/they V#explain/prs/?explainer to N#?accuser/them why N#?victim/they V#be/prs/?victim innocent and N#?accuser/they V#concede/prs/?accuser the point
 
 {at(Now,outcome(option(Opt),o(success,ignored)))}
-N#?explainer/they V#explain/prs/?explainer to N#?accuser/them why N#?victim/they are innocent but N#?accuser/they V#be/prs/?accuser not convinced
+N#?explainer/they V#explain/prs/?explainer to N#?accuser/them why N#?victim/they V#be/prs/?victim innocent but N#?accuser/they V#be/prs/?accuser not convinced
