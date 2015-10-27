@@ -22,6 +22,10 @@ bad(X) :-
   at(root, option(X)),
   not at(root, outcome_feel(option(X), expected_success)).
 
+bad(struct) :-
+  node_status_reached(root, built),
+  not at(root, option_structure(positive_alternatives)).
+
 bad(nopt) :-
   node_status_reached(root, built),
   3 != { at(root, option(X)) }.

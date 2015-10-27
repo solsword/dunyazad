@@ -494,6 +494,7 @@ at(N, option_structure(positive_alternatives)) :-
   higher_stakes(SomeStakes, none),
   0 = #sum {
     1,at(N, option(X)) : at(N, option_feel(option(X), safe));
+    1,at(N, option(X)) : at(N, option_feel(option(X), hopeful));
     -1,at(N, option(X)) : at(N, option(X))
   },
   0 = #sum {
@@ -519,7 +520,6 @@ at(N, option_structure(negative_alternatives)) :-
   0 = #sum {
     1,at(N, option(X)) : at(N, option_feel(option(X), longshot));
     1,at(N, option(X)) : at(N, option_feel(option(X), bad));
-    1,at(N, option(X)) : at(N, option_feel(option(X), doomed));
     -1,at(N, option(X)) : at(N, option(X))
   },
   0 = #sum {
@@ -579,7 +579,6 @@ at(N, option_structure(bleak)) :-
   0 = #sum {
     1,at(N, option(X)) : at(N, option_feel(option(X), longshot));
     1,at(N, option(X)) : at(N, option_feel(option(X), bad));
-    1,at(N, option(X)) : at(N, option_feel(option(X), doomed));
     -1,at(N, option(X)) : at(N, option(X))
   },
   at(N, perceived_stakes(Stakes)),
