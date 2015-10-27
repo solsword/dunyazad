@@ -64,10 +64,10 @@ Experimental conditions:
 
 6. Negative alternatives choice with unexpected success outcomes.
 
-7. Mysterious choice (no options indicate either success or failure) with
+(removed) 7. Mysterious choice (no options indicate either success or failure) with
    success outcomes.
 
-8. Mysterious choice with failure outcomes.
+(removed) 8. Mysterious choice with failure outcomes.
 
 
 Things to measure:
@@ -78,6 +78,9 @@ Things to measure:
 3. Perceived value (bad or good outcome).
 4. Perceived expectedness.
 
+(5). Regret/satisfaction.
+
+* Something to tease out modes of engagement?
 
 Main hypotheses:
 ----------------
@@ -114,7 +117,7 @@ Condition 2 relative to condition 5:
 Condition 4 relative to condition 5:
 - More bad.
 
-Condition 8 relative to condition 5:
+(removed) Condition 8 relative to condition 5:
 - More bad.
 
 
@@ -126,10 +129,10 @@ Condition 1 relative to condition 6:
 Condition 3 (best option) relative to condition 6:
 - Less good.
 
-Condition 1 relative to condition 7:
+(removed) Condition 1 relative to condition 7:
 - Less good.
 
-Condition 3 (best option) relative to condition 7:
+(removed) Condition 3 (best option) relative to condition 7:
 - Less good.
 
 
@@ -146,4 +149,4 @@ Basic hypotheses:
 
 - All unexpected outcomes should be perceived as unexpected.
 
-- All mysterious outcomes should be perceived as slightly unexpected.
+(removed) - All mysterious outcomes should be perceived as slightly unexpected.
