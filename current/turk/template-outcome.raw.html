@@ -132,6 +132,7 @@ fieldset {
 <div class="panel-heading"><strong>Preliminaries</strong></div>
 
 <div class="panel-body">
+<p>This survey consists of a story fragment with a choice in it followed by 20 multiple-choice questions. It should take about ten minutes to complete.</p>
 <p>To provide useful data for this survey, you must be at least 18 years old and able to read English. To confirm this (and to confirm that you aren&#39;t a bot), please answer the following question.</p>
 </div>
 </div><!-- End Instructions Box -->
@@ -147,7 +148,7 @@ fieldset {
 <div class="panel-heading"><strong>The Story</strong></div>
 
 <div class="panel-body">
-<p>Please read the following short story which presents you with a choice, make a decision, and then answer the questions about that choice below.</p>
+<p>Please read the following short story which presents you with a choice, make a decision, and then answer the questions about that choice below. Make sure that you answer every question, or I won&#39;t be able to use your response.</p>
 </div>
 </div><!-- End Instructions Box -->
 
@@ -200,7 +201,13 @@ ${prompt}
 <div class="panel-heading"><strong>Option Questions</strong></div>
 
 <div class="panel-body">
-<p>Please rate your agreement with the following statements, from 1 (strongly disagree) to 5 (strongly agree). For these questions, please consider just the options presented, and ignore the outcome of the option that you chose.</p>
+<p class="note">
+(Note: if you've reached this point, you should already have made a choice and seen an outcome above. If not, please select an option in the story above and read the outcome that appears.)
+</p>
+<p>
+For these questions, consider just the options presented, and ignore the outcome of the option that you chose.
+Please rate your agreement with the following statements, from 1 (strongly disagree) to 5 (strongly agree).
+</p>
 </div>
 </div><!-- End Instructions Box -->
 
@@ -302,7 +309,7 @@ ${prompt}
 </fieldset>
 
 <fieldset>
-  <label>4. &quot;I'm happy with the option that I chose.&quot;</label>
+  <label>4. &quot;I&#39;m happy with the option that I chose.&quot;</label>
   <div class="question-input">
     <input type="radio" name="out-happy" value="1">&nbsp;1 - strongly disagree<br/>
     <input type="radio" name="out-happy" value="2">&nbsp;2 - somewhat disagree<br/>
@@ -335,7 +342,7 @@ ${prompt}
 </fieldset>
 
 <fieldset>
-  <label>7. &quot;There is an outcome.&quot; (This is a trick question to test whether you're paying attention. Please simply indicate that you are in complete <i>disagreement</i>.)</label>
+  <label>7. &quot;There is an outcome.&quot; (This is a trick question to test whether you&#39;re paying attention. Please simply indicate that you are in complete <i>disagreement</i>.)</label>
   <div class="question-input">
     <input type="radio" name="out-trick" value="1">&nbsp;1 - strongly disagree<br/>
     <input type="radio" name="out-trick" value="2">&nbsp;2 - somewhat disagree<br/>
@@ -405,7 +412,7 @@ ${prompt}
  (Note: no submissions will be rejected based on this information; wanting to get this survey done quickly is a perfectly valid reason for making a decision.)
   </p>
   <div class="question-input">
-    <input type="checkbox" name="motives" value="speed">&nbsp;I'm taking an online survey. I just chose an option quickly so that I could complete the survey.<br/>
+    <input type="checkbox" name="motives" value="speed">&nbsp;I&#39;m taking an online survey. I just chose an option quickly so that I could complete the survey.<br/>
     <input type="checkbox" name="motives" value="curious">&nbsp;I was just curious to find out what would happen if I chose the option I did.<br/>
     <input type="checkbox" name="motives" value="role">&nbsp;I imagined a character in the story situation and chose what that character would do.<br/>
     <input type="checkbox" name="motives" value="avatar">&nbsp;I chose what I would have chosen were I in the situation described in the story.<br/>
@@ -433,8 +440,8 @@ ${prompt}
   <label>3. Which of the following judgement(s) contributes to how you generally define a &quot;bad&quot; outcome in interactive experiences like the one you just played? (pick one or more)</label>
   <div class="question-input">
     <input type="checkbox" name="goals" value="avatar">&nbsp;I feel an outcome is bad when something bad happens to my character in the story world.<br/>
-    <input type="checkbox" name="goals" value="interesting">&nbsp;I feel an outcome is bad if it doesn't develop the plot.<br/>
-    <input type="checkbox" name="goals" value="no-control">&nbsp;I feel an outcome is bad when my character doesn't do what I expected them to do.<br/>
+    <input type="checkbox" name="goals" value="interesting">&nbsp;I feel an outcome is bad if it doesn&#39;t develop the plot.<br/>
+    <input type="checkbox" name="goals" value="no-control">&nbsp;I feel an outcome is bad when my character doesn&#39;t do what I expected them to do.<br/>
     <input type="checkbox" name="goals" value="value-clash">&nbsp;I feel an outcome is bad when my character expresses a value or opinion that is different from what I wanted them to express.<br/>
     <input type="checkbox" name="goals" value="power">&nbsp;I feel an outcome is bad when it makes my character less powerful.<br/>
     <input type="checkbox" name="goals" value="progress">&nbsp;I feel an outcome is bad when it prevents me from making progress towards beating a game.<br/>
@@ -446,9 +453,9 @@ ${prompt}
 <fieldset>
   <label>4. Do you feel you approach all interactive experiences (e.g., Choose-Your-Own-Adventure novels, video games, tabletop role-playing games, etc.) with a consistent set of motivations and judgements, or do your motivations and judgements change from story to story?</label>
   <div class="question-input">
-    <input type="radio" name="consistency" value="consistent">&nbsp;I feel that my motivations and judgements are the same no matter what interactive story I'm playing.<br/>
+    <input type="radio" name="consistency" value="consistent">&nbsp;I feel that my motivations and judgements are the same no matter what interactive story I&#39;m playing.<br/>
     <input type="radio" name="consistency" value="variable">&nbsp;I feel that my motivations and judgements change from story to story.<br/>
-    <input type="radio" name="consistency" value="variable">&nbsp;I don't play interactive stories often enough to have a definite answer.<br/>
+    <input type="radio" name="consistency" value="variable">&nbsp;I don&#39;t play interactive stories often enough to have a definite answer.<br/>
     <input type="radio" name="consistency" value="other">&nbsp;Other (please explain):<br/>
     &nbsp;&nbsp;&nbsp;&nbsp;<textarea name="consistency-other" rows=3 cols=110></textarea>
   </div>
@@ -456,15 +463,15 @@ ${prompt}
 
 <!-- Instructions Box -->
 <div class="panel panel-primary">
-<div class="panel-heading"><strong>Meta</strong></div>
+<div class="panel-heading"><strong>Feedback</strong></div>
 
 <div class="panel-body">
-<p>(Optional) Just one last question about the survey itself...</p>
+<p>(Optional) One last question about the survey itself...</p>
 </div>
 </div><!-- End Instructions Box -->
 
 <fieldset>
-  <label>Do you have any suggestions for improving this survey? Where there any parts of it that were confusing, unclear, or just broken?
+  <label>Do you have any suggestions for improving this survey? Where there any parts of it that were confusing, unclear, or just broken? Does the current pay rate ($2.00) make sense given how long it took you to complete the task and how difficult it was?
   <div class="question-input">
     <textarea name="pilot-feedback" rows=5 cols=110></textarea>
   </div>
