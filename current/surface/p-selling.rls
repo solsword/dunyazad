@@ -2,3 +2,11 @@
 
 :potential/relation/selling
 N#?_from/they V#sell/prsc/?_from N#?_to/them
+
+:consequence/init/relation/selling
+N#?_from/they V#be/prs/?_from now V#sell/prp/?_from N#?_to/them
+N#?_from/they V#be/prs/?_from now V#offer/prp/?_from N#?_to/them for sale
+
+:consequence/term/relation/selling
+N#?_from/they V#be/prs/?_from no longer V#sell/prp/?_from N#?_to/them
+N#?_from/they V#stop/psp/?_from V#sell/prp/?_from N#?_to/them

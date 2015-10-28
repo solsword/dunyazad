@@ -2,3 +2,12 @@
 
 :potential/relation/stolen_from
 N#?_to/they V#be/psp/?_to stolen from N#?_from/them
+
+:consequence/init/relation/stolen_from
+N#?_to/they V#be/psp/?_to stolen from N#?_from/them
+N#?_from/they V#have/prs/?_from had N#?_to/they stolen from N#?_from/them
+
+:consequence/term/relation/stolen_from
+N#?_to/they V#be/psp/?_to returned to N#?_from/them
+N#?_to/they V#be/psp/?_to returned to N#?_to/their rightful owner
+N#?_from/they V#have/prs/?_from V#regain/pst/?_from N#?_to/them

@@ -2,3 +2,11 @@
 
 :potential/state/knows_gossip
 N#?_inst/they V#seem/prs/?_inst knowledgeable
+
+:consequence/init/state/knows_gossip
+N#?_inst/they V#have/prs/?_inst heard a juicy rumor
+N#?_inst/they V#have/prs/?_inst learned something useful
+
+:consequence/term/state/knows_gossip
+N#?_inst/they no longer V#have/prs/?_inst any interesting gossip to share
+N#?_inst/they V#have/prs/?_inst revealed all that N#?_inst/they V#know/prs/?_inst

@@ -1,0 +1,7 @@
+:consequence/init/property/has_skill
+N#?_inst/they V#become/psp/?_inst [[misc/skilled/?_value]]
+N#?_inst/they V#be/prs/?_inst now [[misc/skilled/?_value]]
+
+:consequence/term/property/has_skill
+N#?_inst/they V#be/prs/?_inst no longer [[misc/skilled/?_value]]
+N#?_inst/they V#be/prs/?_inst not [[misc/skilled/?_value]] anymore

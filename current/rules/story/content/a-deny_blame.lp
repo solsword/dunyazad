@@ -57,4 +57,5 @@ at(
   at(N, action(X, deny_blame)),
   at(N, arg(X, accuser, Accuser)),
   at(N, arg(X, victim, Victim)),
+  at(N, potential(problem, relation(accusing, Accuser, Victim))),
   story_op(N, build_options).

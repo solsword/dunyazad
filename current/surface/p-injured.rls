@@ -2,3 +2,15 @@
 
 :potential/state/injured
 N#?_inst/they V#be/prs/?_inst injured
+
+:consequence/init/state/injured
+N#?_inst/they V#be/psp/?_inst injured
+N#?_inst/they V#become/psp/?_inst injured
+N#?_inst/they V#be/prs/?_inst injured now
+N#?_inst/they V#be/prs/?_inst now injured
+
+:consequence/term/state/injured
+N#?_inst/they V#be/prs/?_inst no longer injured
+N#?_inst/they V#be/prs/?_inst not injured any more
+N#?_inst/they V#have/prs/?_inst recovered from N#?_inst/their injury
+N#?_inst/their injury V#be/psp/?_singular healed

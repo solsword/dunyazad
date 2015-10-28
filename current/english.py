@@ -247,6 +247,69 @@ STRUCTURE_SCHEMAS = {
         Pr("relation", Vr("RName"), SbT("From"), SbT("To"))
       )
     ),
+  "init_state":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr(
+        "consequence",
+        Pr("option", Vr("Option")),
+        Pr("state", Vr("SName"), SbT("Inst"))
+      )
+    ),
+  "init_property":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr(
+        "consequence",
+        Pr("option", Vr("Option")),
+        Pr("property", Vr("PName"), SbT("Inst"), Vr("PVal"))
+      )
+    ),
+  "init_relation":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr(
+        "consequence",
+        Pr("option", Vr("Option")),
+        Pr("relation", Vr("RName"), SbT("From"), SbT("To"))
+      )
+    ),
+  "term_state":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr(
+        "consequence",
+        Pr("option", Vr("Option")),
+        Pr("_not"),
+        Pr("state", Vr("SName"), SbT("Inst"))
+      )
+    ),
+  "term_property":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr(
+        "consequence",
+        Pr("option", Vr("Option")),
+        Pr("_not"),
+        Pr("property", Vr("PName"), SbT("Inst"), Vr("PVal"))
+      )
+    ),
+  "term_relation":
+    Pr(
+      "at",
+      Vr("Node"),
+      Pr(
+        "consequence",
+        Pr("option", Vr("Option")),
+        Pr("_not"),
+        Pr("relation", Vr("RName"), SbT("From"), SbT("To"))
+      )
+    ),
   "setup": Pr("setup", Vr("Node"), Vr("Setup")),
   "setup_arg":
     Pr(
@@ -520,8 +583,8 @@ def glean_context_variables(story):
     '_setup' - the name of the setup
     - all setup arguments by name
 
-  Finally, each potential for a node gets put into the list node/'potentials'
-  as a dictionary with the following keys:
+  Each potential for a node gets put into the list node/'potentials' as a
+  dictionary with the following keys:
 
     '_node' - the id of the current node
     '_ptype' - the type of potential ('problem' or 'opportunity')
@@ -531,6 +594,19 @@ def glean_context_variables(story):
     '_value' - for 'property'-type states, the property value
     '_from' - for 'relation'-type states, the 'from' instance id
     '_to' - for 'relation'-type states, the 'to' instance id
+
+  Consequences at a node are put into lists node/option/'consequences' as
+  dictionaries with the following keys:
+
+    '_node' - the id of the current node
+    '_option' - the number of the current option
+    '_type' - the type of state ('state', 'property', or 'relation')
+    '_name' - the name of the state
+    '_change' - either 'init' for a new state or 'term' for a terminated state
+    '_inst' - for 'state' and 'property'-type states, the instance id
+    '_value' - the property value for 'property'-type states
+    '_from' - the 'from' instance id for 'relation'-type states
+    '_to' - the 'to' instance id for 'relation'-type states
   """
   result = {}
   for sc, binding in ans.bindings(STRUCTURE_SCHEMAS, story):
@@ -686,16 +762,19 @@ def glean_context_variables(story):
       si = binding["at.potential.state.Inst"]
       sb = ans.bind(INSTANCE_SCHEMA, si)
       if sb:
-        v = sb["inst.Key"].unquoted()
+        si = sb["inst.Key"].unquoted()
       else:
-        v = si.unquoted()
+        si = si.unquoted()
       result[n]["potentials"].append(
         {
           "_node": n,
           "_ptype": pt,
           "_stype": "state",
           "_sname": sn,
-          "_inst": v,
+          "_inst": si,
+          "_value": None,
+          "_from": None,
+          "_to": None,
         }
       )
 
@@ -712,17 +791,19 @@ def glean_context_variables(story):
       pi = binding["at.potential.property.Inst"]
       sb = ans.bind(INSTANCE_SCHEMA, pi)
       if sb:
-        v = sb["inst.Key"].unquoted()
+        pi = sb["inst.Key"].unquoted()
       else:
-        v = pi.unquoted()
+        pi = pi.unquoted()
       result[n]["potentials"].append(
         {
           "_node": n,
           "_ptype": pt,
           "_stype": "property",
           "_sname": pn,
-          "_inst": v,
-          "_value": pv
+          "_inst": pi,
+          "_value": pv,
+          "_from": None,
+          "_to": None,
         }
       )
 
@@ -753,8 +834,113 @@ def glean_context_variables(story):
           "_ptype": pt,
           "_stype": "relation",
           "_sname": rn,
+          "_inst": None,
+          "_value": None,
           "_from": vf,
           "_to": vt
+        }
+      )
+
+    elif sc == "init_state" or sc == "term_state":
+      n = binding["at.Node"].unquoted()
+      o = binding["at.consequence.option.Option"].unquoted()
+
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+      if "consequences" not in result[n][o]:
+        result[n][o]["consequences"] = []
+
+      sn = binding["at.consequence.state.SName"]
+      si = binding["at.consequence.state.Inst"]
+      sb = ans.bind(INSTANCE_SCHEMA, si)
+      if sb:
+        si = sb["inst.Key"].unquoted()
+      else:
+        si = si.unquoted()
+      result[n][o]["consequences"].append(
+        {
+          "_node": n,
+          "_option": o,
+          "_type": "state",
+          "_name": sn,
+          "_change": sc[:4],
+          "_inst": si,
+          "_value": None,
+          "_from": None,
+          "_to": None,
+        }
+      )
+
+    elif sc == "init_property" or sc == "term_property":
+      n = binding["at.Node"].unquoted()
+      o = binding["at.consequence.option.Option"].unquoted()
+
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+      if "consequences" not in result[n][o]:
+        result[n][o]["consequences"] = []
+
+      pn = binding["at.consequence.property.PName"]
+      pv = binding["at.consequence.property.PVal"]
+      pi = binding["at.consequence.property.Inst"]
+      sb = ans.bind(INSTANCE_SCHEMA, pi)
+      if sb:
+        pi = sb["inst.Key"].unquoted()
+      else:
+        pi = pi.unquoted()
+      result[n][o]["consequences"].append(
+        {
+          "_node": n,
+          "_option": o,
+          "_type": "property",
+          "_name": pn,
+          "_change": sc[:4],
+          "_inst": pi,
+          "_value": pv,
+          "_from": None,
+          "_to": None,
+        }
+      )
+
+    elif sc == "init_relation" or sc == "term_relation":
+      n = binding["at.Node"].unquoted()
+      o = binding["at.consequence.option.Option"].unquoted()
+
+      if n not in result:
+        result[n] = {}
+      if o not in result[n]:
+        result[n][o] = {}
+      if "consequences" not in result[n][o]:
+        result[n][o]["consequences"] = []
+
+      rn = binding["at.consequence.relation.RName"]
+      rf = binding["at.consequence.relation.From"]
+      sb = ans.bind(INSTANCE_SCHEMA, rf)
+      if sb:
+        rf = sb["inst.Key"].unquoted()
+      else:
+        rf = rf.unquoted()
+      rt = binding["at.consequence.relation.To"]
+      sb = ans.bind(INSTANCE_SCHEMA, rt)
+      if sb:
+        rt = sb["inst.Key"].unquoted()
+      else:
+        rt = rt.unquoted()
+      result[n][o]["consequences"].append(
+        {
+          "_node": n,
+          "_option": o,
+          "_type": "relation",
+          "_name": rn,
+          "_change": sc[:4],
+          "_inst": None,
+          "_value": None,
+          "_from": rf,
+          "_to": rt,
         }
       )
 
@@ -796,7 +982,10 @@ def enhance_context_variables(cvrs, nouns):
     if "potentials" in cvrs[node]:
       for p in cvrs[node]["potentials"]:
         enhance_vars(p, nouns)
-    for opt in [n for n in cvrs[node] if n != "setup" and n != "potentials"]:
+    for opt in [
+      n for n in cvrs[node]
+        if n != "setup" and n != "potentials" and n != "consequences"
+    ]:
       enhance_vars(cvrs[node][opt], nouns)
 
 def enhance_vars(vs, nouns):
@@ -1410,6 +1599,8 @@ def build_node_text(
   verbs in the text generated.
   """
   outgoing = {}
+  print(node)
+  print(node["intro"])
   intro, _pnslots, _introduced = build_text(
     node["intro"],
     grammar_rules,
@@ -1442,6 +1633,7 @@ def build_node_text(
   situation = sentence(situation)
   options = ""
   outcomes = ""
+  consequences = ""
   if fmt == "example":
     options += "<ol>"
   ocount = len(node["options"])
@@ -1559,6 +1751,34 @@ def build_node_text(
   else:
     options = "ERROR: node {} had <= 0 options!"
 
+  # Consequences:
+  for opt in node["consequences"]:
+    csq_txt = ""
+    results = []
+    for i in range(len(node["consequences"][opt])):
+      txt, pnout, intout = build_text(
+        node["consequences"][opt][i],
+        grammar_rules,
+        context_variables[opt]["consequences"][i],
+        story,
+        nouns,
+        pnout,
+        intout,
+        timeshift,
+        fmt
+      )
+      results.append(txt)
+    if len(results) > 1:
+      csq_txt = ", ".join(results[:-1]) + ", and " + results[-1]
+    elif len(results) == 1:
+      csq_txt = results[0]
+    else:
+      csq_txt = ""
+    if csq_txt:
+      if fmt == "turk":
+        consequences += "{}<snop>".format(sentence(csq_txt))
+        # TODO: consequences in other formats?
+
   # Putting everything together:
   if fmt == "choicescript":
     result = """
@@ -1610,12 +1830,15 @@ def build_node_text(
 {options}
 <snip>
 {outcomes}
+<snip>
+{consequences}
 """.format(
   label=node["name"],
   intro=intro,
   situation=situation,
   options=options,
   outcomes=outcomes,
+  consequences=consequences,
 )
   return result, outgoing
 
@@ -1642,6 +1865,49 @@ def build_intro_text(
     fmt
   )
   return result, introduced
+
+def state_changes(old_potentials, new_potentials):
+  removed = old_potentials.copy()
+  introduced = new_potentials.copy()
+  for op in old_potentials:
+    any_matches = False
+    for np in new_potentials:
+      this_one_matches = True
+      for prp in [
+        '_node',
+        '_ptype',
+        '_stype',
+        '_sname',
+        '_inst',
+        '_value',
+        '_from',
+        '_to',
+      ]:
+        if op[prp] != np[prp]:
+          this_one_matches = False
+          break
+      if this_one_matches:
+        introduced.remove(np)
+        any_matches = True
+    if any_matches:
+      removed.remove(op)
+
+  results = []
+  for r in removed:
+    results.append(
+      (
+        "[[potential/{}/{}/removed]]".format(r["_ptype"], r["_stype"]),
+        r
+      )
+    )
+  for i in introduced:
+    results.append(
+      (
+        "[[potential/{}/{}/introduced]]".format(r["_ptype"], r["_stype"]),
+        i
+      )
+    )
+  return results
 
 def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
   node_templates = {}
@@ -1670,7 +1936,7 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
       "situation": [],
       "options": {},
       "outcomes": {},
-      # TODO: state-change text
+      "consequences": {},
     }
 
   # Next find context variables which also gives us an idea of the story
@@ -1686,6 +1952,9 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
   for k in [key for key in node_templates if key not in cvrs]:
     print("WARNING: Node '{}' is polished, but has no context.".format(k))
 
+  # Find the node structure:
+  node_structure = find_node_structure(story, node_templates.keys())
+
   # Iterate over our nodes and options adding text templates:
   for node in node_templates:
     if "setup" in cvrs[node]:
@@ -1697,7 +1966,10 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
         node_templates[node]["situation"].append(
           "[[potential/{}/{}]]".format(p["_stype"], p["_sname"])
         )
-    options = [o for o in cvrs[node] if o != "setup" and o != "potentials"]
+    options = [
+      o for o in cvrs[node]
+        if o != "setup" and o != "potentials" and o != "consequences"
+    ]
     ocount = len(options)
     for option in options:
       nts = node_templates[node]
@@ -1717,6 +1989,11 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
         nts["options"][option] = "[[action/?_action/option]]"
 
       nts["outcomes"][option] = "[[S|action/?_action/outcome]]"
+      nts["consequences"][option] = []
+      for csq in ovrs["consequences"]:
+        nts["consequences"][option].append(
+          "[[consequence/?_change/?_type/?_name]]"
+        )
 
       # If this is a choice, add skill/tool info:
       if ocount > 1:
@@ -1790,7 +2067,6 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
 
   # Next, use the node structure to recursively render the story text in
   # ChoiceScript:
-  node_structure = find_node_structure(story, node_templates.keys())
   base_pnslots = {
     "I": [0, set()],
     "we": [0, set()],
@@ -1826,7 +2102,11 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
       intro_text = intro_text.replace('\n', '<br/>\n')
     elif fmt == "turk":
       intro_text = re.sub(PAR, '\n', intro_text)
-      framing, assets, set_off = intro_text.split('\n')
+      paragraphs = intro_text.split('\n \n')
+      print(paragraphs)
+      story_parts["framing"] = '\n\n'.join(paragraphs[:-2])
+      story_parts["assets"] = paragraphs[-2]
+      story_parts["set_off"] = paragraphs[-1]
   elif mode == "example":
     story_parts["framing"], base_introduced = build_intro_text(
       "[[prologue/setting/{}]]".format(mode),
@@ -1940,6 +2220,8 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
       story_parts["optlist"] = bits[2]
       if bits[3:]:
         story_parts["outlist"] = bits[3]
+      if bits[4:]:
+        story_parts["csqlist"] = bits[4]
     results.append(txt)
     # update our readiness information and propagate nodes to the open list as
     # they're fully ready:
@@ -1980,6 +2262,7 @@ Readiness is: {}\
     # a tab-delimited input row:
     opts = story_parts["optlist"].split("<snop>")
     outs = story_parts["outlist"].split("<snop>")
+    csqs = story_parts["csqlist"].split("<snop>")
     return """\
 "{framing}","{assets}","{set_off}","{setup}","{potentials}","{prompt}","{opt1}","{opt2}","{opt3}","{out1}","{out2}","{out3}"
 """.format(
@@ -1992,9 +2275,9 @@ Readiness is: {}\
   opt1=opts[0],
   opt2=opts[1],
   opt3=opts[2],
-  out1=outs[0],
-  out2=outs[1],
-  out3=outs[2],
+  out1=outs[0] + " " + csqs[0],
+  out2=outs[1] + " " + csqs[1],
+  out3=outs[2] + " " + csqs[2],
 )
   else:
     return ("\n\n").join(results)

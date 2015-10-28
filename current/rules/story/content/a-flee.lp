@@ -111,7 +111,7 @@ at(
   at(N, action(X, flee)),
   at(N, arg(X, fearful, Fearful)),
   at(N, arg(X, from, From)),
-  st(N, relation(threatening, From, Fearful)),
+  st(N, relation(accusing, From, Fearful)),
   story_op(N, build_options).
 
 % Fleeing puts things off-stage, unless they're a party member, in which case

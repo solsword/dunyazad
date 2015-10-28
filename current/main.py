@@ -275,6 +275,9 @@ if __name__ == "__main__":
     scfrags.append(sys.argv[idx+1])
     scfrags.append("example")
 
+  if '--example' in sys.argv:
+    mode = "example"
+
   if "--twee" in sys.argv:
     fmt = "twee"
 

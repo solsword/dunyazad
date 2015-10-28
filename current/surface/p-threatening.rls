@@ -2,3 +2,11 @@
 
 :potential/relation/threatening
 N#?_from/they V#threaten/prsc/?_from N#?_to/them
+
+:consequence/init/relation/threatening
+N#?_from/they V#be/prs/?_from now V#threaten/prp/?_from N#?_to/them
+N#?_from/they V#have/prs/?_from started to V#threaten/prs/?_plural N#?_to/them
+
+:consequence/term/relation/threatening
+N#?_from/they V#be/prs/?_from no longer V#threaten/prp/?_from N#?_to/them
+N#?_from/they V#be/prs/?_from not V#threaten/prp/?_from N#?_to/them any more

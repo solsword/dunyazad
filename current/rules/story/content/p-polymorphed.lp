@@ -9,14 +9,16 @@ pcategory(potential(problem, property, polymorphed, Any), persistent) :-
 
 problematic_for(problem, property, polymorphed, Any, inst) :- any_class(Any).
 
-% When you become polymorphed, you become a chicken:
+% When you become polymorphed, you become a chicken if you weren't one already:
 at(N, consequence_of(X, O, property(type, Target, chicken))) :-
   at(N, consequence_of(X, O, property(polymorphed, Target, Any))),
+  not st(N, property(type, Target, chicken)),
   story_op(N, build_options).
 
-% You also gain the "unintelligent" skill:
+% You also gain the "unintelligent" skill if you didn't already have it:
 at(N, consequence_of(X, O, property(has_skill, Target, unintelligent))) :-
   at(N, consequence_of(X, O, property(polymorphed, Target, Any))),
+  not st(N, property(has_skill, Target, unintelligent)),
   story_op(N, build_options).
 
 % You also drop all of your items:
@@ -33,6 +35,7 @@ at(N, consequence_of(X, O, _not, relation(has_item, Target, Item))) :-
 
 at(N, consequence_of(X, O, property(type, Target, Original))) :-
   at(N, consequence_of(X, O, _not, property(polymorphed, Target, Original))),
+  Original != chicken,
   story_op(N, build_options).
 
 at(N, consequence_of(X, O, _not, property(has_skill, Target, unintelligent))) :-

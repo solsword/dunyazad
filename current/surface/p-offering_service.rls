@@ -2,3 +2,9 @@
 
 :potential/property/offering_service
 N#?_inst/they V#offer/prsc/?_inst [[action/?_value/infinitive@subject=?_inst]]
+
+:consequence/init/property/offering_service
+N#?_inst/they V#be/prs/?_inst now V#offer/prsc/?_inst [[action/?_value/infinitive@subject=?_inst]]
+
+:consequence/term/property/offering_service
+N#?_inst/they V#be/prs/?_inst no longer V#offer/prsc/?_inst [[action/?_value/infinitive@subject=?_inst]]

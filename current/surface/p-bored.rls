@@ -2,3 +2,11 @@
 
 :potential/state/bored
 N#?_inst/they V#be/prs/?_inst bored
+
+:consequence/init/state/bored
+N#?_inst/they V#have/prs/?_inst become bored
+N#?_inst/they V#be/prs/?_inst bored now
+
+:consequence/term/state/bored
+N#?_inst/they V#be/prs/?_inst not bored any more
+N#?_inst/they V#be/prs/?_inst no longer bored

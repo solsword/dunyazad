@@ -96,13 +96,14 @@ at(
   consequence_of(
     X,
     o(success, shifted),
-    _not,
+    resolves,
     relation(accusing, Accuser, OldVictim)
   )
 ) :-
   at(N, action(X, shift_blame)),
   at(N, arg(X, accuser, Accuser)),
   at(N, arg(X, old_victim, OldVictim)),
+  at(N, potential(problem, relation(accusing, Accuser, OldVictim))),
   story_op(N, build_options).
 
 at(
@@ -110,7 +111,7 @@ at(
   consequence_of(
     X,
     o(success, suspected),
-    _not,
+    resolves,
     relation(accusing, Accuser, OldVictim)
   )
 ) :-
@@ -118,6 +119,7 @@ at(
   at(N, arg(X, shifter, Shifter)),
   at(N, arg(X, accuser, Accuser)),
   at(N, arg(X, old_victim, OldVictim)),
+  at(N, potential(problem, relation(accusing, Accuser, OldVictim))),
   Shifter != OldVictim,
   story_op(N, build_options).
 
