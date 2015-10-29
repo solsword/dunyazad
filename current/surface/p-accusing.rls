@@ -12,7 +12,7 @@ N#?_from/they V#accuse/prsc/?_from N#?_to/them of V#steal/prp/?_to N#?_Item/they
 
 :consequence/init/relation/accusing
 N#?_from/they V#be/prs/?_from now V#accuse/prp/?_from N#?_to/them
-N#?_from/they V#have/prs/?_from started to V#accuse/prs/?_plural N#?_to/them
+N#?_from/they V#have/prs/?_from started to V#accuse/prs/_plural N#?_to/them
 
 :consequence/term/relation/accusing
 N#?_from/they V#be/prs/?_from no longer V#accuse/prp/?_from N#?_to/them

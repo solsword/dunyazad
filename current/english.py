@@ -70,14 +70,14 @@ TSABR = {
 }
 
 NOUN_SCHEMAS = {
-  "class":
+  "type":
     Pr(
       "st",
       Vr("Node"),
       Pr("property",
         Pr("type"),
         Pr("inst", Vr("Type"), Vr("Key")),
-        Vr("Class")
+        Vr("Type")
       )
     ),
   "name":
@@ -466,8 +466,10 @@ def glean_nouns(story):
       )
     if n not in result:
       result[n] = nouns.Noun(n)
-    if sc == "class":
-      result[n].cls = binding["st.property.Class"].unquoted()
+    if sc == "type":
+      result[n].types[
+        binding["st.Node"].unquoted()
+      ] = binding["st.property.Type"].unquoted()
     elif sc == "name":
       result[n].name = binding["surface_property.Name"].unquoted()
     elif sc == "number":
@@ -978,17 +980,17 @@ def enhance_context_variables(cvrs, nouns):
   """
   for node in cvrs:
     if "setup" in cvrs[node]:
-      enhance_vars(cvrs[node]["setup"], nouns)
+      enhance_vars(cvrs[node]["setup"], nouns, node)
     if "potentials" in cvrs[node]:
       for p in cvrs[node]["potentials"]:
-        enhance_vars(p, nouns)
+        enhance_vars(p, nouns, node)
     for opt in [
       n for n in cvrs[node]
         if n != "setup" and n != "potentials" and n != "consequences"
     ]:
-      enhance_vars(cvrs[node][opt], nouns)
+      enhance_vars(cvrs[node][opt], nouns, node)
 
-def enhance_vars(vs, nouns):
+def enhance_vars(vs, nouns, node):
   """
   A helper for enhance_context_variables that enhances a flat dictionary of
   variables.
@@ -996,7 +998,7 @@ def enhance_vars(vs, nouns):
   for key in [k for k in vs.keys() if not k.startswith("_type_of_")]:
     if type(vs[key]) == str and vs[key] in nouns:
       n = nouns[vs[key]]
-      vs["_type_of_" + key] = n.cls
+      vs["_type_of_" + key] = n.type_at(node)
 
 def collate_rules(story):
   """
@@ -1128,7 +1130,10 @@ def subst_vars(text, vs):
         elif isinstance(vs[var], ans.Predicate):
           add = str(vs[var])
         else:
-          add = "ERROR: variable '{}' has weird type {}".format(var, type(var))
+          add = "ERROR: variable '{}' has weird type {}".format(
+            var,
+            type(vs[var])
+          )
       else:
         add = "ERROR: unknown variable '{}'".format(var)
     result += add
@@ -1197,13 +1202,13 @@ class Substitution:
     self.key = key
     self.vs = vs or {}
 
-  def expand(self, rules, vs, story):
+  def expand(self, rules, vs, story, nouns):
     """
     Given a set of substitution rules, returns the substitution result for this
     Substitution object.
     """
     if self.key.split('/')[0] == "special":
-      return self.special_expand(rules, vs)
+      return self.special_expand(rules, vs, nouns)
     matching_keys = []
     for k in rules:
       matches, underscore = keymatch(k, self.key)
@@ -1211,10 +1216,10 @@ class Substitution:
         matching_keys.append((k, underscore))
     all_possibilities = []
     for (ps, u) in [(rules[k], u) for (k, u) in matching_keys]:
-
-      for precond, expand in ps: # for each possible expansion
-        prvars = {'_': u}
+      # for each possible expansion
+      for precond, expand in ps:
         # for each possible binding over preconditions of this expansion:
+        prvars = {'_': u}
         for possibility in precondition_possibilities(
           story,
           precond,
@@ -1233,7 +1238,7 @@ class Substitution:
       result = "@CAP@" + sentence(result)
     return result, underscore
 
-  def special_expand(self, rules, vs):
+  def special_expand(self, rules, vs, nouns):
     """
     Performs a special expansion function.
     """
@@ -1260,6 +1265,37 @@ class Substitution:
         return (l[0] + " and " + l[1], "")
       else:
         return (l[0] + ", " + ", ".join(l[1:-1]) + ", and " + l[-1], "")
+    elif function == ["indefinite"]:
+      if "word" not in vs:
+        raise ValueError("indefinite function: could not find variable ?word.")
+      word = vs["word"]
+      if "ref" in vs:
+        ref = vs["ref"]
+      else:
+        ref = None
+      if ref and ref in nouns:
+        ref = nouns[ref]
+      else:
+        raise ValueError(
+          "indefinite function: reference noun '{}' does not exist.".format(ref)
+        )
+      # TODO: This doesn't work when the new type is different from the noun's
+      # original number... Fix or don't care?
+      if ref and ref.number == "plural":
+        return (word, "")
+      else:
+        if word[0] in vowels:
+          return ("an " + word, "")
+        else:
+          return ("a " + word, "")
+    elif function == ["possessive"]:
+      if "word" not in vs:
+        raise ValueError("possessive function: could not find variable ?word.")
+      word = vs["word"]
+      if word[-1] in "sz":
+        return (word + "'", "")
+      else:
+        return (word + "'s", "")
     else:
       raise KeyError(
         "Unknown special function '{}'.".format('/'.join(function))
@@ -1376,7 +1412,7 @@ def parse_substitutions(text):
       text = text[1:]
   return result
 
-def run_grammar(text, rules, vs, story):
+def run_grammar(text, rules, vs, story, nouns):
   """
   Runs the given grammar rules of the text, expanding it recursively as
   necessary, using the given variable mappings and story predicates.
@@ -1390,9 +1426,9 @@ def run_grammar(text, rules, vs, story):
     if isinstance(b, Substitution):
       newvars = dict(vs)
       newvars.update(b.vs)
-      expansion, exvars = b.expand(rules, newvars, story)
+      expansion, exvars = b.expand(rules, newvars, story, nouns)
       newvars.update(exvars)
-      result += run_grammar(expansion, rules, newvars, story)
+      result += run_grammar(expansion, rules, newvars, story, nouns)
     else:
       result += b
   return result
@@ -1433,7 +1469,7 @@ def build_text(
     introduced = set(introduced)
   # First, recursively perform variable and rule substitutions until we've
   # reached a base text:
-  template = run_grammar(template, rules, cvars, story)
+  template = run_grammar(template, rules, cvars, story, ndict)
   # Next, fill in any tags:
   result = template
   prev_result = ""
@@ -1599,8 +1635,6 @@ def build_node_text(
   verbs in the text generated.
   """
   outgoing = {}
-  print(node)
-  print(node["intro"])
   intro, _pnslots, _introduced = build_text(
     node["intro"],
     grammar_rules,
@@ -1684,6 +1718,7 @@ def build_node_text(
           options += "\nOnwards...\n"
         elif fmt == "turk":
           # we don't care about this
+          # TODO: CARE ABOUT THIS!
           pass
       else:
         # TODO: Epilogue here!
@@ -1694,6 +1729,7 @@ def build_node_text(
     if fmt == "choicescript":
       options = "*choice\n"
     for opt in node["options"]:
+      # Option text for this option
       opt_txt, pnout, intout = build_text(
         node["options"][opt],
         grammar_rules,
@@ -1705,6 +1741,7 @@ def build_node_text(
         timeshift,
         fmt
       )
+      # Outcome text for this option
       out_txt, pnout, intout = build_text(
         node["outcomes"][opt],
         grammar_rules,
@@ -1716,6 +1753,41 @@ def build_node_text(
         timeshift,
         fmt
       )
+      # Consequence text for this option
+      csq_txt = ""
+      results = []
+      # Reset pronouns before consequence text:
+      pnout = {
+        "I": [0, set()],
+        "we": [0, set()],
+        "you": [0, { "you" }],
+        "he/she": [0, set()],
+        "it": [0, set()],
+        "they": [0, set()],
+      }
+      for i in range(len(node["consequences"][opt])):
+        if "consequences" in context_variables[opt]:
+          csq_cvs = context_variables[opt]["consequences"][i]
+        else:
+          csq_cvs = {}
+        txt, pnout, intout = build_text(
+          node["consequences"][opt][i],
+          grammar_rules,
+          csq_cvs,
+          story,
+          nouns,
+          pnout,
+          intout,
+          timeshift,
+          fmt
+        )
+        results.append(txt)
+      if len(results) > 1:
+        csq_txt = ", ".join(results[:-1]) + ", and " + results[-1]
+      elif len(results) == 1:
+        csq_txt = results[0]
+      else:
+        csq_txt = ""
       successors = node_structure[node["name"]]["successors"]
       scc = None
       if opt in successors:
@@ -1723,61 +1795,30 @@ def build_node_text(
         outgoing[scc] = (pnout, intout)
       if fmt == "choicescript":
         options += "  #{}\n".format(sentence(opt_txt))
-        options += "    {}\n".format(sentence(out_txt))
+        options += "    {} {}\n".format(sentence(out_txt), sentence(csq_txt))
         if scc:
           options += "    *goto {}\n".format(scc)
         else:
           options += "    *finish\n"
       elif fmt == "twee":
-        if scc:
-          options += '[[{opt}|{scc}][$outcome="{out}"]]\n'.format(
-            opt=sentence(opt_txt),
-            out=sentence(out_txt),
-            scc=scc
-          )
-        else:
-          options += '[[{opt}|End][$outcome="{out}"]]\n'.format(
-            opt=sentence(opt_txt),
-            out=sentence(out_txt)
-          )
+        options += '[[{opt}|{scc}][$outcome="{out} {csq}"]]\n'.format(
+          opt=sentence(opt_txt),
+          out=sentence(out_txt),
+          csq=sentence(csq_txt),
+          scc=scc or "End"
+        )
       elif fmt == "example":
-        options += "\n  <li>{}<br>&rarr;&nbsp;{}</li>".format(
+        options += "\n  <li>{}<br>&rarr;&nbsp;{} {}</li>".format(
           sentence(opt_txt),
-          sentence(out_txt)
+          sentence(out_txt),
+          sentence(csq_txt),
         )
       elif fmt == "turk":
         options += "{}<snop>".format(sentence(opt_txt))
         outcomes += "{}<snop>".format(sentence(out_txt))
+        consequences += "{}<snop>".format(sentence(csq_txt))
   else:
     options = "ERROR: node {} had <= 0 options!"
-
-  # Consequences:
-  for opt in node["consequences"]:
-    csq_txt = ""
-    results = []
-    for i in range(len(node["consequences"][opt])):
-      txt, pnout, intout = build_text(
-        node["consequences"][opt][i],
-        grammar_rules,
-        context_variables[opt]["consequences"][i],
-        story,
-        nouns,
-        pnout,
-        intout,
-        timeshift,
-        fmt
-      )
-      results.append(txt)
-    if len(results) > 1:
-      csq_txt = ", ".join(results[:-1]) + ", and " + results[-1]
-    elif len(results) == 1:
-      csq_txt = results[0]
-    else:
-      csq_txt = ""
-    if csq_txt:
-      if fmt == "turk":
-        consequences += "{}<snop>".format(sentence(csq_txt))
-        # TODO: consequences in other formats?
 
   # Putting everything together:
   if fmt == "choicescript":
@@ -1989,11 +2030,14 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
         nts["options"][option] = "[[action/?_action/option]]"
 
       nts["outcomes"][option] = "[[S|action/?_action/outcome]]"
-      nts["consequences"][option] = []
-      for csq in ovrs["consequences"]:
-        nts["consequences"][option].append(
-          "[[consequence/?_change/?_type/?_name]]"
-        )
+      if "consequences" not in ovrs:
+        nts["consequences"][option] = ["[[misc/no_consequences]]"]
+      else:
+        nts["consequences"][option] = []
+        for csq in ovrs["consequences"]:
+          nts["consequences"][option].append(
+            "[[consequence/?_change/?_type/?_name]]"
+          )
 
       # If this is a choice, add skill/tool info:
       if ocount > 1:
@@ -2065,8 +2109,7 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
         else:
           nts["options"][option] += " (no relevant skills)"
 
-  # Next, use the node structure to recursively render the story text in
-  # ChoiceScript:
+  # Next, use the node structure to recursively render the story text:
   base_pnslots = {
     "I": [0, set()],
     "we": [0, set()],
@@ -2103,7 +2146,6 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
     elif fmt == "turk":
       intro_text = re.sub(PAR, '\n', intro_text)
       paragraphs = intro_text.split('\n \n')
-      print(paragraphs)
       story_parts["framing"] = '\n\n'.join(paragraphs[:-2])
       story_parts["assets"] = paragraphs[-2]
       story_parts["set_off"] = paragraphs[-1]
@@ -2364,6 +2406,7 @@ _test_cases = [
       { "a/b": [ ((), "sentence substitution test") ] },
       {},
       set(),
+      {},
     ),
     "template.. @CAP@Sentence substitution test."
   ),
@@ -2374,6 +2417,7 @@ _test_cases = [
       {},
       { "var": "val"},
       set(),
+      {},
     ),
     "variable.. val"
   ),
@@ -2389,6 +2433,7 @@ _test_cases = [
       },
       { "var": "initial"},
       set(),
+      {},
     ),
     "nested.. initial @CAP@Subst1 subst3 subst4 stop.subst2 initial"
   ),
@@ -2401,6 +2446,7 @@ _test_cases = [
       },
       { "monster": "leviathan_17"},
       set(),
+      {},
     ),
     "leviathan_17 test"
   ),
@@ -2414,6 +2460,7 @@ _test_cases = [
       },
       { "monster": "leviathan_17"},
       set(),
+      {},
     ),
     "majestically leviathan_17 test"
   ),
@@ -2427,6 +2474,7 @@ _test_cases = [
       },
       { "monster": "leviathan_17"},
       set(),
+      {},
     ),
     "majestically vv test"
   ),
@@ -2440,6 +2488,7 @@ _test_cases = [
       },
       { "monster": "leviathan_17"},
       set(),
+      {},
     ),
     "majestically tentacles curling leviathan_17 test"
   ),
@@ -2468,6 +2517,7 @@ _test_cases = [
         Pr("test", Pr("foo"), Pr("bar")),
         Pr("t2", Pr("gosh"))
       },
+      {},
     ),
     "test foo bar t2 t2(gosh) gosh"
   ),

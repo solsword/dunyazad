@@ -136,6 +136,19 @@ IRREGULAR = {
 
     ("past participle", "any", "any", "come"),
   ],
+  "become": [
+    ("present", "singular", "first", "become"),
+    ("present", "singular", "second", "become"),
+    ("present", "singular", "third", "becomes"),
+
+    ("present", "plural", "any", "become"),
+
+    ("past", "any", "any", "became"),
+
+    ("present participle", "any", "any", "becoming"),
+
+    ("past participle", "any", "any", "become"),
+  ],
   "bring": [
     ("present", "singular", "first", "bring"),
     ("present", "singular", "second", "bring"),

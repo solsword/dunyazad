@@ -1,18 +1,13 @@
 % Potential - polymorphed
 
 :potential/property/polymorphed
-N#?_inst/they V#be/prs/?_inst cursed and V#become/psp/?_inst a chicken 
+N#?_inst/they V#be/prs/?_inst cursed and V#become/prsp/?_inst a chicken 
 
 :consequence/init/property/polymorphed
-N#?_inst/they V#be/psp/?_inst V#curse/pst/?_plural and transformed
-N#?_inst/their body V#become/psp/?_they V#cursed/pst/?_plural
+N#?_inst/they V#be/prsp/?_inst V#curse/pst/_plural and transformed into a chicken
+N#?_inst/they V#become/prsp/?_inst a chicken
+N#?_inst/they V#be/prsp/_singular transformed into a chicken
 
 :consequence/term/property/polymorphed
-N#?_inst/they V#be/psp/?_inst V#restore/pst/?_plural to their original form
-N#?_inst/they V#be/prs/?_inst no longer cursed
-
-:consequence/inst/property/type
-N#?_inst/they V#become/psp/?_inst a ?_value
-
-:consequence/term/property/type
-N#?_inst/they V#be/prs/?_inst no longer a ?_value
+N#?_inst/they V#be/prsp/?_inst V#restore/pst/_plural to their original form
+N#?_inst/they V#be/prs/?_inst no longer transformed

@@ -60,7 +60,7 @@ class Noun:
   def __init__(
     self,
     tag,
-    cls="object",
+    types=None,
     name="nameless",
     person="third",
     number="singular",
@@ -70,7 +70,7 @@ class Noun:
     is_party_member=False,
   ):
     self.tag = tag
-    self.cls = cls
+    self.types = types or {}
     self.name = name
     self.person = person
     self.number = number
@@ -82,7 +82,7 @@ class Noun:
   def __str__(self):
     return "Noun[{}.{}/{}][{}/{}]".format(
       self.tag,
-      self.cls,
+      self.root_type(),
       self.name,
       definite(self),
       pronoun(self)
@@ -91,7 +91,7 @@ class Noun:
   def __repr__(self):
     return "Noun({}, {}, {}, {}, {}, {}, {}, {})".format(
       self.tag,
-      self.cls,
+      self.root_type(),
       self.name,
       self.person,
       self.number,
@@ -99,6 +99,15 @@ class Noun:
       self.determined,
       self.is_party_member,
     )
+
+  def type_at(self, node):
+    if node in self.types:
+      return self.types[node]
+    else:
+      return "<unknown>"
+
+  def root_type(self):
+    return self.type_at("root")
 
 def pnslot(thing):
   """
@@ -180,7 +189,7 @@ def definite(thing, case="subjective"):
 def indefinite(thing, case="subjective"):
   result = ""
   if not thing.determined:
-    result = "a {} named {}".format(thing.cls, thing.name)
+    result = "a {} named {}".format(thing.root_type(), thing.name)
   else:
     if thing.number == "singular":
       if thing.name[0] in vowels: # TODO: better than this T_T

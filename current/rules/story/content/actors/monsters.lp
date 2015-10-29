@@ -19,9 +19,9 @@ class_skill(monster, wilderness_lore, sometimes).
 %actor_def(ripper_pack, monster, "pack of rippers", singular, neuter).
 
 actor_def(ogre, monster, "ogre", singular, either).
-item_def(ogre_horn, treasure, "ogre horn", singular).
+item_def(sack_of_gold, treasure, "sack of gold", singular).
 %item_def(dragon_claws, natural_weapon, "claws", plural).
 %class_item(dragon, dragon_claws, 1, 1).
 class_item(ogre, artificial_weapon, 0, 1).
-class_item(ogre, ogre_horn, 0, 1).
-trophy(ogre, ogre_horn).
+class_item(ogre, sack_of_gold, 0, 1).
+trophy(ogre, sack_of_gold).

@@ -1,6 +1,6 @@
 """
 eng_base.py
-Care English functionality.
+Core English functionality.
 """
 
 from utils import *

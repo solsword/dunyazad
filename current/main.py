@@ -222,7 +222,7 @@ def main(
     outfile = "dunyazad.input"
     output = """\
 "seed","framing","assets","set_off","setup","potentials","prompt","opt1","opt2","opt3","out1","out2","out3"
-"{}","{}"\
+"{}",{}\
 """.format(str(seed), output)
   with open(os.path.join("out", outfile), 'w') as fout:
     fout.write(output)
@@ -277,6 +277,7 @@ if __name__ == "__main__":
 
   if '--example' in sys.argv:
     mode = "example"
+    scfrags.append("example")
 
   if "--twee" in sys.argv:
     fmt = "twee"
