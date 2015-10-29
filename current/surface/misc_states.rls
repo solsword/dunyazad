@@ -13,9 +13,9 @@ N#?_inst/they V#be/prs/?_inst no longer [[misc/skilled/?_value]]
 N#?_inst/they V#be/prs/?_inst not [[misc/skilled/?_value]] anymore
 
 :consequence/init/relation/has_item
-N#?_from/they V#have/prs/?_from N#?_to/them now
-N#?_from/they now V#have/prs/?_from N#?_to/them
-N#?_from/they V#have/prs/?_from acquired N#?_to/them
+N#?_from/they V#have/prs/?_from N#?_to/indefinite now
+N#?_from/they now V#have/prs/?_from N#?_to/indefinite
+N#?_from/they V#have/prs/?_from acquired N#?_to/indefinite
 
 :consequence/term/relation/has_item
 N#?_from/they V#don't/prs/?_from have N#?_to/them any more
@@ -24,8 +24,8 @@ N#?_from/they V#have/prs/?_from lost N#?_to/them
 
 :consequence/init/state/killed
 N#?_inst/they V#be/prs/?_inst now dead
-N#?_inst/they V#be/prsc/?_inst killed
+N#?_inst/they V#be/prsp/?_inst killed
 
 :consequence/term/state/killed
 N#?_inst/they V#be/prs/?_inst no longer dead
-N#?_inst/they V#be/prsc/?_inst raised from the dead
+N#?_inst/they V#be/prsp/?_inst raised from the dead

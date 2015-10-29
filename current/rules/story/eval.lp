@@ -992,33 +992,33 @@ error(m("Individual outcome has no predictability:", N, X, o(OutVar, OutVal))):-
 at(N, overall_predictability(X, predictable)) :-
   story_op(N, build_options),
   at(N, outcome(X, SomeOutcome)),
-  Count = { at(N, outcome(X, Outcome)) : at(N, important_outcome(X, Outcome)) },
-  Count = {
-    at(N, outcome(X, Outcome)) :
-      at(N, outcome_predictability(X, Outcome, predictable)),
-      at(N, important_outcome(X, Outcome))
+  0 = #sum { % All important outcomes for this option are predictable
+    1, at(N, outcome(X, Outcome)) :
+      at(N, important_outcome(X, Outcome));
+    -1, at(N, outcome(X, Outcome)) :
+      at(N, important_outcome(X, Outcome)),
+      at(N, outcome_predictability(X, Outcome, predictable))
   },
-  Count <= max_options * max_outcome_variables,
-  Count > 0.
+  1 <= { at(N, important_outcome(X, Outcome)) }. % and there's at least one
 
 at(N, overall_predictability(X, expected)) :-
   story_op(N, build_options),
   at(N, outcome(X, SomeOutcome)),
   not at(N, overall_predictability(X, predictable)),
-  Count = { at(N, outcome(X, Outcome)) : at(N, important_outcome(X, Outcome)) },
-  Count = {
-    at(N, outcome(X, Outcome)) :
-      at(N, outcome_predictability(X, Outcome, predictable)),
+  0 = #sum { % Outcomes for this option are predictable, expected, or average
+    1, at(N, outcome(X, Outcome)) :
       at(N, important_outcome(X, Outcome));
-    at(N, outcome(X, Outcome)) :
-      at(N, outcome_predictability(X, Outcome, expected)),
-      at(N, important_outcome(X, Outcome));
-    at(N, outcome(X, Outcome)) :
-      at(N, outcome_predictability(X, Outcome, average)),
-      at(N, important_outcome(X, Outcome))
+    -1, at(N, outcome(X, Outcome)) :
+      at(N, important_outcome(X, Outcome)),
+      at(N, outcome_predictability(X, Outcome, predictable));
+    -1, at(N, outcome(X, Outcome)) :
+      at(N, important_outcome(X, Outcome)),
+      at(N, outcome_predictability(X, Outcome, expected));
+    -1, at(N, outcome(X, Outcome)) :
+      at(N, important_outcome(X, Outcome)),
+      at(N, outcome_predictability(X, Outcome, average))
   },
-  Count <= max_options * max_outcome_variables,
-  1 <= {
+  1 <= { % And they're not *all* average
     at(N, outcome(X, Outcome)) :
       at(N, outcome_predictability(X, Outcome, predictable)),
       at(N, important_outcome(X, Outcome));
@@ -1030,13 +1030,14 @@ at(N, overall_predictability(X, expected)) :-
 at(N, overall_predictability(X, average)) :-
   story_op(N, build_options),
   at(N, outcome(X, SomeOutcome)),
-  Count = { at(N, outcome(X, Outcome)) : at(N, important_outcome(X, Outcome)) },
-  Count = {
-    at(N, outcome(X, Outcome)) :
-      at(N, outcome_predictability(X, Outcome, average)),
-      at(N, important_outcome(X, Outcome))
+  0 = #sum { % All important outcomes for this option are average
+    1, at(N, outcome(X, Outcome)) :
+      at(N, important_outcome(X, Outcome));
+    -1, at(N, outcome(X, Outcome)) :
+      at(N, important_outcome(X, Outcome)),
+      at(N, outcome_predictability(X, Outcome, average))
   },
-  Count <= max_options * max_outcome_variables.
+  1 <= { at(N, important_outcome(X, Outcome)) }. % and there's at least one
 
 at(N, overall_predictability(X, unpredictable)) :-
   story_op(N, build_options),
@@ -1071,8 +1072,15 @@ at(N, overall_predictability(option(X), irrelevant)) :-
   at(N, option(X)),
   0 = {
     at(N, outcome_perception(option(X), SomePerception, SomeGoal)):
-     at(N, outcome_perception(option(X), SomePerception, SomeGoal))
+     at(N, outcome_perception(option(X), SomePerception, SomeGoal)),
+     at(N, player_goal(SomeGoal))
   }.
+
+1 >= {
+  at(N, overall_predictability(option(X), unrecognized))
+} :-
+  story_op(N, build_options),
+  at(N, option(X)).
 
 error(m("Outcome has multiple overall predictabilities:", N, X, P1, P2)) :-
   at(N, overall_predictability(X, P1)),

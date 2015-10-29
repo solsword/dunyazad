@@ -32,6 +32,7 @@ def write_crashfile(e):
 
 def main(
   mode = "full",
+  intro_mode = "full",
   storyfile = None,
   scaffoldfiles = None,
   scaffoldfrags = None,
@@ -213,7 +214,13 @@ def main(
 
   print("Building story text...")
   outfile = "story.txt"
-  output = english.build_story_text(sofar, mode, timeshift=None, fmt=fmt)
+  output = english.build_story_text(
+    sofar,
+    mode,
+    intro_mode,
+    timeshift=None,
+    fmt=fmt
+  )
   if fmt == "twee":
     outfile = "story.tw"
   elif fmt == "example":
@@ -241,6 +248,7 @@ if __name__ == "__main__":
   scfiles = []
   scfrags = []
   mode = "full"
+  intro_mode = "full"
   nodelimit = 12
   fmt = "twee"
   do_viz = True
@@ -271,13 +279,18 @@ if __name__ == "__main__":
   if '-x' in sys.argv:
     idx = sys.argv.index('-x')
     mode = "example"
+    intro_mode = "brief"
     fmt = "example"
     scfrags.append(sys.argv[idx+1])
     scfrags.append("example")
 
   if '--example' in sys.argv:
     mode = "example"
+    intro_mode = "brief"
     scfrags.append("example")
+
+  if '--brief-intro' in sys.argv:
+    intro_mode = "brief"
 
   if "--twee" in sys.argv:
     fmt = "twee"
@@ -307,6 +320,7 @@ if __name__ == "__main__":
   viz.VIZ_EXE = VIZ_EXE
   success = main(
     mode,
+    intro_mode,
     storyfile,
     scfiles,
     scfrags,

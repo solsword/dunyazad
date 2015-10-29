@@ -8,12 +8,12 @@ You are not entirely without resources. [[prologue/assets]]
 [[prologue/get_started/full]]
 <
 
->prologue/example
-[[prologue/setting/example]]
+>prologue/brief
+[[prologue/setting/brief]]
 @PAR@
 [[prologue/assets]]
 @PAR@
-[[prologue/get_started/example]]
+[[prologue/get_started/brief]]
 <
 
 :prologue/assets
@@ -43,7 +43,7 @@ send said something different about tradition. No grand procession, no royal
 guard, not even a small caravan: just [[prologue/the_party]].
 <
 
->prologue/setting/example
+>prologue/setting/brief
 @CAP@N#you/they V#be/prs/you about to set out on an epic journey. @CAP@[[prologue/companions/?n_party_members]]N#you/they V#be/prs/_plural V#head/prsc/_plural towards towards the distant country of ?destination, hoping to earn fame and fortune.
 <
 
@@ -222,7 +222,7 @@ N#you/their head to clear it of thoughts of glory and doom. No matter what
 [[prologue/setting/journey]] will be rewarding.
 <
 
->prologue/get_started/example
+>prologue/get_started/brief
 Eager to be on N#you/their way, [[prologue/you_and/?n_party_members]] set off on the road towards ?destination.
 <
 

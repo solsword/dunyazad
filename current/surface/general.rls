@@ -12,10 +12,19 @@ N#?_/their
 :nref/theirs/?
 N#?_/theirs
 
-:misc/no_consequences
+:consequence/no_consequences
 %nothing has changed
 %nothing changes
 the situation remains the same
+
+:consequence/new_location
+N#you/they V#travel/prsp/you to a new location
+N#you/they V#travel/prsp/you to a new place
+
+:consequence/at_destination
+N#you/they V#reach/prsp/you N#you/their destination
+N#you/they V#come/prsp/you to N#you/their destination
+N#you/they V#arrive/prsp/you
 
 :misc/you_ask_for
 N#you/they V#ask/prs/you D#timeshift/infinitive@@?statement@@D#timeshift/pop@@

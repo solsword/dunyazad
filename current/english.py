@@ -1521,31 +1521,44 @@ def build_text(
             if pro[0] == '_':
               nopro = True
               pro = pro[1:]
-            case, position = nouns.casepos(pro)
+
+            # Find the appropriate pronoun slot:
             slot = pnslots[nouns.pnslot(ndict[noun])]
-            if (
-              not nopro
-            and
-              slot[0] <= MAX_PRONOUN_AGE
-            and
-              noun in slot[1]
-            and
-              len(slot[1]) == 1
-            ):
-              slot[0] = 0
-              add = nouns.pronoun(ndict[noun], case, position)
-              # TODO: Gender introduction awareness!
+
+            # Figure out whether we're using definite, indefinite, or a pronoun:
+            if pro == "indefinite":
+              introduced.add(noun)
+              add = nouns.indefinite(ndict[noun], "subjective")
+            elif pro == "definite":
+              introduced.add(noun)
+              add = nouns.definite(ndict[noun], "subjective")
             else:
-              if slot[0] > 0:
+              case, position = nouns.casepos(pro)
+              if (
+                not nopro
+              and
+                slot[0] <= MAX_PRONOUN_AGE
+              and
+                noun in slot[1]
+              and
+                len(slot[1]) == 1
+              ):
                 slot[0] = 0
-                slot[1] = { noun }
+                add = nouns.pronoun(ndict[noun], case, position)
+                # TODO: Gender introduction awareness!
               else:
-                slot[1].add(noun)
-              if noun in introduced:
-                add = nouns.definite(ndict[noun], case)
-              else:
-                introduced.add(noun)
-                add = nouns.indefinite(ndict[noun], case)
+                if noun in introduced:
+                  add = nouns.definite(ndict[noun], case)
+                else:
+                  introduced.add(noun)
+                  add = nouns.indefinite(ndict[noun], case)
+            # Update the slot:
+            if slot[0] > 0 and noun not in slot[1]:
+              slot[0] = 0
+              slot[1] = { noun }
+            else:
+              # Note: if we used a pronoun, this is a no-op...
+              slot[1].add(noun)
 
             # we saw a noun: increment all third-person pnslots age counters
             # except for the counter for the noun we saw:
@@ -1765,15 +1778,11 @@ def build_node_text(
         "it": [0, set()],
         "they": [0, set()],
       }
-      for i in range(len(node["consequences"][opt])):
-        if "consequences" in context_variables[opt]:
-          csq_cvs = context_variables[opt]["consequences"][i]
-        else:
-          csq_cvs = {}
-        txt, pnout, intout = build_text(
-          node["consequences"][opt][i],
+      if context_variables[opt]["_action"] == "travel_onwards":
+        csq_txt, pnout, intout = build_text(
+          "[[consequence/new_location]]",
           grammar_rules,
-          csq_cvs,
+          context_variables[opt],
           story,
           nouns,
           pnout,
@@ -1781,13 +1790,42 @@ def build_node_text(
           timeshift,
           fmt
         )
-        results.append(txt)
-      if len(results) > 1:
-        csq_txt = ", ".join(results[:-1]) + ", and " + results[-1]
-      elif len(results) == 1:
-        csq_txt = results[0]
+      elif context_variables[opt]["_action"] == "reach_destination":
+        csq_txt, pnout, intout = build_text(
+          "[[consequence/at_destination]]",
+          grammar_rules,
+          context_variables[opt],
+          story,
+          nouns,
+          pnout,
+          intout,
+          timeshift,
+          fmt
+        )
       else:
-        csq_txt = ""
+        for i in range(len(node["consequences"][opt])):
+          if "consequences" in context_variables[opt]:
+            csq_cvs = context_variables[opt]["consequences"][i]
+          else:
+            csq_cvs = {}
+          txt, pnout, intout = build_text(
+            node["consequences"][opt][i],
+            grammar_rules,
+            csq_cvs,
+            story,
+            nouns,
+            pnout,
+            intout,
+            timeshift,
+            fmt
+          )
+          results.append(txt)
+        if len(results) > 1:
+          csq_txt = ", ".join(results[:-1]) + ", and " + results[-1]
+        elif len(results) == 1:
+          csq_txt = results[0]
+        else:
+          csq_txt = ""
       successors = node_structure[node["name"]]["successors"]
       scc = None
       if opt in successors:
@@ -1950,7 +1988,13 @@ def state_changes(old_potentials, new_potentials):
     )
   return results
 
-def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
+def build_story_text(
+  story,
+  mode="full",
+  intro_mode="full",
+  timeshift=None,
+  fmt="twee"
+):
   node_templates = {}
   gr_rules = collate_rules(story)
   story_parts = {
@@ -2031,7 +2075,7 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
 
       nts["outcomes"][option] = "[[S|action/?_action/outcome]]"
       if "consequences" not in ovrs:
-        nts["consequences"][option] = ["[[misc/no_consequences]]"]
+        nts["consequences"][option] = ["[[consequence/no_consequences]]"]
       else:
         nts["consequences"][option] = []
         for csq in ovrs["consequences"]:
@@ -2123,7 +2167,7 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
   # Generate the intro text
   if mode == "full":
     intro_text, base_introduced = build_intro_text(
-      "[[prologue/{}]]".format(mode),
+      "[[prologue/{}]]".format(intro_mode),
       gr_rules,
       introvars,
       story,
@@ -2151,7 +2195,7 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
       story_parts["set_off"] = paragraphs[-1]
   elif mode == "example":
     story_parts["framing"], base_introduced = build_intro_text(
-      "[[prologue/setting/{}]]".format(mode),
+      "[[prologue/setting/{}]]".format(intro_mode),
       gr_rules,
       introvars,
       story,
@@ -2173,7 +2217,7 @@ def build_story_text(story, mode="full", timeshift=None, fmt="twee"):
       fmt
     )
     story_parts["set_off"], base_introduced = build_intro_text(
-      "[[prologue/get_started/{}]]".format(mode),
+      "[[prologue/get_started/{}]]".format(intro_mode),
       gr_rules,
       introvars,
       story,
