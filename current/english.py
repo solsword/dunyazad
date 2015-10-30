@@ -570,7 +570,7 @@ def glean_context_variables(story):
 
     '_node' - the id of the current node
     '_option' - the number of the current option
-    '_setting' - the current setting
+    TODO: Make _setting available?
     '_action' - the name of the action
     '_outcome_*' - the values of each outcome variable for the action
     '_initiator' -  the initiator of the action
@@ -582,6 +582,8 @@ def glean_context_variables(story):
   Setups also get their own entries under node/'setup' for nodes that have a
   setup. These include:
 
+    '_node' - the id of the current node
+    TODO: Make _setting available?
     '_setup' - the name of the setup
     - all setup arguments by name
 
@@ -954,6 +956,7 @@ def glean_context_variables(story):
         result[n]["setup"] = {}
 
       s = binding["setup.Setup"].unquoted()
+      result[n]["setup"]["_node"] = n
       result[n]["setup"]["_setup"] = s
 
     elif sc == "setup_arg":
