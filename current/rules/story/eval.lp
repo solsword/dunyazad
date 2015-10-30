@@ -963,6 +963,17 @@ at(N, important_outcome(X, Outcome)) :-
   at(N, player_goal(Goal)),
   at(N, possible_outcome_perception(X, Outcome, Any, Goal)).
 
+% Non-effecacious outcomes that are the alternatives to outcomes that would be
+% important count as important.
+% TODO: Account for exclusion rules here as well to imply importance across
+% multiple outcome variables?
+at(N, important_outcome(X, o(SameVar, Happened))) :-
+  at(N, outcome(X, o(SameVar, Happened))),
+  at(N, outcome_stakes(X, Stakes)),
+  at(N, goal_stakes(Goal, Stakes)),
+  at(N, player_goal(Goal)),
+  at(N, possible_outcome_perception(X, o(SameVar, CouldHave), Any, Goal)).
+
 % Outcomes which are neither likely nor unlikely are labeled as "neutral:"
 
 at(N, neutral_outcome(X, o(OutVar, OutVal))) :-
@@ -1210,7 +1221,8 @@ at(N, outcome_feel(option(X), unfair)) :-
     at(N, overall_predictability(option(X), unfair))
   },
   1 = {
-    at(N, outcome_overall(option(X), not_worth_it));
+  % TODO: Re-enable this when we've got a better lock on what is "worth it"
+  %    at(N, outcome_overall(option(X), not_worth_it));
     at(N, outcome_overall(option(X), bad));
     at(N, outcome_overall(option(X), awful))
   }.
@@ -1265,7 +1277,8 @@ at(N, outcome_feel(option(X), expected_failure)) :-
     at(N, overall_predictability(option(X), average))
   },
   1 <= {
-    at(N, outcome_overall(option(X), not_worth_it));
+  % TODO: Re-enable this when we've got a better lock on what's "worth it"
+  %  at(N, outcome_overall(option(X), not_worth_it));
     at(N, outcome_overall(option(X), bad));
     at(N, outcome_overall(option(X), awful))
   }.
@@ -1285,6 +1298,7 @@ at(N, outcome_feel(option(X), miracle)) :-
   1 = {
     at(N, outcome_overall(option(X), great));
     at(N, outcome_overall(option(X), good));
+  % TODO: but we're leaving this in for now...
     at(N, outcome_overall(option(X), worth_it))
   }.
 

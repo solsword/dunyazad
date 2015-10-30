@@ -10,15 +10,16 @@ error(m("Party not simplified.")) :-
     setup_priority(Setup, P)
 }.
 
+% TODO: Is this more harmful than helpful?
 % We want diverse action selection given a diverse setup. Note: This also winds
 % up optimizing for choices with as few options as possible. Other constraints
 % should be added if more than 2 options are desired.
-#minimize {
-  P@10, at(root, action(option(O), Action)) :
-    at(root, action(option(O), Action)),
-    action_priority(Action, Base),
-    P = Base + 100
-}.
+%#minimize {
+%  P@10, at(root, action(option(O), Action)) :
+%    at(root, action(option(O), Action)),
+%    action_priority(Action, Base),
+%    P = Base + 100
+%}.
 
 
 at(N, text_mode(example)) :- story_node(N).

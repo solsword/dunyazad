@@ -1,0 +1,72 @@
+% vim: syn=gringo
+% setup:
+% ------
+
+max_unique(0).
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+%#minimize { 1@1, bad(Message) : bad(Message) }.
+
+%:- bad(nopt).
+%:- bad(setup).
+
+:- bad(M).
+
+bad(X) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  not at(root, outcome_feel(option(X), unfair)).
+
+bad(nopt) :-
+  node_status_reached(root, built),
+  not optcount(root, 3).
+
+bad(setup) :-
+  node_status_reached(root, built),
+  not setup(root, threatened_innocents).
+
+bad(a(1)) :-
+  node_status_reached(root, built),
+  not at(root, action(option(1), attack)).
+
+bad(a(2)) :-
+  node_status_reached(root, built),
+  not at(root, action(option(2), talk_down)).
+
+bad(a(3)) :-
+  node_status_reached(root, built),
+  not at(root, action(option(3), polymorph)).
+
+bad(e(X)) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  0 = {
+    at(root, option_feel(option(X), sure_thing));
+    at(root, option_feel(option(X), safe));
+    at(root, option_feel(option(X), hopeful))
+  }.
+
+bad(p(X)) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  0 = {
+    at(N, overall_predictability(option(X), unexpected));
+    at(N, overall_predictability(option(X), unfair))
+  }.
+
+bad(r(X)) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  0 = {
+    at(N, outcome_overall(option(X), bad));
+    at(N, outcome_overall(option(X), awful))
+  }.
