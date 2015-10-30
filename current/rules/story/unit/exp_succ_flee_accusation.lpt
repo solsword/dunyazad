@@ -1,0 +1,56 @@
+% vim: syn=gringo
+
+max_unique(0).
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+#minimize { 1@20, bad(Message) : bad(Message) }.
+:- bad(a1).
+:- bad(accuse).
+
+%:- bad(M).
+
+
+% Outcome feel for all options should be "expected success:"
+
+bad(feel(X)) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  not at(root, outcome_feel(option(X), expected_success)).
+
+%bad(f1) :-
+%  node_status_reached(root, built),
+%  not at(root, option_feel(option(1), hopeful)).
+
+%bad(p1) :-
+%  node_status_reached(root, built),
+%  at(root, overall_predictability(option(1), unfair)).
+%not at(root, overall_predictability(option(1), predictable)).
+
+bad(nopt) :-
+  node_status_reached(root, built),
+  3 != {
+    at(root, option(X))
+  }.
+
+bad(stakes) :-
+  node_status_reached(root, built),
+  not at(root, perceived_stakes(high)).
+
+bad(accuse) :-
+  node_status_reached(root, built),
+  0 = {
+    at(root, potential(problem, relation(accusing, Someone, SomeoneElse)))
+  }.
+
+bad(a1) :-
+  node_status_reached(root, built),
+  not at(root, action(option(1), flee)).

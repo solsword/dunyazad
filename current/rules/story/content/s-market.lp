@@ -76,8 +76,12 @@ s_o_st(market, state(c(knows_gossip), v(merchant_one))).
 s_o_st(market, state(c(knows_gossip), v(merchant_two))).
 s_o_st(market, state(c(knows_gossip), v(peasant))).
 s_o_st(market, state(c(knows_gossip), v(lowlife))).
+s_o_st(market, relation(c(accusing), v(noble), c(inst(actor, you)))).
 s_o_st(market, relation(c(accusing), v(noble), v(peasant))).
 s_o_st(market, relation(c(accusing), v(noble), v(merchant_one))).
 s_o_st(market, relation(c(accusing), v(noble), v(merchant_two))).
 s_o_st(market, relation(c(threatening), v(lowlife), v(merchant_one))).
 s_o_st(market, relation(c(threatening), v(lowlife), v(merchant_two))).
+% TODO: find some way to run the text binding for four cases and then enable
+% this.
+%s_o_st(market, relation(c(threatening), v(lowlife), c(inst(actor, you)))).

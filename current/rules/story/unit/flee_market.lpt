@@ -1,0 +1,36 @@
+% vim: syn=gringo
+
+max_unique(0).
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+#minimize { 1@20, bad(Message) : bad(Message) }.
+
+%:- bad(M).
+
+
+bad(setup) :-
+  node_status_reached(root, built),
+  not setup(root, market).
+
+bad(stakes) :-
+  node_status_reached(root, built),
+  not at(root, perceived_stakes(high)).
+
+bad(accuse) :-
+  node_status_reached(root, built),
+  0 = {
+    at(root, potential(problem, relation(accusing, Someone, inst(actor, you))))
+  }.
+
+bad(a1) :-
+  node_status_reached(root, built),
+  not at(root, action(option(1), flee)).

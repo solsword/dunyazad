@@ -281,7 +281,10 @@ if __name__ == "__main__":
     mode = "example"
     intro_mode = "brief"
     fmt = "example"
-    scfrags.append(sys.argv[idx+1])
+    fragment = sys.argv[idx+1]
+    if fragment.startswith("fragments/") and fragment.endswith(".lp"):
+      fragment = fragment[10:-3]
+    scfrags.append(fragment)
     scfrags.append("example")
 
   if '--example' in sys.argv:

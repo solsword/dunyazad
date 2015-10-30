@@ -4,6 +4,9 @@
 @CAP@N#you/they V#come/prs/you to a [[setup/market/busy]] market and V#decide/prs/you to V#browse/prs/you for a bit.
 % TODO: Better here!!
 
+{st(Now,relation(accusing,inst(actor,Accuser),inst(actor,you)))}
+@CAP@N#you/they V#come/prs/you to a [[setup/market/busy]] market and V#browse/prs/you for a bit when N#you/they V#bump/prs/you into N#?_Accuser/them. Suddenly N#?_Accuser/they V#whirl/prs/?_Accuser around and V#begin/prs/?_Accuser berating N#you/them.
+
 :setup/market/busy
 busy
 bustling

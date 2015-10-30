@@ -717,6 +717,90 @@ at(N, outcome_perception(option(X), fails, Goal)) :-
   at(N, consequence(option(X), _not, State)),
   state_fails(Goal, State).
 
+% Possible outcome perceptions (used to determine which outcomes are important):
+
+% hinders and advances
+
+at(N, possible_outcome_perception(X, O, hinders, Goal)) :-
+  at(N, consequence_of(X, O, State)),
+  state_hinders(Goal, State).
+
+at(N, possible_outcome_perception(X, O, advances, Goal)) :-
+  at(N, consequence_of(X, O, State)),
+  state_advances(Goal, State).
+
+at(N, possible_outcome_perception(X, O, hinders, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
+  at(N, consequence_of(X, O, _not, State)),
+  state_advances(Goal, State).
+
+at(N, possible_outcome_perception(X, O, advances, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
+  at(N, consequence_of(X, O, _not, State)),
+  state_hinders(Goal, State).
+
+at(N, possible_outcome_perception(X, O, hinders, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
+  at(N, consequence_of(X, O, _not, State)),
+  state_achieves(Goal, State).
+
+at(N, possible_outcome_perception(X, O, advances, Goal)) :-
+  at(N, action(X, Action)),
+  Action != travel_onwards, Action != reach_destination,
+  at(N, consequence_of(X, O, _not, State)),
+  state_fails(Goal, State).
+
+% fails and achieves
+
+at(N, possible_outcome_perception(X, O, fails, Goal)) :-
+  at(N, consequence_of(X, O, State)),
+  state_fails(Goal, State).
+
+at(N, possible_outcome_perception(X, O, achieves, Goal)) :-
+  at(N, consequence_of(X, O, State)),
+  state_achieves(Goal, State).
+
+% possible outcome perceptions for travel_onwards and reach_destination:
+
+at(N, possible_outcome_perception(option(X), Outcome, fails, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence_of(option(X), Outcome, _not, State)),
+  state_achieves(Goal, State).
+
+at(N, possible_outcome_perception(option(X), Outcome, hinders, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence_of(option(X), Outcome, _not, State)),
+  state_advances(Goal, State).
+
+at(N, possible_outcome_perception(option(X), Outcome, fails, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence_of(option(X), Outcome, _not, State)),
+  state_hinders(Goal, State).
+
+at(N, possible_outcome_perception(option(X), Outcome, fails, Goal)) :-
+  at(N, option(X)),
+  1 = {
+    at(N, action(option(X), travel_onwards));
+    at(N, action(option(X), reach_destination))
+  },
+  at(N, consequence_of(option(X), Outcome, _not, State)),
+  state_fails(Goal, State).
+
 % Mixed outcome perceptions:
 
 % When we achieve a goal with no drawbacks:
@@ -877,7 +961,7 @@ at(N, important_outcome(X, Outcome)) :-
   at(N, outcome_stakes(X, Stakes)),
   at(N, goal_stakes(Goal, Stakes)),
   at(N, player_goal(Goal)),
-  at(N, outcome_perception(X, Any, Goal)).
+  at(N, possible_outcome_perception(X, Outcome, Any, Goal)).
 
 % Outcomes which are neither likely nor unlikely are labeled as "neutral:"
 

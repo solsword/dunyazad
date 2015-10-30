@@ -85,6 +85,7 @@ SC = {
 }
 
 KEEP = {
+  "seed": PVr("seed", "seed", Vr("Seed")),
   "at": PVr("at", "at", Vr("Node"), SbT("Fluent")),
   "st": PVr("st", "st", Vr("Node"), SbT("Fluent")),
   "surface_property":
@@ -135,12 +136,16 @@ KEEP = {
 
   "setup_priority":
     PVr("setup_priority", "setup_priority", Vr("Setup"), Vr("N")),
+
+  "action_priority":
+    PVr("action_priority", "action_priority", Vr("Action"), Vr("N")),
 }
 
 def runfr(story, name, extra = "", seed=0, rand=0.0):
   program = SEP.join(
     [
       BASE_SRC,
+      "seed({}).".format(seed),
       '\n'.join(str(pr) + '.' for pr in story),
       fr(name),
       extra
