@@ -1,8 +1,5 @@
 <!-- Bootstrap v3.0.3 -->
-<link href="https://s3.amazonaws.com/mturk-public/bs30/css/bootstrap.min.css" rel="stylesheet" />
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-<script src="//uniqueturker.myleott.com/lib.js" type="text/javascript"></script>
-<script type="text/javascript">
+<link href="https://s3.amazonaws.com/mturk-public/bs30/css/bootstrap.min.css" rel="stylesheet" /><script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script><script src="//uniqueturker.myleott.com/lib.js" type="text/javascript"></script><script type="text/javascript">
 (function(){
     var ut_id = "dunyazad-outcomes-survey";
     if (UTWorkerLimitReached(ut_id)) {
@@ -25,6 +22,7 @@ $(document).ready(function() {
     $("#opt1").addClass("chosen");
     $("#opt2").addClass("not-chosen");
     $("#opt3").addClass("not-chosen");
+    $("#dbi").val("1");
   });
   $("#opt2").on("click", function(event) {
     $("#out2").show();
@@ -40,6 +38,7 @@ $(document).ready(function() {
     $("#opt1").addClass("not-chosen");
     $("#opt2").addClass("chosen");
     $("#opt3").addClass("not-chosen");
+    $("#dbi").val("2");
   });
   $("#opt3").on("click", function(event) {
     $("#out3").show();
@@ -55,6 +54,7 @@ $(document).ready(function() {
     $("#opt1").addClass("not-chosen");
     $("#opt2").addClass("not-chosen");
     $("#opt3").addClass("chosen");
+    $("#dbi").val("3");
   });
 
   $(".question-input input").on("click", function(event) {
@@ -62,8 +62,7 @@ $(document).ready(function() {
   });
 });
 </script>
-<style type="text/css">
-textarea {
+<style type="text/css">textarea {
   width: 80%;
 }
 
@@ -97,6 +96,8 @@ fieldset {
 
 .outcome {
   display: none;
+  font-size: 120%;
+  font-weight: bold;
 }
 
 .option {
@@ -124,362 +125,298 @@ fieldset {
 .touched {
   background-color: #eeffee;
 }
-
 </style>
-<section class="container" id="Survey" style="margin-bottom:15px; padding: 10px 10px; font-family: Verdana, Geneva, sans-serif; color:#333333; font-size:0.9em;">
-<!-- Instructions Box -->
+<section class="container" id="Survey" style="margin-bottom:15px; padding: 10px 10px; font-family: Verdana, Geneva, sans-serif; color:#333333; font-size:0.9em;"><!-- Instructions Box -->
 <div class="panel panel-primary">
 <div class="panel-heading"><strong>Preliminaries</strong></div>
-
-<input type="hidden" name="seed" value="${seed}" />
-
+<input name="seed" type="hidden" value="${seed}" />
 <div class="panel-body">
 <p>This survey consists of a story fragment with a choice in it followed by 20 multiple-choice questions. It should take about ten minutes to complete.</p>
+
 <p>To provide useful data for this survey, you must be at least 18 years old and able to read English. To confirm this (and to confirm that you aren&#39;t a bot), please answer the following question.</p>
 </div>
-</div><!-- End Instructions Box -->
+</div>
+<!-- End Instructions Box -->
 
 <section>
-<fieldset>
-  <label>If you&#39;re at least 18 years old, please don&#39;t write &quot;Age of years eighteen least at am I that confirm I,&quot; as the answer here, instead write those words <i>backwards, followed by an exclamation point</i>. If not, please do a different HIT, as I cannot use your data in my results, and thus I will not accept your response.</label>
-  <textarea name="agefluency"></textarea>
-</fieldset>
-
+<fieldset><label>If you&#39;re at least 18 years old, please don&#39;t write &quot;Age of years eighteen least at am I that confirm I,&quot; as the answer here, instead write those words <i>backwards, followed by an exclamation point</i>. If not, please do a different HIT, as I cannot use your data in my results, and thus I will not accept your response.</label><textarea name="agefluency"></textarea></fieldset>
 <!-- Instructions Box -->
+
 <div class="panel panel-primary">
 <div class="panel-heading"><strong>The Story</strong></div>
 
 <div class="panel-body">
 <p>Please read the following short story which presents you with a choice, make a decision, and then answer the questions about that choice below. Make sure that you answer every question, or I won&#39;t be able to use your response.</p>
 </div>
-</div><!-- End Instructions Box -->
+</div>
+<!-- End Instructions Box -->
 
 <div class="story">
-<p>
-${framing}
-</p>
-<p>
-${assets}
-</p>
-<p>
-${set_off}
-</p>
-<p>
-${setup}
-</p>
-<p>
-${potentials}
-</p>
-<p>
-${prompt}
-</p>
-<p class="note">
-(To choose, click on an option below. Once you make a decision you will not be able to change it.)
-</p>
-<div class="options">
-<p class="option" id="opt1">
-  <input type="radio" name="choice" value="1" class="optbutton">
-  ${opt1}
-  </input>
-</p>
-<p class="outcome" id="out1">${out1}</p>
-<p class="option" id="opt2">
-  <input type="radio" name="choice" value="2" class="optbutton">
-  ${opt2}
-  </input>
-</p>
-<p class="outcome" id="out2">${out2}</p>
-<p class="option" id="opt3">
-  <input type="radio" name="choice" value="3" class="optbutton">
-  ${opt3}
-  </input>
-</p>
-<p class="outcome" id="out3">${out3}</p>
-</div>
-</div>
+<p>${framing}</p>
 
+<p>${assets}</p>
+
+<p>${set_off}</p>
+
+<p>${setup}</p>
+
+<p>${potentials}</p>
+
+<p>${prompt}</p>
+
+<p class="note">(To choose, click on an option below. Once you make a decision you will not be able to change it.)</p>
+
+<div class="options">
+<p class="option" id="opt1"><input class="optbutton" name="decision" type="radio" value="1" /> ${opt1}</p>
+
+<p class="outcome" id="out1">${out1}</p>
+
+<p class="option" id="opt2"><input class="optbutton" name="decision" type="radio" value="2" /> ${opt2}</p>
+
+<p class="outcome" id="out2">${out2}</p>
+
+<p class="option" id="opt3"><input class="optbutton" name="decision" type="radio" value="3" /> ${opt3}</p>
+
+<p class="outcome" id="out3">${out3}</p>
+<input id="dbi" name="decision-backup" type="hidden" value="no-decision" /></div>
+</div>
 <!-- Instructions Box -->
+
 <div class="panel panel-primary">
 <div class="panel-heading"><strong>Option Questions</strong></div>
 
 <div class="panel-body">
-<p class="note">
-(Note: if you've reached this point, you should already have made a choice and seen an outcome above. If not, please select an option in the story above and read the outcome that appears.)
-</p>
-<p>
-For these questions, consider just the options presented, and ignore the outcome of the option that you chose.
-Please rate your agreement with the following statements, from 1 (strongly disagree) to 5 (strongly agree).
-</p>
+<p class="note">(Note: if you&#39;ve reached this point, you should already have made a choice and seen an outcome above. If not, please select an option in the story above and read the outcome that appears.)</p>
+
+<p>For these questions, consider just the options presented, and ignore the outcome of the option that you chose. Please rate your agreement with the following statements, from 1 (strongly disagree) to 5 (strongly agree).</p>
 </div>
-</div><!-- End Instructions Box -->
+</div>
+<!-- End Instructions Box -->
 
-<fieldset>
-  <label>1. &quot;Considering just the options, there seems to be a clear best option at this choice.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="opt-obvious" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="opt-obvious" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="opt-obvious" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="opt-obvious" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="opt-obvious" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>1. &quot;Considering just the options, there seems to be a clear best option at this choice.&quot;</label>
+
+<div class="question-input"><input name="opt-obvious" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="opt-obvious" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="opt-obvious" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="opt-obvious" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="opt-obvious" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>2. &quot;Ignoring outcomes, the options at this choice all seem about equally good (or bad).&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="opt-balanced" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="opt-balanced" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="opt-balanced" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="opt-balanced" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="opt-balanced" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>2. &quot;Ignoring outcomes, the options at this choice all seem about equally good (or bad).&quot;</label>
+
+<div class="question-input"><input name="opt-balanced" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="opt-balanced" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="opt-balanced" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="opt-balanced" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="opt-balanced" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>3. &quot;Ignoring outcomes, there are no options that seem bad at this choice.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="opt-nobad" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="opt-nobad" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="opt-nobad" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="opt-nobad" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="opt-nobad" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>3. &quot;Ignoring outcomes, there are no options that seem bad at this choice.&quot;</label>
+
+<div class="question-input"><input name="opt-nobad" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="opt-nobad" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="opt-nobad" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="opt-nobad" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="opt-nobad" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>4. &quot;Ignoring outcomes, none of the options at this choice seem good.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="opt-nogood" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="opt-nogood" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="opt-nogood" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="opt-nogood" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="opt-nogood" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>4. &quot;Ignoring outcomes, none of the options at this choice seem good.&quot;</label>
+
+<div class="question-input"><input name="opt-nogood" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="opt-nogood" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="opt-nogood" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="opt-nogood" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="opt-nogood" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>5. &quot;Considering just the options, the stakes for this choice seem low.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="opt-stakes" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="opt-stakes" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="opt-stakes" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="opt-stakes" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="opt-stakes" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
-</fieldset>
+<fieldset><label>5. &quot;Considering just the options, the stakes for this choice seem low.&quot;</label>
 
+<div class="question-input"><input name="opt-stakes" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="opt-stakes" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="opt-stakes" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="opt-stakes" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="opt-stakes" type="radio" value="5" />&nbsp;5 - strongly agree</div>
+</fieldset>
 <!-- Instructions Box -->
+
 <div class="panel panel-primary">
 <div class="panel-heading"><strong>Outcome Questions</strong></div>
 
 <div class="panel-body">
 <p>Please rate your agreement with the following statements, from 1 (strongly disagree) to 5 (strongly agree).</p>
 </div>
-</div><!-- End Instructions Box -->
+</div>
+<!-- End Instructions Box -->
 
-<fieldset>
-  <label>1. &quot;Given the options available, the outcome I got is fair.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="out-fair" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="out-fair" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="out-fair" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="out-fair" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="out-fair" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>1. &quot;Given the options available, the outcome I got is fair.&quot;</label>
+
+<div class="question-input"><input name="out-fair" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="out-fair" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="out-fair" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="out-fair" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="out-fair" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>2. &quot;The outcome that I got makes sense given the option that I selected.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="out-sense" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="out-sense" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="out-sense" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="out-sense" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="out-sense" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>2. &quot;The outcome that I got makes sense given the option that I selected.&quot;</label>
+
+<div class="question-input"><input name="out-sense" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="out-sense" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="out-sense" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="out-sense" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="out-sense" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>3. &quot;I got a bad outcome.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="out-bad" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="out-bad" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="out-bad" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="out-bad" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="out-bad" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>3. &quot;I got a bad outcome.&quot;</label>
+
+<div class="question-input"><input name="out-bad" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="out-bad" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="out-bad" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="out-bad" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="out-bad" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>4. &quot;I&#39;m happy with the option that I chose.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="out-happy" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="out-happy" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="out-happy" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="out-happy" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="out-happy" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>4. &quot;I&#39;m happy with the option that I chose.&quot;</label>
+
+<div class="question-input"><input name="out-happy" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="out-happy" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="out-happy" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="out-happy" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="out-happy" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>5. &quot;The outcome that I got is unfair, given the options available.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="out-unfair" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="out-unfair" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="out-unfair" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="out-unfair" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="out-unfair" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>5. &quot;The outcome that I got is unfair, given the options available.&quot;</label>
+
+<div class="question-input"><input name="out-unfair" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="out-unfair" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="out-unfair" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="out-unfair" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="out-unfair" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>6. &quot;The outcome that I got is completely unexpected.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="out-unexpected" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="out-unexpected" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="out-unexpected" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="out-unexpected" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="out-unexpected" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>6. &quot;The outcome that I got is completely unexpected.&quot;</label>
+
+<div class="question-input"><input name="out-unexpected" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="out-unexpected" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="out-unexpected" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="out-unexpected" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="out-unexpected" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>7. &quot;There is an outcome.&quot; (This is a trick question to test whether you&#39;re paying attention. Please simply indicate that you are in complete <i>disagreement</i>.)</label>
-  <div class="question-input">
-    <input type="radio" name="out-trick" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="out-trick" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="out-trick" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="out-trick" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="out-trick" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>7. &quot;There is an outcome.&quot; (This is a trick question to test whether you&#39;re paying attention. Please simply indicate that you are in complete <i>disagreement</i>.)</label>
+
+<div class="question-input"><input name="out-trick" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="out-trick" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="out-trick" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="out-trick" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="out-trick" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>8. &quot;There might be a problem with this choice--the outcome I got does not make sense.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="out-broken" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="out-broken" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="out-broken" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="out-broken" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="out-broken" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>8. &quot;There might be a problem with this choice--the outcome I got does not make sense.&quot;</label>
+
+<div class="question-input"><input name="out-broken" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="out-broken" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="out-broken" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="out-broken" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="out-broken" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>9. &quot;The outcome that I got is a good outcome.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="out-good" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="out-good" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="out-good" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="out-good" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="out-good" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>9. &quot;The outcome that I got is a good outcome.&quot;</label>
+
+<div class="question-input"><input name="out-good" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="out-good" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="out-good" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="out-good" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="out-good" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>10. &quot;I pretty much expected the outcome that I got.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="out-expected" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="out-expected" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="out-expected" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="out-expected" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="out-expected" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>10. &quot;I pretty much expected the outcome that I got.&quot;</label>
+
+<div class="question-input"><input name="out-expected" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="out-expected" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="out-expected" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="out-expected" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="out-expected" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
 
-<fieldset>
-  <label>11. &quot;I wish I had chosen a different option.&quot;</label>
-  <div class="question-input">
-    <input type="radio" name="out-regret" value="1">&nbsp;1 - strongly disagree<br/>
-    <input type="radio" name="out-regret" value="2">&nbsp;2 - somewhat disagree<br/>
-    <input type="radio" name="out-regret" value="3">&nbsp;3 - neutral<br/>
-    <input type="radio" name="out-regret" value="4">&nbsp;4 - somewhat agree<br/>
-    <input type="radio" name="out-regret" value="5">&nbsp;5 - strongly agree<br/>
-  </div>
+<fieldset><label>11. &quot;I wish I had chosen a different option.&quot;</label>
+
+<div class="question-input"><input name="out-regret" type="radio" value="1" />&nbsp;1 - strongly disagree<br />
+<input name="out-regret" type="radio" value="2" />&nbsp;2 - somewhat disagree<br />
+<input name="out-regret" type="radio" value="3" />&nbsp;3 - neutral<br />
+<input name="out-regret" type="radio" value="4" />&nbsp;4 - somewhat agree<br />
+<input name="out-regret" type="radio" value="5" />&nbsp;5 - strongly agree</div>
 </fieldset>
-
-
 <!-- Instructions Box -->
+
 <div class="panel panel-primary">
 <div class="panel-heading"><strong>Motivation Questions</strong></div>
 
 <div class="panel-body">
 <p>Please answer the following questions about your motivations for making the decision you made, as well as about your motivations and goals in general when playing/reading interactive stories.</p>
 </div>
-</div><!-- End Instructions Box -->
+</div>
+<!-- End Instructions Box -->
 
-<fieldset>
-  <label>1. Which of the following motive(s) contributed to your decision? (pick one or more)</label>
-  <p class="note">
- (Note: no submissions will be rejected based on this information; wanting to get this survey done quickly is a perfectly valid reason for making a decision.)
-  </p>
-  <div class="question-input">
-    <input type="checkbox" name="motives" value="speed">&nbsp;I&#39;m taking an online survey. I just chose an option quickly so that I could complete the survey.<br/>
-    <input type="checkbox" name="motives" value="curious">&nbsp;I was just curious to find out what would happen if I chose the option I did.<br/>
-    <input type="checkbox" name="motives" value="role">&nbsp;I imagined a character in the story situation and chose what that character would do.<br/>
-    <input type="checkbox" name="motives" value="avatar">&nbsp;I chose what I would have chosen were I in the situation described in the story.<br/>
-    <input type="checkbox" name="motives" value="interesting">&nbsp;I chose the option that I thought would lead to the most interesting/satisfying result.<br/>
-    <input type="checkbox" name="motives" value="power">&nbsp;I looked at the skill information and chose the option that I thought would be most successful.<br/>
-    <input type="checkbox" name="motives" value="other">&nbsp;Other (please explain):<br/>
-    &nbsp;&nbsp;&nbsp;&nbsp;<textarea name="motives-other" rows=5 cols=110></textarea>
-  </div>
+<fieldset><label>1. Which of the following motive(s) contributed to your decision? (pick one or more)</label>
+
+<p class="note">(Note: no submissions will be rejected based on this information; wanting to get this survey done quickly is a perfectly valid reason for making a decision.)</p>
+
+<div class="question-input"><input name="motives" type="checkbox" value="speed" />&nbsp;I&#39;m taking an online survey. I just chose an option quickly so that I could complete the survey.<br />
+<input name="motives" type="checkbox" value="curious" />&nbsp;I was just curious to find out what would happen if I chose the option I did.<br />
+<input name="motives" type="checkbox" value="role" />&nbsp;I imagined a character in the story situation and chose what that character would do.<br />
+<input name="motives" type="checkbox" value="avatar" />&nbsp;I chose what I would have chosen were I in the situation described in the story.<br />
+<input name="motives" type="checkbox" value="interesting" />&nbsp;I chose the option that I thought would lead to the most interesting/satisfying result.<br />
+<input name="motives" type="checkbox" value="power" />&nbsp;I looked at the skill information and chose the option that I thought would be most successful.<br />
+<input name="motives" type="checkbox" value="other" />&nbsp;Other (please explain):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<textarea cols="110" name="motives-other" rows="5"></textarea></div>
 </fieldset>
 
-<fieldset>
-  <label>2. Which of the following judgement(s) contributes to how you generally define a &quot;good&quot; outcome in interactive experiences like the one you just played? (pick one or more)</label>
-  <div class="question-input">
-    <input type="checkbox" name="goals" value="avatar">&nbsp;I feel an outcome is good when something good happens to my character in the story world.<br/>
-    <input type="checkbox" name="goals" value="interesting">&nbsp;I feel an outcome is good if it is an interesting development in the story.<br/>
-    <input type="checkbox" name="goals" value="role">&nbsp;I feel an outcome is good when it fits the role that I am building for my character.<br/>
-    <input type="checkbox" name="goals" value="power">&nbsp;I feel an outcome is good when it makes my character more powerful.<br/>
-    <input type="checkbox" name="goals" value="progress">&nbsp;I feel an outcome is good when it makes progress towards beating a game.<br/>
-    <input type="checkbox" name="goals" value="other">&nbsp;Other (please explain):<br/>
-    &nbsp;&nbsp;&nbsp;&nbsp;<textarea name="goals-other" rows=5 cols=110></textarea>
-  </div>
+<fieldset><label>2. Which of the following judgement(s) contributes to how you generally define a &quot;good&quot; outcome in interactive experiences like the one you just played? (pick one or more)</label>
+
+<div class="question-input"><input name="judge-good" type="checkbox" value="avatar" />&nbsp;I feel an outcome is good when something good happens to my character in the story world.<br />
+<input name="judge-good" type="checkbox" value="interesting" />&nbsp;I feel an outcome is good if it is an interesting development in the story.<br />
+<input name="judge-good" type="checkbox" value="role" />&nbsp;I feel an outcome is good when it fits the role that I am building for my character.<br />
+<input name="judge-good" type="checkbox" value="power" />&nbsp;I feel an outcome is good when it makes my character more powerful.<br />
+<input name="judge-good" type="checkbox" value="progress" />&nbsp;I feel an outcome is good when it makes progress towards beating a game.<br />
+<input name="judge-good" type="checkbox" value="other" />&nbsp;Other (please explain):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<textarea cols="110" name="judge-good-other" rows="5"></textarea></div>
 </fieldset>
 
-<fieldset>
-  <label>3. Which of the following judgement(s) contributes to how you generally define a &quot;bad&quot; outcome in interactive experiences like the one you just played? (pick one or more)</label>
-  <div class="question-input">
-    <input type="checkbox" name="goals" value="avatar">&nbsp;I feel an outcome is bad when something bad happens to my character in the story world.<br/>
-    <input type="checkbox" name="goals" value="interesting">&nbsp;I feel an outcome is bad if it doesn&#39;t develop the plot.<br/>
-    <input type="checkbox" name="goals" value="no-control">&nbsp;I feel an outcome is bad when my character doesn&#39;t do what I expected them to do.<br/>
-    <input type="checkbox" name="goals" value="value-clash">&nbsp;I feel an outcome is bad when my character expresses a value or opinion that is different from what I wanted them to express.<br/>
-    <input type="checkbox" name="goals" value="power">&nbsp;I feel an outcome is bad when it makes my character less powerful.<br/>
-    <input type="checkbox" name="goals" value="progress">&nbsp;I feel an outcome is bad when it prevents me from making progress towards beating a game.<br/>
-    <input type="checkbox" name="goals" value="other">&nbsp;Other (please explain):<br/>
-    &nbsp;&nbsp;&nbsp;&nbsp;<textarea name="goals-other" rows=5 cols=110></textarea>
-  </div>
+<fieldset><label>3. Which of the following judgement(s) contributes to how you generally define a &quot;bad&quot; outcome in interactive experiences like the one you just played? (pick one or more)</label>
+
+<div class="question-input"><input name="judge-bad" type="checkbox" value="avatar" />&nbsp;I feel an outcome is bad when something bad happens to my character in the story world.<br />
+<input name="judge-bad" type="checkbox" value="interesting" />&nbsp;I feel an outcome is bad if it doesn&#39;t develop the plot.<br />
+<input name="judge-bad" type="checkbox" value="no-control" />&nbsp;I feel an outcome is bad when my character doesn&#39;t do what I expected them to do.<br />
+<input name="judge-bad" type="checkbox" value="value-clash" />&nbsp;I feel an outcome is bad when my character expresses a value or opinion that is different from what I wanted them to express.<br />
+<input name="judge-bad" type="checkbox" value="power" />&nbsp;I feel an outcome is bad when it makes my character less powerful.<br />
+<input name="judge-bad" type="checkbox" value="progress" />&nbsp;I feel an outcome is bad when it prevents me from making progress towards beating a game.<br />
+<input name="judge-bad" type="checkbox" value="other" />&nbsp;Other (please explain):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<textarea cols="110" name="judge-bad-other" rows="5"></textarea></div>
 </fieldset>
 
-<fieldset>
-  <label>4. Do you feel you approach all interactive experiences (e.g., Choose-Your-Own-Adventure novels, video games, tabletop role-playing games, etc.) with a consistent set of motivations and judgements, or do your motivations and judgements change from story to story?</label>
-  <div class="question-input">
-    <input type="radio" name="consistency" value="consistent">&nbsp;I feel that my motivations and judgements are the same no matter what interactive story I&#39;m playing.<br/>
-    <input type="radio" name="consistency" value="variable">&nbsp;I feel that my motivations and judgements change from story to story.<br/>
-    <input type="radio" name="consistency" value="variable">&nbsp;I don&#39;t play interactive stories often enough to have a definite answer.<br/>
-    <input type="radio" name="consistency" value="other">&nbsp;Other (please explain):<br/>
-    &nbsp;&nbsp;&nbsp;&nbsp;<textarea name="consistency-other" rows=3 cols=110></textarea>
-  </div>
-</fieldset>
+<fieldset><label>4. Do you feel you approach all interactive experiences (e.g., Choose-Your-Own-Adventure novels, video games, tabletop role-playing games, etc.) with a consistent set of motivations and judgements, or do your motivations and judgements change from story to story?</label>
 
+<div class="question-input"><input name="consistency" type="radio" value="consistent" />&nbsp;I feel that my motivations and judgements are the same no matter what interactive story I&#39;m playing.<br />
+<input name="consistency" type="radio" value="variable" />&nbsp;I feel that my motivations and judgements change from story to story.<br />
+<input name="consistency" type="radio" value="variable" />&nbsp;I don&#39;t play interactive stories often enough to have a definite answer.<br />
+<input name="consistency" type="radio" value="other" />&nbsp;Other (please explain):<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<textarea cols="110" name="consistency-other" rows="3"></textarea></div>
+</fieldset>
 <!-- Instructions Box -->
+
 <div class="panel panel-primary">
 <div class="panel-heading"><strong>Feedback</strong></div>
 
 <div class="panel-body">
 <p>(Optional) One last question about the survey itself...</p>
 </div>
-</div><!-- End Instructions Box -->
+</div>
+<!-- End Instructions Box -->
 
-<fieldset>
-  <label>Do you have any suggestions for improving this survey? Where there any parts of it that were confusing, unclear, or just broken? Does the current pay rate ($2.00) make sense given how long it took you to complete the task and how difficult it was?
-  <div class="question-input">
-    <textarea name="pilot-feedback" rows=5 cols=110></textarea>
-  </div>
-</fieldset>
+<fieldset><label>Do you have any suggestions for improving this survey? Where there any parts of it that were confusing, unclear, or just broken? Does the current pay rate ($2.00) make sense given how long it took you to complete the task and how difficult it was? </label>
 
+<div class="question-input"><label><textarea cols="110" name="pilot-feedback" rows="5"></textarea> </label></div>
+<label> </label></fieldset>
 </section>
-<!-- End Survey Body -->
-</section>
+<!-- End Survey Body --></section>
 <!-- close container -->
