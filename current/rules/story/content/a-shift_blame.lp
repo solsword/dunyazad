@@ -97,7 +97,7 @@ at(
     X,
     o(success, shifted),
     resolves,
-    relation(accusing, Accuser, OldVictim)
+    potential(problem, relation(accusing, Accuser, OldVictim))
   )
 ) :-
   at(N, action(X, shift_blame)),
@@ -112,7 +112,7 @@ at(
     X,
     o(success, suspected),
     resolves,
-    relation(accusing, Accuser, OldVictim)
+    potential(problem, relation(accusing, Accuser, OldVictim))
   )
 ) :-
   at(N, action(X, shift_blame)),

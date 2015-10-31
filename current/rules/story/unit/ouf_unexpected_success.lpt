@@ -18,7 +18,54 @@ story_op(root, add_surface).
 
 :- bad(M).
 
+%:- bad(nopt).
+%:- bad(stakes).
+%:- bad(c).
+%:- bad(a(1)).
+
 bad(X) :-
   node_status_reached(root, built),
   at(root, option(X)),
-  not at(root, outcome_feel(option(X), unexpected_success)).
+  not at(root, outcome_feel(option(X), miracle)).
+
+bad(nopt) :-
+  node_status_reached(root, built),
+  3 != { at(root, option(X)) }.
+
+bad(stakes) :-
+  node_status_reached(root, built),
+  not at(root, perceived_stakes(high)).
+
+bad(c) :- not setup(root, market).
+
+bad(c) :- st(root, relation(threatening, Anyone, Victim)).
+
+%bad(c) :- not setup(root, monster_attack).
+%bad(c) :- not at(root, action(option(1), talk_down)).
+%bad(c) :- not at(root, action(option(2), pacify)).
+%bad(c) :- not at(root, action(option(3), flee)).
+%
+
+%bad(c) :- not at(root, unlikely_outcome(option(1), o(attitude, convinced))).
+
+bad(a(X)) :-
+  at(root, option(X)),
+  0 = {
+    at(root, option_feel(option(X), longshot));
+    at(root, option_feel(option(X), bad));
+    at(root, option_feel(option(X), doomed))
+  }.
+
+bad(b(X)) :-
+  at(root, option(X)),
+  0 = {
+    at(root, overall_predictability(option(X), unexpected));
+    at(root, overall_predictability(option(X), unfair))
+  }.
+
+bad(c(X)) :-
+  at(root, option(X)),
+  0 = {
+    at(root, outcome_overall(option(X), good));
+    at(root, outcome_overall(option(X), great))
+  }.

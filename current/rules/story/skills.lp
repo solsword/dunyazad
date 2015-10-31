@@ -318,13 +318,22 @@ at(N, likely_outcome(X, Lose)) :-
   at(N, has_tool_for(ATwo, Skill)),
   story_op(N, build_options).
 
-% An outcome value is "likely" if all other possibilities are unlikely:
+% An outcome value is "likely" if all other possibilities are unlikely and vice
+% versa:
 at(N, likely_outcome(X, o(OutVar, OutVal))) :-
   at(N, action(X, Action)),
   outcome_val(Action, OutVar, OutVal),
   PossibleOutcomes = { outcome_val(Action, OutVar, PossibleVal) },
   PossibleOutcomes - 1 = { at(N, unlikely_outcome(X, o(OutVar, UnlikelyVal))) },
   not at(N, unlikely_outcome(X, o(OutVar, OutVal))),
+  story_op(N, build_options).
+
+at(N, unlikely_outcome(X, o(OutVar, OutVal))) :-
+  at(N, action(X, Action)),
+  outcome_val(Action, OutVar, OutVal),
+  PossibleOutcomes = { outcome_val(Action, OutVar, PossibleVal) },
+  PossibleOutcomes - 1 = { at(N, likely_outcome(X, o(OutVar, UnlikelyVal))) },
+  not at(N, likely_outcome(X, o(OutVar, OutVal))),
   story_op(N, build_options).
 
 % An outcome is unlikely if it is excluded by a likely outcome:

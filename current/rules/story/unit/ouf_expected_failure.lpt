@@ -17,6 +17,10 @@ story_op(root, add_surface).
 %#minimize { 1@0, bad(Message) : bad(Message) }.
 :- bad(M).
 
+%:- bad(nopt).
+%:- bad(stakes).
+%:- bad(c).
+
 bad(X) :-
   node_status_reached(root, built),
   at(root, option(X)),
@@ -31,13 +35,13 @@ bad(stakes) :-
   not at(root, perceived_stakes(high)).
 
 
-:- bad(c).
+%bad(c) :- not setup(root, threatened_innocents).
 
-bad(c) :- not setup(root, monster_attack).
-bad(c) :- not at(root, action(option(1), attack)).
-bad(c) :- not at(root, action(option(2), pacify)).
-bad(c) :- not at(root, action(option(3), flee)).
-
+%bad(c) :- not setup(root, monster_attack).
+%bad(c) :- not at(root, action(option(1), attack)).
+%bad(c) :- not at(root, action(option(2), pacify)).
+%bad(c) :- not at(root, action(option(3), flee)).
+%
 bad(a(X)) :-
   at(root, option(X)),
   0 = {

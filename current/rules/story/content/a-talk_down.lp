@@ -26,7 +26,7 @@ outcome_excludes(
 % skills
 
 skill_link(
-  elocution, promotes, no_tool,
+  elocution, required, no_tool,
   talk_down, asking,
   o(attitude, convinced)
 ).
@@ -38,7 +38,7 @@ skill_link(
 ).
 
 skill_link(
-  elocution, promotes, no_tool,
+  elocution, required, no_tool,
   talk_down, asking,
   o(enraged, not_enraged)
 ).
