@@ -1,0 +1,90 @@
+% vim: syn=gringo
+
+max_unique(0).
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+#minimize { 1@0, bad(Message) : bad(Message) }.
+:- bad(setup).
+:- bad(nopt).
+:- bad(stakes).
+:- bad(a(X)).
+
+%:- bad(M).
+
+
+% Outcome feel for all options should be "expected success:"
+
+bad(feel(X)) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  not at(root, outcome_feel(option(X), expected_success)).
+
+bad(setup) :-
+  node_status_reached(root, built),
+  not setup(root, threatened_innocents).
+
+%bad(f1) :-
+%  node_status_reached(root, built),
+%  not at(root, option_feel(option(1), hopeful)).
+
+%bad(p1) :-
+%  node_status_reached(root, built),
+%  at(root, overall_predictability(option(1), unfair)).
+%not at(root, overall_predictability(option(1), predictable)).
+
+bad(nopt) :-
+  node_status_reached(root, built),
+  3 != {
+    at(root, option(X))
+  }.
+
+bad(stakes) :-
+  node_status_reached(root, built),
+  not at(root, perceived_stakes(high)).
+
+bad(a(1)) :-
+  node_status_reached(root, built),
+  not at(root, action(option(1), talk_down)).
+
+bad(a(2)) :-
+  node_status_reached(root, built),
+  not at(root, action(option(2), polymorph)).
+
+bad(a(3)) :-
+  node_status_reached(root, built),
+  not at(root, action(option(3), pay_off)).
+
+bad(opt_feel(X)) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  0 = {
+    at(N, option_feel(option(X), sure_thing));
+    at(N, option_feel(option(X), safe));
+    at(N, option_feel(option(X), hopeful))
+  }.
+
+bad(predictability(X)) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  0 = {
+    at(N, overall_predictability(option(X), predictable));
+    at(N, overall_predictability(option(X), expected))
+  }.
+
+
+bad(out_feel(X)) :-
+  node_status_reached(root, built),
+  at(root, option(X)),
+  0 = {
+    at(N, outcome_overall(option(X), great));
+    at(N, outcome_overall(option(X), good))
+  }.
