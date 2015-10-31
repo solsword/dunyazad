@@ -8,7 +8,7 @@ V#deny/inf/?subject blame
 
 :action/deny_blame/outcome
 {at(Now,outcome(option(Opt),o(success,exonerated)))}
-N#?denier/they V#argue/prs/?denier that N#?victim/they V#be/psp/?victim wrongly accused, and N#?accuser/they V#be/prs/?accuser forced V#give/inf/?accuser up N#?accuser/their allegations
+N#?denier/they V#argue/prs/?denier that N#?victim/they V#be/prsp/?victim wrongly accused, and N#?accuser/they V#be/prs/?accuser forced V#give/inf/?accuser up N#?accuser/their allegations
 
 {at(Now,outcome(option(Opt),o(success,ignored)))}
-N#?denier/they V#argue/prs/?denier that N#?victim/they V#be/psp/?victim wrongly accused, but N#?accuser/they V#remain/prs/?accuser convinced that N#?victim/they V#be/prs/?victim guilty
+N#?denier/they V#argue/prs/?denier that N#?victim/they V#be/prsp/?victim wrongly accused, but N#?accuser/they V#remain/prs/?accuser convinced that N#?victim/they V#be/prs/?victim guilty

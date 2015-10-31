@@ -1,0 +1,8 @@
+Procedure for generating input:
+
+1. For each condition, generate 3 inputs: one with each of the following three
+setups: monster_attack, threatened_innocents, and market.
+  - Caveat: If a result contains a shift_blame action where the target of the
+    action is not "guilty" (i.e., threatening or accusing someone) then the
+    input will be re-rolled with the same setup. Re-rolls may happen multiple
+    times in a row if necessary.
