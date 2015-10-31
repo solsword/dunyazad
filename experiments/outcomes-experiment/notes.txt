@@ -6,3 +6,6 @@ setups: monster_attack, threatened_innocents, and market.
     action is not "guilty" (i.e., threatening or accusing someone) then the
     input will be re-rolled with the same setup. Re-rolls may happen multiple
     times in a row if necessary.
+  - Corrections: The English "<person> been wrongly accused" was changed by
+    hand to "<person> has been wrongly accused" in some cases; the base file
+    has been updated to produce this result automatically in the future.

@@ -1,0 +1,10 @@
+* exp_expected_success
+* exp_unexpected_failure
+
+* exp_obvious_success
+* exp_obvious_failure
+
+* exp_expected_failure
+# exp_unexpected_success
+  -> market setup crashes w/ error code -9 when the player cares about avoiding
+  threats & accusations too much. Otherwise it works.
