@@ -1,18 +1,22 @@
 % Potential - accusing
 
 :potential/relation/accusing
-N#?_from/they V#accuse/prsc/?_from N#?_to/them of disrespect
-N#?_from/they V#accuse/prsc/?_from N#?_to/them of insolence
-N#?_from/they V#accuse/prsc/?_from N#?_to/them of a crime
+N#?_from/they V#be/prs/?_from baselessly accusing N#?_to/them of disrespect
+N#?_from/they V#be/prs/?_from baselessly accusing N#?_to/them of insolence
 
-% TODO: Test this!!
+% TODO: Re-enable actual real accusations
+%N#?_from/they V#accuse/prsc/?_from N#?_to/them of a crime
+
+% TODO: Test & enable this!!
 %{st(Now,relation(has_item,inst(actor,To),inst(item,Item)))}
-{st(Now,relation(has_item,inst(actor,To),inst(item,Item)));st(Now,relation(stolen_from,inst(actor,Victim),inst(item,Item)))}
-N#?_from/they V#accuse/prsc/?_from N#?_to/them of V#steal/prp/?_to N#?_Item/they from N#?_Victim/them
+%{st(Now,relation(has_item,inst(actor,To),inst(item,Item)));st(Now,relation(stolen_from,inst(actor,Victim),inst(item,Item)))}
+%N#?_from/they V#accuse/prsc/?_from N#?_to/them of V#steal/prp/?_to N#?_Item/they from N#?_Victim/them
 
 :consequence/init/relation/accusing
-N#?_from/they V#be/prs/?_from now V#accuse/prp/?_from N#?_to/them
-N#?_from/they V#have/prs/?_from started to V#accuse/prs/_plural N#?_to/them
+N#?_from/they V#be/prs/?_from now V#berate/prp/?_from N#?_to/them
+N#?_from/they V#be/prs/?_from now V#yell/prp/?_from at N#?_to/them
+N#?_from/they V#have/prs/?_from started to V#berate/prs/_plural N#?_to/them
+N#?_from/they V#have/prs/?_from started to V#yell/prs/_plural at N#?_to/them
 
 :consequence/term/relation/accusing
 N#?_from/they V#be/prs/?_from no longer V#accuse/prp/?_from N#?_to/them
