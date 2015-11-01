@@ -63,32 +63,22 @@ snames = c(
   "extra-feedback" = "If you have any other feedback you'd like to give, [enter it here]."
 )
 
-colnames = c(
-  "Input.seed" = "seed",
-  "Input.constraints" = "constraints",
-  "WorkTimeInSeconds" = "duration",
-  "Answer.decision" = "decision",
-  "Answer.nobad" = "nobad",
-  "Answer.clearbest" = "clearbest",
-  "Answer.lowstakes" = "lowstakes",
-  "Answer.nogood" = "nogood",
-  "Answer.balanced" = "balanced",
-  "Answer.difficult" = "difficult",
-  "Answer.consequences" = "consequences"
-)
+# TODO: Fix these!
+#colnames = c(
+#  "Input.seed" = "seed",
+#  "Input.constraints" = "constraints",
+#  "WorkTimeInSeconds" = "duration",
+#  "Answer.decision" = "decision",
+#  "Answer.nobad" = "nobad",
+#  "Answer.clearbest" = "clearbest",
+#  "Answer.lowstakes" = "lowstakes",
+#  "Answer.nogood" = "nogood",
+#  "Answer.balanced" = "balanced",
+#  "Answer.difficult" = "difficult",
+#  "Answer.consequences" = "consequences"
+#)
 
-seedstakes = c(
-  "11828" = "high",
-  "19914" = "low",
-  "21105" = "high",
-  "46466" = "high",
-  " 4897" = "low",
-  "64487" = "low",
-  "72724" = "low",
-  "79631" = "low",
-  "97623" = "high",
-  "    0" = "none"
-)
+
 
 filterfactor <- function (data) {
   filtered <- data
@@ -99,7 +89,7 @@ filterfactor <- function (data) {
       filtered[["WorkTimeInSeconds"]] == -1
     | filtered[["WorkTimeInSeconds"]] > 90
     )
-  & filtered[["Answer.trick"]] == 1
+  & filtered[["Answer.out-trick"]] == 1
     ,
   ]
   # Get rid of irrelevant columns:
@@ -107,6 +97,7 @@ filterfactor <- function (data) {
     ,
     names(filtered) == "Input.seed"
   | names(filtered) == "Input.constraints"
+  | names(filtered) == "chosen_setup"
   | names(filtered) == "WorkTimeInSeconds"
   | (
       substr(names(filtered), 1, 3) == "Ans"
@@ -134,15 +125,8 @@ filterfactor <- function (data) {
     }
   }
   # Rename things:
-  filtered <- rename(filtered, colnames)
-  # Assign stakes based on seed:
-  filtered[["stakes"]] = apply(
-    filtered,
-    1,
-    function(row) {
-      return(seedstakes[[as.character(row[["seed"]])]])
-    }
-  )
+  # TODO: THIS
+  #filtered <- rename(filtered, colnames)
   return(filtered)
 }
 
@@ -309,7 +293,9 @@ DOliveCIproc <- function(y, alpha = 0.05){
   return(result)
 }
 
-responses <- read.csv(file="study-results.csv",head=TRUE,sep=",")
+# TODO: HERE
+#responses <- read.csv(file="study-results.csv",head=TRUE,sep=",")
+responses <- read.csv(file="partial-results.csv",head=TRUE,sep=",")
 hypotheses <- read.csv(file="hypotheses.csv",head=TRUE,sep=",")
 
 filtered <- filterfactor(responses)
@@ -323,287 +309,287 @@ cat("\n---\n")
 
 cat("Total responses:", nrow(responses), "\n")
 cat("Acceptable responses:", nrow(filtered), "\n")
-cat("     obvious:", nrow(filtered[filtered$constraints == "obvious",]), "\n")
-cat("     relaxed:", nrow(filtered[filtered$constraints == "relaxed",]), "\n")
-cat("     dilemma:", nrow(filtered[filtered$constraints == "dilemma",]), "\n")
-cat("\n")
-cat("  low-stakes:", nrow(filtered[filtered$stakes == "low",]), "\n")
-cat(" high-stakes:", nrow(filtered[filtered$stakes == "high",]), "\n")
-cat("\n")
-cat(
-  " obvious by stakes:",
-  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "obvious",]),
-  "/",
-  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "obvious",]),
-  "\n"
-)
-cat(
-  " relaxed by stakes:",
-  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "relaxed",]),
-  "/",
-  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "relaxed",]),
-  "\n"
-)
-cat(
-  " dilemma by stakes:",
-  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "dilemma",]),
-  "/",
-  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "dilemma",]),
-  "\n"
-)
-cat("\n")
-cat("     uniform:", nrow(filtered[filtered$constraints == "uniform",]), "\n")
-cat("     normal:", nrow(filtered[filtered$constraints == "normal",]), "\n")
-cat("Real responses:", nrow(real), "\n")
-
-
-cat("\n---\n")
-
-cat("Median response time:", median(responses[responses$WorkTimeInSeconds != -1,]$WorkTimeInSeconds),"\n")
-cat("Median accepted response time:", median(real$duration), "\n")
-
-cat("\n---\n")
-
-cat("General statistics:\n")
-for (treatment in c("obvious", "relaxed", "dilemma")) {
-  cat(" ", treatment, ":\n")
-  for (
-    question
-  in
-    c(
-      "nobad",
-      "nogood",
-      "clearbest",
-      "lowstakes",
-      "balanced",
-      "difficult",
-      "consequences"
-    )
-  ) {
-    col <- filtered[filtered$constraints == treatment,][[question]]
-    num <- as.numeric(as.character(col))
-   # cis <- DOliveCIproc(num)
-   # wcis <- wilcox.test(
-   #   num,
-   #   conf.int=TRUE,
-   #   conf.level=0.95,
-   #   alternative="two.sided",
-   #   correct=TRUE
-   # )
-    boottype <- "basic"
-    bcis <- boot.ci(
-      boot(num, function(x, i) median(x[i]), R=1000),
-      type=boottype
-    )
-    cat(
-      "   ",
-      format(question, width=12, justify="left"),
-      #format(sprintf("%0.2f", cis[["LCI"]]), width=5, justify="right"),
-      #format(sprintf("%0.2f", wcis[["conf.int"]][[1]]),width=5,justify="right"),
-      format(sprintf("%0.2f", bcis[[boottype]][[4]]), width=5, justify="right"),
-      "--",
-      median(num),
-      "--",
-      #format(sprintf("%0.2f", cis[["UCI"]]), width=5, justify="right"),
-      #format(sprintf("%0.2f", wcis[["conf.int"]][[2]]),width=5,justify="right"),
-      format(sprintf("%0.2f", bcis[[boottype]][[5]]), width=5, justify="right"),
-      "\n"
-    )
-  }
-}
-
-
-cat("\n---\n")
-
-cat("Hypotheses:\n")
-cat(
-"Question                                          Compare:  Pred:     Pass:  P:             r:     effect:\n"
-)
-for (hidx in 1:nrow(hypotheses)) {
-  hyp <- as.list(hypotheses[hidx,])
-  pred <- "unknown"
-  if (hyp[["against"]] == "uniform" | hyp[["against"]] == "normal") {
-    if (hyp[["predict"]] == "greater") {
-      pred <- "agree"
-    } else if (hyp[["predict"]] == "less") {
-      pred <- "disagree"
-    }
-  } else {
-    if (hyp[["predict"]] == "greater") {
-      pred <- paste(">", hyp[["against"]], sep="")
-    } else if (hyp[["predict"]] == "less") {
-      pred <- paste("<", hyp[["against"]], sep="")
-    }
-  }
-  result <- testhypothesis(hyp, filtered)
-  cat(
-    "",
-    format(snames[[as.character(hyp[["question"]])]], width=49, justify="left"),
-    format(hyp[["compare"]], width=9, justify="left"),
-    format(pred, width=9, justify="left"),
-    format(
-      as.character(as.logical(result[["passed"]])),
-      width=6,
-      justify="left"
-    ),
-    format(result[["pvalue"]], width=12, justify="left"),
-    " ",
-    format(sprintf("%0.3f", result[["effectsize"]]), width=7, justify="left"),
-    format(sprintf("%0.3f", result[["commoneffect"]]), width=7, justify="left"),
-#    format(result[["conf.low"]], width=4, justify="left"),
-#    format(result[["conf.high"]], width=4, justify="left"),
-    "\n"
-  )
-}
-
-cat("\n---\n")
-
-# Get rid of "normal" entries:
-
-filtered <- filtered[filtered$constraints != "normal",]
-filtered$constraints <- factor(filtered$constraints)
-
-# Get rid of "uniform" entries:
-
-filtered <- filtered[filtered$constraints != "uniform",]
-filtered$constraints <- factor(filtered$constraints)
-
-# Prevent anyone from gouging their eyes out:
-sb <- trellis.par.get("strip.background")
-sb[["col"]][1] <- "#ddeeff"
-trellis.par.set("strip.background", sb)
-
-# Choice histograms
-# -----------------
-
-pdf(file="choices.pdf",title="dunyazad-choices.report")
-filtered$seed = factor(filtered$seed)
-histogram(
-  ~ decision | seed,
-  data=filtered[filtered$constraints=="obvious",],
-  type="count",
-  layout=c(3,1),
-  aspect=1,
-  col="#ffff99",
-  xlab="obvious"
-)
-histogram(
-  ~ decision | seed,
-  data=filtered[filtered$constraints=="relaxed",],
-  type="count",
-  layout=c(3,1),
-  aspect=1,
-  col="#ffff99",
-  xlab="relaxed"
-)
-histogram(
-  ~ decision | seed,
-  data=filtered[filtered$constraints=="dilemma",],
-  type="count",
-  layout=c(3,1),
-  aspect=1,
-  col="#ffff99",
-  xlab="dilemma"
-)
-dev.off()
-
-# Get rid of the "decision" column:
-
-filtered <- filtered[,names(filtered) != "decision"]
-
-# Likert reports:
-# ---------------
-
-# Combined
-# --------
-
-pdf(file="combined-report.pdf",title="dunyazad-study-report")
-#png(file="combined-report.png",width=600,height=800)
-report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
-report <- report[,snames]
-lk = likert(
-  report,
-  grouping = filtered[["constraints"]]
-)
-#plot(lk, group.order=c("uniform", "obvious", "relaxed", "dilemma"))
-plot(lk, group.order=c("obvious", "relaxed", "dilemma"))
-dev.off()
-
-
-# By Stakes
-# ---------
-
-pdf(file="report-by-stakes.pdf",title="dunyazad-stakes-report")
-report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
-report <- report[,snames]
-lk = likert(
-  report,
-  grouping = factor(filtered[["stakes"]])
-)
-plot(lk, group.order=c("low", "high"))
-dev.off()
-
-
-# Ungrouped
-# --------
-
-pdf(file="ungrouped-report.pdf",title="dunyazad-ungrouped-report")
-report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
-report <- report[,snames]
-lk = likert(report)
-plot(lk)
-dev.off()
-
-# Obvious
-# --------
-
-pdf(file="obvious-report.pdf",title="dunyazad-obvious-report")
-report <- filtered[
-  filtered$constraints == "obvious",
-  names(filtered) %in% names(snames)
-]
-report <- rename(report, snames)
-report <- report[,snames]
-sort <- filtered[filtered$constraints == "obvious",][["seed"]]
-lk = likert(
-  report,
-  grouping = sort
-)
-plot(lk)
-dev.off()
-
-# Relaxed
-# -------
-
-pdf(file="relaxed-report.pdf",title="dunyazad-relaxed-report")
-report <- filtered[
-  filtered$constraints == "relaxed",
-  names(filtered) %in% names(snames)
-]
-report <- rename(report, snames)
-report <- report[,snames]
-sort <- filtered[filtered$constraints == "relaxed",][["seed"]]
-lk = likert(
-  report,
-  grouping = sort
-)
-plot(lk)
-dev.off()
-
-# Dilemma
-# -------
-
-pdf(file="dilemma-report.pdf",title="dunyazad-dilemma-report")
-report <- filtered[
-  filtered$constraints == "dilemma",
-  names(filtered) %in% names(snames)
-]
-report <- rename(report, snames)
-report <- report[,snames]
-sort <- filtered[filtered$constraints == "dilemma",][["seed"]]
-lk = likert(
-  report,
-  grouping = sort
-)
-plot(lk)
-dev.off()
+#cat("     obvious:", nrow(filtered[filtered$constraints == "obvious",]), "\n")
+#cat("     relaxed:", nrow(filtered[filtered$constraints == "relaxed",]), "\n")
+#cat("     dilemma:", nrow(filtered[filtered$constraints == "dilemma",]), "\n")
+#cat("\n")
+#cat("  low-stakes:", nrow(filtered[filtered$stakes == "low",]), "\n")
+#cat(" high-stakes:", nrow(filtered[filtered$stakes == "high",]), "\n")
+#cat("\n")
+#cat(
+#  " obvious by stakes:",
+#  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "obvious",]),
+#  "/",
+#  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "obvious",]),
+#  "\n"
+#)
+#cat(
+#  " relaxed by stakes:",
+#  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "relaxed",]),
+#  "/",
+#  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "relaxed",]),
+#  "\n"
+#)
+#cat(
+#  " dilemma by stakes:",
+#  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "dilemma",]),
+#  "/",
+#  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "dilemma",]),
+#  "\n"
+#)
+#cat("\n")
+#cat("     uniform:", nrow(filtered[filtered$constraints == "uniform",]), "\n")
+#cat("     normal:", nrow(filtered[filtered$constraints == "normal",]), "\n")
+#cat("Real responses:", nrow(real), "\n")
+#
+#
+#cat("\n---\n")
+#
+#cat("Median response time:", median(responses[responses$WorkTimeInSeconds != -1,]$WorkTimeInSeconds),"\n")
+#cat("Median accepted response time:", median(real$duration), "\n")
+#
+#cat("\n---\n")
+#
+#cat("General statistics:\n")
+#for (treatment in c("obvious", "relaxed", "dilemma")) {
+#  cat(" ", treatment, ":\n")
+#  for (
+#    question
+#  in
+#    c(
+#      "nobad",
+#      "nogood",
+#      "clearbest",
+#      "lowstakes",
+#      "balanced",
+#      "difficult",
+#      "consequences"
+#    )
+#  ) {
+#    col <- filtered[filtered$constraints == treatment,][[question]]
+#    num <- as.numeric(as.character(col))
+#   # cis <- DOliveCIproc(num)
+#   # wcis <- wilcox.test(
+#   #   num,
+#   #   conf.int=TRUE,
+#   #   conf.level=0.95,
+#   #   alternative="two.sided",
+#   #   correct=TRUE
+#   # )
+#    boottype <- "basic"
+#    bcis <- boot.ci(
+#      boot(num, function(x, i) median(x[i]), R=1000),
+#      type=boottype
+#    )
+#    cat(
+#      "   ",
+#      format(question, width=12, justify="left"),
+#      #format(sprintf("%0.2f", cis[["LCI"]]), width=5, justify="right"),
+#      #format(sprintf("%0.2f", wcis[["conf.int"]][[1]]),width=5,justify="right"),
+#      format(sprintf("%0.2f", bcis[[boottype]][[4]]), width=5, justify="right"),
+#      "--",
+#      median(num),
+#      "--",
+#      #format(sprintf("%0.2f", cis[["UCI"]]), width=5, justify="right"),
+#      #format(sprintf("%0.2f", wcis[["conf.int"]][[2]]),width=5,justify="right"),
+#      format(sprintf("%0.2f", bcis[[boottype]][[5]]), width=5, justify="right"),
+#      "\n"
+#    )
+#  }
+#}
+#
+#
+#cat("\n---\n")
+#
+#cat("Hypotheses:\n")
+#cat(
+#"Question                                          Compare:  Pred:     Pass:  P:             r:     effect:\n"
+#)
+#for (hidx in 1:nrow(hypotheses)) {
+#  hyp <- as.list(hypotheses[hidx,])
+#  pred <- "unknown"
+#  if (hyp[["against"]] == "uniform" | hyp[["against"]] == "normal") {
+#    if (hyp[["predict"]] == "greater") {
+#      pred <- "agree"
+#    } else if (hyp[["predict"]] == "less") {
+#      pred <- "disagree"
+#    }
+#  } else {
+#    if (hyp[["predict"]] == "greater") {
+#      pred <- paste(">", hyp[["against"]], sep="")
+#    } else if (hyp[["predict"]] == "less") {
+#      pred <- paste("<", hyp[["against"]], sep="")
+#    }
+#  }
+#  result <- testhypothesis(hyp, filtered)
+#  cat(
+#    "",
+#    format(snames[[as.character(hyp[["question"]])]], width=49, justify="left"),
+#    format(hyp[["compare"]], width=9, justify="left"),
+#    format(pred, width=9, justify="left"),
+#    format(
+#      as.character(as.logical(result[["passed"]])),
+#      width=6,
+#      justify="left"
+#    ),
+#    format(result[["pvalue"]], width=12, justify="left"),
+#    " ",
+#    format(sprintf("%0.3f", result[["effectsize"]]), width=7, justify="left"),
+#    format(sprintf("%0.3f", result[["commoneffect"]]), width=7, justify="left"),
+##    format(result[["conf.low"]], width=4, justify="left"),
+##    format(result[["conf.high"]], width=4, justify="left"),
+#    "\n"
+#  )
+#}
+#
+#cat("\n---\n")
+#
+## Get rid of "normal" entries:
+#
+#filtered <- filtered[filtered$constraints != "normal",]
+#filtered$constraints <- factor(filtered$constraints)
+#
+## Get rid of "uniform" entries:
+#
+#filtered <- filtered[filtered$constraints != "uniform",]
+#filtered$constraints <- factor(filtered$constraints)
+#
+## Prevent anyone from gouging their eyes out:
+#sb <- trellis.par.get("strip.background")
+#sb[["col"]][1] <- "#ddeeff"
+#trellis.par.set("strip.background", sb)
+#
+## Choice histograms
+## -----------------
+#
+#pdf(file="choices.pdf",title="dunyazad-choices.report")
+#filtered$seed = factor(filtered$seed)
+#histogram(
+#  ~ decision | seed,
+#  data=filtered[filtered$constraints=="obvious",],
+#  type="count",
+#  layout=c(3,1),
+#  aspect=1,
+#  col="#ffff99",
+#  xlab="obvious"
+#)
+#histogram(
+#  ~ decision | seed,
+#  data=filtered[filtered$constraints=="relaxed",],
+#  type="count",
+#  layout=c(3,1),
+#  aspect=1,
+#  col="#ffff99",
+#  xlab="relaxed"
+#)
+#histogram(
+#  ~ decision | seed,
+#  data=filtered[filtered$constraints=="dilemma",],
+#  type="count",
+#  layout=c(3,1),
+#  aspect=1,
+#  col="#ffff99",
+#  xlab="dilemma"
+#)
+#dev.off()
+#
+## Get rid of the "decision" column:
+#
+#filtered <- filtered[,names(filtered) != "decision"]
+#
+## Likert reports:
+## ---------------
+#
+## Combined
+## --------
+#
+#pdf(file="combined-report.pdf",title="dunyazad-study-report")
+##png(file="combined-report.png",width=600,height=800)
+#report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
+#report <- report[,snames]
+#lk = likert(
+#  report,
+#  grouping = filtered[["constraints"]]
+#)
+##plot(lk, group.order=c("uniform", "obvious", "relaxed", "dilemma"))
+#plot(lk, group.order=c("obvious", "relaxed", "dilemma"))
+#dev.off()
+#
+#
+## By Stakes
+## ---------
+#
+#pdf(file="report-by-stakes.pdf",title="dunyazad-stakes-report")
+#report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
+#report <- report[,snames]
+#lk = likert(
+#  report,
+#  grouping = factor(filtered[["stakes"]])
+#)
+#plot(lk, group.order=c("low", "high"))
+#dev.off()
+#
+#
+## Ungrouped
+## --------
+#
+#pdf(file="ungrouped-report.pdf",title="dunyazad-ungrouped-report")
+#report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
+#report <- report[,snames]
+#lk = likert(report)
+#plot(lk)
+#dev.off()
+#
+## Obvious
+## --------
+#
+#pdf(file="obvious-report.pdf",title="dunyazad-obvious-report")
+#report <- filtered[
+#  filtered$constraints == "obvious",
+#  names(filtered) %in% names(snames)
+#]
+#report <- rename(report, snames)
+#report <- report[,snames]
+#sort <- filtered[filtered$constraints == "obvious",][["seed"]]
+#lk = likert(
+#  report,
+#  grouping = sort
+#)
+#plot(lk)
+#dev.off()
+#
+## Relaxed
+## -------
+#
+#pdf(file="relaxed-report.pdf",title="dunyazad-relaxed-report")
+#report <- filtered[
+#  filtered$constraints == "relaxed",
+#  names(filtered) %in% names(snames)
+#]
+#report <- rename(report, snames)
+#report <- report[,snames]
+#sort <- filtered[filtered$constraints == "relaxed",][["seed"]]
+#lk = likert(
+#  report,
+#  grouping = sort
+#)
+#plot(lk)
+#dev.off()
+#
+## Dilemma
+## -------
+#
+#pdf(file="dilemma-report.pdf",title="dunyazad-dilemma-report")
+#report <- filtered[
+#  filtered$constraints == "dilemma",
+#  names(filtered) %in% names(snames)
+#]
+#report <- rename(report, snames)
+#report <- report[,snames]
+#sort <- filtered[filtered$constraints == "dilemma",][["seed"]]
+#lk = likert(
+#  report,
+#  grouping = sort
+#)
+#plot(lk)
+#dev.off()
