@@ -8,7 +8,7 @@
 # Note: confidence intervals for median from:
 # http://exploringdatablog.blogspot.sk/2012/04/david-olives-median-confidence-interval.html
 
-library(likert) # likert graphing
+library(likert) # likert graphing *Doesn't do grouping any more :(
 library(reshape) # fix likert error
 library(plyr) # rename function
 library(coin) # wilcox_test allows computing effect sizes
@@ -16,67 +16,128 @@ library(boot) # for bootstrap confidence intervals
 library(lattice) # for histogram
 
 qnames = c(
-  "opt-obvious" = "Considering just the options, there seems to be a clear best option at this choice.",
-  "opt-balanced" = "Ignoring outcomes, the options at this choice all seem about equally good (or bad).",
-  "opt-nobad" = "Ignoring outcomes, there are no options that seem bad at this choice.",
-  "opt-nogood" = "Ignoring outcomes, none of the options at this choice seem good.",
-  "opt-stakes" = "Considering just the options, the stakes for this choice seem low.",
-  "out-fair" = "Given the options available, the outcome I got is fair.",
-  "out-sense" = "The outcome that I got makes sense given the option that I selected.",
-  "out-bad" = "I got a bad outcome.",
-  "out-happy" = "I'm happy with the option that I chose.",
-  "out-unfair" = "The outcome that I got is unfair, given the options available.",
-  "out-unexpected" = "The outcome that I got is completely unexpected.",
-  "out-trick" = "There is an outcome. (This is a trick question to test whether you're paying attention. Please simply indicate that you are in complete disagreement.)",
-  "out-broken" = "There might be a problem with this choice--the outcome I got does not make sense.",
-  "out-good" = "The outcome that I got is a good outcome.",
-  "out-expected" = "I pretty much expected the outcome that I got.",
-  "out-regret" = "I wish I had chosen a different option.",
+  "opt.obvious" = "Considering just the options, there seems to be a clear best option at this choice.",
+  "opt.balanced" = "Ignoring outcomes, the options at this choice all seem about equally good (or bad).",
+  "opt.nobad" = "Ignoring outcomes, there are no options that seem bad at this choice.",
+  "opt.nogood" = "Ignoring outcomes, none of the options at this choice seem good.",
+  "opt.stakes" = "Considering just the options, the stakes for this choice seem low.",
+  "out.fair" = "Given the options available, the outcome I got is fair.",
+  "out.sense" = "The outcome that I got makes sense given the option that I selected.",
+  "out.bad" = "I got a bad outcome.",
+  "out.happy" = "I'm happy with the option that I chose.",
+  "out.unfair" = "The outcome that I got is unfair, given the options available.",
+  "out.unexpected" = "The outcome that I got is completely unexpected.",
+  "out.trick" = "There is an outcome. (This is a trick question to test whether you're paying attention. Please simply indicate that you are in complete disagreement.)",
+  "out.broken" = "There might be a problem with this choice--the outcome I got does not make sense.",
+  "out.good" = "The outcome that I got is a good outcome.",
+  "out.expected" = "I pretty much expected the outcome that I got.",
+  "out.regret" = "I wish I had chosen a different option.",
   "motives" = "Which of the following motive(s) contributed to your decision? (pick one or more)",
-  "judge-good" = "Which of the following judgement(s) contributes to how you generally define a \"good\" outcome in interactive experiences like the one you just played? (pick one or more)",
-  "judge-bad" = "Which of the following judgement(s) contributes to how you generally define a \"bad\" outcome in interactive experiences like the one you just played? (pick one or more)",
+  "judge.good" = "Which of the following judgement(s) contributes to how you generally define a \"good\" outcome in interactive experiences like the one you just played? (pick one or more)",
+  "judge.bad" = "Which of the following judgement(s) contributes to how you generally define a \"bad\" outcome in interactive experiences like the one you just played? (pick one or more)",
   "consistency" = "Do you feel you approach all interactive experiences (e.g., Choose-Your-Own-Adventure novels, video games, tabletop role-playing games, etc.) with a consistent set of motivations and judgements, or do your motivations and judgements change from story to story?",
-  "extra-feedback" = "If you have any other feedback you'd like to give, feel free to enter it here."
+  "extra.feedback" = "If you have any other feedback you'd like to give, feel free to enter it here."
 )
 
 snames = c(
-  "opt-obvious" = "[...] there [is] a clear best option [...].",
-  "opt-balanced" = "[...] [the options] [seem about equally promising].",
-  "opt-nobad" = "[...] there are no options that seem bad [...].",
-  "opt-nogood" = "[...] none of [the options] seem good.",
-  "opt-stakes" = "[...] [the stakes] seem low.",
-  "out-fair" = "[...] the outcome I got is fair.",
-  "out-sense" = "The outcome that I got makes sense [...].",
-  "out-bad" = "I got a bad outcome.",
-  "out-happy" = "I'm happy with the option that I chose.",
-  "out-unfair" = "The outcome that I got is unfair [...].",
-  "out-unexpected" = "The outcome that I got is completely unexpected.",
-  "out-trick" = "There is an outcome. [...]",
-  "out-broken" = "[...] the outcome I got does not make sense.",
-  "out-good" = "The outcome that I got is a good outcome.",
-  "out-expected" = "I pretty much expected the outcome that I got.",
-  "out-regret" = "I wish I had chosen a different option.",
+  "opt.obvious" = "[...] there [is] a clear best option [...].",
+  "opt.balanced" = "[...] [the options] [seem about equally promising].",
+  "opt.nobad" = "[...] there are no options that seem bad [...].",
+  "opt.nogood" = "[...] none of [the options] seem good.",
+  "opt.stakes" = "[...] [the stakes] seem low.",
+
+  "out.good" = "The outcome that I got is a good outcome.",
+  "out.bad" = "I got a bad outcome.",
+
+  "out.expected" = "I pretty much expected the outcome that I got.",
+  "out.unexpected" = "The outcome that I got is completely unexpected.",
+
+  "out.fair" = "[...] the outcome I got is fair.",
+  "out.unfair" = "The outcome that I got is unfair [...].",
+
+  "out.sense" = "The outcome that I got makes sense [...].",
+  "out.broken" = "[...] the outcome I got does not make sense.",
+
+  "out.happy" = "I'm happy with the option that I chose.",
+  "out.regret" = "I wish I had chosen a different option.",
+
+  "out.trick" = "There is an outcome. [...]",
+
   "motives" = "Which of the following motive(s) contributed to your decision? [...]",
-  "judge-good" = "Which of the following judgement(s) contributes to how you [define a \"good\" outcome]?",
-  "judge-bad" = "Which of the following judgement(s) contributes to how you [define a \"bad\" outcome]?",
+  "judge.good" = "Which of the following judgement(s) contributes to how you [define a \"good\" outcome]?",
+  "judge.bad" = "Which of the following judgement(s) contributes to how you [define a \"bad\" outcome]?",
   "consistency" = "Do you feel you approach all interactive experiences [...] with a consistent set of motivations and judgements [...]?",
-  "extra-feedback" = "If you have any other feedback you'd like to give, [enter it here]."
+  "extra.feedback" = "If you have any other feedback you'd like to give, [enter it here]."
 )
 
-# TODO: Fix these!
-#colnames = c(
-#  "Input.seed" = "seed",
-#  "Input.constraints" = "constraints",
-#  "WorkTimeInSeconds" = "duration",
-#  "Answer.decision" = "decision",
-#  "Answer.nobad" = "nobad",
-#  "Answer.clearbest" = "clearbest",
-#  "Answer.lowstakes" = "lowstakes",
-#  "Answer.nogood" = "nogood",
-#  "Answer.balanced" = "balanced",
-#  "Answer.difficult" = "difficult",
-#  "Answer.consequences" = "consequences"
-#)
+likert_questions = c(
+  "opt.obvious",
+  "opt.balanced",
+  "opt.nobad",
+  "opt.nogood",
+  "opt.stakes",
+
+  "out.good",
+  "out.bad",
+
+  "out.expected",
+  "out.unexpected",
+
+  "out.fair",
+  "out.unfair",
+
+  "out.sense",
+  "out.broken",
+
+  "out.happy",
+  "out.regret"
+
+#  "out.trick"
+)
+
+colnames = c(
+  "WorkerId" = "worker",
+  "WorkTimeInSeconds" = "duration",
+  "AssignmentStatus" = "status",
+  "Input.seed" = "seed",
+  "Input.condition" = "condition",
+  "Input.chosen_setup" = "setup",
+  "Answer.decision.backup" = "decision",
+  "Answer.opt.balanced" = "opt.balanced",
+  "Answer.opt.nobad" = "opt.nobad",
+  "Answer.opt.nogood" = "opt.nogood",
+  "Answer.opt.obvious" = "opt.obvious",
+  "Answer.opt.stakes" = "opt.stakes",
+  "Answer.out.bad" = "out.bad",
+  "Answer.out.broken" = "out.broken",
+  "Answer.out.expected" = "out.expected",
+  "Answer.out.fair" = "out.fair",
+  "Answer.out.good" = "out.good",
+  "Answer.out.happy" = "out.happy",
+  "Answer.out.regret" = "out.regret",
+  "Answer.out.sense" = "out.sense",
+  "Answer.out.trick" = "out.trick",
+  "Answer.out.unexpected" = "out.unexpected",
+  "Answer.out.unfair" = "out.unfair",
+  "Answer.motives" = "motives",
+  "Answer.motives.other" = "motives.other",
+  "Answer.judge.good" = "judge.good",
+  "Answer.judge.good.other" = "judge.good.other",
+  "Answer.judge.bad" = "judge.bad",
+  "Answer.judge.bad.other" = "judge.bad.other",
+  "Answer.consistency" = "consistency",
+  "Answer.consistency.other" = "consistency.other",
+  "Answer.extra.feedback" = "extra.feedback"
+)
+
+conditions = c(
+  "expected_success",
+  "unexpected_failure",
+  "obvious_success",
+  "obvious_failure",
+  "expected_failure",
+  "unexpected_success"
+)
 
 
 
@@ -84,39 +145,63 @@ filterfactor <- function (data) {
   filtered <- data
   # Filter out too-quick, rejected, and tricked responses:
   filtered <- filtered[
-    filtered[["AssignmentStatus"]] != "Rejected"
-  & (
-      filtered[["WorkTimeInSeconds"]] == -1
-    | filtered[["WorkTimeInSeconds"]] > 90
-    )
-  & filtered[["Answer.out-trick"]] == 1
+    filtered[["AssignmentStatus"]] == "Approved"
     ,
   ]
   # Get rid of irrelevant columns:
   filtered <- filtered[
     ,
-    names(filtered) == "Input.seed"
-  | names(filtered) == "Input.constraints"
-  | names(filtered) == "chosen_setup"
-  | names(filtered) == "WorkTimeInSeconds"
-  | (
-      substr(names(filtered), 1, 3) == "Ans"
-    & names(filtered) != "Answer.agefluency"
-    & names(filtered) != "Answer.trick"
-    )
+    names(filtered) %in% names(colnames)
   ]
+  # Rename things:
+  filtered <- rename(filtered, colnames)
   # Filter out incomplete entries:
+  # TODO: we'll ignore this for now...
+  #filtered <- filtered[
+  #  complete.cases(filtered)
+  #  ,
+  #]
+
+  # Filter out any entries by workers who completed more than one:
+  #did_multiple <- duplicated(filtered[["worker"]])
+  #print("A")
+  #print(filtered[which(duplicated(filtered[["worker"]])),][["worker"]])
+  #print("B")
+  #print(nrow(filtered))
+  #print("C")
   filtered <- filtered[
-    complete.cases(filtered)
+    !duplicated(filtered[["worker"]]) | filtered[["condition"]] == "uniform"
     ,
   ]
+
+
   # Turn things into factors:
   for (name in names(filtered)) {
     #cat("processing", name, "\n")
-    if (name == "Input.constraints" | name == "Input.stakes") {
+    if (
+      name
+    %in%
+      c("worker", "status", "seed", "condition", "setup", "consistency")
+    ) {
       filtered[[name]] = factor(filtered[[name]], ordered=FALSE)
-    } else if (substr(name, 1, 3) == "Ans") {
-      #cat("FACTORIZE", name, "\n")
+    } else if (
+      name
+    %in%
+      c(
+        "duration",
+        "decision",
+        "motives.other",
+        "judge.good.other",
+        "judge.bad.other",
+        "consistency.other",
+        "extra.feedback"
+      )
+    ) {
+      # nothing here...
+    } else if (name %in% c("motives", "judge.good", "judge.bad")) {
+      # TODO: Split on '|' here...
+    } else {
+      # cat("FACTORIZE", name, "\n")
       filtered[[name]] = factor(
         filtered[[name]],
         levels=c(1, 2, 3, 4, 5),
@@ -124,33 +209,48 @@ filterfactor <- function (data) {
       )
     }
   }
-  # Rename things:
-  # TODO: THIS
-  #filtered <- rename(filtered, colnames)
   return(filtered)
 }
+
+test_error <- c(
+  "passed"="ERROR",
+  "pvalue"=NA,
+  "mr.compare"=NA,
+  "mr.against"=NA,
+  "effectsize"=NA,
+  "commoneffect"=NA,
+  "conf.low"=NA,
+  "conf.high"=NA
+)
 
 testhypothesis <- function(hyp, data) {
   testvar <- as.character(hyp[["question"]])
   compcol <- "ERROR"
   agcol <- "ERROR"
-  if (hyp[["compare"]] %in% data[["constraints"]]) {
-    compcol <- "constraints"
+  onlymain <- "FALSE"
+  if (hyp[["compare"]] %in% data[["condition"]]) {
+    compcol <- "condition"
   } else if (hyp[["compare"]] %in% data[["seed"]]) {
     compcol <- "seed"
   } else if (hyp[["compare"]] %in% data[["stakes"]]) {
     compcol <- "stakes"
+  } else if (hyp[["compare"]] %in% data[["setup"]]) {
+    compcol <- "setup"
   } else {
-    print(hyp[["compare"]])
+    cat("Error: invalid hypothesis condition:", paste("'", as.character(hyp[["compare"]]), "'", sep=""), "\n")
+    return(test_error)
   }
-  if (hyp[["against"]] %in% data[["constraints"]]) {
-    agcol <- "constraints"
+  if (hyp[["against"]] %in% data[["condition"]]) {
+    agcol <- "condition"
   } else if (hyp[["against"]] %in% data[["seed"]]) {
     agcol <- "seed"
   } else if (hyp[["against"]] %in% data[["stakes"]]) {
     agcol <- "stakes"
+  } else if (hyp[["against"]] %in% data[["setup"]]) {
+    agcol <- "setup"
   } else {
-    print(hyp[["against"]])
+    cat("Error: invalid hypothesis against:", paste("'", as.character(hyp[["compare"]]), "'", sep=""), "\n")
+    return(test_error)
   }
   testcol <- data[
     as.character(data[[compcol]]) == as.character(hyp[["compare"]])
@@ -189,11 +289,11 @@ testhypothesis <- function(hyp, data) {
     conf.level=0.95
   )
   #compare <- data[
-  #  as.character(data[["constraints"]]) == as.character(hyp[["compare"]])
+  #  as.character(data[["condition"]]) == as.character(hyp[["compare"]])
   #  ,
   #]
   #against <- data[
-  #  as.character(data[["constraints"]]) == as.character(hyp[["against"]])
+  #  as.character(data[["condition"]]) == as.character(hyp[["against"]])
   #  ,
   #]
   #compare <- as.list(as.numeric(compare[[testvar]]))
@@ -295,13 +395,13 @@ DOliveCIproc <- function(y, alpha = 0.05){
 
 # TODO: HERE
 #responses <- read.csv(file="study-results.csv",head=TRUE,sep=",")
-responses <- read.csv(file="partial-results.csv",head=TRUE,sep=",")
+responses <- read.csv(file="full-results.csv",head=TRUE,sep=",")
 hypotheses <- read.csv(file="hypotheses.csv",head=TRUE,sep=",")
 
 filtered <- filterfactor(responses)
 real <- filtered[
-  filtered[["constraints"]] != "uniform"
-& filtered[["constraints"]] != "normal"
+  filtered[["condition"]] != "uniform"
+& filtered[["condition"]] != "normal"
   ,
 ]
 
@@ -309,287 +409,273 @@ cat("\n---\n")
 
 cat("Total responses:", nrow(responses), "\n")
 cat("Acceptable responses:", nrow(filtered), "\n")
-#cat("     obvious:", nrow(filtered[filtered$constraints == "obvious",]), "\n")
-#cat("     relaxed:", nrow(filtered[filtered$constraints == "relaxed",]), "\n")
-#cat("     dilemma:", nrow(filtered[filtered$constraints == "dilemma",]), "\n")
-#cat("\n")
-#cat("  low-stakes:", nrow(filtered[filtered$stakes == "low",]), "\n")
-#cat(" high-stakes:", nrow(filtered[filtered$stakes == "high",]), "\n")
-#cat("\n")
-#cat(
-#  " obvious by stakes:",
-#  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "obvious",]),
-#  "/",
-#  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "obvious",]),
-#  "\n"
-#)
-#cat(
-#  " relaxed by stakes:",
-#  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "relaxed",]),
-#  "/",
-#  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "relaxed",]),
-#  "\n"
-#)
-#cat(
-#  " dilemma by stakes:",
-#  nrow(filtered[filtered$stakes == "low" & filtered$constraints == "dilemma",]),
-#  "/",
-#  nrow(filtered[filtered$stakes == "high" & filtered$constraints == "dilemma",]),
-#  "\n"
-#)
-#cat("\n")
-#cat("     uniform:", nrow(filtered[filtered$constraints == "uniform",]), "\n")
-#cat("     normal:", nrow(filtered[filtered$constraints == "normal",]), "\n")
-#cat("Real responses:", nrow(real), "\n")
+cat("Real responses:", nrow(real), "\n")
+uniform <- filtered[filtered$condition == "uniform",]
+cat(" uniform:", nrow(uniform), "\n")
+exp_succ <- filtered[filtered$condition == "expected_success",]
+unx_succ <- filtered[filtered$condition == "unexpected_success",]
+exp_fail <- filtered[filtered$condition == "expected_failure",]
+unx_fail <- filtered[filtered$condition == "unexpected_failure",]
+obv_succ <- filtered[filtered$condition == "obvious_success",]
+obv_fail <- filtered[filtered$condition == "obvious_failure",]
+cat(" exp-succ:", nrow(exp_succ), "\n")
+cat("    market:", nrow(exp_succ[exp_succ$setup == "market",]), "\n")
+cat("    threat:", nrow(exp_succ[exp_succ$setup=="threatened_innocents",]),"\n")
+cat("    monstr:", nrow(exp_succ[exp_succ$setup == "monster_attack",]), "\n")
+cat(" unx-fail:", nrow(unx_fail), "\n")
+cat("    market:", nrow(unx_fail[unx_fail$setup == "market",]), "\n")
+cat("    threat:", nrow(unx_fail[unx_fail$setup=="threatened_innocents",]),"\n")
+cat("    monstr:", nrow(unx_fail[unx_fail$setup == "monster_attack",]), "\n")
+cat(" exp-fail:", nrow(exp_fail), "\n")
+cat("    market:", nrow(exp_fail[exp_fail$setup == "market",]), "\n")
+cat("    threat:", nrow(exp_fail[exp_fail$setup=="threatened_innocents",]),"\n")
+cat("    monstr:", nrow(exp_fail[exp_fail$setup == "monster_attack",]), "\n")
+cat(" unx-succ:", nrow(unx_succ), "\n")
+cat("    market:", nrow(unx_succ[unx_succ$setup == "market",]), "\n")
+cat("    threat:", nrow(unx_succ[unx_succ$setup=="threatened_innocents",]),"\n")
+cat("    monstr:", nrow(unx_succ[unx_succ$setup == "monster_attack",]), "\n")
+cat(" obv-succ:", nrow(obv_succ), "\n")
+cat("    market:", nrow(obv_succ[obv_succ$setup == "market",]), "\n")
+cat("    threat:", nrow(obv_succ[obv_succ$setup=="threatened_innocents",]),"\n")
+cat("    monstr:", nrow(obv_succ[obv_succ$setup == "monster_attack",]), "\n")
+cat(" obv-fail:", nrow(obv_fail), "\n")
+cat("    market:", nrow(obv_fail[obv_fail$setup == "market",]), "\n")
+cat("    threat:", nrow(obv_fail[obv_fail$setup=="threatened_innocents",]),"\n")
+cat("    monstr:", nrow(obv_fail[obv_fail$setup == "monster_attack",]), "\n")
+cat("\n")
+cat("\n---\n")
 #
-#
-#cat("\n---\n")
-#
-#cat("Median response time:", median(responses[responses$WorkTimeInSeconds != -1,]$WorkTimeInSeconds),"\n")
-#cat("Median accepted response time:", median(real$duration), "\n")
-#
-#cat("\n---\n")
-#
-#cat("General statistics:\n")
-#for (treatment in c("obvious", "relaxed", "dilemma")) {
-#  cat(" ", treatment, ":\n")
-#  for (
-#    question
-#  in
-#    c(
-#      "nobad",
-#      "nogood",
-#      "clearbest",
-#      "lowstakes",
-#      "balanced",
-#      "difficult",
-#      "consequences"
-#    )
-#  ) {
-#    col <- filtered[filtered$constraints == treatment,][[question]]
-#    num <- as.numeric(as.character(col))
-#   # cis <- DOliveCIproc(num)
-#   # wcis <- wilcox.test(
-#   #   num,
-#   #   conf.int=TRUE,
-#   #   conf.level=0.95,
-#   #   alternative="two.sided",
-#   #   correct=TRUE
-#   # )
-#    boottype <- "basic"
-#    bcis <- boot.ci(
-#      boot(num, function(x, i) median(x[i]), R=1000),
-#      type=boottype
-#    )
-#    cat(
-#      "   ",
-#      format(question, width=12, justify="left"),
-#      #format(sprintf("%0.2f", cis[["LCI"]]), width=5, justify="right"),
-#      #format(sprintf("%0.2f", wcis[["conf.int"]][[1]]),width=5,justify="right"),
-#      format(sprintf("%0.2f", bcis[[boottype]][[4]]), width=5, justify="right"),
-#      "--",
-#      median(num),
-#      "--",
-#      #format(sprintf("%0.2f", cis[["UCI"]]), width=5, justify="right"),
-#      #format(sprintf("%0.2f", wcis[["conf.int"]][[2]]),width=5,justify="right"),
-#      format(sprintf("%0.2f", bcis[[boottype]][[5]]), width=5, justify="right"),
-#      "\n"
-#    )
-#  }
-#}
-#
-#
-#cat("\n---\n")
-#
-#cat("Hypotheses:\n")
-#cat(
-#"Question                                          Compare:  Pred:     Pass:  P:             r:     effect:\n"
-#)
-#for (hidx in 1:nrow(hypotheses)) {
-#  hyp <- as.list(hypotheses[hidx,])
-#  pred <- "unknown"
-#  if (hyp[["against"]] == "uniform" | hyp[["against"]] == "normal") {
-#    if (hyp[["predict"]] == "greater") {
-#      pred <- "agree"
-#    } else if (hyp[["predict"]] == "less") {
-#      pred <- "disagree"
-#    }
-#  } else {
-#    if (hyp[["predict"]] == "greater") {
-#      pred <- paste(">", hyp[["against"]], sep="")
-#    } else if (hyp[["predict"]] == "less") {
-#      pred <- paste("<", hyp[["against"]], sep="")
-#    }
-#  }
-#  result <- testhypothesis(hyp, filtered)
-#  cat(
-#    "",
-#    format(snames[[as.character(hyp[["question"]])]], width=49, justify="left"),
-#    format(hyp[["compare"]], width=9, justify="left"),
-#    format(pred, width=9, justify="left"),
-#    format(
-#      as.character(as.logical(result[["passed"]])),
-#      width=6,
-#      justify="left"
-#    ),
-#    format(result[["pvalue"]], width=12, justify="left"),
-#    " ",
-#    format(sprintf("%0.3f", result[["effectsize"]]), width=7, justify="left"),
-#    format(sprintf("%0.3f", result[["commoneffect"]]), width=7, justify="left"),
-##    format(result[["conf.low"]], width=4, justify="left"),
-##    format(result[["conf.high"]], width=4, justify="left"),
-#    "\n"
-#  )
-#}
-#
-#cat("\n---\n")
-#
-## Get rid of "normal" entries:
-#
-#filtered <- filtered[filtered$constraints != "normal",]
-#filtered$constraints <- factor(filtered$constraints)
-#
-## Get rid of "uniform" entries:
-#
-#filtered <- filtered[filtered$constraints != "uniform",]
-#filtered$constraints <- factor(filtered$constraints)
-#
-## Prevent anyone from gouging their eyes out:
-#sb <- trellis.par.get("strip.background")
-#sb[["col"]][1] <- "#ddeeff"
-#trellis.par.set("strip.background", sb)
-#
-## Choice histograms
-## -----------------
-#
-#pdf(file="choices.pdf",title="dunyazad-choices.report")
-#filtered$seed = factor(filtered$seed)
-#histogram(
-#  ~ decision | seed,
-#  data=filtered[filtered$constraints=="obvious",],
-#  type="count",
-#  layout=c(3,1),
-#  aspect=1,
-#  col="#ffff99",
-#  xlab="obvious"
-#)
-#histogram(
-#  ~ decision | seed,
-#  data=filtered[filtered$constraints=="relaxed",],
-#  type="count",
-#  layout=c(3,1),
-#  aspect=1,
-#  col="#ffff99",
-#  xlab="relaxed"
-#)
-#histogram(
-#  ~ decision | seed,
-#  data=filtered[filtered$constraints=="dilemma",],
-#  type="count",
-#  layout=c(3,1),
-#  aspect=1,
-#  col="#ffff99",
-#  xlab="dilemma"
-#)
-#dev.off()
-#
-## Get rid of the "decision" column:
-#
-#filtered <- filtered[,names(filtered) != "decision"]
-#
-## Likert reports:
-## ---------------
-#
-## Combined
-## --------
-#
-#pdf(file="combined-report.pdf",title="dunyazad-study-report")
+cat("Median response time:", median(responses[responses$WorkTimeInSeconds != -1,]$WorkTimeInSeconds),"\n")
+cat("Median accepted response time:", median(real$duration), "\n")
+
+cat("\n---\n")
+
+cat("General statistics:\n")
+for (cond in conditions) {
+  cat(" ", cond, ":\n")
+  for (
+    question
+  in
+    c(
+      "opt.balanced",
+      "opt.nobad",
+      "opt.nogood",
+      "opt.stakes"
+    )
+  ) {
+    col <- filtered[filtered$condition == cond,][[question]]
+    num <- as.numeric(as.character(col[!is.na(col)]))
+   # cis <- DOliveCIproc(num)
+   # wcis <- wilcox.test(
+   #   num,
+   #   conf.int=TRUE,
+   #   conf.level=0.95,
+   #   alternative="two.sided",
+   #   correct=TRUE
+   # )
+    boottype <- "basic"
+    bcis <- boot.ci(
+      boot(num, function(x, i) median(x[i]), R=1000),
+      type=boottype
+    )
+    cat(
+      "   ",
+      format(question, width=12, justify="left"),
+      #format(sprintf("%0.2f", cis[["LCI"]]), width=5, justify="right"),
+      #format(sprintf("%0.2f", wcis[["conf.int"]][[1]]),width=5,justify="right"),
+      format(sprintf("%0.2f", bcis[[boottype]][[4]]), width=5, justify="right"),
+      "--",
+      median(num),
+      "--",
+      #format(sprintf("%0.2f", cis[["UCI"]]), width=5, justify="right"),
+      #format(sprintf("%0.2f", wcis[["conf.int"]][[2]]),width=5,justify="right"),
+      format(sprintf("%0.2f", bcis[[boottype]][[5]]), width=5, justify="right"),
+      "\n"
+    )
+  }
+}
+
+
+cat("\n---\n")
+
+cat("Hypotheses:\n")
+cat(
+"Question                                              Compare:            Pred:       Pass:  P:             r:     effect:\n"
+)
+for (hidx in 1:nrow(hypotheses)) {
+  hyp <- as.list(hypotheses[hidx,])
+  pred <- "unknown"
+  if (hyp[["against"]] == "uniform" | hyp[["against"]] == "normal") {
+    if (hyp[["predict"]] == "greater") {
+      pred <- "agree"
+    } else if (hyp[["predict"]] == "less") {
+      pred <- "disagree"
+    }
+  } else {
+    if (hyp[["predict"]] == "greater") {
+      pred <- paste(">", hyp[["against"]], sep="")
+    } else if (hyp[["predict"]] == "less") {
+      pred <- paste("<", hyp[["against"]], sep="")
+    }
+  }
+  result <- testhypothesis(hyp, filtered)
+  if (result[["passed"]] != "ERROR") {
+    cat(
+      "",
+      format(snames[[as.character(hyp[["question"]])]], width=53, justify="left"),
+      format(hyp[["compare"]], width=19, justify="left"),
+      format(pred, width=11, justify="left"),
+      format(
+        as.character(as.logical(result[["passed"]])),
+        width=6,
+        justify="left"
+      ),
+      format(result[["pvalue"]], width=12, justify="left"),
+      " ",
+      format(sprintf("%0.3f", result[["effectsize"]]), width=7, justify="left"),
+      format(sprintf("%0.3f", result[["commoneffect"]]), width=7, justify="left"),
+#      format(result[["conf.low"]], width=4, justify="left"),
+#      format(result[["conf.high"]], width=4, justify="left"),
+      "\n"
+    )
+  }
+}
+
+cat("\n---\n")
+
+# Get rid of "normal" entries:
+
+filtered <- filtered[filtered$condition != "normal",]
+filtered$condition <- factor(filtered$condition)
+
+# Get rid of "uniform" entries:
+
+filtered <- filtered[filtered$condition != "uniform",]
+filtered$condition <- factor(filtered$condition)
+
+# Prevent anyone from gouging their eyes out:
+sb <- trellis.par.get("strip.background")
+sb[["col"]][1] <- "#ddeeff"
+trellis.par.set("strip.background", sb)
+
+# Choice histograms
+# -----------------
+
+pdf(file="choices.pdf",title="dunyazad-outcomes-choices.report")
+filtered$seed = factor(filtered$seed)
+histogram(
+  ~ decision | seed,
+  data=filtered[filtered$condition=="expected_success",],
+  type="count",
+  layout=c(3,1),
+  aspect=1,
+  col="#ffff99",
+  xlab="expected_success"
+)
+histogram(
+  ~ decision | seed,
+  data=filtered[filtered$condition=="unexpected_failure",],
+  type="count",
+  layout=c(3,1),
+  aspect=1,
+  col="#ffff99",
+  xlab="unexpected_failure"
+)
+histogram(
+  ~ decision | seed,
+  data=filtered[filtered$condition=="obvious_success",],
+  type="count",
+  layout=c(3,1),
+  aspect=1,
+  col="#ffff99",
+  xlab="obvious_success"
+)
+histogram(
+  ~ decision | seed,
+  data=filtered[filtered$condition=="obvious_failure",],
+  type="count",
+  layout=c(3,1),
+  aspect=1,
+  col="#ffff99",
+  xlab="obvious_failure"
+)
+histogram(
+  ~ decision | seed,
+  data=filtered[filtered$condition=="expected_failure",],
+  type="count",
+  layout=c(3,1),
+  aspect=1,
+  col="#ffff99",
+  xlab="expected_failure"
+)
+histogram(
+  ~ decision | seed,
+  data=filtered[filtered$condition=="unexpected_success",],
+  type="count",
+  layout=c(3,1),
+  aspect=1,
+  col="#ffff99",
+  xlab="unexpected_success"
+)
+dev.off()
+
+# Get rid of the "decision" and "out.trick" columns:
+
+filtered <- filtered[,!( names(filtered) %in% c("decision", "out.trick") )]
+
+# Likert reports:
+# ---------------
+
+likert_names = snames[names(snames) %in% likert_questions]
+
+# Combined
+# --------
+
+#pdf(file="combined-report.pdf",title="dunyazad-outcomes-study-report")
 ##png(file="combined-report.png",width=600,height=800)
-#report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
-#report <- report[,snames]
-#lk = likert(
-#  report,
-#  grouping = filtered[["constraints"]]
-#)
-##plot(lk, group.order=c("uniform", "obvious", "relaxed", "dilemma"))
-#plot(lk, group.order=c("obvious", "relaxed", "dilemma"))
-#dev.off()
-#
-#
-## By Stakes
-## ---------
-#
-#pdf(file="report-by-stakes.pdf",title="dunyazad-stakes-report")
-#report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
-#report <- report[,snames]
-#lk = likert(
-#  report,
-#  grouping = factor(filtered[["stakes"]])
-#)
-#plot(lk, group.order=c("low", "high"))
-#dev.off()
-#
-#
-## Ungrouped
-## --------
-#
-#pdf(file="ungrouped-report.pdf",title="dunyazad-ungrouped-report")
-#report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
-#report <- report[,snames]
+#report <- rename(filtered[,names(filtered) %in% likert_questions], likert_names)
+##report <- report[,likert_names]
+## TODO: Not this!
+##report <- report[complete.cases(report),]
 #lk = likert(report)
+#print(filtered[["condition"]])
+##lk = likert(
+##  report,
+##  grouping = filtered$condition == "expected_success"
+##)
+#print(lk)
+##lk = likert(
+##  report,
+##  grouping = report[["setup"]]
+##)
+##plot(lk, group.order=c("uniform", "obvious", "relaxed", "dilemma"))
+##pp <- plot(lk, group.order=c("expected_success", "unexpected_failure", "obvious_success", "obvious_failure", "expected_failure", "unexpected_failure"))
+##pp <- plot(lk, group.order=c("expected_success"))
+##pp$layers <- pp$layers[-1]
+##pp$layers <- pp$layers[-0]
+##show(pp)
+##plot(lk, group.order=c("expected_success"))
+##plot(lk, group.order=c("monster_attack", "threatened_innocents", "market"))
 #plot(lk)
 #dev.off()
-#
-## Obvious
-## --------
-#
-#pdf(file="obvious-report.pdf",title="dunyazad-obvious-report")
-#report <- filtered[
-#  filtered$constraints == "obvious",
-#  names(filtered) %in% names(snames)
-#]
-#report <- rename(report, snames)
-#report <- report[,snames]
-#sort <- filtered[filtered$constraints == "obvious",][["seed"]]
-#lk = likert(
-#  report,
-#  grouping = sort
-#)
-#plot(lk)
-#dev.off()
-#
-## Relaxed
-## -------
-#
-#pdf(file="relaxed-report.pdf",title="dunyazad-relaxed-report")
-#report <- filtered[
-#  filtered$constraints == "relaxed",
-#  names(filtered) %in% names(snames)
-#]
-#report <- rename(report, snames)
-#report <- report[,snames]
-#sort <- filtered[filtered$constraints == "relaxed",][["seed"]]
-#lk = likert(
-#  report,
-#  grouping = sort
-#)
-#plot(lk)
-#dev.off()
-#
-## Dilemma
-## -------
-#
-#pdf(file="dilemma-report.pdf",title="dunyazad-dilemma-report")
-#report <- filtered[
-#  filtered$constraints == "dilemma",
-#  names(filtered) %in% names(snames)
-#]
-#report <- rename(report, snames)
-#report <- report[,snames]
-#sort <- filtered[filtered$constraints == "dilemma",][["seed"]]
-#lk = likert(
-#  report,
-#  grouping = sort
-#)
-#plot(lk)
-#dev.off()
+
+
+# Individual Conditions
+# ---------------------
+
+for (cond in conditions) {
+  pdf(
+      file=paste("report-", cond, ".pdf", sep=""),
+      title=paste("dunyazad-report-", cond, sep="")
+  )
+  report <- filtered[
+    filtered$condition == cond,
+    names(filtered) %in% names(likert_names)
+  ]
+  report <- rename(report, likert_names)
+  lk = likert(report)
+  lk$results = lk$results[match(likert_names, lk$results$Item),]
+  p <- plot(lk, ordered=FALSE, group.order=likert_names)
+  show(p)
+  dev.off()
+}

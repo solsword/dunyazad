@@ -507,6 +507,7 @@ at(N, option_structure(positive_alternatives)) :-
   at(N, player_goal(Goal1)),
   at(N, player_goal(Goal2)),
   Goal1 != Goal2,
+  % TODO: This is a bit silly...
   2 <= {
     at(N, option(X)) : at(N, expectation(option(X), achieves, Goal1));
     at(N, option(X)) : at(N, expectation(option(X), achieves, Goal2))
