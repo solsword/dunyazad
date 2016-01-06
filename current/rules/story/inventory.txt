@@ -2,7 +2,15 @@ Content
   content/ -
     Action, goal, potential, and setup definitions, as well as actors and
     items.
+  the_party.lp -
+    Rules for the starting state of the player's party.
+  settings.lp -
+    The different possible settings.
 
+Other
+  utils.lp -
+    Various useful rules and some Python code, including a system for
+    generating unique handles.
 
 Representational constraints
   actions.lp -
@@ -27,7 +35,7 @@ Representational constraints
     urgency/immediacy, and importance. The idea of unresolved and hidden
     potentials.
   settings.lp -
-    The different possible settings and setting/scene association.
+    Setting/scene association.
   setup.lp -
     Rules for unpacking setups and creating/editing associated states.
   skills.lp -
@@ -39,26 +47,23 @@ Constituent constraints
   actions.lp -
     Limits interactions with incapacitated/off-stage actors.
   choice_structure.lp -
-    Prohibits redundant options.
-
-Aesthetic constraints
-  actions.lp -
-    Definition of 'surprising' outcomes based on likely/unlikely outcomes.
-  choice_structure.lp -
     Definition of option relevance and requirement that options be relevant and
-    each important potential be addressed. Enforces some aspects of narrative
-    perspective (protagonists as initiators of options at choices and others
-    for events). Establishes the concept of motivation and requires it.
-    Prohibits boring and duplicate events and trick options. Constraints that
-    keep the action moving and prevent problems from repeating or being
-    ignored. Also prevents setups from repeating and
-    requires some setup variety.
-  the_party.lp -
-    Rules for the starting state of the player's party.
+    each important potential be addressed. Prohibits redundant options.
+    Establishes the concept of motivation and requires it. Prohibits boring and
+    duplicate events and trick options. Constraints that keep the action moving
+    and prevent problems from repeating or being ignored. Also prevents setups
+    from repeating and requires some setup variety.
   vignettes.lp -
     The concept of a vignette and vignette transitions.
 
+Aesthetic constraints
+  choice_structure.lp -
+    Enforces some aspects of narrative perspective (protagonists as initiators
+    of options at choices and others for events).
+
 Poetic constraints
+  actions.lp -
+    Definition of 'surprising' outcomes based on likely/unlikely outcomes.
   choice_structure.lp -
     Constraints on story length and number of choices.
   eval.lp -
