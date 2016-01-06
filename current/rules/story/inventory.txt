@@ -1,0 +1,70 @@
+Content
+  content/ -
+    Action, goal, potential, and setup definitions, as well as actors and
+    items.
+
+
+Representational constraints
+  actions.lp -
+    The association between actions and options, binding of arguments and
+    outcomes, and the determination of consequences based on outcome values.
+  actors.lp -
+    Unpacking for actor definitions, and the top level of the actors ontology.
+  core.lp -
+    Constraints that define the basic structure of things (what an option is,
+    events vs. choices, etc.). Building blocks for defining things like states
+    and actions, for example exclusivity of states and reflexivity of actions.
+    The bones of the ontology code: being an instance of a class, subclasses
+    and super-classes, etc.
+  grow.lp - 
+    Node statuses and ordering, the creation of new nodes and state transfer
+    between nodes; state matching. 
+  items.lp -
+    Unpacking for item definitions, having a tool for a skill, and communal
+    ownership for trading purposes.
+  potential.lp -
+    Rules that support the idea of potentials. Resolution methods, initiators,
+    urgency/immediacy, and importance. The idea of unresolved and hidden
+    potentials.
+  settings.lp -
+    The different possible settings and setting/scene association.
+  setup.lp -
+    Rules for unpacking setups and creating/editing associated states.
+  skills.lp -
+    Definitions for each skill (although skill links are specified by actions).
+  surface.lp -
+    Surface properties.
+
+Constituent constraints
+  actions.lp -
+    Limits interactions with incapacitated/off-stage actors.
+  choice_structure.lp -
+    Prohibits redundant options.
+
+Aesthetic constraints
+  actions.lp -
+    Definition of 'surprising' outcomes based on likely/unlikely outcomes.
+  choice_structure.lp -
+    Definition of option relevance and requirement that options be relevant and
+    each important potential be addressed. Enforces some aspects of narrative
+    perspective (protagonists as initiators of options at choices and others
+    for events). Establishes the concept of motivation and requires it.
+    Prohibits boring and duplicate events and trick options. Constraints that
+    keep the action moving and prevent problems from repeating or being
+    ignored. Also prevents setups from repeating and
+    requires some setup variety.
+  the_party.lp -
+    Rules for the starting state of the player's party.
+  vignettes.lp -
+    The concept of a vignette and vignette transitions.
+
+Poetic constraints
+  choice_structure.lp -
+    Constraints on story length and number of choices.
+  eval.lp -
+    Expectations, perceived and actual stakes, option feels, option structures,
+    outcome perceptions, outcome predictabilities, and outcome feels.
+  goals.lp -
+    Player goals; apparent guilt of characters.
+  skills.lp -
+    Likely and unlikely outcomes based on skill links; skill and tool relevance.
