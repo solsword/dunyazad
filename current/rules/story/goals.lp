@@ -39,7 +39,7 @@ at(N, guilty(inst(actor, Guilty))) :-
 
 at(N, guilty(inst(actor, Guilty))) :-
   st(N, relation(accusing, inst(actor, Guilty), inst(actor, Innocent))),
-  not at(N, guity(inst(actor, Innocent))).
+  not at(N, guilty(inst(actor, Innocent))).
 
 at(N, guilty(inst(actor, Guilty))) :-
   st(N, relation(has_item, inst(actor, Guilty), inst(item, Stolen))),
