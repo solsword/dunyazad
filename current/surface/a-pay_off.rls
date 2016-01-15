@@ -1,7 +1,7 @@
 % Action - pay_off
 
 :action/pay_off/option
-N#?asking/they V#offer/prs/?asking N#?listening/them N#?price/them
+N#?asking/they V#bargain/prs/?asking with N#?listening/them to back down using N#?price/them
 
 :action/pay_off/infinitive
 V#pay/inf/?subject off a threat
