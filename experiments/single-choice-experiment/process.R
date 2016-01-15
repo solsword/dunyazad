@@ -8,12 +8,12 @@
 # Note: confidence intervals for median from:
 # http://exploringdatablog.blogspot.sk/2012/04/david-olives-median-confidence-interval.html
 
-library(likert) # likert graphing
-library(reshape) # fix likert error
 library(plyr) # rename function
 library(coin) # wilcox_test allows computing effect sizes
 library(boot) # for bootstrap confidence intervals
 library(lattice) # for histogram
+library(likert) # likert graphing
+#library(reshape) # WOULD CAUSE likert error
 
 qnames = c(
   "nobad" = "There are no bad options at this choice.",
@@ -290,6 +290,9 @@ filtered <- filterfactor(responses)
 real <- filtered[
   filtered[["constraints"]] != "uniform"
 & filtered[["constraints"]] != "normal"
+& filtered[["constraints"]] != "neutral"
+& filtered[["constraints"]] != "agree"
+& filtered[["constraints"]] != "sagree"
   ,
 ]
 
@@ -328,6 +331,9 @@ cat(
 cat("\n")
 cat("     uniform:", nrow(filtered[filtered$constraints == "uniform",]), "\n")
 cat("     normal:", nrow(filtered[filtered$constraints == "normal",]), "\n")
+cat("     neutral:", nrow(filtered[filtered$constraints == "neutral",]), "\n")
+cat("     agree:", nrow(filtered[filtered$constraints == "agree",]), "\n")
+cat("     sagree:", nrow(filtered[filtered$constraints == "sagree",]), "\n")
 cat("Real responses:", nrow(real), "\n")
 
 
@@ -396,7 +402,7 @@ cat(
 for (hidx in 1:nrow(hypotheses)) {
   hyp <- as.list(hypotheses[hidx,])
   pred <- "unknown"
-  if (hyp[["against"]] == "uniform" | hyp[["against"]] == "normal") {
+  if (hyp[["against"]] == "uniform" | hyp[["against"]] == "normal" | hyp[["against"]] == "neutral") {
     if (hyp[["predict"]] == "greater") {
       pred <- "agree"
     } else if (hyp[["predict"]] == "less") {
@@ -432,14 +438,13 @@ for (hidx in 1:nrow(hypotheses)) {
 
 cat("\n---\n")
 
-# Get rid of "normal" entries:
+# Get rid of "normal," "uniform," "neutral," "agree," and "sagree" fake entries:
 
 filtered <- filtered[filtered$constraints != "normal",]
-filtered$constraints <- factor(filtered$constraints)
-
-# Get rid of "uniform" entries:
-
 filtered <- filtered[filtered$constraints != "uniform",]
+filtered <- filtered[filtered$constraints != "neutral",]
+filtered <- filtered[filtered$constraints != "agree",]
+filtered <- filtered[filtered$constraints != "sagree",]
 filtered$constraints <- factor(filtered$constraints)
 
 # Prevent anyone from gouging their eyes out:
@@ -493,91 +498,97 @@ filtered <- filtered[,names(filtered) != "decision"]
 
 pdf(file="combined-report.pdf",title="dunyazad-study-report")
 #png(file="combined-report.png",width=600,height=800)
-report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
-report <- report[,snames]
+#report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
+#report <- report[,snames]
+report <- filtered[,names(filtered) %in% names(snames)]
+report$cc <- filtered$constraints
+print(head(report))
+print(str(report))
+#lk = likert(report[,names(report) != "cc"])
 lk = likert(
-  report,
-  grouping = filtered[["constraints"]]
+  report[,names(report) != "cc"],
+  grouping = report$cc
 )
 #plot(lk, group.order=c("uniform", "obvious", "relaxed", "dilemma"))
-plot(lk, group.order=c("obvious", "relaxed", "dilemma"))
-dev.off()
-
-
-# By Stakes
-# ---------
-
-pdf(file="report-by-stakes.pdf",title="dunyazad-stakes-report")
-report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
-report <- report[,snames]
-lk = likert(
-  report,
-  grouping = factor(filtered[["stakes"]])
-)
-plot(lk, group.order=c("low", "high"))
-dev.off()
-
-
-# Ungrouped
-# --------
-
-pdf(file="ungrouped-report.pdf",title="dunyazad-ungrouped-report")
-report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
-report <- report[,snames]
-lk = likert(report)
+#plot(lk, group.order=c("obvious", "relaxed", "dilemma"))
 plot(lk)
 dev.off()
 
-# Obvious
-# --------
 
-pdf(file="obvious-report.pdf",title="dunyazad-obvious-report")
-report <- filtered[
-  filtered$constraints == "obvious",
-  names(filtered) %in% names(snames)
-]
-report <- rename(report, snames)
-report <- report[,snames]
-sort <- filtered[filtered$constraints == "obvious",][["seed"]]
-lk = likert(
-  report,
-  grouping = sort
-)
-plot(lk)
-dev.off()
-
-# Relaxed
-# -------
-
-pdf(file="relaxed-report.pdf",title="dunyazad-relaxed-report")
-report <- filtered[
-  filtered$constraints == "relaxed",
-  names(filtered) %in% names(snames)
-]
-report <- rename(report, snames)
-report <- report[,snames]
-sort <- filtered[filtered$constraints == "relaxed",][["seed"]]
-lk = likert(
-  report,
-  grouping = sort
-)
-plot(lk)
-dev.off()
-
-# Dilemma
-# -------
-
-pdf(file="dilemma-report.pdf",title="dunyazad-dilemma-report")
-report <- filtered[
-  filtered$constraints == "dilemma",
-  names(filtered) %in% names(snames)
-]
-report <- rename(report, snames)
-report <- report[,snames]
-sort <- filtered[filtered$constraints == "dilemma",][["seed"]]
-lk = likert(
-  report,
-  grouping = sort
-)
-plot(lk)
-dev.off()
+## By Stakes
+## ---------
+#
+#pdf(file="report-by-stakes.pdf",title="dunyazad-stakes-report")
+#report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
+#report <- report[,snames]
+#lk = likert(
+#  report,
+#  grouping = factor(filtered[["stakes"]])
+#)
+#plot(lk, group.order=c("low", "high"))
+#dev.off()
+#
+#
+## Ungrouped
+## --------
+#
+#pdf(file="ungrouped-report.pdf",title="dunyazad-ungrouped-report")
+#report <- rename(filtered[,names(filtered) %in% names(snames)], snames)
+#report <- report[,snames]
+#lk = likert(report)
+#plot(lk)
+#dev.off()
+#
+## Obvious
+## --------
+#
+#pdf(file="obvious-report.pdf",title="dunyazad-obvious-report")
+#report <- filtered[
+#  filtered$constraints == "obvious",
+#  names(filtered) %in% names(snames)
+#]
+#report <- rename(report, snames)
+#report <- report[,snames]
+#sort <- filtered[filtered$constraints == "obvious",][["seed"]]
+#lk = likert(
+#  report,
+#  grouping = sort
+#)
+#plot(lk)
+#dev.off()
+#
+## Relaxed
+## -------
+#
+#pdf(file="relaxed-report.pdf",title="dunyazad-relaxed-report")
+#report <- filtered[
+#  filtered$constraints == "relaxed",
+#  names(filtered) %in% names(snames)
+#]
+#report <- rename(report, snames)
+#report <- report[,snames]
+#sort <- filtered[filtered$constraints == "relaxed",][["seed"]]
+#lk = likert(
+#  report,
+#  grouping = sort
+#)
+#plot(lk)
+#dev.off()
+#
+## Dilemma
+## -------
+#
+#pdf(file="dilemma-report.pdf",title="dunyazad-dilemma-report")
+#report <- filtered[
+#  filtered$constraints == "dilemma",
+#  names(filtered) %in% names(snames)
+#]
+#report <- rename(report, snames)
+#report <- report[,snames]
+#sort <- filtered[filtered$constraints == "dilemma",][["seed"]]
+#lk = likert(
+#  report,
+#  grouping = sort
+#)
+#plot(lk)
+#dev.off()

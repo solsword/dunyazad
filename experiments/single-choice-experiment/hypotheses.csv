@@ -36,8 +36,14 @@ secondary,consequences,dilemma,relaxed,greater
 tertiary,lowstakes,relaxed,dilemma,greater
 stakes,lowstakes,low,uniform,greater
 stakes,lowstakes,high,uniform,less
-stakes,lowstakes,low,high,greater
+stakes,consequences,high,low,greater
 stakesextra,consequences,high,uniform,greater
 stakesextra,consequences,low,uniform,less
 stakesextra,difficult,low,uniform,less
 stakesextra,difficult,high,uniform,greater
+detail,difficult,neutral,uniform,greater
+detail,difficult,neutral,uniform,less
+detail,difficult,agree,uniform,greater
+detail,difficult,agree,uniform,less
+detail,difficult,sagree,uniform,greater
+detail,difficult,sagree,uniform,less

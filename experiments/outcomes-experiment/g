@@ -1,0 +1,3 @@
+#!/bin/sh
+./process.R
+pdfunite combined-report-page-* combined-report.pdf
