@@ -18,7 +18,8 @@ library(boot) # for bootstrap confidence intervals
 library(lattice) # for histogram
 
 # Switch for hypothesis testing:
-test.hypotheses = FALSE
+test.hypotheses = TRUE
+#test.hypotheses = FALSE
 
 qnames = c(
   "opt.obvious" = "Considering just the options, there seems to be a clear best option at this choice.",
@@ -845,7 +846,7 @@ trellis.par.set("strip.background", sb)
 # Choice histograms
 # -----------------
 
-pdf(file="choices.pdf",title="dunyazad-outcomes-choices.report")
+pdf(file="reports/choices.pdf",title="dunyazad-outcomes-choices.report")
 filtered$seed = factor(filtered$seed)
 histogram(
   ~ decision | seed,
@@ -932,17 +933,16 @@ report <- rename(ordered, likert_names)
 
 grouping <- filtered[["condition"]]
 
-print(str(report))
-
 for (i in 1:ncol(report)) {
   lk <- likert(report[i], grouping=grouping, nlevels=5)
   pdf(
-    file=paste("combined-report-page-", sprintf("%02d", i), ".pdf", sep=""),
-    title="dunyazad-outcomes-study-report",
+    file=paste("reports/outcomes-report-", sprintf("%02d", i), "-", likert_questions[i], ".pdf", sep=""),
+    title=paste("dunyazad-outcomes:", likert_questions[i]),
     width=7,
-    height=2.5
+    height=2.8
   )
-  plot(lk, group.order=conditions, ordered=FALSE)
+  p <- plot(lk, group.order=conditions, ordered=FALSE)
+  show(p)
   dev.off()
 }
 
@@ -952,7 +952,7 @@ for (i in 1:ncol(report)) {
 
 for (cond in conditions) {
   pdf(
-      file=paste("report-", cond, ".pdf", sep=""),
+      file=paste("reports/report-", cond, ".pdf", sep=""),
       title=paste("dunyazad-report-", cond, sep="")
   )
   report <- filtered[

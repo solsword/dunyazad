@@ -1,3 +1,10 @@
 #!/bin/sh
 ./process.R
-pdfunite combined-report-page-* combined-report.pdf
+cd reports
+pdfcrop --margins="-4 -124 -4 1" outcomes-report-01-*.pdf legend.pdf
+for p in `ls outcomes-report-[0-9][0-9]-*.pdf`
+do
+  pdfcrop --margins="0 0 0 -55" $p cropped-$p
+done
+pdfunite cropped-outcomes-report-*.pdf legend.pdf combined-report.pdf
+cd ..
