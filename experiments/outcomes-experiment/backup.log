@@ -1,0 +1,252 @@
+
+---
+Total responses: 315 
+Acceptable responses: 245 
+Real responses: 210 
+ uniform: 35 
+ exp-succ: 40 
+    market: 13 
+    threat: 15 
+    monstr: 12 
+ unx-fail: 36 
+    market: 12 
+    threat: 12 
+    monstr: 12 
+ exp-fail: 31 
+    market: 8 
+    threat: 12 
+    monstr: 11 
+ unx-succ: 34 
+    market: 13 
+    threat: 10 
+    monstr: 11 
+ obv-succ: 36 ( 27 / 9 ) 
+    market: 9 
+    threat: 14 
+    monstr: 13 
+ obv-fail: 33 ( 19 / 14 ) 
+    market: 11 
+    threat: 10 
+    monstr: 12 
+
+
+---
+Median response time: 671.5 
+Median accepted response time: 588.5 
+
+---
+
+---
+Hypotheses:
+Question                                              Compare:               Pred:                   Pass:   P:            effect:  #comp:  #ag:
+ [...] there [is] a clear best option [...].           expected_success       disagree                FALSE     0.9870649   0.628    40      35      
+ [...] there [is] a clear best option [...].           unexpected_failure     disagree                FALSE    0.08128434   0.584    36      35      
+ [...] there [is] a clear best option [...].           obvious_success        agree                   TRUE   1.121569e-05   0.744    36      35      
+ [...] there [is] a clear best option [...].           obvious_failure        agree                   TRUE    0.001998839   0.672    33      35      
+ [...] there [is] a clear best option [...].           expected_failure       disagree                FALSE     0.5414465   0.506    31      35      
+ [...] there [is] a clear best option [...].           unexpected_success     disagree                FALSE     0.6901526   0.531    34      35      
+ [...] [the options] [seem about equally promising].   expected_success       agree                   FALSE     0.6449011   0.522    40      35      
+ [...] [the options] [seem about equally promising].   unexpected_failure     agree                   FALSE     0.5885612   0.515    36      35      
+ [...] [the options] [seem about equally promising].   obvious_success        disagree                TRUE    0.001409897   0.675    36      35      
+ [...] [the options] [seem about equally promising].   obvious_failure        disagree                FALSE    0.05754855   0.596    33      35      
+ [...] [the options] [seem about equally promising].   expected_failure       agree                   FALSE     0.5362783   0.506    31      35      
+ [...] [the options] [seem about equally promising].   unexpected_success     agree                   FALSE     0.7725939   0.547    34      35      
+ [...] there are no options that seem bad [...].       expected_success       agree                   FALSE     0.7005344   0.531    40      35      
+ [...] there are no options that seem bad [...].       unexpected_failure     agree                   FALSE     0.6569857   0.524    36      35      
+ [...] there are no options that seem bad [...].       obvious_success        disagree                TRUE    0.001370035   0.676    36      35      
+ [...] there are no options that seem bad [...].       obvious_failure        disagree                TRUE     0.02116124   0.623    33      35      
+ [...] there are no options that seem bad [...].       expected_failure       disagree                TRUE     0.04030024   0.608    31      35      
+ [...] there are no options that seem bad [...].       unexpected_success     disagree                TRUE     0.01529836   0.630    34      35      
+ [...] none of [the options] seem good.                expected_success       disagree                TRUE   5.481814e-06   0.747    40      35      
+ [...] none of [the options] seem good.                unexpected_failure     disagree                TRUE     0.01029279   0.637    36      35      
+ [...] none of [the options] seem good.                obvious_success        disagree                TRUE   7.391256e-06   0.750    36      35      
+ [...] none of [the options] seem good.                obvious_failure        disagree                TRUE    0.006532987   0.650    33      35      
+ [...] none of [the options] seem good.                expected_failure       agree                   FALSE     0.1287972   0.570    31      35      
+ [...] none of [the options] seem good.                unexpected_success     agree                   FALSE     0.8518415   0.562    34      35      
+ [...] [the stakes] seem low.                          expected_success       disagree                FALSE     0.1632507   0.557    40      35      
+ [...] [the stakes] seem low.                          unexpected_failure     disagree                FALSE     0.2045628   0.549    36      35      
+ [...] [the stakes] seem low.                          obvious_success        disagree                FALSE     0.1450875   0.563    36      35      
+ [...] [the stakes] seem low.                          obvious_failure        disagree                FALSE     0.1462433   0.564    33      35      
+ [...] [the stakes] seem low.                          expected_failure       disagree                FALSE     0.4000229   0.517    31      35      
+ [...] [the stakes] seem low.                          unexpected_success     disagree                TRUE    0.001962515   0.672    34      35      
+ [...] the outcome I got is fair.                      expected_success       agree                   TRUE   2.607554e-11   0.856    40      35      
+ The outcome that I got is unfair [...].               expected_success       disagree                TRUE   2.079034e-10   0.841    40      35      
+ [...] the outcome I got is fair.                      obvious_success(main)  agree                   TRUE   2.094286e-08   0.823    27      35      
+ [...] the outcome I got is fair.                      obvious_success[main]  agree                   TRUE   5.563911e-09   0.840    25      35      
+ The outcome that I got is unfair [...].               obvious_success(main)  disagree                TRUE    3.48979e-08   0.822    27      35      
+ The outcome that I got is unfair [...].               obvious_success[main]  disagree                TRUE   1.689967e-08   0.831    25      35      
+ The outcome that I got makes sense [...].             expected_success       agree                   TRUE   1.913717e-09   0.824    40      35      
+ [...] the outcome I got does not make sense.          expected_success       disagree                TRUE   9.174705e-10   0.828    40      35      
+ The outcome that I got makes sense [...].             obvious_success(main)  agree                   TRUE   5.084676e-10   0.855    27      35      
+ The outcome that I got makes sense [...].             obvious_success[main]  agree                   TRUE     1.6775e-09   0.849    25      35      
+ [...] the outcome I got does not make sense.          obvious_success(main)  disagree                TRUE   3.938805e-08   0.820    27      35      
+ [...] the outcome I got does not make sense.          obvious_success[main]  disagree                TRUE    4.74071e-08   0.822    25      35      
+ The outcome that I got is a good outcome.             expected_success       agree                   TRUE   8.179902e-12   0.863    40      35      
+ I got a bad outcome.                                  expected_success       disagree                TRUE   1.502233e-12   0.874    40      35      
+ The outcome that I got is a good outcome.             obvious_success(main)  agree                   TRUE   5.729338e-08   0.815    27      35      
+ The outcome that I got is a good outcome.             obvious_success[main]  agree                   TRUE   5.563911e-09   0.840    25      35      
+ I got a bad outcome.                                  obvious_success(main)  disagree                TRUE    1.30306e-08   0.830    27      35      
+ I got a bad outcome.                                  obvious_success[main]  disagree                TRUE     1.6775e-09   0.849    25      35      
+ I'm happy with the option that I chose.               expected_success       agree                   TRUE   5.777124e-11   0.851    40      35      
+ I wish I had chosen a different option.               expected_success       disagree                TRUE     5.4846e-10   0.832    40      35      
+ I'm happy with the option that I chose.               obvious_success(main)  agree                   TRUE   1.689432e-09   0.846    27      35      
+ I'm happy with the option that I chose.               obvious_success[main]  agree                   TRUE   4.193913e-10   0.859    25      35      
+ I wish I had chosen a different option.               obvious_success(main)  disagree                TRUE    1.03019e-06   0.786    27      35      
+ I wish I had chosen a different option.               obvious_success[main]  disagree                TRUE   3.252446e-07   0.802    25      35      
+ I pretty much expected the outcome that I got.        expected_success       agree                   TRUE    0.005503374   0.646    40      35      
+ The outcome that I got is completely unexpected.      expected_success       disagree                TRUE   3.544886e-06   0.753    40      35      
+ I pretty much expected the outcome that I got.        obvious_success(main)  agree                   TRUE   4.349266e-05   0.742    27      35      
+ I pretty much expected the outcome that I got.        obvious_success[main]  agree                   TRUE   7.204395e-05   0.738    25      35      
+ The outcome that I got is completely unexpected.      obvious_success(main)  disagree                TRUE   2.485769e-05   0.750    27      35      
+ The outcome that I got is completely unexpected.      obvious_success[main]  disagree                TRUE   4.302738e-05   0.747    25      35      
+ [...] the outcome I got is fair.                      expected_failure       agree                   TRUE    0.002543816   0.671    31      35      
+ The outcome that I got is unfair [...].               expected_failure       disagree                TRUE     0.02121617   0.625    31      35      
+ [...] the outcome I got is fair.                      obvious_success(alt)   agree                   FALSE     0.4337228   0.516    9       35      
+ [...] the outcome I got is fair.                      obvious_success[alt]   agree                   FALSE      0.957958   0.618    2       35      
+ The outcome that I got is unfair [...].               obvious_success(alt)   disagree                TRUE     0.01997355   0.657    9       35      
+ The outcome that I got is unfair [...].               obvious_success[alt]   disagree                FALSE     0.6006006   0.500    2       35      
+ The outcome that I got makes sense [...].             expected_failure       agree                   TRUE    0.000136418   0.718    31      35      
+ [...] the outcome I got does not make sense.          expected_failure       disagree                TRUE   0.0006803799   0.694    31      35      
+ The outcome that I got makes sense [...].             obvious_success(alt)   agree                   TRUE     0.01060408   0.673    9       35      
+ The outcome that I got makes sense [...].             obvious_success[alt]   agree                   FALSE     0.1381381   0.618    2       35      
+ [...] the outcome I got does not make sense.          obvious_success(alt)   disagree                TRUE     0.00254924   0.705    9       35      
+ [...] the outcome I got does not make sense.          obvious_success[alt]   disagree                FALSE     0.1381381   0.618    2       35      
+ The outcome that I got is a good outcome.             expected_failure       disagree                FALSE     0.1589846   0.562    31      35      
+ I got a bad outcome.                                  expected_failure       agree                   FALSE     0.8453076   0.562    31      35      
+ The outcome that I got is a good outcome.             obvious_success(alt)   disagree                FALSE     0.6597609   0.531    9       35      
+ The outcome that I got is a good outcome.             obvious_success[alt]   disagree                FALSE    0.05405405   0.658    2       35      
+ I got a bad outcome.                                  obvious_success(alt)   agree                   FALSE     0.9065094   0.594    9       35      
+ I got a bad outcome.                                  obvious_success[alt]   agree                   FALSE     0.1381381   0.618    2       35      
+ I pretty much expected the outcome that I got.        expected_failure       agree                   TRUE     0.03958475   0.608    31      35      
+ The outcome that I got is completely unexpected.      expected_failure       disagree                TRUE   0.0004725197   0.700    31      35      
+ I pretty much expected the outcome that I got.        obvious_success(alt)   agree                   FALSE     0.2113165   0.563    9       35      
+ I pretty much expected the outcome that I got.        obvious_success[alt]   agree                   FALSE     0.7582583   0.539    2       35      
+ The outcome that I got is completely unexpected.      obvious_success(alt)   disagree                TRUE     0.04828662   0.626    9       35      
+ The outcome that I got is completely unexpected.      obvious_success[alt]   disagree                FALSE     0.7582583   0.539    2       35      
+ [...] the outcome I got is fair.                      unexpected_success     agree                   TRUE   2.512338e-06   0.765    34      35      
+ The outcome that I got is unfair [...].               unexpected_success     disagree                TRUE   5.316726e-05   0.728    34      35      
+ [...] the outcome I got is fair.                      obvious_failure(alt)   agree                   TRUE   2.296103e-05   0.774    14      35      
+ [...] the outcome I got is fair.                      obvious_failure[alt]   agree                   TRUE     0.04409673   0.657    3       35      
+ The outcome that I got is unfair [...].               obvious_failure(alt)   disagree                TRUE   9.214985e-06   0.786    14      35      
+ The outcome that I got is unfair [...].               obvious_failure[alt]   disagree                TRUE     0.04409673   0.657    3       35      
+ The outcome that I got makes sense [...].             unexpected_success     agree                   TRUE   9.108125e-05   0.720    34      35      
+ [...] the outcome I got does not make sense.          unexpected_success     disagree                TRUE   1.101952e-05   0.749    34      35      
+ The outcome that I got makes sense [...].             obvious_failure(alt)   agree                   TRUE   9.214985e-06   0.786    14      35      
+ The outcome that I got makes sense [...].             obvious_failure[alt]   agree                   TRUE     0.04409673   0.657    3       35      
+ [...] the outcome I got does not make sense.          obvious_failure(alt)   disagree                TRUE   2.296103e-05   0.774    14      35      
+ [...] the outcome I got does not make sense.          obvious_failure[alt]   disagree                FALSE    0.09388336   0.626    3       35      
+ The outcome that I got is a good outcome.             unexpected_success     agree                   TRUE    2.59578e-06   0.765    34      35      
+ I got a bad outcome.                                  unexpected_success     disagree                TRUE   1.483913e-06   0.771    34      35      
+ The outcome that I got is a good outcome.             obvious_failure(alt)   agree                   TRUE   9.214985e-06   0.786    14      35      
+ The outcome that I got is a good outcome.             obvious_failure[alt]   agree                   TRUE     0.04409673   0.657    3       35      
+ I got a bad outcome.                                  obvious_failure(alt)   disagree                TRUE   9.214985e-06   0.786    14      35      
+ I got a bad outcome.                                  obvious_failure[alt]   disagree                TRUE     0.04409673   0.657    3       35      
+ I'm happy with the option that I chose.               unexpected_success     agree                   TRUE   2.309571e-07   0.791    34      35      
+ I wish I had chosen a different option.               unexpected_success     disagree                TRUE   7.694893e-07   0.779    34      35      
+ I'm happy with the option that I chose.               obvious_failure(alt)   agree                   TRUE   3.346482e-06   0.799    14      35      
+ I'm happy with the option that I chose.               obvious_failure[alt]   agree                   TRUE     0.04409673   0.657    3       35      
+ I wish I had chosen a different option.               obvious_failure(alt)   disagree                TRUE   3.346482e-06   0.799    14      35      
+ I wish I had chosen a different option.               obvious_failure[alt]   disagree                TRUE     0.01422475   0.688    3       35      
+ I pretty much expected the outcome that I got.        unexpected_success     disagree                FALSE     0.7982219   0.552    34      35      
+ The outcome that I got is completely unexpected.      unexpected_success     agree                   FALSE     0.9014742   0.578    34      35      
+ I pretty much expected the outcome that I got.        obvious_failure(alt)   disagree                FALSE      0.995144   0.681    14      35      
+ I pretty much expected the outcome that I got.        obvious_failure[alt]   disagree                FALSE     0.7875771   0.563    3       35      
+ The outcome that I got is completely unexpected.      obvious_failure(alt)   agree                   FALSE     0.9971807   0.693    14      35      
+ The outcome that I got is completely unexpected.      obvious_failure[alt]   agree                   FALSE     0.6531532   0.531    3       35      
+ [...] the outcome I got is fair.                      unexpected_failure     disagree                FALSE     0.4708104   0.505    36      35      
+ The outcome that I got is unfair [...].               unexpected_failure     agree                   FALSE     0.6335141   0.520    36      35      
+ [...] the outcome I got is fair.                      obvious_failure(main)  disagree                FALSE     0.5022968   0.500    19      35      
+ [...] the outcome I got is fair.                      obvious_failure[main]  disagree                FALSE     0.5022968   0.500    19      35      
+ The outcome that I got is unfair [...].               obvious_failure(main)  agree                   FALSE     0.4620895   0.509    19      35      
+ The outcome that I got is unfair [...].               obvious_failure[main]  agree                   FALSE     0.4620895   0.509    19      35      
+ The outcome that I got makes sense [...].             unexpected_failure     disagree                FALSE     0.7936697   0.549    36      35      
+ [...] the outcome I got does not make sense.          unexpected_failure     agree                   FALSE     0.9878037   0.633    36      35      
+ The outcome that I got makes sense [...].             obvious_failure(main)  disagree                FALSE     0.5053198   0.500    19      35      
+ The outcome that I got makes sense [...].             obvious_failure[main]  disagree                FALSE     0.5053198   0.500    19      35      
+ [...] the outcome I got does not make sense.          obvious_failure(main)  agree                   FALSE      0.821005   0.562    19      35      
+ [...] the outcome I got does not make sense.          obvious_failure[main]  agree                   FALSE      0.821005   0.562    19      35      
+ The outcome that I got is a good outcome.             unexpected_failure     disagree                TRUE    2.61542e-05   0.735    36      35      
+ I got a bad outcome.                                  unexpected_failure     agree                   TRUE   0.0004426263   0.693    36      35      
+ The outcome that I got is a good outcome.             obvious_failure(main)  disagree                TRUE    0.009292514   0.659    19      35      
+ The outcome that I got is a good outcome.             obvious_failure[main]  disagree                TRUE    0.009292514   0.659    19      35      
+ I got a bad outcome.                                  obvious_failure(main)  agree                   TRUE     0.02199955   0.637    19      35      
+ I got a bad outcome.                                  obvious_failure[main]  agree                   TRUE     0.02199955   0.637    19      35      
+ I'm happy with the option that I chose.               unexpected_failure     disagree                TRUE     0.02372179   0.618    36      35      
+ I wish I had chosen a different option.               unexpected_failure     agree                   TRUE   0.0001800692   0.707    36      35      
+ I'm happy with the option that I chose.               obvious_failure(main)  disagree                FALSE     0.8176832   0.562    19      35      
+ I'm happy with the option that I chose.               obvious_failure[main]  disagree                FALSE     0.8176832   0.562    19      35      
+ I wish I had chosen a different option.               obvious_failure(main)  agree                   FALSE      0.924976   0.597    19      35      
+ I wish I had chosen a different option.               obvious_failure[main]  agree                   FALSE      0.924976   0.597    19      35      
+ I pretty much expected the outcome that I got.        unexpected_failure     disagree                TRUE    0.002222406   0.667    36      35      
+ The outcome that I got is completely unexpected.      unexpected_failure     agree                   FALSE     0.2331015   0.544    36      35      
+ I pretty much expected the outcome that I got.        obvious_failure(main)  disagree                FALSE     0.2324379   0.553    19      35      
+ I pretty much expected the outcome that I got.        obvious_failure[main]  disagree                FALSE     0.2324379   0.553    19      35      
+ The outcome that I got is completely unexpected.      obvious_failure(main)  agree                   FALSE     0.3521933   0.526    19      35      
+ The outcome that I got is completely unexpected.      obvious_failure[main]  agree                   FALSE     0.3521933   0.526    19      35      
+ [...] the outcome I got is fair.                      unexpected_failure     >obvious_failure(main)  FALSE     0.5817368   0.514    36      19      
+ [...] the outcome I got is fair.                      unexpected_failure     >obvious_failure[main]  FALSE     0.5817368   0.514    36      19      
+ The outcome that I got is unfair [...].               unexpected_failure     <obvious_failure(main)  FALSE     0.3500211   0.527    36      19      
+ The outcome that I got is unfair [...].               unexpected_failure     <obvious_failure[main]  FALSE     0.3500211   0.527    36      19      
+ The outcome that I got makes sense [...].             unexpected_failure     >obvious_failure(main)  FALSE     0.2837539   0.539    36      19      
+ The outcome that I got makes sense [...].             unexpected_failure     >obvious_failure[main]  FALSE     0.2837539   0.539    36      19      
+ [...] the outcome I got does not make sense.          unexpected_failure     <obvious_failure(main)  FALSE      0.174821   0.561    36      19      
+ [...] the outcome I got does not make sense.          unexpected_failure     <obvious_failure[main]  FALSE      0.174821   0.561    36      19      
+ The outcome that I got is a good outcome.             unexpected_failure     >obvious_failure(main)  FALSE     0.9407081   0.605    36      19      
+ The outcome that I got is a good outcome.             unexpected_failure     >obvious_failure[main]  FALSE     0.9407081   0.605    36      19      
+ I got a bad outcome.                                  unexpected_failure     <obvious_failure(main)  FALSE      0.890283   0.582    36      19      
+ I got a bad outcome.                                  unexpected_failure     <obvious_failure[main]  FALSE      0.890283   0.582    36      19      
+ I'm happy with the option that I chose.               unexpected_failure     <obvious_failure(main)  TRUE   0.0007276875   0.712    36      19      
+ I'm happy with the option that I chose.               unexpected_failure     <obvious_failure[main]  TRUE   0.0007276875   0.712    36      19      
+ I wish I had chosen a different option.               unexpected_failure     >obvious_failure(main)  TRUE   1.815469e-05   0.770    36      19      
+ I wish I had chosen a different option.               unexpected_failure     >obvious_failure[main]  TRUE   1.815469e-05   0.770    36      19      
+ I pretty much expected the outcome that I got.        unexpected_failure     >obvious_failure(main)  FALSE     0.9468643   0.609    36      19      
+ I pretty much expected the outcome that I got.        unexpected_failure     >obvious_failure[main]  FALSE     0.9468643   0.609    36      19      
+ The outcome that I got is completely unexpected.      unexpected_failure     <obvious_failure(main)  FALSE     0.5407846   0.506    36      19      
+ The outcome that I got is completely unexpected.      unexpected_failure     <obvious_failure[main]  FALSE     0.5407846   0.506    36      19      
+ The outcome that I got is a good outcome.             expected_success       <obvious_success(main)  FALSE     0.9132149   0.563    40      27      
+ The outcome that I got is a good outcome.             expected_success       <obvious_success[main]  FALSE     0.7500855   0.516    40      25      
+ I got a bad outcome.                                  expected_success       >obvious_success(main)  FALSE     0.9098076   0.582    40      27      
+ I got a bad outcome.                                  expected_success       >obvious_success[main]  FALSE      0.672619   0.528    40      25      
+ I'm happy with the option that I chose.               expected_success       <obvious_success(main)  FALSE     0.4799601   0.512    40      27      
+ I'm happy with the option that I chose.               expected_success       <obvious_success[main]  FALSE     0.2124348   0.572    40      25      
+ I wish I had chosen a different option.               expected_success       >obvious_success(main)  FALSE     0.7722701   0.537    40      27      
+ I wish I had chosen a different option.               expected_success       >obvious_success[main]  FALSE     0.5726256   0.503    40      25      
+ [...] the outcome I got is fair.                      unexpected_failure     <unexpected_success     TRUE   1.298272e-08   0.813    36      34      
+ The outcome that I got is unfair [...].               unexpected_failure     >unexpected_success     TRUE   8.516871e-05   0.719    36      34      
+ The outcome that I got makes sense [...].             unexpected_failure     <unexpected_success     TRUE   0.0004478003   0.697    36      34      
+ [...] the outcome I got does not make sense.          unexpected_failure     >unexpected_success     TRUE    0.007419154   0.645    36      34      
+ The outcome that I got is a good outcome.             unexpected_failure     <expected_failure       TRUE   0.0003611748   0.703    36      31      
+ I got a bad outcome.                                  unexpected_failure     >expected_failure       TRUE   3.690106e-05   0.737    36      31      
+ I'm happy with the option that I chose.               unexpected_failure     <expected_failure       TRUE    0.003354601   0.663    36      31      
+ I wish I had chosen a different option.               unexpected_failure     >expected_failure       TRUE   2.107838e-05   0.743    36      31      
+ The outcome that I got is a good outcome.             obvious_failure(main)  <expected_failure       FALSE    0.05587656   0.613    19      31      
+ The outcome that I got is a good outcome.             obvious_failure[main]  <expected_failure       FALSE    0.05587656   0.613    19      31      
+ I got a bad outcome.                                  obvious_failure(main)  >expected_failure       TRUE    0.002874003   0.692    19      31      
+ I got a bad outcome.                                  obvious_failure[main]  >expected_failure       TRUE    0.002874003   0.692    19      31      
+ I'm happy with the option that I chose.               obvious_failure(main)  <expected_failure       FALSE     0.7236897   0.541    19      31      
+ I'm happy with the option that I chose.               obvious_failure[main]  <expected_failure       FALSE     0.7236897   0.541    19      31      
+ I wish I had chosen a different option.               obvious_failure(main)  >expected_failure       FALSE     0.8669172   0.578    19      31      
+ I wish I had chosen a different option.               obvious_failure[main]  >expected_failure       FALSE     0.8669172   0.578    19      31      
+ The outcome that I got is a good outcome.             expected_success       <unexpected_success     FALSE     0.9519028   0.587    40      34      
+ I got a bad outcome.                                  expected_success       >unexpected_success     FALSE     0.9897907   0.621    40      34      
+ I'm happy with the option that I chose.               expected_success       <unexpected_success     FALSE     0.9345007   0.578    40      34      
+ I wish I had chosen a different option.               expected_success       >unexpected_success     FALSE     0.8786707   0.564    40      34      
+ The outcome that I got is a good outcome.             obvious_success(main)  <unexpected_success     FALSE     0.7068505   0.529    27      34      
+ The outcome that I got is a good outcome.             obvious_success[main]  <unexpected_success     FALSE     0.8999226   0.571    25      34      
+ I got a bad outcome.                                  obvious_success(main)  >unexpected_success     FALSE     0.8163707   0.548    27      34      
+ I got a bad outcome.                                  obvious_success[main]  >unexpected_success     FALSE     0.9597032   0.593    25      34      
+ I'm happy with the option that I chose.               obvious_success(main)  <unexpected_success     FALSE     0.9468135   0.588    27      34      
+ I'm happy with the option that I chose.               obvious_success[main]  <unexpected_success     FALSE     0.9958258   0.636    25      34      
+ I wish I had chosen a different option.               obvious_success(main)  >unexpected_success     FALSE     0.6560213   0.523    27      34      
+ I wish I had chosen a different option.               obvious_success[main]  >unexpected_success     FALSE     0.8121591   0.559    25      34      
+ [Which] motive(s) contributed to your decision? [...] #speed / #all          > 0.5                   FALSE      0.02       4/210    NA      NA      
+ [Which] motive(s) contributed to your decision? [...] #avatar / #all         > 0.5                   TRUE       0.59     124/210    NA      NA      
+ [Which] motive(s) contributed to your decision? [...] #power / #all          > 0.5                   TRUE       0.57     119/210    NA      NA      
+ [How do you define a "good" outcome]?                 #avatar / #all         > 0.5                   TRUE       0.71     150/210    NA      NA      
+ [How do you define a "good" outcome]?                 #power / #all          > 0.5                   FALSE      0.38      80/210    NA      NA      
+ [How do you define a "good" outcome]?                 #progress / #all       > 0.5                   TRUE       0.55     116/210    NA      NA      
+ [How you define a "bad" outcome]?                     #avatar / #all         > 0.5                   TRUE       0.76     159/210    NA      NA      
+ [How you define a "bad" outcome]?                     #no-control / #all     > 0.5                   FALSE      0.34      71/210    NA      NA      
+ [How you define a "bad" outcome]?                     #power / #all          > 0.5                   TRUE       0.51     108/210    NA      NA      
+ [How you define a "bad" outcome]?                     #progress / #all       > 0.5                   TRUE       0.53     112/210    NA      NA      
+ Do [you] approach [all experiences] [the same way]?   #variable / #!no-exp   > 0.7                   FALSE      0.69     129/188    NA      NA      
