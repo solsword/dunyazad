@@ -411,8 +411,8 @@ CITIES = [
 ]
 
 SPECIAL_FILTERING_VARIABLES = {
-  "_From": "_from",
-  "_To": "_to",
+  "_From": "_from", # TODO: Get rid of this?
+  "_To": "_to", # TODO: Get rid of this?
   "_Now": "_node",
   "_Opt": "_option",
   "_Act": "_action",
