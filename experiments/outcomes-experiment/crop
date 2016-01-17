@@ -1,0 +1,35 @@
+#!/bin/sh
+cd reports
+echo ""
+echo ""
+echo "Cropping legend..."
+pdfcrop --margins="-4 -118 -4 1" outcomes-report-01-*.pdf legend.pdf
+echo ""
+echo ""
+echo "Cropping condition-grouped reports per question..."
+for p in `ls outcomes-report-[0-9][0-9]-*.pdf`
+do
+  echo "... '$p' ..."
+  pdfcrop --margins="0 0 0 -55" $p cropped-$p
+done
+echo ""
+echo ""
+echo "Producing combined report PDF..."
+pdfunite cropped-outcomes-report-*.pdf legend.pdf combined-report.pdf
+echo ""
+echo ""
+echo "Cropping choice histograms..."
+for c in `ls choices-*.pdf`
+do
+  echo "... '$c' ..."
+  pdfcrop $c cropped-$c
+done
+echo ""
+echo ""
+echo "Cropping seed-grouped reports per question/condition..."
+for r in `ls detailed-report-*-[0-9][0-9]-*.pdf`
+do
+  echo "... '$r' ..."
+  pdfcrop --margins="0 0 0 -55" $r cropped-$r
+done
+cd ..

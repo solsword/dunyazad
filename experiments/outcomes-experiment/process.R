@@ -18,7 +18,7 @@ library(boot) # for bootstrap confidence intervals
 library(lattice) # for histogram
 
 # Switch for hypothesis testing:
-test.hypotheses = TRUE
+test.hypotheses = FALSE
 #test.hypotheses = FALSE
 
 qnames = c(
@@ -168,8 +168,8 @@ correct_decisions = c(
 )
 
 
-filterfactor <- function (data) {
-  filtered <- data
+filterfactor <- function (input) {
+  filtered <- input
   # Filter out too-quick, rejected, and tricked responses:
   filtered <- filtered[
     filtered[["AssignmentStatus"]] == "Approved"
@@ -283,23 +283,79 @@ filterfactor <- function (data) {
   return(filtered)
 }
 
-test_error <- c(
-  "passed"="ERROR",
-  "pvalue"=NA,
-  "mr.compare"=NA,
-  "mr.against"=NA,
-  "effectsize"=NA,
-  "commoneffect"=NA,
-  "conf.low"=NA,
-  "conf.high"=NA
+# Class for test results:
+setClass(
+  "HResult",
+  representation = representation(
+    # For both:
+    type = "character",
+    subtype = "character",
+
+    in.question = "character",
+    in.compare = "character",
+    in.against = "character",
+
+    hyp.compare = "character",
+    hyp.compcol = "character",
+    hyp.subcomp = "character",
+
+    hyp.against = "character",
+    hyp.agcol = "character",
+    hyp.subag = "character",
+
+    hyp.predict = "character",
+
+    count.comp = "numeric",
+    count.ag= "numeric",
+
+    result.confirmed = "logical",
+
+    # For MWW results:
+    hyp.req.was.obv.comp = "logical",
+    hyp.req.was.obv.ag = "logical",
+
+    result.mr.compare = "numeric",
+    result.mr.against = "numeric",
+    result.pvalue = "numeric",
+    result.effect = "numeric",
+    result.effect.common = "numeric",
+    result.conf.low = "numeric",
+    result.conf.high = "numeric",
+
+    # For counting results:
+    hyp.invertcomp = "logical",
+    hyp.target = "numeric",
+
+    result.count.base = "numeric",
+    result.count.matches = "numeric",
+    result.value = "numeric"
+  )
 )
 
-testhypothesis <- function(hyp, data) {
-  htype <- as.character(hyp[["type"]]) # TODO: USE THIS
+# TODO: These?
+#as.HResult <- function(x) { UseMethod("as.HResult") }
+#
+#as.HResult.list <- function(l) {
+#  # TODO: HERE!
+#  class(l) <- "HResult"; return(l)
+#}
+
+test_error <- new("HResult") 
+
+parsehypothesis <- function(hyp, input) {
+  htype <- as.character(hyp[["type"]])
   if (htype == "pctchosen") {
-    return(testpcthypothesis(hyp, data))
+    return(parsecounthypothesis(hyp))
   } else {
-    return(testnormalhypothesis(hyp, data))
+    return(parsemwwhypothesis(hyp, input))
+  }
+}
+
+testhypothesis <- function(hyp, input) {
+  if (hyp@type == "count") {
+    return(testpcthypothesis(hyp, input))
+  } else {
+    return(testmwwhypothesis(hyp, input))
   }
 }
 
@@ -308,167 +364,209 @@ mrsp <- function(question, response) {
   return(paste(question, "c", gsub("-", ".", response), sep="."))
 }
 
-testpcthypothesis <- function(hyp, data) {
-  testvar <- as.character(hyp[["question"]])
-  filter <- as.character(hyp[["compare"]])
-  invert <- FALSE
-  if (substr(filter, 1, 1) == "!") {
-    filter <- substr(filter, 2, nchar(filter))
-    invert <- TRUE
+parsecounthypothesis <- function(hyp) {
+  rval <- new("HResult")
+  rval@type <- "count"
+  rval@subtype <- as.character(hyp[["type"]])
+  rval@hyp.compcol <- "ERROR"
+  rval@hyp.agcol <- "ERROR"
+  rval@in.question <- as.character(hyp[["question"]])
+  rval@in.compare <- as.character(hyp[["compare"]])
+  rval@in.against <- as.character(hyp[["against"]])
+  rval@hyp.invertcomp <- FALSE
+
+  rval@hyp.compare <- as.character(hyp[["compare"]])
+  if (substr(rval@hyp.compare, 1, 1) == "!") {
+    rval@hyp.compare <- substr(rval@hyp.compare, 2, nchar(rval@hyp.compare))
+    rval@hyp.invertcomp <- TRUE
   }
-  condition <- as.character(hyp[["against"]])
+  rval@hyp.against <- as.character(hyp[["against"]])
   cmptrg <- as.character(hyp[["predict"]])
-  compare <- substr(cmptrg, 1, 1)
-  target <- as.numeric(substr(cmptrg, 2, nchar(cmptrg)))
+  rval@hyp.predict <- substr(cmptrg, 1, 1)
+  rval@hyp.target <- as.numeric(substr(cmptrg, 2, nchar(cmptrg)))
+
+  return(rval)
+}
+
+parsemwwhypothesis <- function(hyp, input) {
+  rval <- new("HResult")
+  rval@type = "mww"
+  rval@subtype <- as.character(hyp[["type"]])
+  rval@hyp.compcol <- "ERROR"
+  rval@hyp.agcol <- "ERROR"
+  rval@in.question <- as.character(hyp[["question"]])
+  rval@in.compare <- as.character(hyp[["compare"]])
+  rval@in.against <- as.character(hyp[["against"]])
+  rval@hyp.predict <- as.character(hyp[["predict"]])
+  rval@hyp.req.was.obv.comp <- FALSE
+  rval@hyp.req.was.obv.ag <- FALSE
+  rval@hyp.compare <- rval@in.compare
+  rval@hyp.against <- rval@in.against
+  if (grepl("\\(", rval@in.compare)) {
+    rval@hyp.subcomp <- sub(".*\\(", "", sub("\\)$", "", rval@in.compare))
+    rval@hyp.compare <- sub("\\(.*\\)$", "", rval@in.compare)
+  }
+  if (grepl("\\(", rval@in.against)) {
+    rval@hyp.subag <- sub(".*\\(", "", sub("\\)$", "", rval@in.against))
+    rval@hyp.against <- sub("\\(.*\\)$", "", rval@in.against)
+  }
+  if (grepl("\\[", rval@in.compare)) {
+    rval@hyp.subcomp <- sub(".*\\[", "", sub("\\]$", "", rval@in.compare))
+    rval@hyp.compare <- sub("\\[.*\\]$", "", rval@in.compare)
+    rval@hyp.req.was.obv.comp <- TRUE
+  }
+  if (grepl("\\[", rval@in.against)) {
+    rval@hyp.subag <- sub(".*\\[", "", sub("\\]$", "", rval@in.against))
+    rval@hyp.against <- sub("\\[.*\\]$", "", rval@in.against)
+    rval@hyp.req.was.obv.ag <- TRUE
+  }
+  if (rval@hyp.compare %in% input[["condition"]]) {
+    rval@hyp.compcol <- "condition"
+  } else if (rval@hyp.compare %in% input[["seed"]]) {
+    rval@hyp.compcol <- "seed"
+  } else if (rval@hyp.compare %in% input[["stakes"]]) {
+    rval@hyp.compcol <- "stakes"
+  } else if (rval@hyp.compare %in% input[["setup"]]) {
+    rval@hyp.compcol <- "setup"
+  } else if (rval@hyp.compare %in% input[["condition"]]) {
+  } else {
+    cat(
+      "Error: invalid hypothesis condition:",
+      paste("'", as.character(rval@hyp.compare), "'", sep=""),
+      "\n"
+    )
+    return(test_error)
+  }
+  if (rval@hyp.against %in% input[["condition"]]) {
+    rval@hyp.agcol <- "condition"
+  } else if (rval@hyp.against %in% input[["seed"]]) {
+    rval@hyp.agcol <- "seed"
+  } else if (rval@hyp.against %in% input[["stakes"]]) {
+    rval@hyp.agcol <- "stakes"
+  } else if (rval@hyp.against %in% input[["setup"]]) {
+    rval@hyp.agcol <- "setup"
+  } else {
+    cat(
+      "Error: invalid hypothesis condition:",
+      paste("'", as.character(rval@hyp.against), "'", sep=""),
+      "\n"
+    )
+    return(test_error)
+  }
+  return(rval)
+}
+
+testpcthypothesis <- function(hyp, data) {
 
   filtered <- data[data$is.real,]
 
-  if (testvar == "consistency") { # TODO~ Generalize this check
-    if (filter != "all") {
-      if (invert) {
-        filtered <- filtered[filtered[[testvar]] != filter,]
+  if (hyp@in.question == "consistency") { # TODO~ Generalize this check
+    if (hyp@hyp.compare != "all") {
+      if (hyp@hyp.invertcomp) {
+        filtered <- filtered[filtered[[hyp@in.question]] != hyp@hyp.compare,]
       } else {
-        filtered <- filtered[filtered[[testvar]] == filter,]
+        filtered <- filtered[filtered[[hyp@in.question]] == hyp@hyp.compare,]
       }
     }
-    matches <- filtered[filtered[[testvar]] == condition,]
+    matches <- filtered[filtered[[hyp@in.question]] == hyp@hyp.against,]
   } else {
-    if (filter != "all") {
-      if (invert) {
-        filtered <- filtered[!filtered[[mrsp(testvar, filter)]],]
+    if (hyp@hyp.compare != "all") {
+      if (hyp@hyp.invertcomp) {
+        filtered <- filtered[
+          !filtered[[mrsp(hyp@in.question, hyp@hyp.compare)]]
+          ,
+        ]
       } else {
-        filtered <- filtered[filtered[[mrsp(testvar, filter)]],]
+        filtered <- filtered[
+          filtered[[mrsp(hyp@in.question, hyp@hyp.compare)]]
+          ,
+        ]
       }
     }
-    matches <- filtered[filtered[[mrsp(testvar, condition)]],]
+    matches <- filtered[filtered[[mrsp(hyp@in.question, hyp@hyp.against)]],]
   }
 
-  count.base <- nrow(filtered)
-  count.matches <- nrow(matches)
+  hyp@result.count.base <- nrow(filtered)
+  hyp@result.count.matches <- nrow(matches)
 
-  result <- count.matches / count.base
+  hyp@result.value <- hyp@result.count.matches / hyp@result.count.base
 
-  if (compare == "<") {
-    passed <- result < target
-  } else if (compare == ">") {
-    passed <- result > target
+  if (hyp@hyp.predict == "<") {
+    hyp@result.confirmed <- hyp@result.value < hyp@hyp.target
+  } else if (hyp@hyp.predict == ">") {
+    hyp@result.confirmed <- hyp@result.value > hyp@hyp.target
   }
 
-  return (list(
-    "type"="count",
-    "compare"=compare,
-    "target"=target,
-    "count.base"=count.base,
-    "count.matches"=count.matches,
-    "value"=result,
-    "passed"=passed
-  ))
+  return(hyp)
 }
 
-testnormalhypothesis <- function(hyp, data) {
-  testvar <- as.character(hyp[["question"]])
-  compcol <- "ERROR"
-  agcol <- "ERROR"
-  onlymain <- "FALSE"
-  compare <- hyp[["compare"]]
-  against <- hyp[["against"]]
-  subcondition <- NA
-  subagainst <- NA
-  require.was.obv.cond <- FALSE
-  require.was.obv.ag <- FALSE
-  if (grepl("\\(", compare)) {
-    subcondition <- sub(".*\\(", "", sub("\\)$", "", compare))
-    compare <- sub("\\(.*\\)$", "", compare)
-  }
-  if (grepl("\\(", against)) {
-    subagainst <- sub(".*\\(", "", sub("\\)$", "", against))
-    against <- sub("\\(.*\\)$", "", against)
-  }
-  if (grepl("\\[", compare)) {
-    subcondition <- sub(".*\\[", "", sub("\\]$", "", compare))
-    compare <- sub("\\[.*\\]$", "", compare)
-    require.was.obv.cond <- TRUE
-  }
-  if (grepl("\\[", against)) {
-    subagainst <- sub(".*\\[", "", sub("\\]$", "", against))
-    against <- sub("\\[.*\\]$", "", against)
-    require.was.obv.ag <- TRUE
-  }
-  if (compare %in% data[["condition"]]) {
-    compcol <- "condition"
-  } else if (compare %in% data[["seed"]]) {
-    compcol <- "seed"
-  } else if (compare %in% data[["stakes"]]) {
-    compcol <- "stakes"
-  } else if (compare %in% data[["setup"]]) {
-    compcol <- "setup"
-  } else if (compare %in% data[["condition"]]) {
-  } else {
-    cat("Error: invalid hypothesis condition:", paste("'", as.character(compare), "'", sep=""), "\n")
-    return(test_error)
-  }
-  if (against %in% data[["condition"]]) {
-    agcol <- "condition"
-  } else if (against %in% data[["seed"]]) {
-    agcol <- "seed"
-  } else if (against %in% data[["stakes"]]) {
-    agcol <- "stakes"
-  } else if (against %in% data[["setup"]]) {
-    agcol <- "setup"
-  } else {
-    cat("Error: invalid hypothesis against:", paste("'", as.character(against), "'", sep=""), "\n")
-    return(test_error)
-  }
+testmwwhypothesis <- function(hyp, data) {
   testcol <- data[
-    as.character(data[[compcol]]) == as.character(compare)
-  | as.character(data[[agcol]]) == as.character(against)
+      as.character(data[[hyp@hyp.compcol]]) == hyp@hyp.compare
+    | as.character(data[[hyp@hyp.agcol]]) == hyp@hyp.against
     ,
   ]
-  if (!is.na(subcondition)) {
+
+  is.compare = as.character(testcol[[hyp@hyp.compcol]]) == hyp@hyp.compare
+  is.against = as.character(testcol[[hyp@hyp.agcol]]) == hyp@hyp.against
+
+  if (!identical(hyp@hyp.subcomp, character(0))) {
     testcol <- testcol[
-        testcol[["decision.case"]] == subcondition
-      | as.character(testcol[[compcol]]) != as.character(compare)
+        testcol[["decision.case"]] == hyp@hyp.subcomp
+      | !is.compare
       ,
     ]
   }
-  if (!is.na(subagainst)) {
+
+  # Re-align conditions since rows may have changed:
+  is.compare = as.character(testcol[[hyp@hyp.compcol]]) == hyp@hyp.compare
+  is.against = as.character(testcol[[hyp@hyp.agcol]]) == hyp@hyp.against
+
+  if (!identical(hyp@hyp.subag, character(0))) {
     testcol <- testcol[
-        testcol[["decision.case"]] == subagainst
-      | as.character(testcol[[agcol]]) != as.character(against)
+        testcol[["decision.case"]] == hyp@hyp.subag
+      | !is.against
       ,
     ]
   }
-  if (require.was.obv.cond) {
+
+  # Re-align conditions since rows may have changed:
+  is.compare = as.character(testcol[[hyp@hyp.compcol]]) == hyp@hyp.compare
+  is.against = as.character(testcol[[hyp@hyp.agcol]]) == hyp@hyp.against
+
+  if (hyp@hyp.req.was.obv.comp) {
     testcol <- testcol[
         testcol[["was.obvious"]]
-      | as.character(testcol[[compcol]]) != as.character(compare)
+      | !is.compare
       ,
     ]
   }
-  if (require.was.obv.ag) {
+
+  # Re-align conditions since rows may have changed:
+  is.compare = as.character(testcol[[hyp@hyp.compcol]]) == hyp@hyp.compare
+  is.against = as.character(testcol[[hyp@hyp.agcol]]) == hyp@hyp.against
+
+  if (hyp@hyp.req.was.obv.ag) {
     testcol <- testcol[
         testcol[["was.obvious"]]
-      | as.character(testcol[[agcol]]) != as.character(against)
+      | !is.against
       ,
     ]
   }
-  is.compare = factor(
-    apply(
-      testcol,
-      1,
-      function(row) {
-        return(
-          as.character(row[[compcol]]) == as.character(compare)
-        )
-      }
-    )
-  )
-  testcol <- testcol[[testvar]]
+
+  # Re-align conditions since rows may have changed:
+  is.compare = as.character(testcol[[hyp@hyp.compcol]]) == hyp@hyp.compare
+  is.against = as.character(testcol[[hyp@hyp.agcol]]) == hyp@hyp.against
+
+  hyp@count.comp <- sum(is.compare, na.rm=TRUE)
+  hyp@count.ag <- sum(is.against, na.rm=TRUE)
+
+  testcol <- testcol[[hyp@in.question]]
   testcol <- sapply(
     testcol,
     function (datum) { return(as.numeric(as.character(datum))) }
   )
-  rev <- as.character(hyp[["predict"]])
+  rev <- hyp@hyp.predict
   if (rev == "greater") {
     rev <- "less"
   } else if (rev == "less") {
@@ -477,7 +575,7 @@ testnormalhypothesis <- function(hyp, data) {
     rev <- "error"
   }
   result <- wilcox_test(
-    testcol ~ is.compare,
+    testcol ~ factor(is.compare),
     distribution="exact",
     alternative=rev,
     conf.int=TRUE,
@@ -491,108 +589,342 @@ testnormalhypothesis <- function(hyp, data) {
   #  as.character(data[["condition"]]) == as.character(against)
   #  ,
   #]
-  #compare <- as.list(as.numeric(compare[[testvar]]))
-  #against <- as.list(as.numeric(against[[testvar]]))
+  #compare <- as.list(as.numeric(compare[[hyp@in.question]]))
+  #against <- as.list(as.numeric(against[[hyp@in.question]]))
   #grouping = factor(c(rep("compare", length(compare)), rep("
   #result <- wilcox.test(
-  #  as.numeric(compare[[testvar]]),
-  #  as.numeric(against[[testvar]]),
+  #  as.numeric(compare[[hyp@in.question]]),
+  #  as.numeric(against[[hyp@in.question]]),
   #  paired=FALSE,
   #  exact=FALSE,
   #  alternative=as.character(hyp[["predict"]])
   #)
-  pass <- as.logical(pvalue(result) < 0.05)
+  hyp@result.pvalue <- pvalue(result)
+  hyp@result.confirmed <- hyp@result.pvalue < 0.05
+
   ranks <- rank(testcol, ties.method="average")
-  framed <- data.frame(ranks, is.compare)
-
-  mr.compare <- mean(framed[framed$is.compare == TRUE,][["ranks"]])
-  mr.against <- mean(framed[framed$is.compare == FALSE,][["ranks"]])
-
-  count.comp <- nrow(framed[framed$is.compare == TRUE,])
-  count.ag <- nrow(framed[framed$is.compare == FALSE,])
+  hyp@result.mr.compare <- mean(ranks[is.compare])
+  hyp@result.mr.against <- mean(ranks[is.against])
 
   #raweffect <- result@statistic@linearstatistic
-  effect <- abs(statistic(result, "test")[["FALSE"]] / sqrt(length(testcol)))
-  commoneffect <- 0.5 + effect / 2.0
-  conf.low <- confint(result)[["conf.int"]][[1]]
-  conf.high <- confint(result)[["conf.int"]][[2]]
-  return(
-    list(
-      "type"="mww",
-      "passed"=pass,
-      "pvalue"=pvalue(result),
-      "mr.compare"=mr.compare,
-      "mr.against"=mr.against,
-      "effectsize"=effect,
-      "commoneffect"=commoneffect,
-      "conf.low"=conf.low,
-      "conf.high"=conf.high,
-      "count.comp"=count.comp,
-      "count.ag"=count.ag
-    )
-  )
+  hyp@result.effect <- abs(statistic(result, "test")[["FALSE"]] / sqrt(length(testcol)))
+  hyp@result.effect.common <- 0.5 + hyp@result.effect / 2.0
+  hyp@result.conf.low <- confint(result)[["conf.int"]][[1]]
+  hyp@result.conf.high <- confint(result)[["conf.int"]][[2]]
+
+  return(hyp)
 }
 
-DOliveCIproc <- function(y, alpha = 0.05){
-  #
-  #  This procedure implements David Olive's simple
-  #  median confidence interval, along with the standard
-  #  confidence interval for the mean, for comparison
-  #
-  #  First, compute the median
-  #
-  n <- length(y)
-  ysort <- sort(y)
-  nhalf <- floor(n/2)
-  if (2*nhalf < n){
-    #  n odd
-    med <- ysort[nhalf + 1]
+display_result <- function (r) {
+  pred <- "unknown"
+  if (r@in.against == "uniform" | r@in.against == "normal") {
+    if (r@hyp.predict == "greater") {
+      pred <- "agree"
+    } else if (r@hyp.predict == "less") {
+      pred <- "disagree"
+    }
+  } else {
+    if (r@hyp.predict == "greater") {
+      pred <- paste(">", r@in.against, sep="")
+    } else if (r@hyp.predict == "less") {
+      pred <- paste("<", r@in.against, sep="")
+    }
   }
-  else{
-    # n even
-    med <- (ysort[nhalf] + ysort[nhalf+1])/2
+  if (r@type == "mww") {
+    if (r@result.confirmed %in% c(FALSE, TRUE)) {
+      cat(
+        "",
+        format(snames[[r@in.question]], width=53, justify="left"),
+        format(r@in.compare, width=22, justify="left"),
+        format(pred, width=23, justify="left"),
+        format(
+          as.character(r@result.confirmed),
+          width=6,
+          justify="left"
+        ),
+        format(r@result.pvalue, width=12, justify="left"),
+        " ",
+        format(sprintf("%0.3f", r@result.effect.common), width=8, justify="left"),
+        format(sprintf("%d", r@count.comp), width=7, justify="left"),
+        format(sprintf("%d", r@count.ag), width=7, justify="left"),
+#        format(sprintf("%0.3f", r@result.effectsize), width=7, justify="left"),
+#        format(r@result.conf.low, width=4, justify="left"),
+#        format(r@result.conf.high, width=4, justify="left"),
+        "\n"
+      )
+    } else {
+      cat(
+        "",
+        format(snames[[as.character(hyp[["question"]])]], width=53, justify="left"),
+        format(r@result.compare, width=22, justify="left"),
+        format(pred, width=23, justify="left"),
+        "ERROR",
+        "\n"
+      )
+    }
+  } else if (r@type == "count") {
+    if (r@result.confirmed != "ERROR") {
+      cat(
+        "",
+        format(snames[[r@in.question]], width=53, justify="left"),
+        format(
+          paste(
+            "#", r@in.against, " / #", r@in.compare,
+            sep=""
+          ),
+          width=22,
+          justify="left"
+        ),
+        format(
+          paste(
+            r@hyp.predict, " ",
+            r@hyp.target,
+            sep=""
+          ),
+          width=23,
+          justify="left"
+        ),
+        format(
+          as.character(r@result.confirmed),
+          width=6,
+          justify="left"
+        ),
+        format(sprintf("%0.1f%%", 100*r@result.value), width=8, justify="right"),
+        format(
+          paste(
+            format(sprintf("%d", r@result.count.matches), width=3, justify="right"),
+            "/",
+            format(sprintf("%d", r@result.count.base), width=3, justify="left"),
+            sep=""
+          ),
+          width=11,
+          justify="right"
+        ),
+        "\n"
+      )
+    } else {
+      cat(
+        "",
+        format(snames[[r@in.question]], width=53, justify="left"),
+        format(
+          paste("#", r@in.against, " / #", r@in.compare, "...", sep=""),
+          width=23,
+          justify="left"
+        ),
+        "ERROR",
+        "\n"
+      )
+    }
+  } else {
+      cat(
+        "ERROR: Invalid test result type",
+        paste("'", r@type, "'", sep=""),
+        "!\n"
+      )
   }
-  #
-  #  Next, compute Olive’s standard error for the median
-  #
-  Ln <- nhalf - ceiling(sqrt(n/4))
-  Un <- n - Ln
-  SE <- 0.5*(ysort[Un] - ysort[Ln+1])
-  #
-  #  Compute the confidence interval based on Student’s t-distribution
-  #  The degrees of freedom parameter p is discussed in Olive’s paper
-  #
-  p <- Un - Ln - 1
-  t <- qt(p = 1 - alpha/2, df = p)
-  medLCI <- med - t * SE
-  medUCI <- med + t * SE
-  #
-  #  Next, compute the mean and its classical confidence interval
-  #
-  mu <- mean(y)
-  SEmu <- sd(y)/sqrt(n)
-  tmu <- qt(p = 1 - alpha/2, df = n-1)
-  muLCI <- mu - tmu * SEmu
-  muUCI <- mu + tmu * SEmu
-  #
-  #  Finally, return a data frame with all of the results computed here
-  #
-  result <- data.frame(
-    Median = med,
-    LCI = medLCI,
-    UCI = medUCI,
-    Mean = mu,
-    MeanLCI = muLCI,
-    MeanUCI = muUCI,
-    N = n,
-    dof = p,
-    tmedian = t,
-    tmean = tmu,
-    SEmedian = SE,
-    SEmean = SEmu
-  )
-  return(result)
 }
+
+latex_result <- function (r, last=FALSE) {
+  if (r@type == "empty") {
+    if (last) {
+      return("\\tenplast ")
+    } else {
+      return("\\tenp ")
+    }
+  } else if (r@type == "mww") {
+    hyp <- "unknown"
+    if (r@in.against == "uniform" | r@in.against == "normal") {
+      if (r@hyp.predict == "greater") {
+        hyp <- "A"
+      } else if (r@hyp.predict == "less") {
+        hyp <- "D"
+      }
+    } else {
+      if (r@hyp.predict == "greater") {
+        hyp <- paste(r@in.compare, ">", r@in.against, sep="")
+      } else if (r@hyp.predict == "less") {
+        hyp <- paste(r@in.compare, "<", r@in.against, sep="")
+      }
+    }
+    p <- r@result.pvalue
+    ef <- r@result.effect.common
+    if (p < 0.001) {
+      sf <- format(p, scientific=TRUE)
+      pattern <- "([0-9.-]+)e\\-([0-9]+)"
+      p.mantissa <- as.numeric(sub(pattern, "\\1", sf))
+      p.exponent <- as.numeric(sub(pattern, "\\2", sf))
+      showp <- paste(
+        "$\\bm{",
+        sprintf("%1.1f", p.mantissa),
+        "\\sqtimes 10^{-",
+        sprintf("%d", p.exponent),
+        "}}$",
+        sep=""
+      )
+    } else {
+      showp <- sprintf("%0.3f", p)
+    }
+    if (r@result.confirmed) {
+      return(
+        paste(
+          "\\tesig{", hyp, "}{", showp, "}{", sprintf("%2.0f\\%%", 100*ef), "}",
+          sep=""
+        )
+      )
+    } else {
+      return(
+        paste(
+          "\\tensig{", hyp, "}{", showp, "}",
+          sep=""
+        )
+      )
+    }
+  #} else if (r@type == "count") {
+    # TODO: HERE?
+  } else {
+    return(paste("ERROR: Invalid result type '", r@type, "'.", sep=""))
+  }
+}
+
+lookup_unary_result <- function (results, question, condition) {
+  candidates <- list()
+  for (r in results) {
+    if (
+      r@in.question == question
+    & r@in.compare == condition
+    & r@in.against %in% c("uniform", "neutral")
+    ) {
+      candidates <- append(candidates, r)
+    }
+  }
+  if (length(candidates) == 1) {
+    return(candidates[[1]])
+  } else if (length(candidates) > 1) {
+    print("ERROR: Multiple candidates for result criteria!")
+    print(question)
+    print(condition)
+    print("Candidates:")
+    print(candidates)
+    stop("Multiple candidates.")
+  } else {
+    return(new("HResult", type="empty"))
+  }
+}
+
+lookup_binary_result <- function (results, question, condition, against) {
+  candidates <- list()
+  for (r in results) {
+    if (
+      r@in.question == question
+    & r@in.compare == condition
+    & r@in.against == against
+    ) {
+      candidates <- append(candidates, r);
+    }
+  }
+  if (length(candidates) == 1) {
+    return(candidates[[1]])
+  } else if (length(candidates) > 1) {
+    print("ERROR: Multiple candidates for result criteria!")
+    print(question)
+    print(condition)
+    print("Candidates:")
+    print(candidates)
+    stop("Multiple candidates.")
+  } else {
+    return(new("HResult", type="empty"))
+  }
+}
+
+latex_opt_row <- function(results, question, col.1, col.2, col.3) {
+  return(c(
+    "\\hline",
+    paste(
+      "\\multirow{2}{7em}{\\hangpara{1.3em}{1}\\sII",
+      gsub("\\.", "", question),
+      "abbr/} &%",
+      sep=""
+    ),
+    paste(
+      "  ",
+      latex_result(lookup_unary_result(results, question, col.1[1])),
+      " &%",
+      sep=""
+    ),
+    paste(
+      "  ",
+      latex_result(lookup_unary_result(results, question, col.2[1])),
+      " &%",
+      sep=""
+    ),
+    paste(
+      "  ",
+      latex_result(lookup_unary_result(results, question, col.3[1]), last=TRUE),
+      " \\\\",
+      sep=""
+    ),
+    "\\cline{2-10}",
+    "&%",
+    paste(
+      "  ",
+      latex_result(lookup_unary_result(results, question, col.1[2])),
+      " &%",
+      sep=""
+    ),
+    paste(
+      "  ",
+      latex_result(lookup_unary_result(results, question, col.2[2])),
+      " &%",
+      sep=""
+    ),
+    paste(
+      "  ",
+      latex_result(lookup_unary_result(results, question, col.3[2]), last=TRUE),
+      " \\\\",
+      sep=""
+    )
+  ))
+}
+
+latex_out_row <- function(results, question, col.1, col.2) {
+  return(c(
+    "\\hline",
+    paste(
+      "\\multirow{2}{8em}{\\hangpara{1.3em}{1}\\sII",
+      gsub("\\.", "", question),
+      "abbr/} &%",
+      sep=""
+    ),
+    paste(
+      "  ",
+      latex_result(lookup_unary_result(results, question, col.1[1])),
+      " &%",
+      sep=""
+    ),
+    paste(
+      "  ",
+      latex_result(lookup_unary_result(results, question, col.2[1]), last=TRUE),
+      " \\\\",
+      sep=""
+    ),
+    "\\cline{2-7}",
+    "&%",
+    paste(
+      "  ",
+      latex_result(lookup_unary_result(results, question, col.1[2])),
+      " &%",
+      sep=""
+    ),
+    paste(
+      "  ",
+      latex_result(lookup_unary_result(results, question, col.2[2]), last=TRUE),
+      " \\\\",
+      sep=""
+    )
+  ))
+}
+
+# Start of processing...
 
 #responses <- read.csv(file="study-results.csv",head=TRUE,sep=",")
 responses <- read.csv(file="full-results.csv",head=TRUE,sep=",")
@@ -679,14 +1011,6 @@ cat("\n---\n")
 #  ) {
 #    col <- filtered[filtered$condition == cond,][[question]]
 #    num <- as.numeric(as.character(col[!is.na(col)]))
-#   # cis <- DOliveCIproc(num)
-#   # wcis <- wilcox.test(
-#   #   num,
-#   #   conf.int=TRUE,
-#   #   conf.level=0.95,
-#   #   alternative="two.sided",
-#   #   correct=TRUE
-#   # )
 #    boottype <- "basic"
 #    bcis <- boot.ci(
 #      boot(num, function(x, i) median(x[i]), R=1000),
@@ -711,125 +1035,139 @@ cat("\n---\n")
 
 
 if (test.hypotheses) {
-cat("\n---\n")
+  cat("\n---\n")
 
-cat("Hypotheses:\n")
-cat(
+  cat("Hypotheses:\n")
+  cat(
 "Question                                              Compare:               Pred:                   Pass:   P:            effect:  #comp:  #ag:\n"
-)
-  for (hidx in 1:nrow(hypotheses)) {
-    hyp <- as.list(hypotheses[hidx,])
+  )
+  results <- list()
+  # parse and test our hypotheses:
+  for (idx in 1:nrow(hypotheses)) {
+    rhyp <- as.list(hypotheses[idx,])
     pred <- "unknown"
-    if (hyp[["against"]] == "uniform" | hyp[["against"]] == "normal") {
-      if (hyp[["predict"]] == "greater") {
+    if (rhyp[["against"]] == "uniform" | rhyp[["against"]] == "normal") {
+      if (rhyp[["predict"]] == "greater") {
         pred <- "agree"
-      } else if (hyp[["predict"]] == "less") {
+      } else if (rhyp[["predict"]] == "less") {
         pred <- "disagree"
       }
     } else {
-      if (hyp[["predict"]] == "greater") {
-        pred <- paste(">", hyp[["against"]], sep="")
-      } else if (hyp[["predict"]] == "less") {
-        pred <- paste("<", hyp[["against"]], sep="")
+      if (rhyp[["predict"]] == "greater") {
+        pred <- paste(">", rhyp[["against"]], sep="")
+      } else if (rhyp[["predict"]] == "less") {
+        pred <- paste("<", rhyp[["against"]], sep="")
       }
     }
-    result <- testhypothesis(hyp, filtered)
-    if (result[["type"]] == "mww") {
-      if (result[["passed"]] != "ERROR") {
-        cat(
-          "",
-          format(snames[[as.character(hyp[["question"]])]], width=53, justify="left"),
-          format(hyp[["compare"]], width=22, justify="left"),
-          format(pred, width=23, justify="left"),
-          format(
-            as.character(as.logical(result[["passed"]])),
-            width=6,
-            justify="left"
-          ),
-          format(result[["pvalue"]], width=12, justify="left"),
-          " ",
-          format(sprintf("%0.3f", result[["commoneffect"]]), width=8, justify="left"),
-          format(sprintf("%d", result[["count.comp"]]), width=7, justify="left"),
-          format(sprintf("%d", result[["count.ag"]]), width=7, justify="left"),
-  #        format(sprintf("%0.3f", result[["effectsize"]]), width=7, justify="left"),
-  #        format(result[["conf.low"]], width=4, justify="left"),
-  #        format(result[["conf.high"]], width=4, justify="left"),
-          "\n"
-        )
-      } else {
-        cat(
-          "",
-          format(snames[[as.character(hyp[["question"]])]], width=53, justify="left"),
-          format(result[["compare"]], width=22, justify="left"),
-          format(pred, width=23, justify="left"),
-          "ERROR",
-          "\n"
-        )
-      }
-    } else if (result[["type"]] == "count") {
-      if (result[["passed"]] != "ERROR") {
-        cat(
-          "",
-          format(snames[[as.character(hyp[["question"]])]], width=53, justify="left"),
-          format(
-            paste(
-              "#", hyp[["against"]], " / #", hyp[["compare"]],
-              sep=""
-            ),
-            width=22,
-            justify="left"
-          ),
-          format(
-            paste(
-              result[["compare"]], " ",
-              result[["target"]],
-              sep=""
-            ),
-            width=23,
-            justify="left"
-          ),
-          format(
-            as.character(as.logical(result[["passed"]])),
-            width=6,
-            justify="left"
-          ),
-          format(sprintf("%0.2f", result[["value"]]), width=8, justify="right"),
-          format(
-            paste(
-              format(sprintf("%d", result[["count.matches"]]), width=3, justify="right"),
-              "/",
-              format(sprintf("%d", result[["count.base"]]), width=3, justify="left"),
-              sep=""
-            ),
-            width=11,
-            justify="right"
-          ),
-          "  ",
-          format("NA", width=7, justify="left"),
-          format("NA", width=7, justify="left"),
-          "\n"
-        )
-      } else {
-        cat(
-          "",
-          format(snames[[as.character(hyp[["question"]])]], width=53, justify="left"),
-          format(
-            paste("#", hyp[["against"]], " / #", hyp[["compare"]], "...", sep=""),
-            width=23,
-            justify="left"
-          ),
-          "ERROR",
-          "\n"
-        )
-      }
-    } else {
-        cat(
-          "ERROR: Invalid test result type",
-          paste("'", result[["type"]], "'", sep=""),
-          "!\n"
-        )
-    }
+    h <- parsehypothesis(rhyp, filtered)
+    result <- testhypothesis(h, filtered)
+    results <- append(results, result)
   }
+
+  # display our results:
+  for (r in results) {
+    display_result(r)
+  }
+
+  # Open files for writing .tex results:
+  fout.opt <- file("retrospective-option-results-table.tex")
+  fout.pos.out <- file("retrospective-positive-outcomes-results-table.tex")
+  fout.neg.out <- file("retrospective-negative-outcomes-results-table.tex")
+
+  writeLines(unlist(c(
+"\\begin{tabular}{l | c|c|c | c|c|c | c|c|c}",
+"\\multicolumn{1}{c|}{Question} &%",
+"  \\multicolumn{3}{|p{8em}|}{Expected Success} &%",
+"  \\multicolumn{3}{|p{7.5em}|}{Obvious Success} &%",
+"  \\multicolumn{3}{|p{8em}}{Expected Failure} \\\\",
+"\\cline{2-10}",
+"&%",
+"  \\multicolumn{3}{|p{8em}|}{Unexp. Failure} &%",
+"  \\multicolumn{3}{|p{7.5em}|}{Obvious Trap} &%",
+"  \\multicolumn{3}{|p{8em}}{Unexp. Success} \\\\",
+lapply(
+  c("opt.obvious", "opt.balanced", "opt.nobad", "opt.nogood", "opt.stakes"),
+  function(question) {
+    latex_opt_row(
+      results,
+      question,
+      c("expected_success", "unexpected_failure"),
+      c("obvious_success", "obvious_failure"),
+      c("expected_failure", "unexpected_success")
+    )
+  }
+),
+"\\end{tabular}"
+    )),
+    fout.opt
+  )
+
+  writeLines(unlist(c(
+"\\begin{tabular}{l | c|c|c | c|c|c}",
+"\\multicolumn{1}{c|}{Question} &%",
+"  \\multicolumn{3}{|p{12em}|}{Expected Success} &%",
+"  \\multicolumn{3}{|p{12em}}{Unexp. Success} \\\\",
+"\\cline{2-7}",
+"&%",
+"  \\multicolumn{3}{|p{12em}|}{Obvious Success [main]} &%",
+"  \\multicolumn{3}{|p{12em}}{Obvious Trap [alt]} \\\\",
+lapply(
+  c(
+    "out.fair", "out.unfair",
+    "out.sense", "out.broken",
+    "out.good", "out.bad",
+    "out.happy", "out.regret",
+    "out.expected", "out.unexpected"
+  ),
+  function(question) {
+    latex_out_row(
+      results,
+      question,
+      c("expected_success", "obvious_success(main)"),
+      c("unexpected_success", "obvious_failure(alt)")
+    )
+  }
+),
+"\\end{tabular}"
+    )),
+    fout.pos.out
+  )
+
+  writeLines(unlist(c(
+"\\begin{tabular}{l | c|c|c | c|c|c}",
+"\\multicolumn{1}{c|}{Question} &%",
+"  \\multicolumn{3}{|p{12em}|}{Expected Failure} &%",
+"  \\multicolumn{3}{|p{12em}}{Unexp. Failure} \\\\",
+"\\cline{2-7}",
+"&%",
+"  \\multicolumn{3}{|p{12em}|}{Obvious Success [alt]} &%",
+"  \\multicolumn{3}{|p{12em}}{Obvious Trap [main]} \\\\",
+lapply(
+  c(
+    "out.fair", "out.unfair",
+    "out.sense", "out.broken",
+    "out.good", "out.bad",
+    "out.happy", "out.regret",
+    "out.expected", "out.unexpected"
+  ),
+  function(question) {
+    latex_out_row(
+      results,
+      question,
+      c("expected_failure", "obvious_success(alt)"),
+      c("unexpected_failure", "obvious_failure(main)")
+    )
+  }
+),
+"\\end{tabular}"
+    )),
+    fout.neg.out
+  )
+
+  # Close output files:
+  close(fout.opt)
+  close(fout.pos.out)
+  close(fout.neg.out)
 }
 
 cat("\n---\n")
@@ -846,89 +1184,37 @@ trellis.par.set("strip.background", sb)
 # Choice histograms
 # -----------------
 
-pdf(file="reports/choices.pdf",title="dunyazad-outcomes-choices.report")
 filtered$seed = factor(filtered$seed)
-histogram(
-  ~ decision | seed,
-  data=filtered[filtered$condition=="expected_success",],
-  type="count",
-  layout=c(3,1),
-  aspect=1,
-  col="#ffff99",
-  xlab="expected_success"
-)
-histogram(
-  ~ decision | seed,
-  data=filtered[filtered$condition=="unexpected_failure",],
-  type="count",
-  layout=c(3,1),
-  aspect=1,
-  col="#ffff99",
-  xlab="unexpected_failure"
-)
-histogram(
-  ~ decision | seed,
-  data=filtered[filtered$condition=="obvious_success",],
-  type="count",
-  layout=c(3,1),
-  aspect=1,
-  col="#ffff99",
-  xlab="obvious_success"
-)
-histogram(
-  ~ decision | seed,
-  data=filtered[filtered$condition=="obvious_failure",],
-  type="count",
-  layout=c(3,1),
-  aspect=1,
-  col="#ffff99",
-  xlab="obvious_failure"
-)
-histogram(
-  ~ decision | seed,
-  data=filtered[filtered$condition=="expected_failure",],
-  type="count",
-  layout=c(3,1),
-  aspect=1,
-  col="#ffff99",
-  xlab="expected_failure"
-)
-histogram(
-  ~ decision | seed,
-  data=filtered[filtered$condition=="unexpected_success",],
-  type="count",
-  layout=c(3,1),
-  aspect=1,
-  col="#ffff99",
-  xlab="unexpected_success"
-)
-dev.off()
 
-## Get rid of the "decision" and "out.trick" columns:
-#
-#filtered <- filtered[,!( names(filtered) %in% c("decision", "out.trick") )]
+for (cond in conditions) {
+  h <- histogram(
+    ~ decision | seed,
+    data=filtered[filtered$condition==cond,],
+    type="count",
+    layout=c(3,1),
+    aspect=1,
+    col="#ffff99",
+    xlab=cond
+  )
+  pdf(
+    file=paste("reports/choices-", cond, ".pdf", sep=""),
+    title=paste("dunyazad-outcomes-choices-", cond, "-report", sep="")
+  )
+  show(h)
+  dev.off()
+}
 
 # Likert reports:
 # ---------------
 
 likert_names = snames[names(snames) %in% likert_questions]
 
-# Combined
-# --------
-
-page.1 = 1:5
-page.2 = 6:9
-page.3 = 10:13
-page.4 = c(14:length(likert_questions), 1:2)
-
-#print(likert_questions[page.1])
-#print(likert_questions[page.2])
-#print(likert_questions[page.3])
-#print(likert_questions[page.4])
-#exit
+# Grouped by condition:
+# ---------------------
 
 ordered <- filtered[,names(filtered) %in% likert_questions][,likert_questions]
 
+oreport <- ordered
 report <- rename(ordered, likert_names)
 
 grouping <- filtered[["condition"]]
@@ -936,10 +1222,17 @@ grouping <- filtered[["condition"]]
 for (i in 1:ncol(report)) {
   lk <- likert(report[i], grouping=grouping, nlevels=5)
   pdf(
-    file=paste("reports/outcomes-report-", sprintf("%02d", i), "-", likert_questions[i], ".pdf", sep=""),
-    title=paste("dunyazad-outcomes:", likert_questions[i]),
+    file=paste(
+      "reports/outcomes-report-",
+      sprintf("%02d", i),
+      "-",
+      names(oreport)[i],
+      ".pdf",
+      sep=""
+    ),
+    title=paste("dunyazad-outcomes:", names(oreport)[i]),
     width=7,
-    height=2.8
+    height=2.7
   )
   p <- plot(lk, group.order=conditions, ordered=FALSE)
   show(p)
@@ -947,22 +1240,62 @@ for (i in 1:ncol(report)) {
 }
 
 
-# Individual Conditions
-# ---------------------
+# Filtered by Condition, Grouped by Seed
+# --------------------------------------
 
 for (cond in conditions) {
-  pdf(
-      file=paste("reports/report-", cond, ".pdf", sep=""),
-      title=paste("dunyazad-report-", cond, sep="")
-  )
   report <- filtered[
     filtered$condition == cond,
     names(filtered) %in% names(likert_names)
   ]
+  oreport <- report
   report <- rename(report, likert_names)
-  lk = likert(report)
-  lk$results = lk$results[match(likert_names, lk$results$Item),]
-  p <- plot(lk, ordered=FALSE, group.order=likert_names)
-  show(p)
-  dev.off()
+  grouping <- filtered[filtered$condition==cond,"seed"]
+  #grouping <- factor(
+  #  paste(
+  #    as.character(filtered[filtered$condition==cond,"seed"]),
+  #    "-",
+  #    as.character(filtered[filtered$condition==cond,"decision"]),
+  #    sep=""
+  #  )
+  #)
+  for (i in 1:ncol(report)) {
+    lk = likert(report[i], grouping=grouping, nlevels=5)
+    p <- plot(lk, ordered=FALSE)
+    # hack out any layers missing data:
+    valid <- list()
+    for (l in p$layers) {
+      if ("value" %in% names(l[["data"]])) {
+        if (!is.na(l$data[["value"]][[1]])) {
+          valid <- append(valid, l)
+        }
+      } else {
+        valid <- append(valid, l)
+      }
+    }
+    p$layers <- valid
+    pdf(
+      file=paste(
+        "reports/detailed-report-",
+        cond,
+        "-",
+        sprintf("%02d", i),
+        "-",
+        names(oreport)[i],
+        ".pdf",
+        sep=""
+      ),
+      title=paste(
+        "dunyazad-report-",
+        cond,
+        "-",
+        names(oreport)[i],
+        sep=""
+      ),
+      width=7,
+      height=2.0
+    )
+    show(p)
+    dev.off()
+  }
 }

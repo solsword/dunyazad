@@ -1,2 +1,5 @@
 *.csv
 *.pdf
+*.tex
+reports/
+results.log
