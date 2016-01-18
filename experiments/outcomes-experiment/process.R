@@ -10,7 +10,9 @@
 
 library(iterators) # iter() function
 library(foreach) # foreach function and %do% operator
+library(grid) # for gList for likert plots w/ histograms
 library(likert) # likert graphing *Doesn't do grouping any more :(
+library(gtable) # operating on the likert graphs
 #library(reshape) # WOULD CAUSE likert error
 library(plyr) # rename function
 library(coin) # wilcox_test allows computing effect sizes
@@ -19,7 +21,11 @@ library(lattice) # for histogram
 
 # Switch for hypothesis testing:
 test.hypotheses = FALSE
-#test.hypotheses = FALSE
+#test.hypotheses = TRUE
+
+# Switch for report production:
+#produce.reports = FALSE
+produce.reports = TRUE
 
 qnames = c(
   "opt.obvious" = "Considering just the options, there seems to be a clear best option at this choice.",
@@ -145,6 +151,37 @@ conditions = c(
   "unexpected_success"
 )
 
+conditions.ext = c(
+  "obvious_success(main)",
+  "expected_success",
+  "unexpected_failure",
+  "obvious_success",
+  "obvious_failure",
+  "obvious_success(main)",
+  "obvious_failure(main)",
+  "obvious_success(alt)",
+  "obvious_failure(alt)",
+  "expected_failure",
+  "unexpected_success"
+)
+
+shortcond = list(
+  "expected_success"="exp. success",
+  "unexpected_success"="unexp. success",
+  "expected_failure"="exp. failure",
+  "unexpected_failure"="unexp. failure",
+  "obvious_success"="obv. success",
+  "obvious_failure"="obv. failure",
+  "obvious_success(main)"="obv. success [main]",
+  "obvious_failure(main)"="obv. failure [main]",
+  "obvious_success(alt)"="obv. success [alt]",
+  "obvious_failure(alt)"="obv. failure [alt]",
+  "obvious_success[main]"="obv. success [[main]]",
+  "obvious_failure[main]"="obv. failure [[main]]",
+  "obvious_success[alt]"="obv. success [[alt]]",
+  "obvious_failure[alt]"="obv. failure [[alt]]"
+)
+
 correct_decisions = c(
   "20739" = 1,
   "28306" = 3,
@@ -172,9 +209,14 @@ filterfactor <- function (input) {
   filtered <- input
   # Filter out too-quick, rejected, and tricked responses:
   filtered <- filtered[
-    filtered[["AssignmentStatus"]] == "Approved"
+    as.character(filtered[["AssignmentStatus"]]) == "Approved"
     ,
   ]
+  cat(
+    "Filtered",
+    sum(as.character(input[["AssignmentStatus"]]) != "Approved", na.rm=TRUE),
+    "non-approved assignments.\n"
+  )
   # Get rid of irrelevant columns:
   filtered <- filtered[
     ,
@@ -190,16 +232,21 @@ filterfactor <- function (input) {
   #]
 
   # Filter out any entries by workers who completed more than one:
-  #did_multiple <- duplicated(filtered[["worker"]])
-  #print("A")
-  #print(filtered[which(duplicated(filtered[["worker"]])),][["worker"]])
-  #print("B")
-  #print(nrow(filtered))
-  #print("C")
+  dup <- filtered[duplicated(filtered$worker),"worker"]
+  bad <- unique(dup)
+  olen <- nrow(filtered[filtered$condition != "uniform",])
   filtered <- filtered[
-    !duplicated(filtered[["worker"]]) | filtered[["condition"]] == "uniform"
+    !(filtered[["worker"]] %in% bad) | filtered[["condition"]] == "uniform"
     ,
   ]
+  nlen <- nrow(filtered[filtered$condition != "uniform",])
+  cat(
+    "Filtered",
+    olen - nlen,
+    "submissions by",
+    length(bad) - 1,
+    "duplicating workers.\n"
+  )
 
   # Add columns for the "best" option and whether the answer given matched it:
   filtered$best.option <- correct_decisions[as.character(filtered[["seed"]])]
@@ -209,6 +256,16 @@ filterfactor <- function (input) {
     ,
     "main",
     "alt"
+  )
+
+  na.count <- 0
+  for (name in likert_questions) {
+    na.count <- na.count + sum(is.na(filtered[[name]]))
+  }
+  cat(
+    "There were a total of",
+    na.count,
+    "missing responses among all the Likert questions.\n"
   )
 
   #foreach(row=iter(filtered, by="row"), .combine=rbind) %do% (
@@ -272,7 +329,6 @@ filterfactor <- function (input) {
         filtered[is.na(filtered[,col]),col] = FALSE
       }
     } else {
-      # cat("FACTORIZE", name, "\n")
       filtered[[name]] = factor(
         filtered[[name]],
         levels=c(1, 2, 3, 4, 5),
@@ -741,10 +797,26 @@ latex_result <- function (r, last=FALSE) {
       }
     } else {
       if (r@hyp.predict == "greater") {
-        hyp <- paste(r@in.compare, ">", r@in.against, sep="")
+        cmp <- ">"
       } else if (r@hyp.predict == "less") {
-        hyp <- paste(r@in.compare, "<", r@in.against, sep="")
+        cmp <- "<"
       }
+      #hyp <- paste(
+      #  "\\prq{",
+      #  gsub("_", "\\\\_", r@in.compare),
+      #  "}{}$",
+      #  cmp,
+      #  "$\\prq{",
+      #  gsub("_", "\\\\_", r@in.against),
+      #  "}{}",
+      #  sep=""
+      #)
+      hyp <- paste(
+        shortcond[[r@in.compare]],
+        "$", cmp, "$",
+        shortcond[[r@in.against]],
+        sep=""
+      )
     }
     p <- r@result.pvalue
     ef <- r@result.effect.common
@@ -838,47 +910,46 @@ lookup_binary_result <- function (results, question, condition, against) {
 
 latex_opt_row <- function(results, question, col.1, col.2, col.3) {
   return(c(
-    "\\hline",
+    "\\midrule",
     paste(
-      "\\multirow{2}{7em}{\\hangpara{1.3em}{1}\\sII",
+      "\\multirow{2}{5em}{\\sII",
       gsub("\\.", "", question),
       "abbr/} &%",
       sep=""
     ),
     paste(
-      "  ",
+      " & ",
       latex_result(lookup_unary_result(results, question, col.1[1])),
       " &%",
       sep=""
     ),
     paste(
-      "  ",
+      " & ",
       latex_result(lookup_unary_result(results, question, col.2[1])),
       " &%",
       sep=""
     ),
     paste(
-      "  ",
+      " & ",
       latex_result(lookup_unary_result(results, question, col.3[1]), last=TRUE),
       " \\\\",
       sep=""
     ),
-    "\\cline{2-10}",
     "&%",
     paste(
-      "  ",
+      " & ",
       latex_result(lookup_unary_result(results, question, col.1[2])),
       " &%",
       sep=""
     ),
     paste(
-      "  ",
+      " & ",
       latex_result(lookup_unary_result(results, question, col.2[2])),
       " &%",
       sep=""
     ),
     paste(
-      "  ",
+      " & ",
       latex_result(lookup_unary_result(results, question, col.3[2]), last=TRUE),
       " \\\\",
       sep=""
@@ -888,7 +959,7 @@ latex_opt_row <- function(results, question, col.1, col.2, col.3) {
 
 latex_out_row <- function(results, question, col.1, col.2) {
   return(c(
-    "\\hline",
+    "\\midrule",
     paste(
       "\\multirow{2}{8em}{\\hangpara{1.3em}{1}\\sII",
       gsub("\\.", "", question),
@@ -896,32 +967,91 @@ latex_out_row <- function(results, question, col.1, col.2) {
       sep=""
     ),
     paste(
-      "  ",
+      " & ",
       latex_result(lookup_unary_result(results, question, col.1[1])),
       " &%",
       sep=""
     ),
     paste(
-      "  ",
+      " & ",
       latex_result(lookup_unary_result(results, question, col.2[1]), last=TRUE),
       " \\\\",
       sep=""
     ),
-    "\\cline{2-7}",
     "&%",
     paste(
-      "  ",
+      " & ",
       latex_result(lookup_unary_result(results, question, col.1[2])),
       " &%",
       sep=""
     ),
     paste(
-      "  ",
+      " & ",
       latex_result(lookup_unary_result(results, question, col.2[2]), last=TRUE),
       " \\\\",
       sep=""
     )
   ))
+}
+
+latex_rel_row <- function(results, question, hyp.comp, hyp.ag) {
+  return(c(
+    paste(
+      "\\sII", gsub("\\.", "", question), "abbr/ & ",
+      latex_result(lookup_binary_result(results, question, hyp.comp, hyp.ag)),
+      " \\\\",
+      sep=""
+    )
+  ))
+}
+
+strip_invalid_plot_layers <- function(plot) {
+  # hack out any layers missing data:
+  valid <- list()
+  for (l in p$layers) {
+    if ("value" %in% names(l[["data"]])) {
+      if (
+        identical(l[["data"]][["value"]], numeric(0))
+      ) { # do nothing &/| won't shortcut?
+      } else if (
+        is.na(l[["data"]][["value"]][[1]])
+      ) { # do nothing
+      } else {
+        valid <- append(valid, l)
+      }
+    } else {
+      valid <- append(valid, l)
+    }
+  }
+  p$layers <- valid
+  return(p)
+}
+
+grob_with_sample_counts <- function(plot, grouping) {
+  counts <- table(grouping)
+  labels <- list()
+  for (v in p$layers[[length(p$layers)-1]]$data$Group) {
+    labels <- append(labels, paste("[", counts[[v]], "]", sep=""))
+  }
+
+  g <- ggplotGrob(p)
+  g1 <- gtable_filter(ggplotGrob(p), "axis_l")
+  # Edit the labels:
+  ax <- g1$grobs[[1]][["children"]]["axis"][[1]][["grobs"]][[1]]
+  l <- ax[["children"]][[1]]
+  l[["label"]] <- labels
+  l[["just"]] <- "left"
+  l[["hjust"]] <- NULL
+  l[["vjust"]] <- NULL
+  l[["x"]] <- unit(c(0.1, 0.1, 0.1), "npc")
+  ax[["children"]][[1]] <- l
+  g1$grobs[[1]][["children"]]["axis"][[1]][["grobs"]][[1]] <- ax
+
+  index <- subset(g$layout, name=="panel-1")
+
+  g <- gtable_add_cols(g, unit(0.5, "in"), pos=index$r)
+  g <- gtable_add_grob(g, g1, t=index$t, l=index$r+1, b=index$b, r=index$r+1)
+  return(g)
 }
 
 # Start of processing...
@@ -1073,18 +1203,24 @@ if (test.hypotheses) {
   fout.opt <- file("retrospective-option-results-table.tex")
   fout.pos.out <- file("retrospective-positive-outcomes-results-table.tex")
   fout.neg.out <- file("retrospective-negative-outcomes-results-table.tex")
+  fout.free.forced.failure <- file("retrospective-free-vs-forced-failure-results-table.tex")
+  fout.chosen.inevitable.success <- file("retrospective-chosen-vs-inevitable-success-results-table.tex")
+  fout.good.bad.unexpected <- file("retrospective-good-vs-bad-unexpected-results-table.tex")
+  fout.expected.unexpected.failure <- file("retrospective-expected-vs-unexpected-failure-results-table.tex")
+  fout.expected.unexpected.success <- file("retrospective-expected-vs-unexpected-success-results-table.tex")
 
   writeLines(unlist(c(
-"\\begin{tabular}{l | c|c|c | c|c|c | c|c|c}",
-"\\multicolumn{1}{c|}{Question} &%",
-"  \\multicolumn{3}{|p{8em}|}{Expected Success} &%",
-"  \\multicolumn{3}{|p{7.5em}|}{Obvious Success} &%",
-"  \\multicolumn{3}{|p{8em}}{Expected Failure} \\\\",
-"\\cline{2-10}",
+"\\begin{tabular}{l  c  c c c  c  c c c  c  c c c}",
+"\\toprule",
+"\\multirow{2}{5em}{Question} &%",
+" & \\multicolumn{3}{c}{Expected Success} &%",
+" & \\multicolumn{3}{c}{Obvious Success} &%",
+" & \\multicolumn{3}{c}{Expected Failure} \\\\",
 "&%",
-"  \\multicolumn{3}{|p{8em}|}{Unexp. Failure} &%",
-"  \\multicolumn{3}{|p{7.5em}|}{Obvious Trap} &%",
-"  \\multicolumn{3}{|p{8em}}{Unexp. Success} \\\\",
+" & \\multicolumn{3}{c}{Unexp. Failure} &%",
+" & \\multicolumn{3}{c}{Obvious Failure} &%",
+" & \\multicolumn{3}{c}{Unexp. Success} \\\\",
+"\\toprule",
 lapply(
   c("opt.obvious", "opt.balanced", "opt.nobad", "opt.nogood", "opt.stakes"),
   function(question) {
@@ -1097,20 +1233,22 @@ lapply(
     )
   }
 ),
+"\\bottomrule",
 "\\end{tabular}"
     )),
     fout.opt
   )
 
   writeLines(unlist(c(
-"\\begin{tabular}{l | c|c|c | c|c|c}",
-"\\multicolumn{1}{c|}{Question} &%",
-"  \\multicolumn{3}{|p{12em}|}{Expected Success} &%",
-"  \\multicolumn{3}{|p{12em}}{Unexp. Success} \\\\",
-"\\cline{2-7}",
+"\\begin{tabular}{l  c  c c c  c  c c c}",
+"\\toprule",
+"\\multirow{2}{5em}{Question} &%",
+" & \\multicolumn{3}{c}{Expected Success} &%",
+" & \\multicolumn{3}{c}{Unexp. Success} \\\\",
 "&%",
-"  \\multicolumn{3}{|p{12em}|}{Obvious Success [main]} &%",
-"  \\multicolumn{3}{|p{12em}}{Obvious Trap [alt]} \\\\",
+" & \\multicolumn{3}{c}{Obv. Success [main]} &%",
+" & \\multicolumn{3}{c}{Obv. Failure [alt]} \\\\",
+"\\toprule",
 lapply(
   c(
     "out.fair", "out.unfair",
@@ -1128,20 +1266,22 @@ lapply(
     )
   }
 ),
+"\\bottomrule",
 "\\end{tabular}"
     )),
     fout.pos.out
   )
 
   writeLines(unlist(c(
-"\\begin{tabular}{l | c|c|c | c|c|c}",
-"\\multicolumn{1}{c|}{Question} &%",
-"  \\multicolumn{3}{|p{12em}|}{Expected Failure} &%",
-"  \\multicolumn{3}{|p{12em}}{Unexp. Failure} \\\\",
-"\\cline{2-7}",
+"\\begin{tabular}{l  c  c c c  c  c c c}",
+"\\toprule",
+"\\multirow{2}{5em}{Question} &%",
+" & \\multicolumn{3}{c}{Expected Failure} &%",
+" & \\multicolumn{3}{c}{Unexp. Failure} \\\\",
 "&%",
-"  \\multicolumn{3}{|p{12em}|}{Obvious Success [alt]} &%",
-"  \\multicolumn{3}{|p{12em}}{Obvious Trap [main]} \\\\",
+" & \\multicolumn{3}{c}{Obv. Success [alt]} &%",
+" & \\multicolumn{3}{c}{Obv. Failure [main]} \\\\",
+"\\toprule",
 lapply(
   c(
     "out.fair", "out.unfair",
@@ -1159,143 +1299,311 @@ lapply(
     )
   }
 ),
+"\\bottomrule",
 "\\end{tabular}"
     )),
     fout.neg.out
+  )
+
+  writeLines(unlist(c(
+"\\begin{tabular}{l c c c}",
+"\\toprule",
+"Question & Hypothesis & $p$-value & Effect \\\\",
+"\\midrule",
+lapply(
+  c(
+    "out.fair", "out.unfair",
+    "out.sense", "out.broken",
+    "out.good", "out.bad",
+    "out.happy", "out.regret",
+    "out.expected", "out.unexpected"
+  ),
+  function(question) {
+    latex_rel_row(
+      results,
+      question,
+      "unexpected_failure",
+      "obvious_failure(main)"
+    )
+  }
+),
+"\\bottomrule",
+"\\end{tabular}"
+    )),
+    fout.free.forced.failure
+  )
+
+  writeLines(unlist(c(
+"\\begin{tabular}{l c c c}",
+"\\toprule",
+"Question & Hypothesis & $p$-value & Effect \\\\",
+"\\midrule",
+lapply(
+  c(
+    "out.good", "out.bad",
+    "out.happy", "out.regret"
+  ),
+  function(question) {
+    latex_rel_row(
+      results,
+      question,
+      "expected_success",
+      "obvious_success(main)"
+    )
+  }
+),
+"\\bottomrule",
+"\\end{tabular}"
+    )),
+    fout.chosen.inevitable.success
+  )
+
+  writeLines(unlist(c(
+"\\begin{tabular}{l c c c}",
+"\\toprule",
+"Question & Hypothesis & $p$-value & Effect \\\\",
+"\\midrule",
+lapply(
+  c(
+    "out.fair", "out.unfair",
+    "out.sense", "out.broken"
+  ),
+  function(question) {
+    latex_rel_row(
+      results,
+      question,
+      "unexpected_failure",
+      "unexpected_success"
+    )
+  }
+),
+"\\bottomrule",
+"\\end{tabular}"
+    )),
+    fout.good.bad.unexpected
+  )
+
+  writeLines(unlist(c(
+"\\begin{tabular}{l c c c}",
+"\\toprule",
+"Question & Hypothesis & $p$-value & Effect \\\\",
+"\\midrule",
+lapply(
+  c(
+    "out.good", "out.bad",
+    "out.happy", "out.regret"
+  ),
+  function(question) {
+    latex_rel_row(
+      results,
+      question,
+      "unexpected_failure",
+      "expected_failure"
+    )
+  }
+),
+lapply(
+  c(
+    "out.good", "out.bad",
+    "out.happy", "out.regret"
+  ),
+  function(question) {
+    latex_rel_row(
+      results,
+      question,
+      "obvious_failure(main)",
+      "expected_failure"
+    )
+  }
+),
+"\\bottomrule",
+"\\end{tabular}"
+    )),
+    fout.expected.unexpected.failure
+  )
+
+  writeLines(unlist(c(
+"\\begin{tabular}{l c c c}",
+"\\toprule",
+"Question & Hypothesis & $p$-value & Effect \\\\",
+"\\midrule",
+lapply(
+  c(
+    "out.good", "out.bad",
+    "out.happy", "out.regret"
+  ),
+  function(question) {
+    latex_rel_row(
+      results,
+      question,
+      "expected_success",
+      "unexpected_success"
+    )
+  }
+),
+lapply(
+  c(
+    "out.good", "out.bad",
+    "out.happy", "out.regret"
+  ),
+  function(question) {
+    latex_rel_row(
+      results,
+      question,
+      "obvious_success(main)",
+      "unexpected_success"
+    )
+  }
+),
+"\\bottomrule",
+"\\end{tabular}"
+    )),
+    fout.expected.unexpected.success
   )
 
   # Close output files:
   close(fout.opt)
   close(fout.pos.out)
   close(fout.neg.out)
+  close(fout.free.forced.failure)
+  close(fout.chosen.inevitable.success)
+  close(fout.good.bad.unexpected)
+  close(fout.expected.unexpected.failure)
+  close(fout.expected.unexpected.success)
 }
 
-cat("\n---\n")
+if (produce.reports) {
+  cat("\n---\n")
 
-# Get rid of fake entries:
+  # Get rid of fake entries:
 
-filtered <- filtered[filtered$is.real,]
+  filtered <- filtered[filtered$is.real,]
 
-# Prevent anyone from gouging their eyes out:
-sb <- trellis.par.get("strip.background")
-sb[["col"]][1] <- "#ddeeff"
-trellis.par.set("strip.background", sb)
+  # Prevent anyone from gouging their eyes out:
+  sb <- trellis.par.get("strip.background")
+  sb[["col"]][1] <- "#ddeeff"
+  trellis.par.set("strip.background", sb)
 
-# Choice histograms
-# -----------------
+  # Choice histograms
+  # -----------------
 
-filtered$seed = factor(filtered$seed)
+  filtered$seed = factor(filtered$seed)
 
-for (cond in conditions) {
-  h <- histogram(
-    ~ decision | seed,
-    data=filtered[filtered$condition==cond,],
-    type="count",
-    layout=c(3,1),
-    aspect=1,
-    col="#ffff99",
-    xlab=cond
-  )
-  pdf(
-    file=paste("reports/choices-", cond, ".pdf", sep=""),
-    title=paste("dunyazad-outcomes-choices-", cond, "-report", sep="")
-  )
-  show(h)
-  dev.off()
-}
+  for (cond in conditions) {
+    h <- histogram(
+      ~ decision | seed,
+      data=filtered[filtered$condition==cond,],
+      type="count",
+      layout=c(3,1),
+      aspect=1,
+      col="#ffff99",
+      xlab=cond
+    )
+    pdf(
+      file=paste("reports/choices-", cond, ".pdf", sep=""),
+      title=paste("dunyazad-outcomes-choices-", cond, "-report", sep="")
+    )
+    show(h)
+    dev.off()
+  }
 
-# Likert reports:
-# ---------------
+  # Likert reports:
+  # ---------------
 
-likert_names = snames[names(snames) %in% likert_questions]
+  likert_names = snames[names(snames) %in% likert_questions]
 
-# Grouped by condition:
-# ---------------------
+  # Grouped by condition:
+  # ---------------------
 
-ordered <- filtered[,names(filtered) %in% likert_questions][,likert_questions]
+  ordered <- filtered[,names(filtered) %in% likert_questions][,likert_questions]
 
-oreport <- ordered
-report <- rename(ordered, likert_names)
+  oreport <- ordered
+  report <- rename(ordered, likert_names)
 
-grouping <- filtered[["condition"]]
+  grouping <- filtered[["condition"]]
+  #grouping <- filtered[["seed"]]
 
-for (i in 1:ncol(report)) {
-  lk <- likert(report[i], grouping=grouping, nlevels=5)
-  pdf(
-    file=paste(
-      "reports/outcomes-report-",
-      sprintf("%02d", i),
-      "-",
-      names(oreport)[i],
-      ".pdf",
-      sep=""
-    ),
-    title=paste("dunyazad-outcomes:", names(oreport)[i]),
-    width=7,
-    height=2.7
-  )
-  p <- plot(lk, group.order=conditions, ordered=FALSE)
-  show(p)
-  dev.off()
-}
-
-
-# Filtered by Condition, Grouped by Seed
-# --------------------------------------
-
-for (cond in conditions) {
-  report <- filtered[
-    filtered$condition == cond,
-    names(filtered) %in% names(likert_names)
-  ]
-  oreport <- report
-  report <- rename(report, likert_names)
-  grouping <- filtered[filtered$condition==cond,"seed"]
-  #grouping <- factor(
-  #  paste(
-  #    as.character(filtered[filtered$condition==cond,"seed"]),
-  #    "-",
-  #    as.character(filtered[filtered$condition==cond,"decision"]),
-  #    sep=""
-  #  )
-  #)
   for (i in 1:ncol(report)) {
-    lk = likert(report[i], grouping=grouping, nlevels=5)
-    p <- plot(lk, ordered=FALSE)
-    # hack out any layers missing data:
-    valid <- list()
-    for (l in p$layers) {
-      if ("value" %in% names(l[["data"]])) {
-        if (!is.na(l$data[["value"]][[1]])) {
-          valid <- append(valid, l)
-        }
-      } else {
-        valid <- append(valid, l)
-      }
-    }
-    p$layers <- valid
+    lk <- likert(report[i], grouping=grouping, nlevels=5)
     pdf(
       file=paste(
-        "reports/detailed-report-",
-        cond,
-        "-",
+        "reports/outcomes-report-",
         sprintf("%02d", i),
         "-",
         names(oreport)[i],
         ".pdf",
         sep=""
       ),
-      title=paste(
-        "dunyazad-report-",
-        cond,
-        "-",
-        names(oreport)[i],
-        sep=""
-      ),
+      title=paste("dunyazad-outcomes:", names(oreport)[i]),
       width=7,
-      height=2.0
+      height=2.7
     )
+    #p <- plot(lk, group.order=conditions, ordered=FALSE,include.histogram=TRUE)
+    p <- plot(lk, group.order=conditions, ordered=FALSE)
+    #p <- plot(lk, ordered=FALSE, include.histogram=TRUE)
     show(p)
     dev.off()
+  }
+
+
+  # Filtered by Condition, Grouped by Seed
+  # --------------------------------------
+
+  for (cond in conditions.ext) {
+    if (grepl("\\(", cond)) {
+      cond.base = sub("\\(.*$", "", cond)
+      cond.case = sub("\\)", "", sub("^.*\\(", "", cond))
+      rows <- filtered[
+        filtered$condition == cond.base & filtered$decision.case == cond.case
+        ,
+      ]
+    } else {
+      rows <- filtered[filtered$condition == cond,]
+    }
+    report <- rows[, names(filtered) %in% names(likert_names) ]
+    oreport <- report
+    report <- rename(report, likert_names)
+    grouping <- rows[["seed"]]
+    #grouping <- factor(
+    #  paste(
+    #    as.character(rows[,"seed"])
+    #    "-",
+    #    as.character(rows[,"decision"]),
+    #    sep=""
+    #  )
+    #)
+    for (i in 1:ncol(report)) {
+      lk = likert(report[i], grouping=grouping, nlevels=5)
+      p <- plot(lk, ordered=FALSE)
+      p <- strip_invalid_plot_layers(p)
+
+      # hack in counts:
+      g <- grob_with_sample_counts(p, grouping)
+
+      pdf(
+        file=paste(
+          "reports/detailed-report-",
+          cond,
+          "-",
+          sprintf("%02d", i),
+          "-",
+          names(oreport)[i],
+          ".pdf",
+          sep=""
+        ),
+        title=paste(
+          "dunyazad-report-",
+          cond,
+          "-",
+          names(oreport)[i],
+          sep=""
+        ),
+        width=7,
+        height=2.0
+      )
+      grid.draw(g)
+      #show(p)
+      dev.off()
+    }
   }
 }
