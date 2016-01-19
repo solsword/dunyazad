@@ -64,6 +64,46 @@ seedstakes = c(
   "    0" = "none"
 )
 
+all_comparisons <- function(pop.1, pop.2) {
+  result <- list()
+  for (e.1 in pop.1) {
+    for (e.2 in pop.2) {
+      result[[length(result) + 1]] = list(e.1, e.2)
+    }
+  }
+  return(result)
+}
+
+cleffect <- function(pop.1, pop.2, cmp=">") {
+  pop.1 <- pop.1[!is.na(pop.1)]
+  pop.2 <- pop.2[!is.na(pop.2)]
+  ac <- all_comparisons(pop.1, pop.2)
+  total <- length(ac)
+  supporting <- 0
+  for (c in ac) {
+    if (c[[1]] > c[[2]]) {
+      if (cmp == ">") {
+        supporting <- supporting + 1
+      }
+    } else if (c[[1]] < c[[2]]) {
+      if (cmp == "<") {
+        supporting <- supporting + 1
+      }
+    } else {
+      supporting <- supporting + 0.5
+    }
+  }
+  return(supporting / total)
+}
+
+cleffect.greater <- function(pop.1, pop.2) {
+  cleffect(pop.1, pop.2, cmp=">")
+}
+
+cleffect.less <- function(pop.1, pop.2) {
+  cleffect(pop.1, pop.2, cmp="<")
+}
+
 filterfactor <- function (data) {
   filtered <- data
   # Filter out too-quick, rejected, and tricked responses:
@@ -147,16 +187,14 @@ testhypothesis <- function(hyp, data) {
   | as.character(data[[agcol]]) == as.character(hyp[["against"]])
     ,
   ]
-  is.compare = factor(
-    apply(
-      testcol,
-      1,
-      function(row) {
-        return(
-          as.character(row[[compcol]]) == as.character(hyp[["compare"]])
-        )
-      }
-    )
+  is.compare = apply(
+    testcol,
+    1,
+    function(row) {
+      return(
+        as.character(row[[compcol]]) == as.character(hyp[["compare"]])
+      )
+    }
   )
   testcol <- testcol[[testvar]]
   testcol <- sapply(
@@ -166,13 +204,16 @@ testhypothesis <- function(hyp, data) {
   rev <- as.character(hyp[["predict"]])
   if (rev == "greater") {
     rev <- "less"
+    sym <- ">"
   } else if (rev == "less") {
     rev <- "greater"
+    sym <- "<"
   } else {
     rev <- "error"
+    sym <- "error"
   }
   result <- wilcox_test(
-    testcol ~ is.compare,
+    testcol ~ as.factor(is.compare),
     distribution="exact",
     alternative=rev,
     conf.int=TRUE,
@@ -205,11 +246,20 @@ testhypothesis <- function(hyp, data) {
 
   #raweffect <- result@statistic@linearstatistic
   effect <- abs(statistic(result, "test")[["FALSE"]] / sqrt(length(testcol)))
-  commoneffect <- 0.5 + effect / 2.0
+  commoneffect.alt <- 0.5 + effect / 2.0
+  commoneffect <- cleffect(
+    testcol[is.compare],
+    testcol[!is.compare],
+    sym
+  )
   conf.low <- confint(result)[["conf.int"]][[1]]
   conf.high <- confint(result)[["conf.int"]][[2]]
   return(
-    c(
+    list(
+      "question"=as.character(hyp[["question"]]),
+      "compare"=as.character(hyp[["compare"]]),
+      "against"=as.character(hyp[["against"]]),
+      "predict"=as.character(hyp[["predict"]]),
       "passed"=pass,
       "pvalue"=pvalue(result),
       "mr.compare"=mr.compare,
@@ -281,6 +331,241 @@ DOliveCIproc <- function(y, alpha = 0.05){
     SEmean = SEmu
   )
   return(result)
+}
+
+
+latex_result <- function (result) {
+  if (identical(result, NA)) {
+    return("\\tenp ")
+  }
+  hypoth <- "unknown"
+  if (result[["against"]] == "uniform" | result[["against"]] == "normal") {
+    if (result[["predict"]] == "greater") {
+      hypoth <- "A"
+    } else if (result[["predict"]] == "less") {
+      hypoth <- "D"
+    }
+  } else {
+    if (result[["predict"]] == "greater") {
+      cmp <- ">"
+    } else if (result[["predict"]] == "less") {
+      cmp <- "<"
+    }
+    hypoth <- paste(
+      result[["compare"]],
+      "$", cmp, "$",
+      result[["against"]],
+      sep=""
+    )
+  }
+  p <- result[["pvalue"]]
+  ef <- result[["commoneffect"]]
+  if (p < 0.001) {
+    sf <- format(p, scientific=TRUE)
+    pattern <- "([0-9.-]+)e\\-([0-9]+)"
+    p.mantissa <- as.numeric(sub(pattern, "\\1", sf))
+    p.exponent <- as.numeric(sub(pattern, "\\2", sf))
+    showp <- paste(
+      "$\\bm{",
+      sprintf("%1.1f", p.mantissa),
+      "\\sqtimes 10^{-",
+      sprintf("%d", p.exponent),
+      "}}$",
+      sep=""
+    )
+  } else {
+    showp <- sprintf("%0.3f", p)
+  }
+  if (result[["passed"]]) {
+    return(
+      paste(
+        "\\tesig{",
+        hypoth,
+        "}{",
+        showp,
+        "}{",
+        sprintf("%2.0f\\%%", 100*ef),
+        "}",
+        sep=""
+      )
+    )
+  } else {
+    return(
+      paste(
+        "\\tensig{", hypoth, "}{", showp, "}",
+        sep=""
+      )
+    )
+  }
+}
+
+lookup_unary_result <- function (results, question, condition) {
+  candidates <- list()
+  for (r in results) {
+    if (
+      r[["question"]] == question
+    & r[["compare"]] == condition
+    & r[["against"]] %in% c("uniform", "neutral")
+    ) {
+      candidates[[length(candidates) + 1]] = r
+    }
+  }
+  if (length(candidates) == 1) {
+    return(candidates[[1]])
+  } else if (length(candidates) > 1) {
+    print("ERROR: Multiple candidates for result criteria!")
+    print(question)
+    print(condition)
+    print("Candidates:")
+    print(candidates)
+    stop("Multiple candidates.")
+  } else {
+    return(NA)
+  }
+}
+
+lookup_binary_result <- function (results, question, condition, against) {
+  candidates <- list()
+  for (r in results) {
+    if (
+      r[["question"]] == question
+    & r[["compare"]] == condition
+    & r[["against"]] == against
+    ) {
+      candidates[[length(candidates) + 1]] = r
+    }
+  }
+  if (length(candidates) == 1) {
+    return(candidates[[1]])
+  } else if (length(candidates) > 1) {
+    print("ERROR: Multiple candidates for result criteria!")
+    print(question)
+    print(condition)
+    print("Candidates:")
+    print(candidates)
+    stop("Multiple candidates.")
+  } else {
+    return(NA)
+  }
+}
+
+latex_main_row <- function(results, question, col.1, col.2, col.3) {
+  return(c(
+    paste(
+      "\\eI",
+      gsub("\\.", "", question),
+      "abbr/ &%",
+      sep=""
+    ),
+    paste(
+      " & ",
+      latex_result(lookup_unary_result(results, question, col.1)),
+      " &%",
+      sep=""
+    ),
+    paste(
+      " & ",
+      latex_result(lookup_unary_result(results, question, col.2)),
+      " &%",
+      sep=""
+    ),
+    paste(
+      " & ",
+      latex_result(lookup_unary_result(results, question, col.3)),
+      " \\\\",
+      sep=""
+    )
+  ))
+}
+
+
+latex_rel_row <- function(
+  results,
+  question,
+  hyp.comp,
+  hyp.ag,
+  nxt=FALSE,
+  prev=FALSE
+) {
+  #exspace <- "[2ex]"
+  q <- paste("\\eI", gsub("\\.", "", question), "abbr/", sep="")
+  if (prev) {
+    q <- ""
+  }
+  if (nxt) {
+    #exspace <- ""
+    q <- paste(
+      "\\multirow{2}{10em}{",
+      q,
+      "}",
+      sep=""
+    )
+  }
+  q <- paste(q, "&")
+  return(c(
+    paste(
+      q,
+      latex_result(lookup_binary_result(results, question, hyp.comp, hyp.ag)),
+      " \\\\",
+      #exspace,
+      sep=""
+    )
+  ))
+}
+
+writeMainTable <- function(file, results) {
+  writeLines(unlist(c(
+"\\begin{tabular}{l  c  c c c  c  c c c  c  c c c}",
+"\\toprule",
+"Question &%",
+" & \\multicolumn{3}{c}{\\eIobviousabbr/} &%",
+" & \\multicolumn{3}{c}{\\eIrelaxedabbr/} &%",
+" & \\multicolumn{3}{c}{\\eIdilemmaabbr/} \\\\",
+"\\midrule",
+lapply(
+  c("nobad", "clearbest", "lowstakes", "nogood", "balanced", "difficult", "consequences"),
+  function(question) {
+    latex_main_row(
+      results,
+      question,
+      "obvious",
+      "relaxed",
+      "dilemma"
+    )
+  }
+),
+"\\bottomrule",
+"\\end{tabular}"
+    )),
+    file
+  )
+}
+
+writeRelTable <- function(file, results) {
+  writeLines(unlist(c(
+    "\\begin{tabular}{l c c c c}",
+    "\\toprule",
+    "Question & Hypothesis & $p$-value & Effect \\\\",
+    "\\toprule",
+    latex_rel_row(results, "nobad", "relaxed", "dilemma"),
+    "\\midrule",
+    latex_rel_row(results, "clearbest", "obvious", "dilemma"),
+    "\\midrule",
+    latex_rel_row(results, "nogood", "dilemma", "obvious", nxt=TRUE),
+    latex_rel_row(results, "nogood", "dilemma", "relaxed", prev=TRUE),
+    "\\midrule",
+    latex_rel_row(results, "balanced", "dilemma", "obvious"),
+    "\\midrule",
+    latex_rel_row(results, "difficult", "dilemma", "obvious", nxt=TRUE),
+    latex_rel_row(results, "difficult", "dilemma", "relaxed", prev=TRUE),
+    "\\midrule",
+    latex_rel_row(results, "consequences", "dilemma", "obvious", nxt=TRUE),
+    latex_rel_row(results, "consequences", "dilemma", "relaxed", prev=TRUE),
+    "\\bottomrule",
+    "\\end{tabular}"
+    )),
+    file
+  )
 }
 
 responses <- read.csv(file="study-results.csv",head=TRUE,sep=",")
@@ -399,6 +684,7 @@ cat("Hypotheses:\n")
 cat(
 "Question                                          Compare:  Pred:     Pass:  P:             r:     effect:\n"
 )
+all_results <- list()
 for (hidx in 1:nrow(hypotheses)) {
   hyp <- as.list(hypotheses[hidx,])
   pred <- "unknown"
@@ -416,6 +702,7 @@ for (hidx in 1:nrow(hypotheses)) {
     }
   }
   result <- testhypothesis(hyp, filtered)
+  all_results[[length(all_results) + 1]] = result
   cat(
     "",
     format(snames[[as.character(hyp[["question"]])]], width=49, justify="left"),
@@ -435,6 +722,17 @@ for (hidx in 1:nrow(hypotheses)) {
     "\n"
   )
 }
+
+cat("\n---\n")
+
+fout.normal = file("prospective-normal-results-table.tex")
+fout.relative = file("prospective-relative-results-table.tex")
+
+writeMainTable(fout.normal, all_results)
+writeRelTable(fout.relative, all_results)
+
+close(fout.normal)
+close(fout.relative)
 
 cat("\n---\n")
 
@@ -502,8 +800,6 @@ pdf(file="combined-report.pdf",title="dunyazad-study-report")
 #report <- report[,snames]
 report <- filtered[,names(filtered) %in% names(snames)]
 report$cc <- filtered$constraints
-print(head(report))
-print(str(report))
 #lk = likert(report[,names(report) != "cc"])
 lk = likert(
   report[,names(report) != "cc"],

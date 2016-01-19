@@ -151,6 +151,10 @@ high,out.sense,unexpected_failure,obvious_failure(main),greater
 high,out.sense,unexpected_failure,obvious_failure[main],greater
 high,out.broken,unexpected_failure,obvious_failure(main),less
 high,out.broken,unexpected_failure,obvious_failure[main],less
+followup,out.fair,unexpected_failure,8638(main),greater
+followup,out.unfair,unexpected_failure,8638(main),less
+followup,out.sense,unexpected_failure,8638(main),greater
+high,out.broken,unexpected_failure,8638(main),less
 low,out.good,unexpected_failure,obvious_failure(main),greater
 low,out.good,unexpected_failure,obvious_failure[main],greater
 low,out.bad,unexpected_failure,obvious_failure(main),less
@@ -167,6 +171,8 @@ high,out.good,expected_success,obvious_success(main),less
 high,out.good,expected_success,obvious_success[main],less
 high,out.bad,expected_success,obvious_success(main),greater
 high,out.bad,expected_success,obvious_success[main],greater
+ignore,out.good,expected_success,obvious_success(main),greater
+ignore,out.bad,expected_success,obvious_success(main),less
 high,out.happy,expected_success,obvious_success(main),less
 high,out.happy,expected_success,obvious_success[main],less
 high,out.regret,expected_success,obvious_success(main),greater

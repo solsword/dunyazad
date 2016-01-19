@@ -20,12 +20,12 @@ library(boot) # for bootstrap confidence intervals
 library(lattice) # for histogram
 
 # Switch for hypothesis testing:
-test.hypotheses = FALSE
-#test.hypotheses = TRUE
+#test.hypotheses = FALSE
+test.hypotheses = TRUE
 
 # Switch for report production:
-#produce.reports = FALSE
-produce.reports = TRUE
+produce.reports = FALSE
+#produce.reports = TRUE
 
 qnames = c(
   "opt.obvious" = "Considering just the options, there seems to be a clear best option at this choice.",
@@ -204,6 +204,47 @@ correct_decisions = c(
   "--"    = NA
 )
 
+all_comparisons <- function(pop.1, pop.2) {
+  result <- list()
+  for (e.1 in pop.1) {
+    for (e.2 in pop.2) {
+      result[[length(result) + 1]] = list(e.1, e.2)
+    }
+  }
+  return(result)
+}
+
+cleffect <- function(pop.1, pop.2, cmp=">") {
+  pop.1 <- pop.1[!is.na(pop.1)]
+  pop.2 <- pop.2[!is.na(pop.2)]
+  ac <- all_comparisons(pop.1, pop.2)
+  total <- length(ac)
+  supporting <- 0
+  for (c in ac) {
+    if (c[[1]] > c[[2]]) {
+      if (cmp == ">") {
+        supporting <- supporting + 1
+      }
+    } else if (c[[1]] < c[[2]]) {
+      if (cmp == "<") {
+        supporting <- supporting + 1
+      }
+    } else {
+      supporting <- supporting + 0.5
+    }
+  }
+  return(supporting / total)
+}
+
+cleffect.greater <- function(pop.1, pop.2) {
+  cleffect(pop.1, pop.2, cmp=">")
+}
+
+cleffect.less <- function(pop.1, pop.2) {
+  cleffect(pop.1, pop.2, cmp="<")
+}
+
+
 
 filterfactor <- function (input) {
   filtered <- input
@@ -375,6 +416,7 @@ setClass(
     result.pvalue = "numeric",
     result.effect = "numeric",
     result.effect.common = "numeric",
+    result.effect.common.alt = "numeric",
     result.conf.low = "numeric",
     result.conf.high = "numeric",
 
@@ -625,10 +667,13 @@ testmwwhypothesis <- function(hyp, data) {
   rev <- hyp@hyp.predict
   if (rev == "greater") {
     rev <- "less"
+    sym <- ">"
   } else if (rev == "less") {
     rev <- "greater"
+    sym <- "<"
   } else {
     rev <- "error"
+    sym <- "error"
   }
   result <- wilcox_test(
     testcol ~ factor(is.compare),
@@ -664,7 +709,12 @@ testmwwhypothesis <- function(hyp, data) {
 
   #raweffect <- result@statistic@linearstatistic
   hyp@result.effect <- abs(statistic(result, "test")[["FALSE"]] / sqrt(length(testcol)))
-  hyp@result.effect.common <- 0.5 + hyp@result.effect / 2.0
+  hyp@result.effect.common.alt <- 0.5 + hyp@result.effect / 2.0
+  hyp@result.effect.common <- cleffect(
+    testcol[is.compare],
+    testcol[is.against],
+    sym
+  )
   hyp@result.conf.low <- confint(result)[["conf.int"]][[1]]
   hyp@result.conf.high <- confint(result)[["conf.int"]][[2]]
 
@@ -701,6 +751,7 @@ display_result <- function (r) {
         format(r@result.pvalue, width=12, justify="left"),
         " ",
         format(sprintf("%0.3f", r@result.effect.common), width=8, justify="left"),
+        format(sprintf("%0.3f", r@result.effect.common.alt), width=8, justify="left"),
         format(sprintf("%d", r@count.comp), width=7, justify="left"),
         format(sprintf("%d", r@count.ag), width=7, justify="left"),
 #        format(sprintf("%0.3f", r@result.effectsize), width=7, justify="left"),
@@ -780,20 +831,20 @@ display_result <- function (r) {
   }
 }
 
-latex_result <- function (r, last=FALSE) {
+latex_result <- function (r, hyp=FALSE) {
   if (r@type == "empty") {
-    if (last) {
-      return("\\tenplast ")
-    } else {
-      return("\\tenp ")
-    }
+    return("\\tenp ")
   } else if (r@type == "mww") {
-    hyp <- "unknown"
+    star <- ""
+    if (r@subtype == "low") {
+      star <- "\\lc/"
+    }
+    hypoth <- "unknown"
     if (r@in.against == "uniform" | r@in.against == "normal") {
       if (r@hyp.predict == "greater") {
-        hyp <- "A"
+        hypoth <- "A"
       } else if (r@hyp.predict == "less") {
-        hyp <- "D"
+        hypoth <- "D"
       }
     } else {
       if (r@hyp.predict == "greater") {
@@ -801,58 +852,64 @@ latex_result <- function (r, last=FALSE) {
       } else if (r@hyp.predict == "less") {
         cmp <- "<"
       }
-      #hyp <- paste(
-      #  "\\prq{",
-      #  gsub("_", "\\\\_", r@in.compare),
-      #  "}{}$",
-      #  cmp,
-      #  "$\\prq{",
-      #  gsub("_", "\\\\_", r@in.against),
-      #  "}{}",
-      #  sep=""
-      #)
-      hyp <- paste(
+      hypoth <- paste(
         shortcond[[r@in.compare]],
         "$", cmp, "$",
         shortcond[[r@in.against]],
         sep=""
       )
     }
-    p <- r@result.pvalue
-    ef <- r@result.effect.common
-    if (p < 0.001) {
-      sf <- format(p, scientific=TRUE)
-      pattern <- "([0-9.-]+)e\\-([0-9]+)"
-      p.mantissa <- as.numeric(sub(pattern, "\\1", sf))
-      p.exponent <- as.numeric(sub(pattern, "\\2", sf))
-      showp <- paste(
-        "$\\bm{",
-        sprintf("%1.1f", p.mantissa),
-        "\\sqtimes 10^{-",
-        sprintf("%d", p.exponent),
-        "}}$",
-        sep=""
-      )
+    if (hyp) {
+      if (hypoth == "A") {
+        return(paste("agree", star, sep=""))
+      } else if (hypoth == "D") {
+        return(paste("disagree", star, sep=""))
+      }
+      return(paste(hypoth, star, sep=""))
     } else {
-      showp <- sprintf("%0.3f", p)
-    }
-    if (r@result.confirmed) {
-      return(
-        paste(
-          "\\tesig{", hyp, "}{", showp, "}{", sprintf("%2.0f\\%%", 100*ef), "}",
+      hypoth <- paste(hypoth, star, sep="")
+      p <- r@result.pvalue
+      ef <- r@result.effect.common
+      if (p < 0.001) {
+        sf <- format(p, scientific=TRUE)
+        pattern <- "([0-9.-]+)e\\-([0-9]+)"
+        p.mantissa <- as.numeric(sub(pattern, "\\1", sf))
+        p.exponent <- as.numeric(sub(pattern, "\\2", sf))
+        showp <- paste(
+          "$\\bm{",
+          sprintf("%1.1f", p.mantissa),
+          "\\sqtimes 10^{-",
+          sprintf("%d", p.exponent),
+          "}}$",
           sep=""
         )
-      )
-    } else {
-      return(
-        paste(
-          "\\tensig{", hyp, "}{", showp, "}",
-          sep=""
+      } else {
+        showp <- sprintf("%0.3f", p)
+      }
+      if (r@result.confirmed) {
+        return(
+          paste(
+            "\\tesig{",
+            hypoth,
+            "}{",
+            showp,
+            "}{",
+            sprintf("%2.0f\\%%", 100*ef),
+            "}",
+            sep=""
+          )
         )
-      )
-    }
+      } else {
+        return(
+          paste(
+            "\\tensig{", hypoth, "}{", showp, "}",
+            sep=""
+          )
+        )
+      }
   #} else if (r@type == "count") {
     # TODO: HERE?
+    }
   } else {
     return(paste("ERROR: Invalid result type '", r@type, "'.", sep=""))
   }
@@ -908,97 +965,105 @@ lookup_binary_result <- function (results, question, condition, against) {
   }
 }
 
-latex_opt_row <- function(results, question, col.1, col.2, col.3) {
+latex_opt_row <- function(results, question, col.1, col.2, col.3, hyp=FALSE) {
+  if (hyp) {
+    sep <- " "
+  } else {
+    sep <- " & "
+  }
   return(c(
     "\\midrule",
     paste(
-      "\\multirow{2}{5em}{\\sII",
+      "\\multirow{2}{5em}{\\raggedleft \\eII",
       gsub("\\.", "", question),
       "abbr/} &%",
       sep=""
     ),
     paste(
-      " & ",
-      latex_result(lookup_unary_result(results, question, col.1[1])),
+      sep,
+      latex_result(lookup_unary_result(results, question, col.1[1]), hyp=hyp),
       " &%",
       sep=""
     ),
     paste(
-      " & ",
-      latex_result(lookup_unary_result(results, question, col.2[1])),
+      sep,
+      latex_result(lookup_unary_result(results, question, col.2[1]), hyp=hyp),
       " &%",
       sep=""
     ),
     paste(
-      " & ",
-      latex_result(lookup_unary_result(results, question, col.3[1]), last=TRUE),
+      sep,
+      latex_result(lookup_unary_result(results, question, col.3[1]), hyp=hyp),
       " \\\\",
       sep=""
     ),
     "&%",
     paste(
-      " & ",
-      latex_result(lookup_unary_result(results, question, col.1[2])),
+      sep,
+      latex_result(lookup_unary_result(results, question, col.1[2]), hyp=hyp),
       " &%",
       sep=""
     ),
     paste(
-      " & ",
-      latex_result(lookup_unary_result(results, question, col.2[2])),
+      sep,
+      latex_result(lookup_unary_result(results, question, col.2[2]), hyp=hyp),
       " &%",
       sep=""
     ),
     paste(
-      " & ",
-      latex_result(lookup_unary_result(results, question, col.3[2]), last=TRUE),
+      sep,
+      latex_result(lookup_unary_result(results, question, col.3[2]), hyp=hyp),
       " \\\\",
       sep=""
     )
   ))
 }
 
-latex_out_row <- function(results, question, col.1, col.2) {
+latex_out_row <- function(results, question, col.1, col.2, hyp=FALSE) {
   return(c(
     "\\midrule",
     paste(
-      "\\multirow{2}{8em}{\\hangpara{1.3em}{1}\\sII",
+      "\\multirow{2}{8em}{\\raggedleft \\hangpara{1.3em}{1}\\eII",
       gsub("\\.", "", question),
       "abbr/} &%",
       sep=""
     ),
     paste(
       " & ",
-      latex_result(lookup_unary_result(results, question, col.1[1])),
+      latex_result(lookup_unary_result(results, question, col.1[1]), hyp=hyp),
       " &%",
       sep=""
     ),
     paste(
       " & ",
-      latex_result(lookup_unary_result(results, question, col.2[1]), last=TRUE),
+      latex_result(lookup_unary_result(results, question, col.2[1]), hyp=hyp),
       " \\\\",
       sep=""
     ),
     "&%",
     paste(
       " & ",
-      latex_result(lookup_unary_result(results, question, col.1[2])),
+      latex_result(lookup_unary_result(results, question, col.1[2]), hyp=hyp),
       " &%",
       sep=""
     ),
     paste(
       " & ",
-      latex_result(lookup_unary_result(results, question, col.2[2]), last=TRUE),
+      latex_result(lookup_unary_result(results, question, col.2[2]), hyp=hyp),
       " \\\\",
       sep=""
     )
   ))
 }
 
-latex_rel_row <- function(results, question, hyp.comp, hyp.ag) {
+latex_rel_row <- function(results, question, hyp.comp, hyp.ag, hyp=FALSE) {
   return(c(
     paste(
-      "\\sII", gsub("\\.", "", question), "abbr/ & ",
-      latex_result(lookup_binary_result(results, question, hyp.comp, hyp.ag)),
+      "\\eII", gsub("\\.", "", question), "abbr/ & ",
+      latex_result(
+        lookup_binary_result(results, question, hyp.comp, hyp.ag),
+        hyp=hyp
+      ),
       " \\\\",
       sep=""
     )
@@ -1054,11 +1119,200 @@ grob_with_sample_counts <- function(plot, grouping) {
   return(g)
 }
 
+
+writeOptTable <- function(file, results, hyp=FALSE) {
+  if (hyp) {
+    fmt <- "\\begin{tabular}{r c c c}"
+    header <- c(
+"\\multirow{2}{5em}{\\centering Question} &%",
+" \\eIIexpectedsuccessabbr/ &%",
+" \\eIIobvioussuccessabbr/ &%",
+" \\eIIexpectedfailureabbr/ \\\\",
+"&%",
+" \\eIIunexpectedfailureabbr/ &%",
+" \\eIIobviousfailureabbr/ &%",
+" \\eIIunexpectedsuccessabbr/ \\\\"
+)
+  } else {
+    fmt <- "\\begin{tabular}{r  c  c c c  c  c c c  c  c c c}"
+    header <- c(
+"\\multirow{2}{5em}{\\centering Question} &%",
+" & \\multicolumn{3}{c}{\\eIIexpectedsuccessabbr/} &%",
+" & \\multicolumn{3}{c}{\\eIIobvioussuccessabbr/} &%",
+" & \\multicolumn{3}{c}{\\eIIexpectedfailureabbr/} \\\\",
+"&%",
+" & \\multicolumn{3}{c}{\\eIIunexpectedfailureabbr/} &%",
+" & \\multicolumn{3}{c}{\\eIIobviousfailureabbr/} &%",
+" & \\multicolumn{3}{c}{\\eIIunexpectedsuccessabbr/} \\\\"
+)
+  }
+  writeLines(unlist(c(
+fmt,
+"\\toprule",
+header,
+"\\toprule",
+lapply(
+  c("opt.obvious", "opt.balanced", "opt.nobad", "opt.nogood", "opt.stakes"),
+  function(question) {
+    latex_opt_row(
+      results,
+      question,
+      c("expected_success", "unexpected_failure"),
+      c("obvious_success", "obvious_failure"),
+      c("expected_failure", "unexpected_success"),
+      hyp=hyp
+    )
+  }
+),
+"\\bottomrule",
+"\\end{tabular}"
+    )),
+    file
+  )
+}
+
+writeOutTable <- function(file, results, col.1, col.2, hyp=FALSE) {
+  writeLines(unlist(c(
+"\\begin{tabular}{r  c  c c c  c  c c c}",
+"\\toprule",
+"\\multirow{2}{5em}{\\centering Question} &%",
+paste(
+  " & \\multicolumn{3}{c}{\\eII",
+  gsub("[)_(]", "", col.1[[1]]),
+  "abbr/} &%",
+  sep=""
+),
+paste(
+  " & \\multicolumn{3}{c}{\\eII",
+  gsub("[)_(]", "", col.2[[1]]),
+  "abbr/} \\\\",
+  sep=""
+),
+"&%",
+paste(
+  " & \\multicolumn{3}{c}{\\eII",
+  gsub("[)_(]", "", col.1[[2]]),
+  "abbr/} &%",
+  sep=""
+),
+paste(
+  " & \\multicolumn{3}{c}{\\eII",
+  gsub("[)_(]", "", col.2[[2]]),
+  "abbr/} \\\\",
+  sep=""
+),
+"\\toprule",
+lapply(
+  c(
+    "out.fair", "out.unfair",
+    "out.sense", "out.broken",
+    "out.good", "out.bad",
+    "out.happy", "out.regret",
+    "out.expected", "out.unexpected"
+  ),
+  function(question) {
+    latex_out_row(
+      results,
+      question,
+      col.1,
+      col.2,
+      hyp=hyp
+    )
+  }
+),
+"\\bottomrule",
+"\\end{tabular}"
+    )),
+    file
+  )
+}
+
+
+writeRelTable <- function(
+  file,
+  results,
+  questions,
+  hyp.comp,
+  hyp.ag,
+  add.comp=NA,
+  add.ag=NA,
+  hyp=FALSE
+) {
+  if (hyp) {
+    format <- "\\begin{tabular}{r c}"
+    header <- "Question & Hypothesis \\\\"
+  } else {
+    format <- "\\begin{tabular}{r c c c}"
+    header <- "Question & Hypothesis & $p$-value & Effect \\\\"
+  }
+  if (is.na(add.comp)) {
+    writeLines(unlist(c(
+      format,
+      "\\toprule",
+      header,
+      "\\midrule",
+      lapply(
+        questions,
+        function(question) {
+          latex_rel_row(
+            results,
+            question,
+            hyp.comp,
+            hyp.ag,
+            hyp=hyp
+          )
+        }
+      ),
+      "\\bottomrule",
+      "\\end{tabular}"
+      )),
+      file
+    )
+  } else {
+    writeLines(unlist(c(
+      format,
+      "\\toprule",
+      header,
+      "\\midrule",
+      lapply(
+        questions,
+        function(question) {
+          latex_rel_row(
+            results,
+            question,
+            hyp.comp,
+            hyp.ag,
+            hyp=hyp
+          )
+        }
+      ),
+      lapply(
+        questions,
+        function(question) {
+          latex_rel_row(
+            results,
+            question,
+            add.comp,
+            add.ag,
+            hyp=hyp
+          )
+        }
+      ),
+      "\\bottomrule",
+      "\\end{tabular}"
+      )),
+      file
+    )
+  }
+}
+
 # Start of processing...
 
 #responses <- read.csv(file="study-results.csv",head=TRUE,sep=",")
 responses <- read.csv(file="full-results.csv",head=TRUE,sep=",")
 hypotheses <- read.csv(file="hypotheses.csv",head=TRUE,sep=",")
+
+hypotheses <- hypotheses[hypotheses$type != "ignore",]
 
 filtered <- filterfactor(responses)
 filtered$is.real <- filtered[["duration"]] != -1
@@ -1120,7 +1374,87 @@ cat("    threat:", nrow(obv_fail[obv_fail$setup=="threatened_innocents",]),"\n")
 cat("    monstr:", nrow(obv_fail[obv_fail$setup == "monster_attack",]), "\n")
 cat("\n")
 cat("\n---\n")
-#
+
+has.other.motive <- real[real$motives.other != "{}",]
+has.other.judge.bad <- real[real$judge.bad.other != "{}",]
+has.other.judge.good <- real[real$judge.good.other != "{}",]
+has.other.consistency <- real[real$consistency.other != "{}",]
+has.extra.feedback <- real[real$extra.feedback != "{}",]
+
+cat("Responses with `other' motivations:", nrow(has.other.motive), "\n")
+cat("Responses with `other' judge-good reasons:", nrow(has.other.judge.good), "\n")
+cat("Responses with `other' judge-bad reasons:", nrow(has.other.judge.bad),"\n")
+cat("Responses with `other' consistency responses:", nrow(has.other.consistency),"\n")
+cat("Responses with extra feedback:", nrow(has.extra.feedback),"\n")
+
+fout.motive.other <- file("reports/other-motives.txt")
+fout.judge.bad.other <- file("reports/other-judge-bad.txt")
+fout.judge.good.other <- file("reports/other-judge-good.txt")
+fout.consistency.other <- file("reports/other-consistency.txt")
+fout.extra.feedback <- file("reports/extra-feedback.txt")
+
+pasterow <- function (row, columns) {
+  cols <- lapply(
+    columns,
+    function (col) {
+      gsub("\\n", "\\\\n", as.character(row[[col]]))
+    }
+  )
+  args <- as.list(unlist(cols))
+  args <- append(list(" || "), args)
+  names(args)[[1]] = "sep"
+  return(do.call(paste, args))
+}
+
+writecolumns <- function (file, frame, columns) {
+  writeLines(
+    apply(
+      frame,
+      1,
+      function (row) { pasterow(row, columns) }
+    ),
+    file
+  )
+}
+
+writecolumns(
+  fout.motive.other,
+  has.other.motive,
+  c("condition", "seed", "motives", "motives.other")
+)
+
+writecolumns(
+  fout.judge.good.other,
+  has.other.judge.good,
+  c("condition", "seed", "judge.good", "judge.good.other")
+)
+
+writecolumns(
+  fout.judge.bad.other,
+  has.other.judge.bad,
+  c("condition", "seed", "judge.bad", "judge.bad.other")
+)
+
+writecolumns(
+  fout.consistency.other,
+  has.other.consistency,
+  c("condition", "seed", "consistency", "consistency.other")
+)
+
+writecolumns(
+  fout.extra.feedback,
+  has.extra.feedback,
+  c("condition", "seed", "extra.feedback")
+)
+
+close(fout.motive.other)
+close(fout.judge.bad.other)
+close(fout.judge.good.other)
+close(fout.consistency.other)
+close(fout.extra.feedback)
+
+cat("\n---\n")
+
 cat("Median response time:", median(responses[responses$WorkTimeInSeconds != -1,]$WorkTimeInSeconds),"\n")
 cat("Median accepted response time:", median(real$duration), "\n")
 
@@ -1200,275 +1534,237 @@ if (test.hypotheses) {
   }
 
   # Open files for writing .tex results:
-  fout.opt <- file("retrospective-option-results-table.tex")
-  fout.pos.out <- file("retrospective-positive-outcomes-results-table.tex")
-  fout.neg.out <- file("retrospective-negative-outcomes-results-table.tex")
-  fout.free.forced.failure <- file("retrospective-free-vs-forced-failure-results-table.tex")
-  fout.chosen.inevitable.success <- file("retrospective-chosen-vs-inevitable-success-results-table.tex")
-  fout.good.bad.unexpected <- file("retrospective-good-vs-bad-unexpected-results-table.tex")
-  fout.expected.unexpected.failure <- file("retrospective-expected-vs-unexpected-failure-results-table.tex")
-  fout.expected.unexpected.success <- file("retrospective-expected-vs-unexpected-success-results-table.tex")
+  fout.opt.hyp <- file("reports/retrospective-option-hypotheses-table.tex")
+  fout.opt <- file("reports/retrospective-option-results-table.tex")
 
-  writeLines(unlist(c(
-"\\begin{tabular}{l  c  c c c  c  c c c  c  c c c}",
-"\\toprule",
-"\\multirow{2}{5em}{Question} &%",
-" & \\multicolumn{3}{c}{Expected Success} &%",
-" & \\multicolumn{3}{c}{Obvious Success} &%",
-" & \\multicolumn{3}{c}{Expected Failure} \\\\",
-"&%",
-" & \\multicolumn{3}{c}{Unexp. Failure} &%",
-" & \\multicolumn{3}{c}{Obvious Failure} &%",
-" & \\multicolumn{3}{c}{Unexp. Success} \\\\",
-"\\toprule",
-lapply(
-  c("opt.obvious", "opt.balanced", "opt.nobad", "opt.nogood", "opt.stakes"),
-  function(question) {
-    latex_opt_row(
-      results,
-      question,
-      c("expected_success", "unexpected_failure"),
-      c("obvious_success", "obvious_failure"),
-      c("expected_failure", "unexpected_success")
-    )
-  }
-),
-"\\bottomrule",
-"\\end{tabular}"
-    )),
-    fout.opt
+  fout.pos.out.hyp <- file(
+    "reports/retrospective-positive-outcomes-hypotheses-table.tex"
+  )
+  fout.pos.out <- file(
+    "reports/retrospective-positive-outcomes-results-table.tex"
   )
 
-  writeLines(unlist(c(
-"\\begin{tabular}{l  c  c c c  c  c c c}",
-"\\toprule",
-"\\multirow{2}{5em}{Question} &%",
-" & \\multicolumn{3}{c}{Expected Success} &%",
-" & \\multicolumn{3}{c}{Unexp. Success} \\\\",
-"&%",
-" & \\multicolumn{3}{c}{Obv. Success [main]} &%",
-" & \\multicolumn{3}{c}{Obv. Failure [alt]} \\\\",
-"\\toprule",
-lapply(
-  c(
-    "out.fair", "out.unfair",
-    "out.sense", "out.broken",
-    "out.good", "out.bad",
-    "out.happy", "out.regret",
-    "out.expected", "out.unexpected"
-  ),
-  function(question) {
-    latex_out_row(
-      results,
-      question,
-      c("expected_success", "obvious_success(main)"),
-      c("unexpected_success", "obvious_failure(alt)")
-    )
-  }
-),
-"\\bottomrule",
-"\\end{tabular}"
-    )),
-    fout.pos.out
+  fout.neg.out.hyp <- file(
+    "reports/retrospective-negative-outcomes-hypotheses-table.tex"
+  )
+  fout.neg.out <- file(
+    "reports/retrospective-negative-outcomes-results-table.tex"
   )
 
-  writeLines(unlist(c(
-"\\begin{tabular}{l  c  c c c  c  c c c}",
-"\\toprule",
-"\\multirow{2}{5em}{Question} &%",
-" & \\multicolumn{3}{c}{Expected Failure} &%",
-" & \\multicolumn{3}{c}{Unexp. Failure} \\\\",
-"&%",
-" & \\multicolumn{3}{c}{Obv. Success [alt]} &%",
-" & \\multicolumn{3}{c}{Obv. Failure [main]} \\\\",
-"\\toprule",
-lapply(
-  c(
-    "out.fair", "out.unfair",
-    "out.sense", "out.broken",
-    "out.good", "out.bad",
-    "out.happy", "out.regret",
-    "out.expected", "out.unexpected"
-  ),
-  function(question) {
-    latex_out_row(
-      results,
-      question,
-      c("expected_failure", "obvious_success(alt)"),
-      c("unexpected_failure", "obvious_failure(main)")
-    )
-  }
-),
-"\\bottomrule",
-"\\end{tabular}"
-    )),
-    fout.neg.out
+  fout.free.forced.failure.hyp <- file(
+    "reports/retrospective-free-vs-forced-failure-hypotheses-table.tex"
+  )
+  fout.free.forced.failure <- file(
+    "reports/retrospective-free-vs-forced-failure-results-table.tex"
+  )
+  fout.chosen.inevitable.success.hyp <- file(
+    "reports/retrospective-chosen-vs-inevitable-success-hypotheses-table.tex"
+  )
+  fout.chosen.inevitable.success <- file(
+    "reports/retrospective-chosen-vs-inevitable-success-results-table.tex"
+  )
+  fout.good.bad.unexpected.hyp <- file(
+    "reports/retrospective-good-vs-bad-unexpected-hypotheses-table.tex"
+  )
+  fout.good.bad.unexpected <- file(
+    "reports/retrospective-good-vs-bad-unexpected-results-table.tex"
+  )
+  fout.expected.unexpected.failure.hyp <- file(
+    "reports/retrospective-expected-vs-unexpected-failure-hypotheses-table.tex"
+  )
+  fout.expected.unexpected.failure <- file(
+    "reports/retrospective-expected-vs-unexpected-failure-results-table.tex"
+  )
+  fout.expected.unexpected.success.hyp <- file(
+    "reports/retrospective-expected-vs-unexpected-success-hypotheses-table.tex"
+  )
+  fout.expected.unexpected.success <- file(
+    "reports/retrospective-expected-vs-unexpected-success-results-table.tex"
   )
 
-  writeLines(unlist(c(
-"\\begin{tabular}{l c c c}",
-"\\toprule",
-"Question & Hypothesis & $p$-value & Effect \\\\",
-"\\midrule",
-lapply(
-  c(
-    "out.fair", "out.unfair",
-    "out.sense", "out.broken",
-    "out.good", "out.bad",
-    "out.happy", "out.regret",
-    "out.expected", "out.unexpected"
-  ),
-  function(question) {
-    latex_rel_row(
-      results,
-      question,
-      "unexpected_failure",
-      "obvious_failure(main)"
-    )
-  }
-),
-"\\bottomrule",
-"\\end{tabular}"
-    )),
-    fout.free.forced.failure
+  writeOptTable(fout.opt.hyp, results, hyp=TRUE)
+  writeOptTable(fout.opt, results, hyp=FALSE)
+
+  writeOutTable(
+    fout.pos.out.hyp,
+    results,
+    c("expected_success", "obvious_success(main)"),
+    c("unexpected_success", "obvious_failure(alt)"),
+    hyp=TRUE
+  )
+  writeOutTable(
+    fout.pos.out,
+    results,
+    c("expected_success", "obvious_success(main)"),
+    c("unexpected_success", "obvious_failure(alt)"),
+    hyp=FALSE
   )
 
-  writeLines(unlist(c(
-"\\begin{tabular}{l c c c}",
-"\\toprule",
-"Question & Hypothesis & $p$-value & Effect \\\\",
-"\\midrule",
-lapply(
-  c(
-    "out.good", "out.bad",
-    "out.happy", "out.regret"
-  ),
-  function(question) {
-    latex_rel_row(
-      results,
-      question,
-      "expected_success",
-      "obvious_success(main)"
-    )
-  }
-),
-"\\bottomrule",
-"\\end{tabular}"
-    )),
-    fout.chosen.inevitable.success
+  writeOutTable(
+    fout.neg.out.hyp,
+    results,
+    c("expected_failure", "obvious_success(alt)"),
+    c("unexpected_failure", "obvious_failure(main)"),
+    hyp=TRUE
+  )
+  writeOutTable(
+    fout.neg.out,
+    results,
+    c("expected_failure", "obvious_success(alt)"),
+    c("unexpected_failure", "obvious_failure(main)"),
+    hyp=FALSE
   )
 
-  writeLines(unlist(c(
-"\\begin{tabular}{l c c c}",
-"\\toprule",
-"Question & Hypothesis & $p$-value & Effect \\\\",
-"\\midrule",
-lapply(
-  c(
-    "out.fair", "out.unfair",
-    "out.sense", "out.broken"
-  ),
-  function(question) {
-    latex_rel_row(
-      results,
-      question,
-      "unexpected_failure",
-      "unexpected_success"
-    )
-  }
-),
-"\\bottomrule",
-"\\end{tabular}"
-    )),
-    fout.good.bad.unexpected
+  writeRelTable(
+    fout.free.forced.failure.hyp,
+    results,
+    c(
+      "out.fair", "out.unfair",
+      "out.sense", "out.broken",
+      "out.good", "out.bad",
+      "out.happy", "out.regret",
+      "out.expected", "out.unexpected"
+    ),
+    "unexpected_failure",
+    "obvious_failure(main)",
+    hyp=TRUE
   )
 
-  writeLines(unlist(c(
-"\\begin{tabular}{l c c c}",
-"\\toprule",
-"Question & Hypothesis & $p$-value & Effect \\\\",
-"\\midrule",
-lapply(
-  c(
-    "out.good", "out.bad",
-    "out.happy", "out.regret"
-  ),
-  function(question) {
-    latex_rel_row(
-      results,
-      question,
-      "unexpected_failure",
-      "expected_failure"
-    )
-  }
-),
-lapply(
-  c(
-    "out.good", "out.bad",
-    "out.happy", "out.regret"
-  ),
-  function(question) {
-    latex_rel_row(
-      results,
-      question,
-      "obvious_failure(main)",
-      "expected_failure"
-    )
-  }
-),
-"\\bottomrule",
-"\\end{tabular}"
-    )),
-    fout.expected.unexpected.failure
+  writeRelTable(
+    fout.free.forced.failure,
+    results,
+    c(
+      "out.fair", "out.unfair",
+      "out.sense", "out.broken",
+      "out.good", "out.bad",
+      "out.happy", "out.regret",
+      "out.expected", "out.unexpected"
+    ),
+    "unexpected_failure",
+    "obvious_failure(main)",
+    hyp=FALSE
   )
 
-  writeLines(unlist(c(
-"\\begin{tabular}{l c c c}",
-"\\toprule",
-"Question & Hypothesis & $p$-value & Effect \\\\",
-"\\midrule",
-lapply(
-  c(
-    "out.good", "out.bad",
-    "out.happy", "out.regret"
-  ),
-  function(question) {
-    latex_rel_row(
-      results,
-      question,
-      "expected_success",
-      "unexpected_success"
-    )
-  }
-),
-lapply(
-  c(
-    "out.good", "out.bad",
-    "out.happy", "out.regret"
-  ),
-  function(question) {
-    latex_rel_row(
-      results,
-      question,
-      "obvious_success(main)",
-      "unexpected_success"
-    )
-  }
-),
-"\\bottomrule",
-"\\end{tabular}"
-    )),
-    fout.expected.unexpected.success
+  writeRelTable(
+    fout.chosen.inevitable.success.hyp,
+    results,
+    c(
+      "out.good", "out.bad",
+      "out.happy", "out.regret"
+    ),
+    "expected_success",
+    "obvious_success(main)",
+    hyp=TRUE
+  )
+
+  writeRelTable(
+    fout.chosen.inevitable.success,
+    results,
+    c(
+      "out.good", "out.bad",
+      "out.happy", "out.regret"
+    ),
+    "expected_success",
+    "obvious_success(main)",
+    hyp=FALSE
+  )
+
+  writeRelTable(
+    fout.good.bad.unexpected.hyp,
+    results,
+    c(
+      "out.fair", "out.unfair",
+      "out.sense", "out.broken"
+    ),
+    "unexpected_failure",
+    "unexpected_success",
+    hyp=TRUE
+  )
+
+  writeRelTable(
+    fout.good.bad.unexpected,
+    results,
+    c(
+      "out.fair", "out.unfair",
+      "out.sense", "out.broken"
+    ),
+    "unexpected_failure",
+    "unexpected_success",
+    hyp=FALSE
+  )
+
+  writeRelTable(
+    fout.expected.unexpected.failure.hyp,
+    results,
+    c(
+      "out.good", "out.bad",
+      "out.happy", "out.regret"
+    ),
+    "unexpected_failure",
+    "expected_failure",
+    add.comp="obvious_failure(main)",
+    add.ag="expected_failure",
+    hyp=TRUE
+  )
+
+  writeRelTable(
+    fout.expected.unexpected.failure,
+    results,
+    c(
+      "out.good", "out.bad",
+      "out.happy", "out.regret"
+    ),
+    "unexpected_failure",
+    "expected_failure",
+    add.comp="obvious_failure(main)",
+    add.ag="expected_failure",
+    hyp=FALSE
+  )
+
+  writeRelTable(
+    fout.expected.unexpected.success.hyp,
+    results,
+    c(
+      "out.good", "out.bad",
+      "out.happy", "out.regret"
+    ),
+    "expected_success",
+    "unexpected_success",
+    add.comp="obvious_success(main)",
+    add.ag="unexpected_success",
+    hyp=TRUE
+  )
+
+  writeRelTable(
+    fout.expected.unexpected.success,
+    results,
+    c(
+      "out.good", "out.bad",
+      "out.happy", "out.regret"
+    ),
+    "expected_success",
+    "unexpected_success",
+    add.comp="obvious_success(main)",
+    add.ag="unexpected_success",
+    hyp=FALSE
   )
 
   # Close output files:
+  close(fout.opt.hyp)
   close(fout.opt)
+  close(fout.pos.out.hyp)
   close(fout.pos.out)
+  close(fout.neg.out.hyp)
   close(fout.neg.out)
+  close(fout.free.forced.failure.hyp)
   close(fout.free.forced.failure)
+  close(fout.chosen.inevitable.success.hyp)
   close(fout.chosen.inevitable.success)
+  close(fout.good.bad.unexpected.hyp)
   close(fout.good.bad.unexpected)
+  close(fout.expected.unexpected.failure.hyp)
   close(fout.expected.unexpected.failure)
+  close(fout.expected.unexpected.success.hyp)
   close(fout.expected.unexpected.success)
 }
 
@@ -1521,13 +1817,12 @@ if (produce.reports) {
   report <- rename(ordered, likert_names)
 
   grouping <- filtered[["condition"]]
-  #grouping <- filtered[["seed"]]
 
   for (i in 1:ncol(report)) {
     lk <- likert(report[i], grouping=grouping, nlevels=5)
     pdf(
       file=paste(
-        "reports/outcomes-report-",
+        "reports/outcomes-report-basic-",
         sprintf("%02d", i),
         "-",
         names(oreport)[i],
@@ -1538,9 +1833,29 @@ if (produce.reports) {
       width=7,
       height=2.7
     )
-    #p <- plot(lk, group.order=conditions, ordered=FALSE,include.histogram=TRUE)
     p <- plot(lk, group.order=conditions, ordered=FALSE)
     #p <- plot(lk, ordered=FALSE, include.histogram=TRUE)
+    show(p)
+    dev.off()
+  }
+
+  #grouping <- filtered[["seed"]]
+  for (i in 1:ncol(report)) {
+    lk <- likert(report[i], grouping=grouping, nlevels=5)
+    pdf(
+      file=paste(
+        "reports/outcomes-report-with-histogram-",
+        sprintf("%02d", i),
+        "-",
+        names(oreport)[i],
+        ".pdf",
+        sep=""
+      ),
+      title=paste("dunyazad-outcomes:", names(oreport)[i]),
+      width=7,
+      height=2.7
+    )
+    p <- plot(lk, group.order=conditions, ordered=FALSE, include.histogram=TRUE)
     show(p)
     dev.off()
   }
