@@ -205,6 +205,13 @@ high,out.happy,obvious_success(main),unexpected_success,less
 high,out.happy,obvious_success[main],unexpected_success,less
 high,out.regret,obvious_success(main),unexpected_success,greater
 high,out.regret,obvious_success[main],unexpected_success,greater
+followup,opt.stakes,market,uniform,less
+followup,opt.stakes,monster_attack,uniform,less
+followup,opt.stakes,threatened_innocents,uniform,less
+followup,opt.nobad,58403,uniform,less
+followup,opt.nobad,99500,uniform,less
+followup,opt.nogood,58403,uniform,greater
+followup,opt.nogood,99500,uniform,greater
 pctchosen,motives,all,speed,>0.5
 pctchosen,motives,all,avatar,>0.5
 pctchosen,motives,all,power,>0.5

@@ -10,6 +10,7 @@
 
 library(iterators) # iter() function
 library(foreach) # foreach function and %do% operator
+library(ggplot2) # for motive histograms
 library(grid) # for gList for likert plots w/ histograms
 library(likert) # likert graphing *Doesn't do grouping any more :(
 library(gtable) # operating on the likert graphs
@@ -20,12 +21,19 @@ library(boot) # for bootstrap confidence intervals
 library(lattice) # for histogram
 
 # Switch for hypothesis testing:
-#test.hypotheses = FALSE
-test.hypotheses = TRUE
+test.hypotheses = FALSE
+#test.hypotheses = TRUE
 
 # Switch for report production:
-produce.reports = FALSE
-#produce.reports = TRUE
+#produce.reports = FALSE
+produce.reports = TRUE
+
+# Palette for motive histograms:
+#palette.motives = scale_fill_brewer(palette = "Set3")
+#palette.motives = scale_fill_manual(values=c("#bebada", "#fb8072", "#80b1d3", "#fdb462", "#b3de69", "#8dd3c7", "#ffffb3"))
+palette.motives = scale_fill_manual(values=c("#bebada", "#fb8072", "#8dd3c7", "#fdb462", "#b3de69", "#80b1d3", "#ffffb3"))
+#palette.consistency = scale_fill_brewer(palette = "Set3")
+palette.consistency = scale_fill_manual(values=c("#fb8072", "#80b1d3", "#fdb462", "#b3de69"))
 
 qnames = c(
   "opt.obvious" = "Considering just the options, there seems to be a clear best option at this choice.",
@@ -163,6 +171,42 @@ conditions.ext = c(
   "obvious_failure(alt)",
   "expected_failure",
   "unexpected_success"
+)
+
+motives.values = c(
+  "speed",
+  "curious",
+  "role",
+  "avatar",
+  "interesting",
+  "power",
+  "other"
+)
+
+judge.good.values = c(
+  "avatar",
+  "interesting",
+  "role",
+  "power",
+  "progress",
+  "other"
+)
+
+judge.bad.values = c(
+  "avatar",
+  "interesting",
+  "no.control",
+  "value.clash",
+  "power",
+  "progress",
+  "other"
+)
+
+consistency.values = c(
+  "consistent",
+  "variable",
+  "no.exp",
+  "other"
 )
 
 shortcond = list(
@@ -1785,40 +1829,277 @@ if (produce.reports) {
 
   filtered$seed = factor(filtered$seed)
 
-  for (cond in conditions) {
-    h <- histogram(
-      ~ decision | seed,
-      data=filtered[filtered$condition==cond,],
-      type="count",
-      layout=c(3,1),
-      aspect=1,
-      col="#ffff99",
-      xlab=cond
+  for (seed in unique(filtered$seed)) {
+    if (seed != "--") {
+      fout.seeddesc <- file(paste0("reports/framed-seed-", seed, ".tex"))
+      row <- responses[responses$Input.seed == seed,][1,]
+      opt.1.fore <- sub("\\(.*$", "", row$Input.opt1)
+      opt.1.aft <- sub("^[^(]*(\\(.*)$", "\\1", row$Input.opt1)
+      out.1 <- row$Input.out1
+      opt.2.fore <- sub("\\(.*$", "", row$Input.opt2)
+      opt.2.aft <- sub("^[^(]*(\\(.*)$", "\\1", row$Input.opt2)
+      out.2 <- row$Input.out2
+      opt.3.fore <- sub("\\(.*$", "", row$Input.opt3)
+      opt.3.aft <- sub("^[^(]*(\\(.*)$", "\\1", row$Input.opt3)
+      out.3 <- row$Input.out3
+      count.1 <- sum(filtered$seed==seed & filtered$decision == "1", na.rm=TRUE)
+      count.2 <- sum(filtered$seed==seed & filtered$decision == "2", na.rm=TRUE)
+      count.3 <- sum(filtered$seed==seed & filtered$decision == "3", na.rm=TRUE)
+      writeLines(
+        sapply(c(
+"\\fbox{",
+"\\parbox{0.95\\linewidth}{",
+"\\slshape",
+#%as.character(row$Input.framing),
+#%"",
+#%as.character(row$Input.assets),
+#%"",
+#%as.character(row$Input.set_off),
+#%"",
+as.character(row$Input.setup),
+" ",
+as.character(row$Input.potentials),
+" ",
+as.character(row$Input.prompt),
+"",
+"\\begin{enumerate}[itemsep=0pt,topsep=4pt,parsep=0pt,partopsep=0pt]",
+paste0("\\item ", opt.1.fore, " \\\\"),
+paste0(opt.1.aft, " \\\\[0.3em]"),
+paste0("\\choicecount{", count.1,"}$\\rightarrow$ ", out.1, " \\\\[-0.5em]"),
+paste0("\\item ", opt.2.fore, " \\\\"),
+paste0(opt.2.aft, " \\\\[0.3em]"),
+paste0("\\choicecount{", count.2, "}$\\rightarrow$ ", out.2, " \\\\[-0.5em]"),
+paste0("\\item ", opt.3.fore, " \\\\"),
+paste0(opt.3.aft, " \\\\[0.3em]"),
+paste0("\\choicecount{", count.3, "}$\\rightarrow$ ", out.3),
+"\\end{enumerate}",
+"}",
+"}"
+          ),
+          function(line) {
+            r <- gsub("’", "'", line)
+            r <- gsub("á", "\\\\'{a}", r)
+            r <- gsub("ü", "\\\\:{u}", r)
+            return(r)
+          }
+        ),
+        fout.seeddesc
+      )
+      close(fout.seeddesc)
+    }
+  }
+  #for (cond in conditions) {
+  #  f <- filtered[filtered$condition==cond,]
+  #  seeds <- unique(f$seed)
+  #  otext <- responses[
+  #    !duplicated(responses$Input.seed) & responses$WorkTimeInSeconds != -1
+  #    ,
+  #    c("Input.opt1", "Input.opt2", "Input.opt3", "Input.seed")
+  #  ]
+  #  otext = rename(otext, c("Input.seed"="seed"))
+  #  otext[[1]] = as.character(otext[[1]])
+  #  otext[[2]] = as.character(otext[[2]])
+  #  otext[[3]] = as.character(otext[[3]])
+  #  counts <- lapply(
+  #    seeds,
+  #    function (s) {
+  #      r <- as.list(unlist(lapply(
+  #        c(1, 2, 3),
+  #        function(d) {
+  #          sum(filtered$seed==s & filtered$decision==d)
+  #        }
+  #      )))
+  #      r[["seed"]] = as.character(s)
+  #      return(r)
+  #    }
+  #  )
+  #  for (count in counts) {
+  #    s <- count[["seed"]]
+  #    txt <- as.list(as.character(otext[otext$seed == s,1:3]))
+  #    t <- data.frame(
+  #      "option"=unlist(txt), 30,
+  #      #"option"=1:3,
+  #      "count"=unlist(as.list(count[1:3]))
+  #    )
+  #    wr <- strwrap(
+  #      sub("\\(", "\n(", as.character(t$option)),
+  #      40,
+  #      simplify=FALSE,
+  #      prefix="\n",
+  #      initial=""
+  #    )
+  #    wr <- lapply(
+  #      wr,
+  #      function (lines) {
+  #        do.call(paste0, as.list(lines))
+  #      }
+  #    )
+  #    #t$option <- unlist(wr)
+  #    t$option <- sub("\\(", "\n(", as.character(t$option))
+  #    t$option <- sub("([.,])", "\\1\n", as.character(t$option))
+  #    g <- ggplot(t, aes(x=option, y=count))
+  #    g <- g + ylim(0, 10)
+  #    g <- g + geom_bar(stat="identity", fill="#80b1d3")
+  #    g <- g + geom_text(
+  #      aes(x=option, y=count, label=count),
+  #      size=8,
+  #      vjust=0.5,
+  #      nudge_x=0,
+  #      nudge_y=1
+  #    )
+  #    g <- g + palette.motives
+  #    #g <- g + guides(fill = "legend")
+  #    g <- g + guides(fill = "none")
+  #    g <- g + coord_flip()
+  #    g <- g + theme(
+  #      panel.grid.major.x = element_blank(),
+  #      panel.grid.major.y = element_blank(),
+  #      panel.grid.minor.x = element_blank(),
+  #      panel.grid.minor.y = element_blank(),
+  #      axis.text.x = element_blank(),
+  #      axis.text.y = element_text(size=20, vjust=0.5),
+  #      axis.title.x = element_blank(),
+  #      axis.title.y = element_blank(),
+  #      axis.ticks.x = element_blank()
+  #      #axis.ticks.y = element_blank()
+  #    )
+  #    pdf(
+  #      file=paste("reports/choices-", cond, "-", s, ".pdf", sep=""),
+  #      title=paste(
+  #        "dunyazad-outcomes-choices-",
+  #        cond,
+  #        "-",
+  #        s,
+  #        "-report",
+  #        sep=""
+  #      )
+  #    )
+  #    show(g)
+  #    dev.off()
+  #    exit
+  #  }
+  #}
+
+  # Motivation histograms
+  # ---------------------
+
+  for (m in c("motives", "judge.good", "judge.bad")) {
+    values <- "error"
+    if (m == "motives") {
+      values <- motives.values
+    } else if (m == "judge.good") {
+      values <- judge.good.values
+    } else if (m == "judge.bad") {
+      values <- judge.bad.values
+    }
+    columns <- lapply(
+      values,
+      function (x) {
+        paste(m, "c", x, sep=".")
+      }
     )
+    counts <- lapply(
+      columns,
+      function (col) {
+        sum(filtered[filtered$is.real,col], na.rm=TRUE)
+      }
+    )
+    l <- lapply(
+      values,
+      function (v) {
+        gsub("\\.", ".\n", v)
+      }
+    )
+    l <- factor(l, ordered=TRUE, levels=l)
+    t <- data.frame(labels=l, count=as.vector(unlist(counts)))
+    g <- ggplot(t, aes(x=labels, y=count, fill=labels))
+    g <- g + ylim(0, 175)
+    g <- g + geom_bar(stat="identity", color="#000000")
+    g <- g + geom_text(
+      aes(x=labels, y=count, label=count),
+      size=8,
+      vjust=0,
+      nudge_y=4
+    )
+    g <- g + palette.motives
+    g <- g + guides(fill = "none")
+    g <- g + theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      axis.text.x = element_text(size=26, angle=90, vjust=0.5, hjust=1),
+      axis.text.y = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.ticks.y = element_blank()
+    )
+    g <- g + labs(x="")
     pdf(
-      file=paste("reports/choices-", cond, ".pdf", sep=""),
-      title=paste("dunyazad-outcomes-choices-", cond, "-report", sep="")
+      file=paste("reports/motives-", m, ".pdf", sep=""),
+      title=paste("dunyazad-motives-", m, "-report", sep="")
     )
-    show(h)
+    show(g)
     dev.off()
   }
+
+  # Consistency:
+  values <- c("consistent", "variable", "no-exp", "other")
+  counts <- lapply(
+    values,
+    function (x) {
+      nrow(filtered[filtered$is.real & as.character(filtered$consistency)==x,])
+    }
+  )
+  values <- c("consistent", "variable", "no.exp", "other")
+  t <- data.frame(
+    labels=factor(values, ordered=TRUE, levels=values),
+    count=as.vector(unlist(counts))
+  )
+  g <- ggplot(t, aes(x=labels, y=count, fill=labels))
+  g <- g + ylim(0, 175)
+  g <- g + geom_bar(stat="identity", color="#000000")
+  g <- g + geom_text(
+    aes(x=labels, y=count, label=count),
+    size=8,
+    vjust=0,
+    nudge_y=2
+  )
+  g <- g + palette.consistency
+  g <- g + guides(fill = "none")
+  g <- g + theme(
+    panel.grid.major.x = element_blank(),
+    panel.grid.minor.y = element_blank(),
+    axis.text.x = element_text(size=26, angle=90, vjust=0.5, hjust=1),
+    axis.text.y = element_blank(),
+    axis.title.x = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.x = element_blank(),
+    axis.ticks.y = element_blank()
+  )
+  pdf(
+    file="reports/motives-consistency.pdf",
+    title="dunyazad-motives-consistency-report"
+  )
+  show(g)
+  dev.off()
 
   # Likert reports:
   # ---------------
 
   likert_names = snames[names(snames) %in% likert_questions]
 
-  # Grouped by condition:
-  # ---------------------
-
   ordered <- filtered[,names(filtered) %in% likert_questions][,likert_questions]
 
   oreport <- ordered
   report <- rename(ordered, likert_names)
 
+  # Grouped by condition:
+  # ---------------------
+
   grouping <- filtered[["condition"]]
 
   for (i in 1:ncol(report)) {
+    cat("Creating report for", paste("'", names(oreport)[i], "'...", sep=""))
     lk <- likert(report[i], grouping=grouping, nlevels=5)
     pdf(
       file=paste(
@@ -1837,10 +2118,12 @@ if (produce.reports) {
     #p <- plot(lk, ordered=FALSE, include.histogram=TRUE)
     show(p)
     dev.off()
+    cat(" done.\n")
   }
 
   #grouping <- filtered[["seed"]]
   for (i in 1:ncol(report)) {
+    cat("Creating report w/histogram for", paste("'", names(oreport)[i], "'...", sep=""))
     lk <- likert(report[i], grouping=grouping, nlevels=5)
     pdf(
       file=paste(
@@ -1858,6 +2141,7 @@ if (produce.reports) {
     p <- plot(lk, group.order=conditions, ordered=FALSE, include.histogram=TRUE)
     show(p)
     dev.off()
+    cat(" done.\n")
   }
 
 
@@ -1865,6 +2149,7 @@ if (produce.reports) {
   # --------------------------------------
 
   for (cond in conditions.ext) {
+    cat("Processing detailed data for condition", paste("'", cond, "'...\n", sep=""))
     if (grepl("\\(", cond)) {
       cond.base = sub("\\(.*$", "", cond)
       cond.case = sub("\\)", "", sub("^.*\\(", "", cond))
@@ -1888,6 +2173,7 @@ if (produce.reports) {
     #  )
     #)
     for (i in 1:ncol(report)) {
+      cat("  ...creating detailed report for", paste("'", names(oreport)[i], "'...", sep=""))
       lk = likert(report[i], grouping=grouping, nlevels=5)
       p <- plot(lk, ordered=FALSE)
       p <- strip_invalid_plot_layers(p)
@@ -1919,6 +2205,34 @@ if (produce.reports) {
       grid.draw(g)
       #show(p)
       dev.off()
+      cat(" done.\n")
     }
+    cat("  ...done.\n")
   }
+
+  # Custom Extra Reports
+  # --------------------
+
+  cat("Creating custom extra reports...\n")
+
+  ordered <- filtered[,names(filtered) %in% likert_questions][,likert_questions]
+
+  oreport <- ordered
+  report <- rename(ordered, likert_names)
+
+  grouping <- filtered[["setup"]]
+
+  r <- report[likert_names[["opt.stakes"]]]
+  lk <- likert(r, grouping=grouping, nlevels=5)
+  pdf(
+    file="reports/extra-outcomes-report-by-setup-05-opt.stakes.pdf",
+    title="dunyazad-extra-outcomes-report-stakes-by-setup",
+    width=7,
+    height=2.7
+  )
+  p <- plot(lk, group.order=c("market", "threatened_innocents", "monster_attack"), ordered=FALSE)
+  #p <- plot(lk, ordered=FALSE, include.histogram=TRUE)
+  show(p)
+  dev.off()
+  cat("  ...done.\n")
 }

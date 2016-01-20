@@ -2,8 +2,9 @@
 cd reports
 echo ""
 echo ""
-echo "Cropping legend..."
-pdfcrop --margins="-4 -118 -4 1" outcomes-report-01-*.pdf legend.pdf
+echo "Cropping legends..."
+pdfcrop --margins="0 -116 0 1" outcomes-report-01-*.pdf legend.pdf
+pdfcrop --margins="0 -66 0 1" detailed-report-expected_failure-01-*.pdf detailed-legend.pdf
 echo ""
 echo ""
 echo "Cropping condition-grouped reports per question..."
@@ -44,4 +45,19 @@ do
   echo "... '$r' ..."
   pdfcrop --margins="0 0 0 -55" $r cropped-$r
 done
+echo ""
+echo "Producing combined by-seed report PDF..."
+pdfunite cropped-detailed-report-*.pdf legend.pdf combined-detailed-report.pdf
+echo ""
+echo ""
+echo "Cropping extra reports..."
+pdfcrop --margins="0 0 0 -55" extra-outcomes-report-by-setup-05-opt.stakes.pdf cropped-extra-outcomes-report-by-setup-05-opt.stakes.pdf
+echo ""
+echo ""
+echo ""
+echo ""
+echo "Merging miscellaneous comparisons..."
+pdfunite cropped-detailed-report-expected_failiiure-02-opt.nobad.pdf cropped-detailed-report-unexpected_success-02-opt.nobad.pdf legend.pdf cropped-extra-opt.nobad-report.pdf
+echo ""
+echo ""
 cd ..
