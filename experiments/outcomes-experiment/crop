@@ -57,7 +57,7 @@ echo ""
 echo ""
 echo ""
 echo "Merging miscellaneous comparisons..."
-pdfunite cropped-detailed-report-expected_failiiure-02-opt.nobad.pdf cropped-detailed-report-unexpected_success-02-opt.nobad.pdf legend.pdf cropped-extra-opt.nobad-report.pdf
+pdfunite cropped-detailed-report-expected_failure-02-opt.nobad.pdf cropped-detailed-report-unexpected_success-02-opt.nobad.pdf legend.pdf cropped-extra-opt.nobad-report.pdf
 echo ""
 echo ""
 cd ..

@@ -21,12 +21,12 @@ library(boot) # for bootstrap confidence intervals
 library(lattice) # for histogram
 
 # Switch for hypothesis testing:
-test.hypotheses = FALSE
-#test.hypotheses = TRUE
+#test.hypotheses = FALSE
+test.hypotheses = TRUE
 
 # Switch for report production:
-#produce.reports = FALSE
-produce.reports = TRUE
+produce.reports = FALSE
+#produce.reports = TRUE
 
 # Palette for motive histograms:
 #palette.motives = scale_fill_brewer(palette = "Set3")
@@ -2179,7 +2179,9 @@ paste0("\\choicecount{", count.3, "}$\\rightarrow$ ", out.3),
       p <- strip_invalid_plot_layers(p)
 
       # hack in counts:
-      g <- grob_with_sample_counts(p, grouping)
+      # Manually remove NAs:
+      fgroups <- rows[!is.na(rows[names(oreport)[i]]),"seed"]
+      g <- grob_with_sample_counts(p, fgroups)
 
       pdf(
         file=paste(
@@ -2223,6 +2225,7 @@ paste0("\\choicecount{", count.3, "}$\\rightarrow$ ", out.3),
   grouping <- filtered[["setup"]]
 
   r <- report[likert_names[["opt.stakes"]]]
+  dev.off()
   lk <- likert(r, grouping=grouping, nlevels=5)
   pdf(
     file="reports/extra-outcomes-report-by-setup-05-opt.stakes.pdf",
