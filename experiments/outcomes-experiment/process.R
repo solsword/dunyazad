@@ -5,9 +5,6 @@
 # Note: instructions on MWW effect size calculation & reporting:
 # http://yatani.jp/teaching/doku.php?id=hcistats:mannwhitney
 
-# Note: confidence intervals for median from:
-# http://exploringdatablog.blogspot.sk/2012/04/david-olives-median-confidence-interval.html
-
 library(iterators) # iter() function
 library(foreach) # foreach function and %do% operator
 library(ggplot2) # for motive histograms
@@ -19,14 +16,16 @@ library(plyr) # rename function
 library(coin) # wilcox_test allows computing effect sizes
 library(boot) # for bootstrap confidence intervals
 library(lattice) # for histogram
+library(scales) # for rescale
+library(permute) # for shuffle
 
 # Switch for hypothesis testing:
-#test.hypotheses = FALSE
-test.hypotheses = TRUE
+test.hypotheses = FALSE
+#test.hypotheses = TRUE
 
 # Switch for report production:
-produce.reports = FALSE
-#produce.reports = TRUE
+#produce.reports = FALSE
+produce.reports = TRUE
 
 # Palette for motive histograms:
 #palette.motives = scale_fill_brewer(palette = "Set3")
@@ -34,6 +33,35 @@ produce.reports = FALSE
 palette.motives = scale_fill_manual(values=c("#bebada", "#fb8072", "#8dd3c7", "#fdb462", "#b3de69", "#80b1d3", "#ffffb3"))
 #palette.consistency = scale_fill_brewer(palette = "Set3")
 palette.consistency = scale_fill_manual(values=c("#fb8072", "#80b1d3", "#fdb462", "#b3de69"))
+palette.multi = scale_fill_brewer(palette="Spectral")
+#helper <- scale_fill_distiller(palette = "Spectral", values=rescale(1:11))
+#palette.multi = lapply(
+#  2:20,
+#  function (x) {
+#    scale_fill_manual(values=sapply(1-rescale(1:x), helper[["palette"]]))
+#  }
+#)
+#palette.multi = lapply(
+#  2:20,
+#  function (x) {
+#    scale_fill_manual(values=sapply(rep(rescale(1:12),length.out=x), helper[["palette"]]))
+#  }
+#)
+#helper <- scale_fill_brewer(palette = "Spectral")
+#lim <- 8
+#palette.multi = lapply(
+#  2:20,
+#  function (x) {
+#    if (x <= lim) {
+#      values <- helper[["palette"]](x)
+#    } else {
+#      values <- helper[["palette"]](lim)
+#    }
+#    #values <- values[shuffle(length(values))]
+#    s <- scale_fill_manual(values=rep(values,length.out=x))
+#    return(s)
+#  }
+#)
 
 qnames = c(
   "opt.obvious" = "Considering just the options, there seems to be a clear best option at this choice.",
@@ -223,7 +251,8 @@ shortcond = list(
   "obvious_success[main]"="obv. success [[main]]",
   "obvious_failure[main]"="obv. failure [[main]]",
   "obvious_success[alt]"="obv. success [[alt]]",
-  "obvious_failure[alt]"="obv. failure [[alt]]"
+  "obvious_failure[alt]"="obv. failure [[alt]]",
+  "8638(main)"="8638 [main]"
 )
 
 correct_decisions = c(
@@ -704,10 +733,12 @@ testmwwhypothesis <- function(hyp, data) {
   hyp@count.ag <- sum(is.against, na.rm=TRUE)
 
   testcol <- testcol[[hyp@in.question]]
+
   testcol <- sapply(
     testcol,
     function (datum) { return(as.numeric(as.character(datum))) }
   )
+
   rev <- hyp@hyp.predict
   if (rev == "greater") {
     rev <- "less"
@@ -759,8 +790,17 @@ testmwwhypothesis <- function(hyp, data) {
     testcol[is.against],
     sym
   )
-  hyp@result.conf.low <- confint(result)[["conf.int"]][[1]]
-  hyp@result.conf.high <- confint(result)[["conf.int"]][[2]]
+  hyp@result.conf.low <- -10
+  hyp@result.conf.high <- -10
+
+  # Cleanup if the distributions turned out to be identical:
+  if (is.na(pvalue(result)) & hyp@result.effect.common == 0.5) {
+    hyp@result.pvalue <- 1.0
+    hyp@result.confirmed <- FALSE
+  } else {
+    hyp@result.conf.low <- confint(result)[["conf.int"]][[1]]
+    hyp@result.conf.high <- confint(result)[["conf.int"]][[2]]
+  }
 
   return(hyp)
 }
@@ -806,8 +846,8 @@ display_result <- function (r) {
     } else {
       cat(
         "",
-        format(snames[[as.character(hyp[["question"]])]], width=53, justify="left"),
-        format(r@result.compare, width=22, justify="left"),
+        format(snames[[as.character(r@in.question)]], width=53, justify="left"),
+        format(r@result.confirmed, width=22, justify="left"),
         format(pred, width=23, justify="left"),
         "ERROR",
         "\n"
@@ -1354,9 +1394,11 @@ writeRelTable <- function(
 
 #responses <- read.csv(file="study-results.csv",head=TRUE,sep=",")
 responses <- read.csv(file="full-results.csv",head=TRUE,sep=",")
+# TODO: NOT THIS!!!
+#responses <- responses[responses$Input.seed != "99500",]
 hypotheses <- read.csv(file="hypotheses.csv",head=TRUE,sep=",")
 
-hypotheses <- hypotheses[hypotheses$type != "ignore",]
+hypotheses <- hypotheses[hypotheses$ignore != "TRUE",]
 
 filtered <- filterfactor(responses)
 filtered$is.real <- filtered[["duration"]] != -1
@@ -1601,6 +1643,9 @@ if (test.hypotheses) {
   fout.free.forced.failure <- file(
     "reports/retrospective-free-vs-forced-failure-results-table.tex"
   )
+  fout.free.forced.failure.extra <- file(
+    "reports/retrospective-free-vs-forced-failure-extra-results-table.tex"
+  )
   fout.chosen.inevitable.success.hyp <- file(
     "reports/retrospective-chosen-vs-inevitable-success-hypotheses-table.tex"
   )
@@ -1686,6 +1731,21 @@ if (test.hypotheses) {
     ),
     "unexpected_failure",
     "obvious_failure(main)",
+    hyp=FALSE
+  )
+
+  writeRelTable(
+    fout.free.forced.failure.extra,
+    results,
+    c(
+      "out.fair", "out.unfair",
+      "out.sense", "out.broken",
+      "out.good", "out.bad",
+      "out.happy", "out.regret",
+      "out.expected", "out.unexpected"
+    ),
+    "unexpected_failure",
+    "8638(main)",
     hyp=FALSE
   )
 
@@ -1983,6 +2043,7 @@ paste0("\\choicecount{", count.3, "}$\\rightarrow$ ", out.3),
   # Motivation histograms
   # ---------------------
 
+  nsamples <- nrow(real)
   for (m in c("motives", "judge.good", "judge.bad")) {
     values <- "error"
     if (m == "motives") {
@@ -2013,10 +2074,27 @@ paste0("\\choicecount{", count.3, "}$\\rightarrow$ ", out.3),
     l <- factor(l, ordered=TRUE, levels=l)
     t <- data.frame(labels=l, count=as.vector(unlist(counts)))
     g <- ggplot(t, aes(x=labels, y=count, fill=labels))
-    g <- g + ylim(0, 175)
+    g <- g + scale_y_continuous(
+      limits=c(0, nsamples),
+      breaks=c(0, nsamples*0.5, nsamples)
+    )
     g <- g + geom_bar(stat="identity", color="#000000")
     g <- g + geom_text(
-      aes(x=labels, y=count, label=count),
+      aes(
+        x=labels,
+        y=count,
+        label=ifelse(count > 20, count, "")
+      ),
+      size=8,
+      vjust=1,
+      nudge_y=-5
+    )
+    g <- g + geom_text(
+      aes(
+        x=labels,
+        y=count,
+        label=ifelse(count > 20, paste0(as.integer(100*count/205), "%"), count)
+      ),
       size=8,
       vjust=0,
       nudge_y=4
@@ -2056,13 +2134,30 @@ paste0("\\choicecount{", count.3, "}$\\rightarrow$ ", out.3),
     count=as.vector(unlist(counts))
   )
   g <- ggplot(t, aes(x=labels, y=count, fill=labels))
-  g <- g + ylim(0, 175)
+  g <- g + scale_y_continuous(
+    limits=c(0, nsamples),
+    breaks=c(0, nsamples*0.5, nsamples)
+  )
   g <- g + geom_bar(stat="identity", color="#000000")
   g <- g + geom_text(
-    aes(x=labels, y=count, label=count),
+    aes(
+      x=labels,
+      y=count,
+      label=ifelse(count > 20, count, "")
+    ),
+    size=8,
+    vjust=1,
+    nudge_y=-5
+  )
+  g <- g + geom_text(
+    aes(
+      x=labels,
+      y=count,
+      label=ifelse(count > 20, paste0(as.integer(100*count/205), "%"), count)
+    ),
     size=8,
     vjust=0,
-    nudge_y=2
+    nudge_y=4
   )
   g <- g + palette.consistency
   g <- g + guides(fill = "none")
@@ -2082,6 +2177,171 @@ paste0("\\choicecount{", count.3, "}$\\rightarrow$ ", out.3),
   )
   show(g)
   dev.off()
+
+  # Motives multivalues
+
+  nsamples <- nrow(real)
+  for (m in c("motives", "judge.good", "judge.bad")) {
+    values <- "error"
+    if (m == "motives") {
+      values <- unique(real$motives)
+    } else if (m == "judge.good") {
+      values <- unique(real$judge.good)
+    } else if (m == "judge.bad") {
+      values <- unique(real$judge.bad)
+    }
+    counts <- lapply(
+      values,
+      function (val) {
+        sum(filtered[[m]] == val, na.rm=TRUE)
+      }
+    )
+
+    l <- values
+
+    l <- lapply(l, function (v) { gsub("-", ".", v) })
+
+    l <- lapply(l, function (v) { gsub("\\|", " +\n", v) })
+
+    #l <- lapply(values, function (v) { sub("\\|", " + ", v) })
+    #l <- lapply(l, function (v) { sub("\\|", " +\n", v) })
+    #l <- lapply(l, function (v) { gsub("\\|", " + ", v) })
+
+    #l <- lapply(values, function (v) { gsub("\\|", ", ", v) })
+    #l <- lapply(l, function (v) { gsub("avatar", "Ava", v) })
+    #l <- lapply(l, function (v) { gsub("power", "Pwr", v) })
+    #l <- lapply(l, function (v) { gsub("progress", "Prg", v) })
+    #l <- lapply(l, function (v) { gsub("interesting", "Int", v) })
+    #l <- lapply(l, function (v) { gsub("role", "Rol", v) })
+    #l <- lapply(l, function (v) { gsub("curious", "Cur", v) })
+    #l <- lapply(l, function (v) { gsub("no-control", "NCt", v) })
+    #l <- lapply(l, function (v) { gsub("value-clash", "VCl", v) })
+    counts <- as.vector(unlist(counts))
+
+    # Filter out ones, twos, and threes:
+    has.enough <- counts > 10
+    #has.enough <- counts > 0
+    counts <- counts[has.enough]
+    l <- l[has.enough]
+    l <- unlist(l)
+
+    t <- data.frame(lbl=l, count=counts)
+    t <- t[with(t, order(-count)),]
+    t$lbl <- factor(t$lbl, ordered=TRUE, levels=t$lbl)
+    t$running <- sapply(as.numeric(t$lbl), function(l) { sum(t$count[1:l]) })
+
+    empty <- ggplot(
+    ) + theme_void() + annotate(
+      "rect",
+      xmin=0, xmax=100,
+      ymin=0, ymax=100,
+      fill="white",
+      color="white"
+    )
+    eg <- ggplotGrob(empty)
+
+    g <- ggplot(t)
+    g <- g + geom_bar(
+      aes(x=lbl, y=count, width=0.4 + 0.5*count/(0.25*205), fill=count/205),
+      stat="identity",
+      color="#000000"
+    )
+    g <- g + scale_fill_distiller(
+      palette="Spectral",
+      #values=1-rescale(1:max(t$count)),
+      #limits=c(10, max(t$count))
+      limits=c(0.035, 0.22)
+      #limits=c(0.0, 0.3)
+    )
+    # create our false bottom:
+    g <- g + annotation_custom(
+      eg,
+      xmin=0, xmax=nrow(t)+1,
+      ymin=-54, ymax=0
+    )
+    g <- g + scale_y_continuous(
+      limits=c(-22, 42),
+      breaks=205*0.05*0:8
+    )
+    # And put our false labels in:
+    g <- g + geom_text(
+      aes(x=lbl, y=count, label=count),
+      size=6,
+      vjust=0,
+      nudge_y=1
+    )
+    g <- g + geom_text(
+      aes(x=lbl, y=count, label=paste0(as.integer(100*count/205), "%")),
+      size=6,
+      vjust=1,
+      nudge_y=-1
+    )
+    g <- g + geom_text(
+      aes(
+        x=lbl,
+        y=-4,
+        label=lbl,
+        #size=(count/max(count))
+        #label=(
+        #  -sapply(
+        #    as.character(lbl),
+        #    function (l) {
+        #      #length(gregexpr("\n", l)[[1]])
+        #      sum(strsplit(l, "") == "+")
+        #    }
+        #  )
+        #),
+        size=(
+          -sapply(
+            as.character(lbl),
+            function (l) {
+              sum(strsplit(l, "")[[1]] == "\n")
+            }
+          )
+        )
+      ),
+      angle=0,
+      vjust=1,
+      hjust=0.5
+    )
+    g <- g + scale_size_continuous(range=c(7, 8))
+    #g <- g + geom_line(
+    #  aes(x=as.numeric(lbl), y=45*as.numeric(running)/205),
+    #  inherit.aes=FALSE
+    #)
+    #g <- g + geom_line(
+    #  aes(x=as.numeric(lbl), y=0),
+    #  inherit.aes=FALSE
+    #)
+    #g <- g + geom_line(
+    #  aes(x=as.numeric(lbl), y=45),
+    #  inherit.aes=FALSE
+    #)
+    #g <- g + palette.multi[nrow(t)]
+    #g <- g + palette.multi
+    g <- g + guides(fill = "none", size="none")
+    g <- g + theme(
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      #axis.text.x = element_text(size=18, angle=90, vjust=0.5, hjust=1),
+      axis.text.x = element_blank(),
+      axis.text.y = element_blank(),
+      axis.title.x = element_blank(),
+      axis.title.y = element_blank(),
+      axis.ticks.x = element_blank(),
+      axis.ticks.y = element_blank()
+    )
+    g <- g + labs(x="")
+    pdf(
+      file=paste("reports/motives-multi-", m, ".pdf", sep=""),
+      title=paste("dunyazad-motives-multi-", m, "-report", sep=""),
+      width=9.5,
+      height=7
+    )
+    show(g)
+    dev.off()
+  }
+  exit
 
   # Likert reports:
   # ---------------
