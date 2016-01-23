@@ -52,12 +52,14 @@ echo ""
 echo ""
 echo "Cropping extra reports..."
 pdfcrop --margins="0 0 0 -55" extra-outcomes-report-by-setup-05-opt.stakes.pdf cropped-extra-outcomes-report-by-setup-05-opt.stakes.pdf
+pdfcrop --margins="0 0 0 -65" motives-multi-motives.pdf cropped-motives-multi-motives.pdf
+pdfcrop --margins="0 0 0 -10" motives-multi-judge.good.pdf cropped-motives-multi-judge.good.pdf
+pdfcrop --margins="0 0 0 -35" motives-multi-judge.bad.pdf cropped-motives-multi-judge.bad.pdf
 echo ""
 echo ""
 echo ""
 echo ""
 echo "Merging miscellaneous comparisons..."
 pdfunite cropped-detailed-report-expected_failure-02-opt.nobad.pdf cropped-detailed-report-unexpected_success-02-opt.nobad.pdf legend.pdf cropped-extra-opt.nobad-report.pdf
-echo ""
 echo ""
 cd ..

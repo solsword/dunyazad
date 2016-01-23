@@ -2071,6 +2071,7 @@ paste0("\\choicecount{", count.3, "}$\\rightarrow$ ", out.3),
         gsub("\\.", ".\n", v)
       }
     )
+    l <- lapply(l, function (v) { gsub("interesting", "interest", v) })
     l <- factor(l, ordered=TRUE, levels=l)
     t <- data.frame(labels=l, count=as.vector(unlist(counts)))
     g <- ggplot(t, aes(x=labels, y=count, fill=labels))
@@ -2203,6 +2204,7 @@ paste0("\\choicecount{", count.3, "}$\\rightarrow$ ", out.3),
 
     l <- lapply(l, function (v) { gsub("\\|", " +\n", v) })
 
+    l <- lapply(l, function (v) { gsub("interesting", "interest", v) })
     #l <- lapply(values, function (v) { sub("\\|", " + ", v) })
     #l <- lapply(l, function (v) { sub("\\|", " +\n", v) })
     #l <- lapply(l, function (v) { gsub("\\|", " + ", v) })
@@ -2211,12 +2213,19 @@ paste0("\\choicecount{", count.3, "}$\\rightarrow$ ", out.3),
     #l <- lapply(l, function (v) { gsub("avatar", "Ava", v) })
     #l <- lapply(l, function (v) { gsub("power", "Pwr", v) })
     #l <- lapply(l, function (v) { gsub("progress", "Prg", v) })
-    #l <- lapply(l, function (v) { gsub("interesting", "Int", v) })
+    #l <- lapply(l, function (v) { gsub("interest", "Int", v) })
     #l <- lapply(l, function (v) { gsub("role", "Rol", v) })
     #l <- lapply(l, function (v) { gsub("curious", "Cur", v) })
     #l <- lapply(l, function (v) { gsub("no-control", "NCt", v) })
     #l <- lapply(l, function (v) { gsub("value-clash", "VCl", v) })
     counts <- as.vector(unlist(counts))
+    cat(
+      "Motive question",
+      paste0("'", m, "'"),
+      "had",
+      length(counts),
+      "unique responses.\n"
+    )
 
     # Filter out ones, twos, and threes:
     has.enough <- counts > 10
@@ -2341,7 +2350,6 @@ paste0("\\choicecount{", count.3, "}$\\rightarrow$ ", out.3),
     show(g)
     dev.off()
   }
-  exit
 
   # Likert reports:
   # ---------------
