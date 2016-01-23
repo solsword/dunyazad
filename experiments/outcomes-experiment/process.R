@@ -1107,7 +1107,7 @@ latex_out_row <- function(results, question, col.1, col.2, hyp=FALSE) {
   return(c(
     "\\midrule",
     paste(
-      "\\multirow{2}{8em}{\\raggedleft \\hangpara{1.3em}{1}\\eII",
+      "\\multirow{2}{6em}{\\raggedleft \\hangpara{1.3em}{1}\\eII",
       gsub("\\.", "", question),
       "abbr/} &%",
       sep=""
@@ -1234,7 +1234,6 @@ writeOptTable <- function(file, results, hyp=FALSE) {
 fmt,
 "\\toprule",
 header,
-"\\toprule",
 lapply(
   c("opt.obvious", "opt.balanced", "opt.nobad", "opt.nogood", "opt.stakes"),
   function(question) {
@@ -1257,7 +1256,7 @@ lapply(
 
 writeOutTable <- function(file, results, col.1, col.2, hyp=FALSE) {
   writeLines(unlist(c(
-"\\begin{tabular}{r  c  c c c  c  c c c}",
+"\\begin{tabular}{r  c@{\\hspace{2em}}  c c c  c@{\\hspace{2em}} c c c}",
 "\\toprule",
 "\\multirow{2}{5em}{\\centering Question} &%",
 paste(
@@ -1285,7 +1284,6 @@ paste(
   "abbr/} \\\\",
   sep=""
 ),
-"\\toprule",
 lapply(
   c(
     "out.fair", "out.unfair",
@@ -1909,7 +1907,7 @@ if (produce.reports) {
         sapply(c(
 "\\fbox{",
 "\\parbox{0.95\\linewidth}{",
-"\\slshape",
+"\\quoteshape",
 #%as.character(row$Input.framing),
 #%"",
 #%as.character(row$Input.assets),
