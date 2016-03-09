@@ -14,13 +14,13 @@ default_intent(talk_down, o(attitude, convinced)).
 outcome_val(talk_down, attitude, convinced).
 outcome_val(talk_down, attitude, unconvinced).
 
-outcome_val(talk_down, enraged, enraged).
-outcome_val(talk_down, enraged, not_enraged).
+outcome_val(talk_down, is_enraged, enraged).
+outcome_val(talk_down, is_enraged, not_enraged).
 
 outcome_excludes(
   talk_down,
   o(attitude, convinced),
-  o(enraged, enraged)
+  o(is_enraged, enraged)
 ).
 
 % skills
@@ -40,13 +40,13 @@ skill_link(
 skill_link(
   elocution, required, no_tool,
   talk_down, asking,
-  o(enraged, not_enraged)
+  o(is_enraged, not_enraged)
 ).
 
 skill_link(
   storytelling, promotes, no_tool,
   talk_down, asking,
-  o(enraged, not_enraged)
+  o(is_enraged, not_enraged)
 ).
 
 error(m("Unintelligent asker.", N, X)) :-
@@ -107,7 +107,7 @@ at(
   N,
   consequence_of(
     X,
-    o(enraged, enraged),
+    o(is_enraged, enraged),
     relation(threatening, Listening, Asking)
   )
 ) :-
@@ -122,7 +122,7 @@ at(
   N,
   consequence_of(
     X,
-    o(enraged, enraged),
+    o(is_enraged, enraged),
     relation(accusing, Listening, Asking)
   )
 ) :-
