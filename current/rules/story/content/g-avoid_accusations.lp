@@ -11,7 +11,7 @@ state_hinders(
   st(N, inst(actor, ThreatKey)).
 
 % If there's an accusation, it being likely to persist seems dangerous:
-at(N, expectation(X, fails, avoid_accusations(inst(actor, Victim)))) :-
+at(N, expectation(X, hinders, avoid_accusations(inst(actor, Victim)))) :-
   at(N, action(X, Action)),
   st(N, relation(accusing, Threat, inst(actor, Victim))),
   0 = { % There's no likely or neutral outcome which will resolve the threat:
@@ -45,7 +45,7 @@ at(
   N,
   outcome_perception(
     option(X),
-    hinders,
+    bad_for,
     avoid_accusations(inst(actor, Key))
   )
 ) :-

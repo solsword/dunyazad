@@ -11,7 +11,7 @@ state_hinders(
   st(N, inst(actor, ThreatKey)).
 
 % If there's a threat, it being likely to persist seems dangerous:
-at(N, expectation(X, fails, avoid_threats_to(inst(actor, Victim)))) :-
+at(N, expectation(X, hinders, avoid_threats_to(inst(actor, Victim)))) :-
   at(N, action(X, Action)),
   st(N, relation(threatening, Threat, inst(actor, Victim))),
   0 = { % There's no likely or neutral outcome which will resolve the threat:
@@ -45,7 +45,7 @@ at(
   N,
   outcome_perception(
     option(X),
-    hinders,
+    bad_for,
     avoid_threats_to(inst(actor, Key))
   )
 ) :-
