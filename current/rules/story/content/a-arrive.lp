@@ -10,8 +10,8 @@
 %
 %% outcomes
 %
-%% It doesn't make sense for arriving to fail, so there's only one outcome:
-%outcome_val(arrive, result, arrived).
+%% It doesn't make sense for arriving to fail, so there's only one
+%% outcome: outcome_val(arrive, result, arrived).
 %
 %% skills
 %
@@ -34,12 +34,26 @@
 %  not st(N, state(off_stage, Subject)),
 %  story_op(N, build_options).
 %
-%at(N, consequence_of(o(result, arrived), _not, state(off_stage, Subject))) :-
+%at(
+%  N,
+%  consequence_of(
+%    o(result,
+%    arrived), _not,
+%    state(off_stage, Subject)
+%  )
+%) :-
 %  at(N, action(X, arrive)),
 %  at(N, arg(X, subject, Subject)),
 %  story_op(N, build_options).
 %
-%at(N, consequence_of(o(result, arrived), _not, state(off_stage, Item))) :-
+%at(
+%  N,
+%  consequence_of(
+%    o(result,
+%    arrived), _not,
+%    state(off_stage, Item)
+%  )
+%) :-
 %  at(N, action(X, arrive)),
 %  at(N, arg(X, subject, Subject)),
 %  st(N, relation(has_item, Subject, Item)),

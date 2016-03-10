@@ -33,7 +33,15 @@ at(N, likely_outcome(X, o(success, shifted))) :-
   at(N, arg(X, shifter, SamePerson)),
   at(N, arg(X, new_victim, SamePerson)).
 
-at(N, relevant_factor(X, SamePerson, shift_blame_via_confession, SamePerson)) :-
+at(
+  N,
+  relevant_factor(
+    X,
+    SamePerson,
+    shift_blame_via_confession,
+    SamePerson
+  )
+) :-
   at(N, action(X, shift_blame)),
   at(N, arg(X, accuser, Accuser)),
   at(N, arg(X, shifter, SamePerson)),

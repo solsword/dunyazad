@@ -26,7 +26,11 @@ skill_link(
 
 at(
   N,
-  consequence_of(X, o(success, accused), relation(accusing, Accuser, Target))
+  consequence_of(
+    X,
+    o(success, accused),
+    relation(accusing, Accuser, Target)
+  )
 ) :-
   at(N, action(X, accuse)),
   at(N, arg(X, accuser, Accuser)),

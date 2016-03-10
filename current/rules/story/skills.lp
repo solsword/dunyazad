@@ -49,7 +49,8 @@ at(N, skill_link(Skill, Link, NeedsTool, Action, Arg, Outcome)) :-
 
 % Skill link unpacking:
 
-% 'required' skill links depress expectations if a skill and/or tool is missing:
+% 'required' skill links depress expectations if a skill and/or tool
+% is missing:
 at(N, unlikely_outcome(X, Outcome)) :-
   at(N, action(X, Action)),
   at(N, arg(X, Arg, Actor)),
@@ -65,7 +66,8 @@ at(N, unlikely_outcome(X, Outcome)) :-
   not at(N, has_tool_for(Actor, Skill)),
   story_op(N, build_options).
 
-% 'promotes' as opposed to 'required' links directly increase expectations:
+% 'promotes' as opposed to 'required' links directly increase
+% expectations:
 at(N, likely_outcome(X, Outcome)) :-
   at(N, action(X, Action)),
   at(N, arg(X, Arg, Actor)),
@@ -97,7 +99,8 @@ at(N, unlikely_outcome(X, Outcome)) :-
   at(N, has_tool_for(Actor, Skill)),
   story_op(N, build_options).
 
-% 'contest' links using between to name two arguments & compare skill levels:
+% 'contest' links using between to name two arguments & compare skill
+% levels:
 at(N, likely_outcome(X, Win)) :-
   at(N, action(X, Action)),
   at(N, arg(X, One, AOne)),
@@ -318,13 +321,15 @@ at(N, likely_outcome(X, Lose)) :-
   at(N, has_tool_for(ATwo, Skill)),
   story_op(N, build_options).
 
-% An outcome value is "likely" if all other possibilities are unlikely and vice
-% versa:
+% An outcome value is "likely" if all other possibilities are unlikely
+% and vice versa:
 at(N, likely_outcome(X, o(OutVar, OutVal))) :-
   at(N, action(X, Action)),
   outcome_val(Action, OutVar, OutVal),
   PossibleOutcomes = { outcome_val(Action, OutVar, PossibleVal) },
-  PossibleOutcomes - 1 = { at(N, unlikely_outcome(X, o(OutVar, UnlikelyVal))) },
+  PossibleOutcomes - 1 = {
+    at(N, unlikely_outcome(X, o(OutVar, UnlikelyVal)))
+  },
   not at(N, unlikely_outcome(X, o(OutVar, OutVal))),
   story_op(N, build_options).
 
@@ -332,7 +337,9 @@ at(N, unlikely_outcome(X, o(OutVar, OutVal))) :-
   at(N, action(X, Action)),
   outcome_val(Action, OutVar, OutVal),
   PossibleOutcomes = { outcome_val(Action, OutVar, PossibleVal) },
-  PossibleOutcomes - 1 = { at(N, likely_outcome(X, o(OutVar, UnlikelyVal))) },
+  PossibleOutcomes - 1 = {
+    at(N, likely_outcome(X, o(OutVar, UnlikelyVal)))
+  },
   not at(N, likely_outcome(X, o(OutVar, OutVal))),
   story_op(N, build_options).
 
@@ -342,7 +349,8 @@ at(N, unlikely_outcome(X, Excluded)) :-
   outcome_excludes(Action, Likely, Excluded),
   at(N, likely_outcome(X, Likely)).
 
-% Some predicates that make gleaning a list of applicable skills/tools easy:
+% Some predicates that make gleaning a list of applicable skills/tools
+% easy:
 
 at(N, relevant_skill(X, Actor, has, Skill)) :-
   at(N, action(X, Action)),

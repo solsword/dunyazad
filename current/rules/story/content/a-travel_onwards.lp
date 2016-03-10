@@ -1,4 +1,5 @@
-% travel_onwards: a special party-only action that moves to the next vignette
+% travel_onwards: a special party-only action that moves to the next
+% vignette
 action(travel_onwards).
 
 % arguments
@@ -18,9 +19,9 @@ outcome_val(travel_onwards, onwards, onwards).
 at(N, arg(Opt, subject, inst(actor, you))) :-
   at(N, action(Opt, travel_onwards)).
 
-% travel_onwards as an option removes all problems and opportunities related to
-% things left behind, but it can't be an option if doing so would remove a
-% non-hidden problem.
+% travel_onwards as an option removes all problems and opportunities
+% related to things left behind, but it can't be an option if doing so
+% would remove a non-hidden problem.
 
 removed_by(N, X, potential(PType, state(PState, Subject))) :-
   at(N, action(X, travel_onwards)),
@@ -58,15 +59,20 @@ error(m("Left a non-hidden problem behind.", N, Prb)) :-
 
 at(
   N,
-  consequence_of(X, o(onwards, onwards), nullifies, potential(PType, Pot))
+  consequence_of(
+    X,
+    o(onwards, onwards),
+    nullifies, potential(PType, Pot)
+  )
 ) :-
   at(N, action(X, travel_onwards)),
   at(N, potential(PType, Pot)),
   removed_by(N, X, potential(PType, Pot)),
   story_op(N, build_options).
 
-% travelling onwards gets rid of all spontaneous instances and properties
-% thereof unless the party has picked up the instance to take with them:
+% travelling onwards gets rid of all spontaneous instances and
+% properties thereof unless the party has picked up the instance to
+% take with them:
 
 travel_away_from(N, X, inst(Type, Inst)) :-
   at(N, action(X, travel_onwards)),
@@ -83,27 +89,46 @@ travel_away_from(N, X, inst(Type, Inst)) :-
 at(N, consequence_of(X, o(onwards, onwards), _not, Inst)) :-
   travel_away_from(N, X, Inst).
 
-at(N, consequence_of(X, o(onwards, onwards), _not, state(State, Inst))) :-
+at(
+  N,
+  consequence_of(
+    X,
+    o(onwards, onwards),
+    _not, state(State, Inst)
+  )
+) :-
   st(N, state(State, Inst)),
   travel_away_from(N, X, Inst).
 
 at(
   N,
-  consequence_of(X, o(onwards, onwards), _not, property(Prop, Inst, Value))
+  consequence_of(
+    X,
+    o(onwards, onwards),
+    _not, property(Prop, Inst, Value)
+  )
 ) :-
   st(N, property(Prop, Inst, Value)),
   travel_away_from(N, X, Inst).
 
 at(
   N,
-  consequence_of(X, o(onwards, onwards), _not, relation(Rel, Inst, Other))
+  consequence_of(
+    X,
+    o(onwards, onwards),
+    _not, relation(Rel, Inst, Other)
+  )
 ) :-
   st(N, relation(Rel, Inst, Other)),
   travel_away_from(N, X, Inst).
 
 at(
   N,
-  consequence_of(X, o(onwards, onwards), _not, relation(Rel, Other, Inst))
+  consequence_of(
+    X,
+    o(onwards, onwards),
+    _not, relation(Rel, Other, Inst)
+  )
 ) :-
   st(N, relation(Rel, Other, Inst)),
   travel_away_from(N, X, Inst).

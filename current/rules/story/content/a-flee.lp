@@ -114,8 +114,9 @@ at(
   st(N, relation(accusing, From, Fearful)),
   story_op(N, build_options).
 
-% Fleeing puts things off-stage, unless they're a party member, in which case
-% it puts everything not in your party or belonging to it off-stage:
+% Fleeing puts things off-stage, unless they're a party member, in
+% which case it puts everything not in your party or belonging to it
+% off-stage:
 
 at(
   N,
@@ -162,7 +163,10 @@ at(
 
 % You can be injured if you fail to escape:
 
-at(N, consequence_of(X, o(get_injured, injured), state(injured, Fearful))) :-
+at(
+  N,
+  consequence_of(X, o(get_injured, injured), state(injured, Fearful))
+) :-
   at(N, action(X, flee)),
   at(N, arg(X, fearful, Fearful)),
   story_op(N, build_options).

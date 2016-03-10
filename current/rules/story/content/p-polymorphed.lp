@@ -4,12 +4,22 @@ potential(problem, property, polymorphed, Any) :- any_class(Any).
 pcategory(potential(problem, property, polymorphed, Any), urgent) :-
   any_class(Any).
 
-pcategory(potential(problem, property, polymorphed, Any), persistent) :-
+pcategory(
+  potential(problem, property, polymorphed, Any),
+  persistent
+) :-
   any_class(Any).
 
-problematic_for(problem, property, polymorphed, Any, inst) :- any_class(Any).
+problematic_for(
+  problem,
+  property,
+  polymorphed,
+  Any,
+  inst
+) :- any_class(Any).
 
-% When you become polymorphed, you become a chicken if you weren't one already:
+% When you become polymorphed, you become a chicken if you weren't one
+% already:
 % Changing the type and/or number of an entity is NOT GOOD!
 % TODO: Make this work?
 %at(N, consequence_of(X, O, property(type, Target, chicken))) :-
@@ -17,8 +27,12 @@ problematic_for(problem, property, polymorphed, Any, inst) :- any_class(Any).
 %  not st(N, property(type, Target, chicken)),
 %  story_op(N, build_options).
 
-% You also gain the "unintelligent" skill if you didn't already have it:
-at(N, consequence_of(X, O, property(has_skill, Target, unintelligent))) :-
+% You also gain the "unintelligent" skill if you didn't already have
+% it:
+at(
+  N,
+  consequence_of(X, O, property(has_skill, Target, unintelligent))
+) :-
   at(N, consequence_of(X, O, property(polymorphed, Target, Any))),
   not st(N, property(has_skill, Target, unintelligent)),
   story_op(N, build_options).
@@ -32,18 +46,40 @@ at(N, consequence_of(X, O, _not, relation(has_item, Target, Item))) :-
   story_op(N, build_options).
 
 
-% When you're polymporhed back, you regain your original type and lose the
-% unintelligent skill unless it's a class skill for your original type:
+% When you're polymporhed back, you regain your original type and lose
+% the unintelligent skill unless it's a class skill for your original
+% type:
 
 % See above
 % TODO: Make this work?
 %at(N, consequence_of(X, O, property(type, Target, Original))) :-
-%  at(N, consequence_of(X, O, _not, property(polymorphed, Target, Original))),
+%  at(
+%    N,
+%    consequence_of(
+%      X,
+%      O, _not,
+%      property(polymorphed, Target, Original)
+%    )
+%  ),
 %  Original != chicken,
 %  story_op(N, build_options).
 
-at(N, consequence_of(X, O, _not, property(has_skill, Target, unintelligent))) :-
-  at(N, consequence_of(X, O, _not, property(polymorphed, Target, Original))),
+at(
+  N,
+  consequence_of(
+    X,
+    O, _not,
+    property(has_skill, Target, unintelligent)
+  )
+) :-
+  at(
+    N,
+    consequence_of(
+      X,
+      O, _not,
+      property(polymorphed, Target, Original)
+    )
+  ),
   0 = {
     class_skill(SomeClass, unintelligent, always) :
       subclass(Original, SomeClass),
@@ -101,11 +137,20 @@ at(
     X,
     O,
     nullifies,
-    potential(opportunity, property(offering_service, Target, Anything))
+    potential(
+      opportunity,
+      property(offering_service, Target, Anything)
+    )
   )
 ) :-
   at(N, consequence_of(X, O, property(polymorphed, Target, Any))),
-  at(N, potential(opportunity, property(offering_service, Target, Anything))),
+  at(
+    N,
+    potential(
+      opportunity,
+      property(offering_service, Target, Anything)
+    )
+  ),
   story_op(N, build_options).
 
 at(

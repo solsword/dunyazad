@@ -16,7 +16,8 @@
 %
 %% none
 %
-%% You can't leave if you're being threatened (you should flee instead):
+%% You can't leave if you're being threatened (you should flee
+%% instead):
 %
 %error(m("Walked out of a threatening situation.", N, X)) :-
 %  at(N, action(X, leave)),
@@ -24,8 +25,8 @@
 %  st(N, relation(threatening, Someone, Subject)),
 %  story_op(N, build_options).
 %
-%% Since it's all the same in the end, the initator of leaving should always be
-%% you.
+%% Since it's all the same in the end, the initator of leaving should
+%% always be % you.
 %
 %error(m("Party member other than you left...")) :-
 %  at(N, action(X, leave)),
@@ -34,8 +35,8 @@
 %  Subject != inst(actor, you),
 %  story_op(N, build_options).
 %
-%% Leaving puts things off-stage, unless they're you, in which case it puts
-%% everything not in your party or belonging to it off-stage:
+%% Leaving puts things off-stage, unless they're you, in which case it
+%% puts % everything not in your party or belonging to it off-stage:
 %
 %at(
 %  N,

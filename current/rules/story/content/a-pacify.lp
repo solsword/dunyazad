@@ -99,7 +99,14 @@ at(
   story_op(N, build_options).
 
 % You can get injured if things go badly.
-at(N, consequence_of(X, o(get_injured, injured), state(injured, Pacifier))) :-
+at(
+  N,
+  consequence_of(
+    X,
+    o(get_injured, injured),
+    state(injured, Pacifier)
+  )
+) :-
   at(N, action(X, pacify)),
   at(N, arg(X, pacifier, Pacifier)),
   story_op(N, build_options).

@@ -12,7 +12,12 @@ class_skill(monster, wilderness_lore, sometimes).
 %trophy(dragon, dragon_scale).
 
 %actor_def(leviathan, monster, "leviathan", singular, neuter).
-%item_def(leviathan_ambergris, treasure, "leviathan ambergris", singular).
+%item_def(
+%  leviathan_ambergris,
+%  treasure,
+%  "leviathan ambergris",
+%  singular
+%).
 %trophy(leviathan, leviathan_ambergris).
 
 % TODO: "group" number

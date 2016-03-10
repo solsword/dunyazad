@@ -75,8 +75,8 @@ at(
   },
   story_op(N, build_options).
 
-% if you get caught stealing something that doesn't belong to you you'll be
-% either threatened or accused (TODO: accusations!).
+% if you get caught stealing something that doesn't belong to you
+% you'll be either threatened or accused (TODO: accusations!).
 
 at(
   N,

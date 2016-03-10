@@ -49,13 +49,27 @@ error(m("Seller can't trade goods.", N, X, Seller, Goods)) :-
   not at(N, can_trade(Seller, Goods)),
   story_op(N, build_options).
 
-at(N, consequence_of(X, o(deal, deal), relation(has_item, Buyer, Goods))) :-
+at(
+  N,
+  consequence_of(
+    X,
+    o(deal, deal),
+    relation(has_item, Buyer, Goods)
+  )
+) :-
   at(N, action(X, trade)),
   at(N, arg(X, buyer, Buyer)),
   at(N, arg(X, goods, Goods)),
   story_op(N, build_options).
 
-at(N, consequence_of(X, o(deal, deal), relation(has_item, Seller, Price))) :-
+at(
+  N,
+  consequence_of(
+    X,
+    o(deal, deal),
+    relation(has_item, Seller, Price)
+  )
+) :-
   at(N, action(X, trade)),
   at(N, arg(X, seller, Seller)),
   at(N, arg(X, price, Price)),

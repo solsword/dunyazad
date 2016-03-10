@@ -13,5 +13,7 @@ item_def(spear, artificial_weapon, "spear", singular).
 %item_def(bow, artificial_weapon, "bow", singular).
 %item_def(rapier, artificial_weapon, "rapier", singular).
 
-tool_for(IType, fighting) :- item_def(IType, artificial_weapon, Name, Number).
-tool_for(IType, fighting) :- item_def(IType, natural_weapon, Name, Number).
+tool_for(IType, fighting) :-
+  item_def(IType, artificial_weapon, Name, Number).
+tool_for(IType, fighting) :-
+  item_def(IType, natural_weapon, Name, Number).

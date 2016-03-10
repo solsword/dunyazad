@@ -1,5 +1,6 @@
 % items.lp
-% Special rules for items. See content/items/*.lp for item definitions.
+% Special rules for items. See content/items/*.lp for item
+% definitions.
 
 % Item definition unpacking:
 subclass(Imm, Spec) :-

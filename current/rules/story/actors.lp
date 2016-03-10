@@ -1,5 +1,6 @@
 % actors.lp
-% Special rules for actors. See content/actors/*.lp for actor definitions.
+% Special rules for actors. See content/actors/*.lp for actor
+% definitions.
 
 % Actor definition unpacking:
 subclass(Imm, Spec) :-

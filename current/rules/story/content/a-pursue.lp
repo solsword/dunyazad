@@ -48,7 +48,8 @@
 %  },
 %  story_node(N).
 %
-%% You can't pursue if you're being threatened (you should flee instead):
+%% You can't pursue if you're being threatened (you should flee
+%% instead):
 %
 %error(m("Pursued out of a threatening situation.", N, X)) :-
 %  at(N, action(X, pursue)),
@@ -64,9 +65,10 @@
 %  not st(N, state(off_stage, Object)),
 %  story_op(N, build_options).
 %
-%% Pursuit puts things off-stage, unless they're you, in which case it puts
-%% everything not in your party or belonging to it off-stage, while putting
-%% previously off-stage things on-stage (unless you get lost).
+%% Pursuit puts things off-stage, unless they're you, in which case it
+%% puts % everything not in your party or belonging to it off-stage,
+%% while putting % previously off-stage things on-stage (unless you
+%% get lost).
 %
 %at(
 %  N,
@@ -143,7 +145,12 @@
 %
 %at(
 %  N,
-%  consequence_of(X, o(result, caught_up), _not, state(off_stage, Thing))
+%  consequence_of(
+%    X,
+%    o(result, caught_up),
+%    _not,
+%    state(off_stage, Thing)
+%  )
 %) :-
 %  at(N, action(X, pursue)),
 %  at(N, arg(X, subject, Subject)),

@@ -22,6 +22,9 @@ at(
     )
   )
 ) :-
-  at(N, consequence_of(X, O, _not, relation(has_item, Merchant, Item))),
+  at(
+    N,
+    consequence_of(X, O, _not, relation(has_item, Merchant, Item))
+  ),
   at(N, potential(opportunity, relation(selling, Merchant, Item))),
   story_op(N, build_options).

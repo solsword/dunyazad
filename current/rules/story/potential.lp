@@ -32,21 +32,35 @@ at(N, consequence(Option, _not, PState)) :-
   resolution_method(RM).
 
 at(N, consequence_of(Option, Outcome, _not, PState)) :-
-  at(N, consequence_of(Option, Outcome, RM, potential(PType, PState))),
+  at(
+    N,
+    consequence_of(
+      Option,
+      Outcome,
+      RM,
+      potential(PType, PState)
+    )
+  ),
   resolution_method(RM).
 
-% certain parties are the initiators of and/or are troubled by different
-% potentials.
+% certain parties are the initiators of and/or are troubled by
+% different potentials.
 
 at(N, initiated_by(potential(PTyp, state(PState, Inst)), Inst)) :-
   at(N, potential(PTyp, state(PState, Inst))),
   initiated_by(PTyp, state, PState, inst).
 
-at(N, initiated_by(potential(PTyp, property(PProp, Inst, PVal)), Inst)) :-
+at(
+  N,
+  initiated_by(potential(PTyp, property(PProp, Inst, PVal)), Inst)
+) :-
   at(N, potential(PTyp, property(PProp, Inst, PVal))),
   initiated_by(PTyp, property, PProp, PVal, inst).
 
-at(N, initiated_by(potential(PTyp, relation(PRel, From, To)), From)) :-
+at(
+  N,
+  initiated_by(potential(PTyp, relation(PRel, From, To)), From)
+) :-
   at(N, potential(PTyp, relation(PRel, From, To))),
   initiated_by(PTyp, relation, PRel, from).
 
@@ -58,15 +72,24 @@ at(N, problematic_for(potential(PTyp, state(PState, Inst)), Inst)) :-
   at(N, potential(PTyp, state(PState, Inst))),
   problematic_for(PTyp, state, PState, inst).
 
-at(N, problematic_for(potential(PTyp, property(PProp, Inst, PVal)), Inst)) :-
+at(
+  N,
+  problematic_for(potential(PTyp, property(PProp, Inst, PVal)), Inst)
+) :-
   at(N, potential(PTyp, property(PProp, Inst, PVal))),
   problematic_for(PTyp, property, PProp, PVal, inst).
 
-at(N, problematic_for(potential(PTyp, relation(PRel, From, To)), From)) :-
+at(
+  N,
+  problematic_for(potential(PTyp, relation(PRel, From, To)), From)
+) :-
   at(N, potential(PTyp, relation(PRel, From, To))),
   problematic_for(PTyp, relation, PRel, from).
 
-at(N, problematic_for(potential(PTyp, relation(PRel, From, To)), To)) :-
+at(
+  N,
+  problematic_for(potential(PTyp, relation(PRel, From, To)), To)
+) :-
   at(N, potential(PTyp, relation(PRel, From, To))),
   problematic_for(PTyp, relation, PRel, to).
 
@@ -76,7 +99,10 @@ at(N, category(potential(PTyp, state(PState, Inst)), Category)) :-
   pcategory(potential(PTyp, state, PState), Category),
   story_op(N, build_options).
 
-at(N, category(potential(PTyp, property(PProp, Inst, PVal)), Category)) :-
+at(
+  N,
+  category(potential(PTyp, property(PProp, Inst, PVal)), Category)
+) :-
   at(N, potential(PTyp, property(PProp, Inst, PVal))),
   pcategory(potential(PTyp, property, PProp, PVal), Category),
   story_op(N, build_options).
@@ -86,8 +112,8 @@ at(N, category(potential(PTyp, relation(PRel, I1, I2)), Category)) :-
   pcategory(potential(PTyp, relation, PRel), Category),
   story_op(N, build_options).
 
-% From immediate problems to mere opportunities some potentials are more
-% important than others.
+% From immediate problems to mere opportunities some potentials are
+% more important than others.
 at(N, most_important(Pt)) :-
   at(N, importance(I, Pt)),
   0 = {
@@ -143,12 +169,20 @@ unresolved_potential(N, Opt, potential(PTyp, state(PState, Inst))) :-
   potential(PTyp, state, PState),
   story_op(N, build_options).
 
-unresolved_potential(N, Opt, potential(PTyp, property(PProp, Inst, PVal))) :-
+unresolved_potential(
+  N,
+  Opt,
+  potential(PTyp, property(PProp, Inst, PVal))
+) :-
   at(N, consequence(Opt, property(PProp, Inst, PVal))),
   potential(PTyp, property, PProp, PVal),
   story_op(N, build_options).
 
-unresolved_potential(N, Opt, potential(PTyp, relation(PRel, I1, I2))) :-
+unresolved_potential(
+  N,
+  Opt,
+  potential(PTyp, relation(PRel, I1, I2))
+) :-
   at(N, consequence(Opt, relation(PRel, I1, I2))),
   potential(PTyp, relation, PRel),
   story_op(N, build_options).

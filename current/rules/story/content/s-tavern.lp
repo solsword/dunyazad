@@ -20,19 +20,25 @@ error(m("Tavern population too low.", N)) :-
 
 error(m("Too much boredom", N)) :-
   setup(N, tavern),
-  3 <= { sp_st(N, state(bored, inst(actor, A))) : st(N, inst(actor, A)) },
+  3 <= {
+    sp_st(N, state(bored, inst(actor, A))) : st(N, inst(actor, A))
+  },
   story_op(N, initialize_node).
 
 error(m("Too much gossip", N)) :-
   setup(N, tavern),
-  3 <= { sp_st(N, state(knows_gossip, inst(actor, A))) : st(N, inst(actor, A))},
+  3 <= {
+    sp_st(N, state(knows_gossip, inst(actor, A)))
+      : st(N, inst(actor, A))
+  },
   story_op(N, initialize_node).
 
 error(m("Noble accusing multiple parties.", N)) :-
   setup(N, tavern),
   at(N, setup_arg(noble, Noble)),
   2 <= {
-    sp_st(N, relation(accusing, Noble, inst(actor, O))) : st(N, inst(actor, O))
+    sp_st(N, relation(accusing, Noble, inst(actor, O)))
+      : st(N, inst(actor, O))
   },
   story_op(N, initialize_node).
 

@@ -1,8 +1,8 @@
 % option constraints:
 % -------------------
 
-% relevance: any action which might cause a potential to dissappear (via any
-% mechanism) is relevant
+% relevance: any action which might cause a potential to dissappear
+% (via any mechanism) is relevant
 at(N, relevant_to(option(X), potential(PTyp, Something))) :-
   at(N, consequence_of(option(X), Outcome, _not, Something)),
   at(N, potential(PTyp, Something)),
@@ -20,7 +20,13 @@ error(m("Irrelevant option", N, option(X))) :-
   not at(N, action(option(X), reach_destination)),
   story_op(N, build_options).
 
-error(m("Option relevant but only to unimportant potential.", N, option(X))) :-
+error(
+  m(
+    "Option relevant but only to unimportant potential.",
+    N,
+    option(X)
+  )
+) :-
   at(N, option(X)),
   at(N, relevant_to(option(X), Potential)),
   0 = {
@@ -35,7 +41,8 @@ error(m("Option relevant but only to unimportant potential.", N, option(X))) :-
 error(m("Unaddressed important potential", N)) :-
   at(N, most_important(potential(PTyp, Something))),
   0 = {
-    at(N, option(X)) : at(N, relevant_to(option(X), potential(PTyp, Something)))
+    at(N, option(X))
+      : at(N, relevant_to(option(X), potential(PTyp, Something)))
   },
   2 <= { at(N, option(X)) },
   node_type(N, choice),
@@ -45,14 +52,20 @@ error(m("Unaddressed important potential", N)) :-
 
 % Resolving or nullifying your own problems:
 at(N, motivated(X)) :-
-  at(N, consequence_of(X, Outcome, resolves, potential(PType, PState))),
+  at(
+    N,
+    consequence_of(X, Outcome, resolves, potential(PType, PState))
+  ),
   at(N, potential(problem, PState)),
   at(N, initiator(X, Initiator)),
   at(N, problematic_for(potential(PType, PState), Initiator)),
   story_op(N, build_options).
 
 at(N, motivated(X)) :-
-  at(N, consequence_of(X, Outcome, nullifies, potential(PType, PState))),
+  at(
+    N,
+    consequence_of(X, Outcome, nullifies, potential(PType, PState))
+  ),
   at(N, potential(problem, PState)),
   at(N, initiator(X, Initiator)),
   at(N, problematic_for(potential(PType, PState), Initiator)),
@@ -79,7 +92,10 @@ at(N, motivated(X)) :-
   ),
   at(N, potential(opportunity, Opportunity)),
   at(N, initiator(X, Initiator)),
-  not at(N, initiated_by(potential(opportunity, Opportunity), Initiator)),
+  not at(
+    N,
+    initiated_by(potential(opportunity, Opportunity), Initiator)
+  ),
   story_op(N, build_options).
 
 % Manifesting opportunities that you initiated:
@@ -256,12 +272,14 @@ error(m("Not enough choices", A, B, C)) :-
   },
   story_op(C, build_options).
 
-% events shouldn't re-hash the choice you just made or a prevoius event
+% events shouldn't re-hash the choice you just made or a prevoius
+% event
 arg_mismatch(N, option(NO), O, option(OO)) :-
   at(N, arg(option(NO), Arg, Val)),
   at(O, option(OO)),
   0 = {
-    at(O, arg(option(OO), Arg, Val)) : at(O, arg(option(OO), Arg, Val))
+    at(O, arg(option(OO), Arg, Val))
+      : at(O, arg(option(OO), Arg, Val))
   },
   N < O,
   story_op(N, build_options).
@@ -279,7 +297,9 @@ error(m("Event duplicates previous action", N, Prev, Action)) :-
   story_op(N, build_options).
 
 % failing to deal with a potential twice is enough
-error(m("Persistent potential is getting boring", Three, option(Z))) :-
+error(
+  m("Persistent potential is getting boring", Three, option(Z))
+) :-
   story_node(One),
   successor(One, option(X), Two),
   successor(Two, option(Y), Three),
@@ -288,14 +308,14 @@ error(m("Persistent potential is getting boring", Three, option(Z))) :-
   at(Three, potential(PTyp, Something)),
   at(One, consequence_of(option(X), DidntHappen, _not, Something)),
   not at(One, outcome(option(X), DidntHappen)),
-  at(Two, consequence_of(option(Y), AlsoDidntHappen, _not, Something)),
+  at(Two, consequence_of(option(Y), AlsoDidntHappen, _not,Something)),
   not at(Two, outcome(option(Y), AlsoDidntHappen)),
   at(Three, consequence_of(option(Z), MustHappen, _not, Something)),
   not at(Three, outcome(option(Z), MustHappen)),
   story_op(Three, build_options).
 
-% failing to deal with a problem is no excuse for ignoring it (opportunities
-% don't care)
+% failing to deal with a problem is no excuse for ignoring it
+% (opportunities don't care)
 error(m("Ignored failure to solve problem", Two, option(Y))) :-
   story_node(One),
   successor(One, option(X), Two),
@@ -368,8 +388,8 @@ error(m("Boring vignette setup", N)) :-
   Boredom > 0,
   Boredom + 1 >= Unique.
 
-% every vignette ends with one of the special actions "travel onwards" or
-% "reach destination:"
+% every vignette ends with one of the special actions "travel onwards"
+% or "reach destination:"
 % TODO: This!?!?
 
 %1 = {

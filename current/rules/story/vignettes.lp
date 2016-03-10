@@ -11,10 +11,10 @@ vignette(N, PrV) :-
   vignette(Prev, PrV),
   story_op(N, initialize_node).
 
-% An option which resolves the all remaining potentials at a given node
-% resolves that node's vignette, since a new vignette will be needed to start
-% to reintroduce potential. Travel onwards is an exception, as it happens
-% between vignettes.
+% An option which resolves the all remaining potentials at a given
+% node resolves that node's vignette, since a new vignette will be
+% needed to start to reintroduce potential. Travel onwards is an
+% exception, as it happens between vignettes.
 resolves_vignette(N, option(O)) :-
   story_node(N),
   at(N, option(O)),

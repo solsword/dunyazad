@@ -27,8 +27,16 @@ outcome_val(attack, success, victory).
 outcome_val(attack, success, defeat).
 outcome_val(attack, success, tie).
 
-outcome_excludes(attack, o(success, victory), o(aggressor_state, killed)).
-outcome_excludes(attack, o(success, defeat), o(target_state, killed)).
+outcome_excludes(
+  attack,
+  o(success, victory),
+  o(aggressor_state, killed)
+).
+outcome_excludes(
+  attack,
+  o(success, defeat),
+  o(target_state, killed)
+).
 
 outcome_excludes(attack, o(success, tie), o(aggressor_state, killed)).
 
@@ -92,8 +100,8 @@ at(
   st(N, relation(threatening, Target, Someone)),
   story_op(N, build_options).
 
-% no matter the outcome, an attack that winds up injuring a threat resolves the
-% threat
+% no matter the outcome, an attack that winds up injuring a threat
+% resolves the threat
 
 at(
   N,
@@ -170,7 +178,11 @@ at(
 % fighting is dangerous:
 at(
   N,
-  consequence_of(X, o(aggressor_state, injured), state(injured, Aggressor))
+  consequence_of(
+    X,
+    o(aggressor_state, injured),
+    state(injured, Aggressor)
+  )
 ) :-
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, Aggressor)),
@@ -178,18 +190,36 @@ at(
 
 at(
   N,
-  consequence_of(X, o(aggressor_state, killed), state(killed, Aggressor))
+  consequence_of(
+    X,
+    o(aggressor_state, killed),
+    state(killed, Aggressor)
+  )
 ) :-
   at(N, action(X, attack)),
   at(N, arg(X, aggressor, Aggressor)),
   story_op(N, build_options).
 
-at(N, consequence_of(X, o(target_state, injured), state(injured, Target))) :-
+at(
+  N,
+  consequence_of(
+    X,
+    o(target_state, injured),
+    state(injured, Target)
+  )
+) :-
   at(N, action(X, attack)),
   at(N, arg(X, target, Target)),
   story_op(N, build_options).
 
-at(N, consequence_of(X, o(target_state, killed), state(killed, Target))) :-
+at(
+  N,
+  consequence_of(
+    X,
+    o(target_state, killed),
+    state(killed, Target)
+  )
+) :-
   at(N, action(X, attack)),
   at(N, arg(X, target, Target)),
   story_op(N, build_options).
@@ -199,7 +229,11 @@ at(N, consequence_of(X, o(target_state, killed), state(killed, Target))) :-
 1 = {
   at(
     N,
-    consequence_of(X, o(get_loot, loot), relation(has_item, Aggressor, Item))
+    consequence_of(
+      X,
+      o(get_loot, loot),
+      relation(has_item, Aggressor, Item)
+    )
   ) : st(N, relation(has_item, Aggressor, Item))
 } :-
   at(N, action(X, attack)),

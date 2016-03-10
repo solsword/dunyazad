@@ -62,7 +62,8 @@ error(m("Action without initiator.", N, X)) :-
   },
   story_op(N, build_options).
 
-% Actual consequences depend on which outcome variables have which values:
+% Actual consequences depend on which outcome variables have which
+% values:
 at(N, consequence(X, Consequence)) :-
   at(N, consequence_of(X, Outcome, Consequence)),
   at(N, outcome(X, Outcome)),
@@ -73,8 +74,8 @@ at(N, consequence(X, Modifier, Consequence)) :-
   at(N, outcome(X, Outcome)),
   story_op(N, build_options).
 
-% Being injured, polymorphed, dead, or off-stage limits what actions you can
-% take and which actions can be taken on you:
+% Being injured, polymorphed, dead, or off-stage limits what actions
+% you can take and which actions can be taken on you:
 
 error(m("Injured actor initiated an action.", N, X)) :-
   at(N, action(X, Action)),
@@ -103,8 +104,8 @@ at(N, surprising(X)) :-
   at(N, unlikely_outcome(X, Outcome)),
   story_op(N, build_options).
 
-% Outcomes are also surprising if there's a likely outcome but something else
-% happens:
+% Outcomes are also surprising if there's a likely outcome but
+% something else happens:
 at(N, surprising(X)) :-
   at(N, likely_outcome(X, o(OutVar, Likely))),
   at(N, outcome(X, o(OutVar, NotLikely))),
@@ -112,8 +113,8 @@ at(N, surprising(X)) :-
   story_op(N, build_options).
 
 % Only chaotic actions may have surprising outcomes:
-% Note: now any outcome may be surprising because outcome feel constraints can
-% be used to constrain surprise if desired.
+% Note: now any outcome may be surprising because outcome feel
+% constraints can be used to constrain surprise if desired.
 
 %error(m("Non-chaotic action had surprising outcome.", N, X)) :-
 %  at(N, action(X, Action)),

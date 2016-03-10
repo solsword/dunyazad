@@ -29,10 +29,11 @@ surface_property(person, inst(actor, you), second).
 surface_property(gender, inst(actor, you), feminine).
 surface_property(number, inst(actor, you), singular).
 surface_property(determined, inst(actor, you), false).
-% You start with literacy and three other random skills (from the list of
-% "starting" skills):
+% You start with literacy and three other random skills (from the list
+% of "starting" skills):
 3 = {
-  st(R, property(has_skill, inst(actor, you), Skill)) : starting_skill(Skill);
+  st(R, property(has_skill, inst(actor, you), Skill))
+    : starting_skill(Skill);
   error(m("Missing starting skill."))
 } :- _sr(R).
 st(R, property(has_skill, inst(actor, you), literacy)) :- _sr(R).
@@ -143,7 +144,8 @@ error(m("Party member initial skill overlap.", Skill)) :-
 
 % Supply unpacking:
 
-get_unique_key(s(supplies(Owner, Item))) :- supplies(Owner, Item), _sr(R).
+get_unique_key(s(supplies(Owner, Item))) :-
+  supplies(Owner, Item), _sr(R).
 supply_inst(R, Owner, inst(item, @inst(Item, K)), Item) :-
   unique_key(s(supplies(Owner, Item)), K),
   supplies(Owner, Item),

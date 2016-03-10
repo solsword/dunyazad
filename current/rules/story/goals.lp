@@ -31,19 +31,25 @@ at(N, player_goal(have_tool_for(Member, Skill))) :-
   st(N, property(has_skill, Member, Skill)),
   story_op(N, initialize_node).
 
-% the player doesn't want others to be threatened or accused as long as they're
-% not aggressive:
+% the player doesn't want others to be threatened or accused as long
+% as they're not aggressive:
 
 at(N, guilty(inst(actor, Guilty))) :-
   st(N, relation(threatening, inst(actor, Guilty), Anyone)).
 
 at(N, guilty(inst(actor, Guilty))) :-
-  st(N, relation(accusing, inst(actor, Guilty), inst(actor, Innocent))),
+  st(
+    N,
+    relation(accusing, inst(actor, Guilty), inst(actor, Innocent))
+  ),
   not at(N, guilty(inst(actor, Innocent))).
 
 at(N, guilty(inst(actor, Guilty))) :-
   st(N, relation(has_item, inst(actor, Guilty), inst(item, Stolen))),
-  st(N, relation(stolen_from, inst(actor, Victim), inst(item, Stolen))).
+  st(
+    N,
+    relation(stolen_from, inst(actor, Victim), inst(item, Stolen))
+  ).
 
 at(N, player_goal(avoid_threats_to(inst(actor, Innocent)))) :-
   st(N, inst(actor, Innocent)),
@@ -53,7 +59,13 @@ at(N, player_goal(avoid_threats_to(inst(actor, Innocent)))) :-
 
 %at(N, player_goal(avoid_threats_to(inst(actor, Innocent)))) :-
 %  st(N, inst(actor, Innocent)),
-%  at(N, consequence(O, relation(threatening, Someone, inst(actor, Innocent)))),
+%  at(
+%    N,
+%    consequence(
+%      O,
+%      relation(threatening, Someone, inst(actor, Innocent))
+%    )
+%  ),
 %  not at(N, guilty(inst(actor, Innocent))),
 %  story_op(N, initialize_node).
 
@@ -66,7 +78,13 @@ at(N, player_goal(avoid_accusations(inst(actor, Innocent)))) :-
 % TODO: Some way of making this not crash & overload things?
 %at(N, player_goal(avoid_accusations(inst(actor, Innocent)))) :-
 %  st(N, inst(actor, Innocent)),
-%  at(N, consequence(O, relation(accusing, Someone, inst(actor, Innocent)))),
+%  at(
+%    N,
+%    consequence(
+%      O,
+%      relation(accusing, Someone, inst(actor, Innocent))
+%    )
+%  ),
 %  not at(N, guilty(inst(actor, Innocent))),
 %  story_op(N, initialize_node).
 

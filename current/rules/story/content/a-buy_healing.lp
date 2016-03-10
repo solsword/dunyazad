@@ -110,7 +110,14 @@ at(N, consequence_of(X, o(success, killed), state(dead, Patient))) :-
   story_op(N, build_options).
 
 % And the doctor takes the price:
-at(N, consequence_of(X, o(deal, deal), relation(has_item, Doctor, Price))) :-
+at(
+  N,
+  consequence_of(
+    X,
+    o(deal, deal),
+    relation(has_item, Doctor, Price)
+  )
+) :-
   at(N, action(X, buy_healing)),
   at(N, arg(X, doctor, Doctor)),
   at(N, arg(X, price, Price)),
@@ -123,7 +130,10 @@ at(
     X,
     o(deal, deal),
     resolves,
-    potential(opportunity, property(offering_service, Doctor, treat_injury))
+    potential(
+      opportunity,
+      property(offering_service, Doctor, treat_injury)
+    )
   )
 ) :-
   at(N, action(X, trade)),

@@ -1,7 +1,8 @@
 % Nodes statuses
 % --------------
 
-% All nodes can be uninitialized, initialized, built, branched, or polished.
+% All nodes can be uninitialized, initialized, built, branched, or
+% polished.
 
 error(m("Node without status.", N)) :-
   story_node(N),
@@ -89,8 +90,8 @@ error(m("Node status skipped 'branched'.", N)) :-
 % Some sanity checks
 % ------------------
 
-% Choice nodes which have neither inherited potential nor a setup cannot reach
-% "initialized":
+% Choice nodes which have neither inherited potential nor a setup
+% cannot reach "initialized":
 
 inherited_potential(N) :-
   story_node(N),
@@ -117,10 +118,12 @@ error(m("Built node has no options!", N)) :-
   node_status_reached(N, built),
   optcount(N, 0).
 
-% Every option of a "branched" node must have a successor, unless it's an
-% "ending" node:
+% Every option of a "branched" node must have a successor, unless it's
+% an "ending" node:
 
-error(m("Branched node's option is missing a successor.", N, option(O))) :-
+error(
+  m("Branched node's option is missing a successor.", N, option(O))
+) :-
   node_status_reached(N, branched),
   at(N, option(O)),
   0 = {
@@ -168,8 +171,8 @@ before(Prev, New) :-
   successor(Prev, Opt, Int),
   before(Int, New).
 
-% Succession involves either an existing node that matches the outcome state of
-% the branching node, or a new node.
+% Succession involves either an existing node that matches the outcome
+% state of the branching node, or a new node.
 matching_successor(Br, option(Opt), Succ) :-
   story_node(Succ),
   state_match(Br, option(Opt), Succ),
@@ -213,7 +216,8 @@ path_length(Next, Shortest+1) :-
 shortest_path(N, Shortest) :-
   path_length(N, Shortest),
   0 = {
-    path_length(N, Shorter) : path_length(N, Shorter), Shorter < Shortest
+    path_length(N, Shorter)
+      : path_length(N, Shorter), Shorter < Shortest
   }.
 
 

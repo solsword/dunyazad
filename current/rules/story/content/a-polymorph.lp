@@ -37,7 +37,8 @@ error(m("Unintelligent caster.", N, X)) :-
 
 % effects:
 
-% Note: this one effect has many rammifications; see content/p-polymorphed.lp
+% Note: this one effect has many rammifications; see
+% content/p-polymorphed.lp
 at(
   N,
   consequence_of(
