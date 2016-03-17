@@ -1,0 +1,35 @@
+% vim: syn=gringo
+
+max_unique(0).
+story_root(root).
+story_node(root).
+node_status_reached(root, uninitialized).
+path_length(root, 0).
+node_type(root, choice).
+
+story_op(root, initialize_node).
+story_op(root, build_options).
+story_op(root, add_branch_nodes).
+story_op(root, add_surface).
+
+%#minimize { 1@1, bad(Message) : bad(Message) }.
+
+:- bad(M).
+
+bad(1) :- not setup(root, threatened_innocents).
+bad(2) :- not at(root, action(option(1), talk_down)).
+bad(3) :- not at(root, outcome(option(1), o(attitude, convinced))).
+
+%bad(4) :- not at(root, action(option(2), pay_off)).
+
+bad(5) :- not successor(root, option(1), root_1).
+
+%story_op(root_1, initialize_node).
+%story_op(root_1, build_options).
+%story_op(root_1, add_branch_nodes).
+
+%:- not successor(root, option(2), root_2).
+%story_op(root_2, initialize_node).
+%story_op(root_2, build_options).
+%story_op(root_2, add_branch_nodes).
+

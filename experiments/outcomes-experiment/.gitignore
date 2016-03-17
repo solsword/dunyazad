@@ -3,3 +3,5 @@
 *.tex
 reports/
 results.log
+.RData
+.Rhistory
