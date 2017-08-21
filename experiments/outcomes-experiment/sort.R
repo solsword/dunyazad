@@ -103,7 +103,7 @@ suspect_agefluency = c(
   "I'am at least the age of eighteen years."
 )
 
-base <- read.csv(file="partial-results.csv",head=TRUE,sep=",")
+base <- read.csv(file="raw-results.csv",head=TRUE,sep=",")
 
 
 #print(base)
@@ -123,6 +123,11 @@ cat("Already rejected:", nrow(rejected), "\n")
 
 data <- anti_join(base, approved)
 data <- anti_join(data, rejected)
+
+if (nrow(data) == 0) {
+  cat("All responses already approved or rejected...\n")
+  quit()
+}
 
 # Too quick:
 pass <- data[(data[["WorkTimeInSeconds"]] > 90) | (data[["WorkTimeInSeconds"]] == -1),]
