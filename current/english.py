@@ -1602,7 +1602,7 @@ def build_text(
   elif fmt == "example":
     result = re.sub(PAR, '\n\n', result)
     result = re.sub('\n\n', '<br/>', result)
-  elif fmt == "twee":
+  elif fmt in ("twee", "twee2"):
     result = re.sub(PAR, '<br/><br/>', result)
   result = re.sub(BREAK, '', result)
   result = re.sub(CAP, lambda m: m.group(1).upper(), result)
@@ -1728,7 +1728,7 @@ def build_node_text(
         outgoing[scc] = (pnout, intout)
         if fmt == "choicescript":
           options += "\n*goto {}\n".format(scc)
-        elif fmt == "twee":
+        elif fmt in ("twee", "twee2"):
           options += "\n[[Onwards...|{}][$outcome='']]\n".format(scc)
         elif fmt == "example":
           options += "\nOnwards...\n"
@@ -1841,7 +1841,7 @@ def build_node_text(
           options += "    *goto {}\n".format(scc)
         else:
           options += "    *finish\n"
-      elif fmt == "twee":
+      elif fmt in ("twee", "twee2"):
         options += '[[{opt}|{scc}][$outcome="{out} {csq}"]]\n'.format(
           opt=sentence(opt_txt),
           out=sentence(out_txt),
@@ -1874,7 +1874,7 @@ def build_node_text(
   situation=situation,
   options=options
 )
-  elif fmt == "twee":
+  elif fmt in ("twee", "twee2"):
     result = """
 :: {label}
 <<if $outcome neq "">><<print $outcome>> <<endif>>\
@@ -2120,7 +2120,7 @@ def build_story_text(
                 actor,
                 actor
               ) + ", and ".join(
-                "N#{}/them".format(tool) for tool in rtls[actor][0],
+                "N#{}/them".format(tool) for tool in rtls[actor][0]
               )
               if rtls[actor][1]:
                 relevant += " but "
@@ -2129,7 +2129,7 @@ def build_story_text(
                 actor,
                 actor
               ) + ", nor any ".join(
-                "tool for {}".format(skill) for skill in rtls[actor][1],
+                "tool for {}".format(skill) for skill in rtls[actor][1]
               )
             if relevant:
               rlist.append(relevant)
@@ -2180,7 +2180,7 @@ def build_story_text(
       timeshift,
       fmt
     )
-    if fmt == "twee":
+    if fmt in ("twee", "twee2"):
       # TODO: Make title/author/css/etc. parameters!
       intro_text = """\
 :: Intro
@@ -2230,7 +2230,7 @@ def build_story_text(
       timeshift,
       fmt
     )
-    if fmt == "twee":
+    if fmt in ("twee", "twee2"):
       intro_text = """\
 :: Intro
 {framing}

@@ -13,6 +13,9 @@ Dunyazad
 And so you come to the end of your journey.
 /% TODO: Improve this! %/
 
+:: StoryIncludes
+out/story.tw2
+
 :: Style [stylesheet]
 @import url(http://fonts.googleapis.com/css?family=Bree+Serif);
 
@@ -20,6 +23,13 @@ body {
   max-width: 110em;
   font-family: "Bree Serif", "Tex Gyre Pagella", "Palatino", serif;
   color: #301800;
+  background-color: #fffce0;
+}
+
+#title {
+  margin: 4pt;
+  padding: 6pt;
+  border-radius: 6pt;
   background-color: #fffce0;
 }
 

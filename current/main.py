@@ -22,6 +22,7 @@ CRASHFILE = os.path.join("out", "crash.lp")
 
 CLINGO_EXE = ["clingo"]
 TWEE_EXE = ["twee"]
+TWEE2_EXE = ["twee2"]
 VIZ_EXE = ["dot"]
 
 def write_crashfile(e):
@@ -37,7 +38,7 @@ def main(
   scaffoldfiles = None,
   scaffoldfrags = None,
   nodelimit = 12,
-  fmt="twee",
+  fmt="twee2",
   do_viz = True,
   seed=0,
   rand=0.0
@@ -223,6 +224,8 @@ def main(
   )
   if fmt == "twee":
     outfile = "story.tw"
+  elif fmt == "twee2":
+    outfile = "story.tw2"
   elif fmt == "example":
     outfile = "story.html"
   elif fmt == "turk":
@@ -240,6 +243,16 @@ def main(
     )
     with open(os.path.join("out", "tlottolad.html"), 'w') as fout:
       fout.write(html.decode())
+  if fmt == "twee2":
+    print("Compiling Twine2 version...")
+    messages = subprocess.check_output(
+      TWEE2_EXE + [
+        "build",
+        os.path.join("twine", "template.tw"),
+        os.path.join("out", "tlottolad.html"),
+        "--format=SugarCube2"
+      ]
+    )
   return not error
 
 if __name__ == "__main__":
@@ -250,7 +263,7 @@ if __name__ == "__main__":
   mode = "full"
   intro_mode = "full"
   nodelimit = 12
-  fmt = "twee"
+  fmt = "twee2"
   do_viz = True
   seed = random.randint(1, 100000)
   rand = 0.15
@@ -298,6 +311,9 @@ if __name__ == "__main__":
   if "--twee" in sys.argv:
     fmt = "twee"
 
+  if "--twee2" in sys.argv:
+    fmt = "twee2"
+
   if "--choicescript" in sys.argv:
     fmt = "choicescript"
 
@@ -311,6 +327,10 @@ if __name__ == "__main__":
   if '--twee-exe' in sys.argv:
     idx = sys.argv.index('--twee-exe')
     TWEE_EXE = '&'.split(sys.argv[idx+1])
+
+  if '--twee2-exe' in sys.argv:
+    idx = sys.argv.index('--twee2-exe')
+    TWEE2_EXE = '&'.split(sys.argv[idx+1])
 
   if '--graphviz-exe' in sys.argv:
     idx = sys.argv.index('--graphviz-exe')

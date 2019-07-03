@@ -9,11 +9,13 @@ node_type(root, choice).
 % that should be much less stable than orderings based on ASP constraints.
 #script (python)
 import random
-import gringo
+import clingo
 
 # TODO: seed this!
 
 def random_priority(cat, ignored, setup_count, shuffled={}, indexes={}):
+  cat = cat.name
+  setup_count = setup_count.number
   if cat not in shuffled:
     shuffled[cat] = [x + 1 for x in range(setup_count)]
     indexes[cat] = [-1]

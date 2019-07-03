@@ -14,7 +14,8 @@ import types
 
 MAX_ERROR_CONTEXT = 80
 
-RegExpType = re._pattern_type
+dummyRE = re.compile(' ')
+RegExpType = type(dummyRE)
 
 # A dictionary for storing intermediate parsing results:
 # TODO: make this more local and/or provide a way of cleaning it up?
